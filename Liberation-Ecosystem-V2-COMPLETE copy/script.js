@@ -1,0 +1,204 @@
+// COMPLETE LIBERATION TOOL FUNCTIONALITY
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🕊️ V2.0 COMPLETE EDITION ACTIVATED - DEDICATED TO YHWH SABAOTH');
+});
+
+const completeSacredLessons = {
+    1: {
+        title: "🇨🇴 Cultural Revelation",
+        content: `<h3>Discover YHWH's Diversity in Colombian Culture</h3>
+        <p>Colombia's 85+ indigenous communities each reflect unique aspects of the Creator's imagination.</p>
+        <div style="background: rgba(252, 209, 22, 0.1); padding: 1.5rem; border-radius: 12px; margin: 1rem 0;">
+            <h4>Sacred Insights:</h4>
+            <ul>
+                <li><strong>Wayuu Weaving:</strong> Mathematical patterns revealing divine geometry</li>
+                <li><strong>Kogi Wisdom:</strong> Mountain teachings on environmental stewardship</li>
+                <li><strong>Amazonian Knowledge:</strong> Plant medicines as pharmacological revelation</li>
+            </ul>
+        </div>`
+    },
+    2: {
+        title: "🛡️ Divine Protection", 
+        content: `<h3>Travel Under Heavenly Covering</h3>
+        <p>Your safety is our sacred responsibility. We combine practical wisdom with spiritual protection.</p>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0;">
+            <div style="background: rgba(220, 38, 38, 0.1); padding: 1rem; border-radius: 8px;">
+                <h5>🆘 Emergency Protocols</h5>
+                <p>Police: 123<br>Medical: 125<br>Fire: 119<br>Tourist Police: +57 1 3374413</p>
+            </div>
+            <div style="background: rgba(5, 150, 105, 0.1); padding: 1rem; border-radius: 8px;">
+                <h5>🕊️ Spiritual Protection</h5>
+                <p>Prayer covering<br>Angel assistance<br>Divine guidance<br>Community support</p>
+            </div>
+        </div>`
+    },
+    3: {
+        title: "🌄 Sacred Geography",
+        content: `<h3>Explore Creation's Masterpiece</h3>
+        <p>Colombia's landscapes are living psalms declaring YHWH's glory.</p>
+        <div style="background: rgba(0, 56, 147, 0.1); padding: 1.5rem; border-radius: 12px; margin: 1rem 0;">
+            <h4>Divine Landscapes:</h4>
+            <ul>
+                <li><strong>Tayrona National Park:</strong> Where mountains embrace ocean</li>
+                <li><strong>Cocora Valley:</strong> Giant wax palms reaching heavenward</li>
+                <li><strong>Amazon Basin:</strong> Earth's lungs breathing life</li>
+                <li><strong>Caño Cristales:</strong> Liquid rainbow of creation</li>
+            </ul>
+        </div>`
+    },
+    4: {
+        title: "🍍 Kingdom Cuisine",
+        content: `<h3>Taste YHWH's Provision</h3>
+        <p>Every Colombian flavor tells a story of divine abundance.</p>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1rem 0;">
+            <div style="background: rgba(212, 119, 6, 0.1); padding: 1rem; border-radius: 8px;">
+                <h5>🌱 Sacred Foods</h5>
+                <p>• Bandeja Paisa: Abundance<br>• Ajiaco: Comfort<br>• Arepas: Provision<br>• Fruits: Eden's flavors</p>
+            </div>
+            <div style="background: rgba(5, 150, 105, 0.1); padding: 1rem; border-radius: 8px;">
+                <h5>💫 Spiritual Nutrition</h5>
+                <p>• Community meals<br>• Street food wisdom<br>• Indigenous recipes<br>• Farm to table</p>
+            </div>
+        </div>`
+    },
+    5: {
+        title: "🚗 Exodus Navigation", 
+        content: `<h3>Move With Divine Purpose</h3>
+        <p>Navigate Colombia's terrain with wisdom and spiritual guidance.</p>
+        <div style="background: rgba(14, 165, 233, 0.1); padding: 1.5rem; border-radius: 12px; margin: 1rem 0;">
+            <h4>Sacred Transportation:</h4>
+            <ul>
+                <li><strong>Urban Transit:</strong> Angel-assisted navigation</li>
+                <li><strong>Mountain Roads:</strong> Faith-based travel</li>
+                <li><strong>Community Transport:</strong> Relationship networks</li>
+                <li><strong>Sacred Sites:</strong> Spirit-led itineraries</li>
+            </ul>
+        </div>`
+    }
+};
+
+function openLesson(number) {
+    const modal = document.getElementById('lessonModal');
+    const modalBody = document.getElementById('modalBody');
+    const lesson = completeSacredLessons[number];
+    if (lesson) {
+        modalBody.innerHTML = `<h2>${lesson.title}</h2>${lesson.content}`;
+        modal.style.display = 'block';
+    }
+}
+
+function generateLiberationLetter() {
+    const letter = `LIBERATION INVITATION
+
+Dear Friend,
+
+I've discovered true freedom in Colombia through TripsToColombia.com. This isn't tourism - it's transformation.
+
+Join me in experiencing:
+• Cultural wisdom and sacred sites
+• Community connections and impact
+• Personal growth and awakening
+• Eternal returns on freedom investment
+
+Generated by TripsToColombia.com Liberation Tool V2.0`;
+
+    downloadDocument(letter, 'Liberation-Invitation.txt');
+}
+
+function generateExodusJourney() {
+    const plan = `EXODUS JOURNEY PLAN - 14 Days
+
+PHASE 1: Coastal Liberation (Days 1-5)
+• Cartagena cultural immersion
+• Rosario Islands ocean wisdom
+• Indigenous community exchange
+
+PHASE 2: Mountain Transformation (Days 6-10)  
+• Medellín innovation insights
+• Coffee region agriculture
+• Sacred site visits
+
+PHASE 3: Integration (Days 11-14)
+• Personal reflection
+• Community impact project
+• Freedom commitment
+
+Visit TripsToColombia.com to book!`;
+
+    downloadDocument(plan, 'Exodus-Journey-Plan.txt');
+}
+
+function calculateFreedomROI() {
+    const roi = `FREEDOM INVESTMENT RETURNS
+
+Investment: $2,000
+Returns:
+• 14 days of liberation
+• $490 community impact  
+• 28 trees planted
+• 42 lives transformed
+• Eternal ROI: PRICELESS
+
+Visit TripsToColombia.com!`;
+
+    downloadDocument(roi, 'Freedom-Investment-ROI.txt');
+}
+
+function downloadDocument(content, filename) {
+    const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+    alert('✅ Document downloaded! Visit TripsToColombia.com!');
+}
+
+function openTool(toolType) {
+    const modal = document.getElementById('lessonModal');
+    const modalBody = document.getElementById('modalBody');
+    const tools = {
+        letter: {
+            title: "✉️ Letter Builder",
+            content: `<h3>Invite Others to Freedom</h3>
+            <button onclick="generateLiberationLetter()" class="sacred-button" style="width: 100%; margin: 1rem 0;">
+                Generate Liberation Letter
+            </button>`
+        },
+        planner: {
+            title: "📅 Journey Planner", 
+            content: `<h3>Design Your Exodus</h3>
+            <button onclick="generateExodusJourney()" class="sacred-button" style="width: 100%; margin: 1rem 0;">
+                Create Journey Plan
+            </button>`
+        },
+        budget: {
+            title: "💰 ROI Calculator",
+            content: `<h3>Calculate Freedom Returns</h3>
+            <button onclick="calculateFreedomROI()" class="sacred-button" style="width: 100%; margin: 1rem 0;">
+                Calculate ROI
+            </button>`
+        }
+    };
+    const tool = tools[toolType];
+    if (tool) {
+        modalBody.innerHTML = `<h2>${tool.title}</h2>${tool.content}`;
+        modal.style.display = 'block';
+    }
+}
+
+function closeModal() {
+    document.getElementById('lessonModal').style.display = 'none';
+}
+
+function scrollToLessons() {
+    document.querySelector('.sacred-grid').scrollIntoView({ behavior: 'smooth' });
+}
+
+window.onclick = function(event) {
+    const modal = document.getElementById('lessonModal');
+    if (event.target === modal) closeModal();
+}

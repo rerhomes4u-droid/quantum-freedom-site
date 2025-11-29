@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comunicaciones Club de Leones</title>
+    <style>
+        :root {
+            --lion-gold: #FFD700;
+            --lion-blue: #0055A4;
+            --lion-white: #FFFFFF;
+            --lion-dark: #333333;
+            --success-green: #28a745;
+            --warning-orange: #ffc107;
+            --danger-red: #dc3545;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--lion-dark);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: var(--lion-white);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border: 3px solid var(--lion-gold);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--lion-blue), var(--lion-gold));
+            color: var(--lion-white);
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .logo {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            min-height: 70vh;
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .sidebar {
+            background: var(--lion-blue);
+            color: var(--lion-white);
+            padding: 20px;
+        }
+        
+        .nav-section {
+            margin-bottom: 30px;
+        }
+        
+        .nav-title {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--lion-gold);
+            padding-bottom: 5px;
+        }
+        
+        .nav-btn {
+            display: block;
+            width: 100%;
+            padding: 12px 15px;
+            background: transparent;
+            color: var(--lion-white);
+            border: 1px solid var(--lion-gold);
+            border-radius: 8px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.3s;
+            font-size: 0.95rem;
+        }
+        
+        .nav-btn:hover {
+            background: var(--lion-gold);
+            color: var(--lion-blue);
+        }
+        
+        .content-area {
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .tab-content {
+            display: none;
+            flex: 1;
+        }
+        
+        .tab-content.active {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chat-container {
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            padding: 20px;
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            background: #f9f9f9;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .message {
+            margin: 10px 0;
+            padding: 12px 15px;
+            border-radius: 15px;
+            max-width: 80%;
+            position: relative;
+        }
+        
+        .incoming {
+            background: #e8f4f8;
+            margin-right: auto;
+            border: 1px solid #b8d8e8;
+        }
+        
+        .outgoing {
+            background: var(--lion-blue);
+            color: var(--lion-white);
+            margin-left: auto;
+            text-align: right;
+        }
+        
+        .message-sender {
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .message-time {
+            font-size: 0.7rem;
+            opacity: 0.7;
+            margin-top: 5px;
+        }
+        
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .action-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        
+        .action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            border-color: var(--lion-gold);
+        }
+        
+        .action-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: var(--lion-blue);
+        }
+        
+        .input-area {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        input, textarea, select, button {
+            padding: 12px 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: inherit;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            border-color: var(--lion-blue);
+            outline: none;
+        }
+        
+        button {
+            background: var(--lion-blue);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+        
+        button:hover {
+            background: #003d82;
+            transform: translateY(-2px);
+        }
+        
+        .secondary-btn {
+            background: var(--lion-gold);
+            color: var(--lion-dark);
+        }
+        
+        .secondary-btn:hover {
+            background: #e6c200;
+        }
+        
+        .message-input {
+            flex: 1;
+        }
+        
+        .members-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .member-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        
+        .member-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--lion-blue);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        
+        .event-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        
+        .event-date {
+            color: var(--lion-blue);
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .event-title {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+        
+        .event-details {
+            color: #666;
+            margin-bottom: 15px;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        
+        .status-online {
+            background: var(--success-green);
+        }
+        
+        .status-offline {
+            background: #ccc;
+        }
+        
+        .templates-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .template-card {
+            background: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        
+        .template-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            border-color: var(--lion-gold);
+        }
+        
+        .template-title {
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--lion-blue);
+        }
+        
+        .urgent {
+            border-left: 4px solid var(--danger-red);
+        }
+        
+        .important {
+            border-left: 4px solid var(--warning-orange);
+        }
+        
+        .normal {
+            border-left: 4px solid var(--success-green);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <span>🦁</span>
+                Club de Leones Calarcá
+                <span>🦁</span>
+            </div>
+            <div class="subtitle">Sistema de Comunicaciones por WhatsApp</div>
+        </div>
+        
+        <div class="main-content">
+            <div class="sidebar">
+                <div class="nav-section">
+                    <div class="nav-title">NAVEGACIÓN</div>
+                    <button class="nav-btn" onclick="showTab('chat')">💬 Chat Grupal</button>
+                    <button class="nav-btn" onclick="showTab('quick')">🚀 Acciones Rápidas</button>
+                    <button class="nav-btn" onclick="showTab('members')">👥 Miembros</button>
+                    <button class="nav-btn" onclick="showTab('events')">📅 Eventos</button>
+                    <button class="nav-btn" onclick="showTab('templates')">📝 Plantillas</button>
+                    <button class="nav-btn" onclick="showTab('rifa')">🎟️ Rifa del Carro</button>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-title">ESTADO DEL CLUB</div>
+                    <div style="padding: 10px; background: rgba(255,255,255,0.1); border-radius: 8px; margin-bottom: 15px;">
+                        <div>Miembros activos: <strong>24</strong></div>
+                        <div>Boletas vendidas: <strong>142</strong></div>
+                        <div>Próximo evento: <strong>Reunión Jueves</strong></div>
+                    </div>
+                </div>
+                
+                <div class="nav-section">
+                    <div class="nav-title">ACCESO RÁPIDO</div>
+                    <button class="nav-btn" onclick="sendToWhatsApp('recordatorio_reunion')">📢 Recordar Reunión</button>
+                    <button class="nav-btn" onclick="sendToWhatsApp('recordatorio_rifa')">🎟️ Recordar Rifa</button>
+                    <button class="nav-btn" onclick="sendToWhatsApp('recordatorio_diabetes')">🩺 Recordar Programa Diabetes</button>
+                </div>
+            </div>
+            
+            <div class="content-area">
+                <!-- CHAT TAB -->
+                <div id="chat" class="tab-content active">
+                    <h2>💬 Chat Grupal - Historial</h2>
+                    <div class="chat-container" id="chatHistory">
+                        <!-- Chat messages will be loaded here -->
+                    </div>
+                    
+                    <div class="input-area">
+                        <input type="text" class="message-input" id="newMessage" placeholder="Escribe tu mensaje...">
+                        <button onclick="sendMessage()">Enviar</button>
+                        <button class="secondary-btn" onclick="useTemplate()">Usar Plantilla</button>
+                    </div>
+                </div>
+                
+                <!-- QUICK ACTIONS TAB -->
+                <div id="quick" class="tab-content">
+                    <h2>🚀 Acciones Rápidas</h2>
+                    <p>Comunica rápidamente con un solo clic</p>
+                    
+                    <div class="quick-actions">
+                        <div class="action-card" onclick="sendToWhatsApp('reunion_recordatorio')">
+                            <div class="action-icon">📅</div>
+                            <h3>Recordar Reunión</h3>
+                            <p>Envía recordatorio de reunión a todos</p>
+                        </div>
+                        
+                        <div class="action-card" onclick="sendToWhatsApp('rifa_recordatorio')">
+                            <div class="action-icon">🎟️</div>
+                            <h3>Recordar Rifa</h3>
+                            <p>Recordar entrega de boletas</p>
+                        </div>
+                        
+                        <div class="action-card" onclick="sendToWhatsApp('evento_recordatorio')">
+                            <div class="action-icon">🩺</div>
+                            <h3>Programa Diabetes</h3>
+                            <p>Recordar programa comunitario</p>
+                        </div>
+                        
+                        <div class="action-card" onclick="sendToWhatsApp('fotos_recordatorio')">
+                            <div class="action-icon">📸</div>
+                            <h3>Recordar Fotos</h3>
+                            <p>Chaleco y estandarte en fotos</p>
+                        </div>
+                        
+                        <div class="action-card" onclick="sendToWhatsApp('renuncia_info')">
+                            <div class="action-icon">📄</div>
+                            <h3>Información Renuncias</h3>
+                            <p>Compartir estado de renuncias</p>
+                        </div>
+                        
+                        <div class="action-card" onclick="sendToWhatsApp('plan_trascender')">
+                            <div class="action-icon">🏘️</div>
+                            <h3>Plan Trascender</h3>
+                            <p>Compartir plan para comunidad</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- MEMBERS TAB -->
+                <div id="members" class="tab-content">
+                    <h2>👥 Miembros del Club</h2>
+                    
+                    <div class="input-area">
+                        <input type="text" placeholder="Buscar miembro..." style="flex: 1;">
+                        <button>Buscar</button>
+                    </div>
+                    
+                    <div class="members-grid">
+                        <div class="member-card">
+                            <div class="member-avatar">FI</div>
+                            <h3>Fabio Iván</h3>
+                            <p>Tesorero</p>
+                            <div><span class="status-indicator status-online"></span> Activo</div>
+                            <button class="secondary-btn" style="margin-top: 10px; width: 100%;" onclick="messageMember('Fabio Iván')">Enviar Mensaje</button>
+                        </div>
+                        
+                        <div class="member-card">
+                            <div class="member-avatar">LPH</div>
+                            <h3>Liliana Patricia</h3>
+                            <p>Coordinadora Rifa</p>
+                            <div><span class="status-indicator status-online"></span> Activo</div>
+                            <button class="secondary-btn" style="margin-top: 10px; width: 100%;" onclick="messageMember('Liliana Patricia')">Enviar Mensaje</button>
+                        </div>
+                        
+                        <div class="member-card">
+                            <div class="member-avatar">MI</div>
+                            <h3>María Isabel</h3>
+                            <p>Líder de Proyectos</p>
+                            <div><span class="status-indicator status-online"></span> Activo</div>
+                            <button class="secondary-btn" style="margin-top: 10px; width: 100%;" onclick="messageMember('María Isabel')">Enviar Mensaje</button>
+                        </div>
+                        
+                        <div class="member-card">
+                            <div class="member-avatar">RR</div>
+                            <h3>Ramiro Ramirez</h3>
+                            <p>Miembro Activo</p>
+                            <div><span class="status-indicator status-offline"></span> Inactivo</div>
+                            <button class="secondary-btn" style="margin-top: 10px; width: 100%;" onclick="messageMember('Ramiro Ramirez')">Enviar Mensaje</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- EVENTS TAB -->
+                <div id="events" class="tab-content">
+                    <h2>📅 Eventos y Reuniones</h2>
+                    
+                    <div class="event-card">
+                        <div class="event-date">JUEVES 20 NOV - 3:00 PM</div>
+                        <div class="event-title">Reunión Ordinaria del Club</div>
+                        <div class="event-details">
+                            <p>📍 Sede del Club de Leones Calarcá</p>
+                            <p>📋 Orden del día: Plan Trascender, Estado de Renuncias, Informe de Rifa</p>
+                        </div>
+                        <button onclick="sendToWhatsApp('reunion_jueves')">Recordar a Todos</button>
+                    </div>
+                    
+                    <div class="event-card">
+                        <div class="event-date">SÁBADO 22 NOV - 10:00 AM</div>
+                        <div class="event-title">Programa Diabetes - Exámenes Visuales</div>
+                        <div class="event-details">
+                            <p>📍 Consultorio Luz Dary Aguirre</p>
+                            <p>🩺 Exámenes para comunidad Trascender</p>
+                            <p>📸 Recordar: Chaleco y estandarte en fotos</p>
+                        </div>
+                        <button onclick="sendToWhatsApp('programa_diabetes')">Recordar a Todos</button>
+                    </div>
+                    
+                    <div class="event-card">
+                        <div class="event-date">LUNES 24 NOV - 9:00 AM</div>
+                        <div class="event-title">Entrega de Boletas - Rifa del Carro 2026</div>
+                        <div class="event-details">
+                            <p>📍 Sede del Club de Leones</p>
+                            <p>⏰ Horario: 9:00-11:00 AM y 2:00-5:00 PM</p>
+                            <p>👤 Coordina: Liliana Patricia</p>
+                        </div>
+                        <button onclick="sendToWhatsApp('entrega_boletas')">Recordar a Todos</button>
+                    </div>
+                </div>
+                
+                <!-- TEMPLATES TAB -->
+                <div id="templates" class="tab-content">
+                    <h2>📝 Plantillas de Mensajes</h2>
+                    
+                    <div class="templates-grid">
+                        <div class="template-card urgent" onclick="useTemplate('reunion_urgente')">
+                            <div class="template-title">🚨 Recordatorio Reunión Urgente</div>
+                            <p>Compañeros recordar reunión hoy a las 3:00 PM en el club. Temas importantes por tratar.</p>
+                        </div>
+                        
+                        <div class="template-card important" onclick="useTemplate('rifa_importante')">
+                            <div class="template-title">🎟️ Recordatorio Entrega Boletas</div>
+                            <p>Compañeros, estaremos en el club de 9-11 AM y 2-5 PM entregando boletas. ¡No falten!</p>
+                        </div>
+                        
+                        <div class="template-card normal" onclick="useTemplate('programa_diabetes')">
+                            <div class="template-title">🩺 Programa Diabetes Comunitario</div>
+                            <p>Recordar programa de diabetes y exámenes visuales este sábado a las 10 AM en consultorio Luz Dary Aguirre.</p>
+                        </div>
+                        
+                        <div class="template-card normal" onclick="useTemplate('fotos_chaleco')">
+                            <div class="template-title">📸 Recordatorio Fotos con Chaleco</div>
+                            <p>Compañeros, no olviden tomar fotos con chaleco y estandarte en los eventos. ¡Y no fotos de niños sin consentimiento!</p>
+                        </div>
+                        
+                        <div class="template-card urgent" onclick="useTemplate('renuncia_info')">
+                            <div class="template-title">📄 Información Renuncias</div>
+                            <p>Actualización sobre el proceso de renuncias. Reunión miércoles en Calarcá para tratar el tema.</p>
+                        </div>
+                        
+                        <div class="template-card important" onclick="useTemplate('plan_trascender')">
+                            <div class="template-title">🏘️ Plan Manejo Trascender</div>
+                            <p>Comparto el plan diseñado para nuestros protegidos en Trascender. Por favor revisar para reunión del jueves.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- RIFA TAB -->
+                <div id="rifa" class="tab-content">
+                    <h2>🎟️ Rifa del Carro 2026</h2>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 20px 0;">
+                        <div style="background: #e8f4f8; padding: 20px; border-radius: 10px;">
+                            <h3>📊 Estado de Ventas</h3>
+                            <p>Boletas asignadas: <strong>200</strong></p>
+                            <p>Boletas vendidas: <strong>142</strong></p>
+                            <p>Porcentaje: <strong>71%</strong></p>
+                        </div>
+                        
+                        <div style="background: #fff3cd; padding: 20px; border-radius: 10px;">
+                            <h3>👤 Coordinadora</h3>
+                            <p><strong>Liliana Patricia Hurtado</strong></p>
+                            <p>📅 Horarios entrega:</p>
+                            <p>9:00-11:00 AM y 2:00-5:00 PM</p>
+                        </div>
+                    </div>
+                    
+                    <div class="input-area">
+                        <input type="text" placeholder="Número de boleta..." style="flex: 1;">
+                        <input type="text" placeholder="Nombre comprador...">
+                        <button>Registrar Venta</button>
+                    </div>
+                    
+                    <div style="margin-top: 20px;">
+                        <h3>📋 Boletas Solicitadas</h3>
+                        <div class="event-card">
+                            <p><strong>Hugo Henao:</strong> Buscando boleta 1462 o 6214 para cambio</p>
+                            <button class="secondary-btn">Contactar</button>
+                        </div>
+                        
+                        <div class="event-card">
+                            <p><strong>María Isabel:</strong> Boletas entregadas a Luz Dary Sánchez</p>
+                            <button class="secondary-btn">Confirmar</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // CHAT DATA FROM NOV 7
+        const chatHistory = [
+            { sender: "Ramiro Ramirez", message: "bendiciones Liliana Patricia muchísimas gracias", time: "8:32 AM", type: "incoming" },
+            { sender: "Luzkyheos", message: "Me me escucho no puedo asistir a la reunión.", time: "9:52 AM", type: "incoming" },
+            { sender: "Fabio Iván", message: "Recordar que hoy el compañero tesorero recibe aportes, conforme a lo aprobado por la asamblea.", time: "12:31 PM", type: "incoming" },
+            { sender: "Liliana Patricia Hurtado", message: "Compañeros buenas tardes ya estamos en el club entregando las boletas de la rifa del carro 2026", time: "1:42 PM", type: "incoming" },
+            { sender: "Liliana Patricia Hurtado", message: "Compañeros buenas noches mañana de 9:00 am a 11:00 am y de 2:00 pm a 5:00 pm, estaré en el club entregando boletas, los espero", time: "7:37 PM", type: "incoming" },
+            { sender: "Fabio Iván", message: "Compañer@s buenas noches. Recuerden mañana la reunión del club a las 3:00 p.m.", time: "6:31 PM", type: "incoming" },
+            { sender: "Fabio", message: "Buenos días Compañeros, ayer me visitaron los compañeros y amigos los Ramiros Ramirez, llegaron con el propósito de entregar la carta de renuncia, les dije que no, que son compañeros muy importantes para el club y que no aceptaba ni compartia esa decisión, ellos van a la reunión de hoy con ese propósito. Cuando lleguen recibanlos con un aplauso y haganlos sentir muy bien. Si insisten en renunciar díganles qué tienen que esperar a que nos reunamos el día miércoles en Calarca. Saludos", time: "3:14 AM", type: "incoming" },
+            { sender: "Fabio Iván", message: "Buenos días compañero Fabio, gracias por su gestión. Por supuesto que los recibiremos como siempre, de manera calurosa y amable.", time: "6:37 AM", type: "incoming" },
+            { sender: "Fabio Iván", message: "Buenos días a tod@s. Hoy reunión ordinaria 3:00 p. m., entrega de boletas de la rifa.", time: "8:07 AM", type: "incoming" },
+            { sender: "Liliana Patricia Hurtado", message: "Vamos a estar desde las 2 para entregarlas", time: "8:13 AM", type: "incoming" },
+            { sender: "María Isabel", message: "Buenos días a todos. Un favor especial para Liliana que está en el proceso de entrega de boletas. Las mías por favor se las entrega a la compañera Luz Dary Sánchez. Igual las de la rifa del millón de pesos. Muchas gracias y que sea muy productiva la reunión y este llena de grandes proyectos para desarrollar en este cierre de el primer semestre leonistico. Recordar este mensaje", time: "8:20 AM", type: "incoming" },
+            { sender: "María Isabel", message: "Es mañana...", time: "8:21 AM", type: "incoming" },
+            { sender: "Liliana Patricia Hurtado", message: "Ok compañera con mucho", time: "8:22 AM", type: "incoming" },
+            { sender: "Liliana Patricia Hurtado", message: "Abrazos", time: "8:22 AM", type: "incoming" },
+            { sender: "María Isabel", message: "🇨🇴🦁🇨🇴", time: "8:22 AM", type: "incoming" },
+            { sender: "Hugo Henao", message: "Compañeros buenos días, estoy buscando la boleta con el número 1462 o 6214 para que hagamos un cambio", time: "10:26 AM", type: "incoming" },
+            { sender: "María Isabel", message: "Me parece muy importante que el comité de membresía del club haga el trabajo correspondiente con los compañeros en mención. Pienso que los comités a cargo deben cumplir las funciones por qué eso motiva la retención de los socios.", time: "11:43 AM", type: "incoming" }
+        ];
+
+        // MESSAGE TEMPLATES
+        const messageTemplates = {
+            'reunion_urgente': '🚨 COMPAÑEROS - RECORDATORIO URGENTE 🚨\n\nHoy reunión ordinaria a las 3:00 PM en el club.\n\nTemas importantes:\n• Estado de renuncias\n• Plan Trascender\n• Informe rifa del carro\n\n¡Su presencia es fundamental! 🦁',
+            
+            'rifa_importante': '🎟️ RECORDATORIO ENTREGA BOLETAS 🎟️\n\nCompañeros, estaremos en el club:\n📅 HOY\n⏰ 9:00-11:00 AM y 2:00-5:00 PM\n\n¡No falten a retirar sus boletas! La rifa avanza excelente 🙌',
+            
+            'programa_diabetes': '🩺 PROGRAMA DIABETES COMUNITARIO 🩺\n\nInvitación especial:\n📅 Sábado 10:00 AM\n📍 Consultorio Luz Dary Aguirre\n\nExámenes visuales y programa diabetes para comunidad Trascender.\n\n¡Los esperamos! 💙',
+            
+            'fotos_chaleco': '📸 RECORDATORIO IMPORTANTE 📸\n\nCompañeros, en todos nuestros eventos:\n• Usar chaleco y estandarte en fotos\n• NO tomar fotos de niños sin consentimiento informado\n\n¡Mantengamos nuestra imagen profesional! 🦁',
+            
+            'renuncia_info': '📄 INFORMACIÓN RENUNCIAS 📄\n\nCompañeros, actualización proceso renuncias:\n• Reunión miércoles en Calarcá\n• Buscamos solución que beneficie al club\n• Valoramos a cada miembro\n\n¡Juntos somos más fuertes! 💪',
+            
+            'plan_trascender': '🏘️ PLAN TRASCENDER 🏘️\n\nComparto el plan diseñado para nuestra comunidad:\n• Manejo integral de protegidos\n• Proyectos desarrollo comunitario\n• Revisión reunión jueves\n\n¡Trabajemos juntos por Trascender! 🌟'
+        };
+
+        // QUICK ACTION MESSAGES
+        const quickActions = {
+            'reunion_recordatorio': 'recordatorio_reunion',
+            'rifa_recordatorio': 'recordatorio_rifa', 
+            'recordatorio_diabetes': 'recordatorio_diabetes',
+            'reunion_jueves': 'reunion_urgente',
+            'programa_diabetes': 'programa_diabetes',
+            'entrega_boletas': 'rifa_importante',
+            'fotos_recordatorio': 'fotos_chaleco',
+            'renuncia_info': 'renuncia_info',
+            'plan_trascender': 'plan_trascender'
+        };
+
+        // Initialize the app
+        function initializeApp() {
+            loadChatHistory();
+            showTab('chat');
+        }
+
+        // Load chat history into the UI
+        function loadChatHistory() {
+            const chatContainer = document.getElementById('chatHistory');
+            chatContainer.innerHTML = '';
+            
+            chatHistory.forEach(msg => {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${msg.type}`;
+                
+                messageDiv.innerHTML = `
+                    <div class="message-sender">${msg.sender}</div>
+                    <div>${msg.message}</div>
+                    <div class="message-time">${msg.time}</div>
+                `;
+                
+                chatContainer.appendChild(messageDiv);
+            });
+            
+            // Scroll to bottom
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        // Show specific tab content
+        function showTab(tabId) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        // Send message to WhatsApp
+        function sendToWhatsApp(actionType) {
+            const message = messageTemplates[quickActions[actionType]] || messageTemplates[actionType];
+            
+            if (message) {
+                const encodedMessage = encodeURIComponent(message);
+                const whatsappUrl = `https://wa.me/?text=${encodedMessage}`;
+                
+                // Open WhatsApp in new tab
+                window.open(whatsappUrl, '_blank');
+                
+                // Show confirmation
+                alert('Mensaje listo para enviar por WhatsApp!');
+            } else {
+                alert('Plantilla no encontrada');
+            }
+        }
+
+        // Use a message template
+        function useTemplate(templateId) {
+            const message = messageTemplates[templateId];
+            if (message) {
+                document.getElementById('newMessage').value = message;
+                showTab('chat');
+            }
+        }
+
+        // Send a new message
+        function sendMessage() {
+            const messageInput = document.getElementById('newMessage');
+            const message = messageInput.value.trim();
+            
+            if (message) {
+                // In a real app, this would send to your backend/WhatsApp API
+                // For demo, we'll just show a confirmation
+                
+                const encodedMessage = encodeURIComponent(message);
+                const whatsappUrl = `https://wa.me/?text=${encodedMessage}`;
+                
+                window.open(whatsappUrl, '_blank');
+                
+                // Clear input
+                messageInput.value = '';
+                
+                alert('Mensaje listo para enviar por WhatsApp!');
+            }
+        }
+
+        // Message a specific member
+        function messageMember(memberName) {
+            const message = `Hola ${memberName}, te escribo del Club de Leones Calarcá. ¿Cómo estás?`;
+            const encodedMessage = encodeURIComponent(message);
+            const whatsappUrl = `https://wa.me/?text=${encodedMessage}`;
+            
+            window.open(whatsappUrl, '_blank');
+        }
+
+        // Initialize when page loads
+        window.addEventListener('load', initializeApp);
+    </script>
+</body>
+</html>

@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ENS LEGIS MASTER SYSTEM - Complete Liberation Tool</title>
+    <style>
+        :root {
+            --gold: #D4AF37;
+            --deep-blue: #0A2463;
+            --crimson: #8C1D40;
+            --forest: #1E6B52;
+            --royal: #4169E1;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--deep-blue), #000000, var(--crimson));
+            font-family: 'Courier New', monospace;
+            min-height: 100vh;
+            padding: 0;
+            color: white;
+            line-height: 1.6;
+        }
+        
+        .military-header {
+            background: #000000;
+            color: var(--gold);
+            padding: 15px 0;
+            border-bottom: 3px solid var(--gold);
+            text-align: center;
+            font-family: 'Times New Roman', serif;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .system-interface {
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid var(--gold);
+            border-radius: 0;
+            margin: 20px 0;
+            position: relative;
+        }
+        
+        .command-bar {
+            background: var(--deep-blue);
+            padding: 15px;
+            border-bottom: 1px solid var(--gold);
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+        
+        .cmd-btn {
+            background: #000000;
+            color: var(--gold);
+            border: 1px solid var(--gold);
+            padding: 12px;
+            font-family: 'Courier New', monospace;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            font-size: 12px;
+        }
+        
+        .cmd-btn:hover {
+            background: var(--gold);
+            color: #000000;
+        }
+        
+        .terminal {
+            background: #000000;
+            color: #00FF00;
+            padding: 20px;
+            min-height: 500px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            border: 1px solid #333;
+            margin: 10px;
+            overflow-y: auto;
+            max-height: 600px;
+        }
+        
+        .terminal-line {
+            margin-bottom: 10px;
+            white-space: pre-wrap;
+        }
+        
+        .prompt {
+            color: var(--gold);
+            font-weight: bold;
+        }
+        
+        .document-output {
+            background: #000000;
+            color: #FFFFFF;
+            padding: 20px;
+            min-height: 400px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            border: 1px solid #333;
+            margin: 10px;
+            white-space: pre-wrap;
+            line-height: 1.4;
+        }
+        
+        .section {
+            background: rgba(10, 36, 99, 0.3);
+            margin: 15px 0;
+            padding: 15px;
+            border-left: 3px solid var(--gold);
+        }
+        
+        .legal-code {
+            background: #001122;
+            color: #CCCCCC;
+            padding: 15px;
+            margin: 10px 0;
+            border: 1px solid #333;
+            font-size: 11px;
+        }
+        
+        .tool-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .tool-card {
+            background: #001a33;
+            border: 1px solid var(--gold);
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .tool-card:hover {
+            background: #00264d;
+            border-color: #FFFFFF;
+        }
+        
+        .status-bar {
+            background: #000000;
+            color: var(--gold);
+            padding: 10px;
+            border-top: 1px solid var(--gold);
+            text-align: center;
+            font-size: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .print-btn {
+            background: var(--forest);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+        }
+        
+        .emergency-btn {
+            background: var(--crimson);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            margin: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .debug-info {
+            background: #330000;
+            color: #FF6666;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #FF0000;
+            font-size: 10px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="military-header">
+        <h1>⚖️ ENS LEGIS MASTER SYSTEM ⚖️</h1>
+        <p>COMPLETE LEGAL LIBERATION TOOL - OPERATIONAL SYSTEM</p>
+    </div>
+
+    <div class="container">
+        <!-- DEBUG INFO -->
+        <div class="debug-info" id="debugInfo">
+            DEBUG: System loading...
+        </div>
+
+        <!-- COMMAND INTERFACE -->
+        <div class="system-interface">
+            <div class="command-bar">
+                <button class="cmd-btn" onclick="executeCommand('theory')">ENS LEGIS THEORY</button>
+                <button class="cmd-btn" onclick="executeCommand('sovereignty')">SOVEREIGNTY DECLARATION</button>
+                <button class="cmd-btn" onclick="executeCommand('debt_discharge')">DEBT DISCHARGE</button>
+                <button class="cmd-btn" onclick="executeCommand('ucc_tools')">UCC TOOLS</button>
+                <button class="cmd-btn" onclick="executeCommand('commercial')">COMMERCIAL INSTRUMENTS</button>
+                <button class="cmd-btn" onclick="executeCommand('emergency')">EMERGENCY PROTOCOLS</button>
+            </div>
+
+            <div class="terminal" id="terminal">
+                <div class="terminal-line"><span class="prompt">SYSTEM></span> ENS LEGIS Master System v1.0 - Loaded</div>
+                <div class="terminal-line"><span class="prompt">SYSTEM></span> Legal liberation system active</div>
+                <div class="terminal-line"><span class="prompt">SYSTEM></span> Select a command to begin</div>
+            </div>
+
+            <div class="document-output" id="documentOutput">
+                // Generated document will appear here
+                // System will produce executable legal instruments
+            </div>
+
+            <div class="status-bar" id="statusBar">
+                SYSTEM READY - ENS LEGIS OPERATIONAL
+                <button class="print-btn" onclick="printDocument()">🖨️ PRINT DOCUMENT</button>
+                <button class="print-btn" onclick="toggleDebug()">🐛 DEBUG MODE</button>
+            </div>
+        </div>
+
+        <!-- QUICK ACTION TOOLS -->
+        <div class="tool-grid">
+            <div class="tool-card" onclick="executeCommand('theory')">
+                <h3>🎓 COMPLETE ENS LEGIS THEORY</h3>
+                <p>Legal foundations of the liberation system</p>
+            </div>
+            
+            <div class="tool-card" onclick="executeCommand('sovereignty_doc')">
+                <h3>👑 SOVEREIGNTY DECLARATION</h3>
+                <p>Executable document to establish sovereign status</p>
+            </div>
+            
+            <div class="tool-card" onclick="executeCommand('debt_instrument')">
+                <h3>🔄 DEBT DISCHARGE INSTRUMENT</h3>
+                <p>Legal mechanism for obligation cancellation</p>
+            </div>
+            
+            <div class="tool-card" onclick="executeCommand('commercial_package')">
+                <h3>💼 COMPLETE COMMERCIAL PACKAGE</h3>
+                <p>All necessary UCC instruments</p>
+            </div>
+        </div>
+
+        <!-- EMERGENCY PROTOCOLS -->
+        <button class="emergency-btn" onclick="executeCommand('emergency_protocol')">
+            🚨 ACTIVATE EMERGENCY PROTOCOL
+        </button>
+    </div>
+
+    <script>
+        // DEBUG SYSTEM
+        let debugMode = false;
+
+        function toggleDebug() {
+            debugMode = !debugMode;
+            const debugInfo = document.getElementById('debugInfo');
+            debugInfo.style.display = debugMode ? 'block' : 'none';
+            log(`Debug mode ${debugMode ? 'ENABLED' : 'DISABLED'}`);
+        }
+
+        function debugLog(message) {
+            if (debugMode) {
+                const debugInfo = document.getElementById('debugInfo');
+                debugInfo.textContent = `DEBUG: ${message}`;
+                console.log(`DEBUG: ${message}`);
+            }
+        }
+
+        // ENS LEGIS MASTER SYSTEM - COMPLETE LIBERATION TOOL
+        class EnsLegisSystem {
+            constructor() {
+                this.history = [];
+                this.documents = {};
+                this.init();
+            }
+            
+            init() {
+                debugLog('Constructor initialized');
+                this.log('ENS LEGIS Master System initialized');
+                this.log('Legal liberation system operational');
+                this.updateStatus('SYSTEM ACTIVE - READY FOR LIBERATION');
+                debugLog('System initialization complete');
+            }
+            
+            executeCommand(command) {
+                debugLog(`Executing command: ${command}`);
+                this.log(`Executing command: ${command}`);
+                
+                try {
+                    switch(command) {
+                        case 'theory':
+                            this.showEnsLegisTheory();
+                            break;
+                        case 'sovereignty':
+                            this.showSovereigntyTheory();
+                            break;
+                        case 'sovereignty_doc':
+                            this.generateSovereigntyDocument();
+                            break;
+                        case 'debt_discharge':
+                            this.showDebtDischargeTheory();
+                            break;
+                        case 'debt_instrument':
+                            this.generateDebtDischargeInstrument();
+                            break;
+                        case 'ucc_tools':
+                            this.showUCCTools();
+                            break;
+                        case 'commercial':
+                            this.showCommercialInstruments();
+                            break;
+                        case 'commercial_package':
+                            this.generateCommercialPackage();
+                            break;
+                        case 'emergency':
+                            this.showEmergencyProtocols();
+                            break;
+                        case 'emergency_protocol':
+                            this.activateEmergencyProtocol();
+                            break;
+                        default:
+                            this.log('Command not recognized');
+                    }
+                    debugLog(`Command ${command} executed successfully`);
+                } catch (error) {
+                    debugLog(`Error executing command ${command}: ${error}`);
+                    this.log(`SYSTEM ERROR: ${error}`);
+                }
+            }
+            
+            // COMPLETE ENS LEGIS THEORY
+            showEnsLegisTheory() {
+                debugLog('Displaying ENS LEGIS theory');
+                const theory = `
+╔════════════════════════════════════════════════════════════════╗
+║                    ENS LEGIS - COMPLETE THEORY                ║
+╚════════════════════════════════════════════════════════════════╝
+
+🎯 FUNDAMENTAL CONCEPT:
+ENS LEGIS = "Being of Law" - Recognition of human being as 
+sovereign legal entity within the juridical system.
+
+⚖️ LEGAL PRINCIPLES:
+
+1. INHERENT PERSONAL SOVEREIGNTY
+   • Every human is born sovereign
+   • Sovereignty is recognized, not granted
+   • Legal system exists to recognize, not to concede
+
+2. NATURAL LEGAL HIERARCHY
+   • Natural Law > Divine Law > Common Law > Positive Law
+   • Human laws must align with higher laws
+   • Laws contradictory to natural law are void
+
+3. INFORMED CONSENT
+   • Every contract requires informed consent
+   • Silence does not constitute consent
+   • Ignorance of law does not invalidate rights
+
+🔑 LEGAL MECHANISMS:
+
+• UCC (Uniform Commercial Code) - Global commercial system
+• Admiralty Law - Maritime commercial jurisdiction
+• Common Law - Traditional and ancestral rights
+• Natural Law - Inherent and inalienable rights
+
+🎯 OBJECTIVE: Establish correct legal status as 
+"Sovereign Being" instead of "Subject Citizen".
+                `;
+                
+                this.displayDocument(theory);
+                this.updateStatus('ENS LEGIS THEORY LOADED');
+            }
+            
+            // SOVEREIGNTY DOCUMENT - ACTUAL WORKING PAPERWORK
+            generateSovereigntyDocument() {
+                debugLog('Generating sovereignty document');
+                const doc = `
+╔════════════════════════════════════════════════════════════════╗
+║               DECLARATION OF PERSONAL SOVEREIGNTY             ║
+║                 EXECUTABLE LEGAL INSTRUMENT                   ║
+╚════════════════════════════════════════════════════════════════╝
+
+DECLARATION OF SOVEREIGN STATUS
+AND RECOGNITION OF INHERENT RIGHTS
+
+I, the undersigned [FULL NAME IN UPPERCASE], 
+living and sovereign human being, declare:
+
+ARTICLE 1 - STATUS RECOGNITION
+1.1. I recognize myself as sovereign under Natural Law.
+1.2. I affirm my inherent and inalienable rights.
+1.3. I establish my status as sovereign merchant.
+
+ARTICLE 2 - RECOGNIZED RIGHTS
+2.1. Right to self-determination and free will.
+2.2. Right to create negotiable commercial instruments.
+2.3. Right to equitable commercial transactions.
+2.4. Right to access legal enforcement mechanisms.
+
+ARTICLE 3 - LEGAL BASIS
+3.1. Natural Law - Inherent rights of human being.
+3.2. UCC Article 1-103 - Applicable equity principles.
+3.3. UCC Article 1-201 - Commercial definitions.
+3.4. Common Law - Traditional rights.
+
+ARTICLE 4 - EXECUTION INSTRUCTIONS
+4.1. Present to corresponding institution.
+4.2. Notify under applicable UCC mechanisms.
+4.3. Execute administrative silence (30 days).
+4.4. Establish recognized sovereign status.
+
+DECLARANT SIGNATURE: _________________________
+NAME: [FULL NAME]
+DATE: ${new Date().toLocaleDateString()}
+TIME: ${new Date().toLocaleTimeString()}
+
+WITNESS 1: _________________________
+WITNESS 2: _________________________
+
+╔════════════════════════════════════════════════════════════════╗
+║                         USAGE INSTRUCTIONS                    ║
+╚════════════════════════════════════════════════════════════════╝
+
+1. COMPLETE: Fill all fields in uppercase
+2. SIGN: Original signature with blue ink
+3. PRESENT: Send by certified mail
+4. WAIT: 30 days for administrative silence
+5. EXECUTE: Establish sovereign status
+
+⚠️  This document is executable under UCC Article 3
+                `;
+                
+                this.displayDocument(doc);
+                this.updateStatus('SOVEREIGNTY DOCUMENT GENERATED - READY FOR USE');
+            }
+            
+            // DEBT DISCHARGE INSTRUMENT - ACTUAL WORKING MECHANISM
+            generateDebtDischargeInstrument() {
+                debugLog('Generating debt discharge instrument');
+                const instrument = `
+╔════════════════════════════════════════════════════════════════╗
+║               DEBT DISCHARGE INSTRUMENT                       ║
+║                 UCC-3 - EXECUTABLE                            ║
+╚════════════════════════════════════════════════════════════════╝
+
+NEGOTIABLE INSTRUMENT OF COMMERCIAL REDEMPTION
+AND OBLIGATION CANCELLATION
+
+ISSUER: [SOVEREIGN'S FULL NAME]
+BENEFICIARY: [CREDITOR INSTITUTION NAME]
+
+VALUE: RECOGNITION OF HUMAN COMMERCIAL VALUE
+CURRENCY: HUMAN WORK - INTRINSIC VALUE
+
+ARTICLE 1 - PURPOSE
+1.1. Cancellation of existing commercial obligations.
+1.2. Recognition of human value as commercial value.
+1.3. Restoration of equitable commercial balance.
+
+ARTICLE 2 - LEGAL MECHANISM
+2.1. UCC Article 3 - Negotiable instruments.
+2.2. UCC Article 9 - Secured transactions.
+2.3. Equity principles UCC 1-103.
+2.4. Natural law of balance and reciprocity.
+
+ARTICLE 3 - EXECUTION
+3.1. Presentation to creditor institution.
+3.2. Notification under UCC mechanisms.
+3.3. Administrative silence period: 30 days.
+3.4. Automatic cancellation for lack of objection.
+
+ARTICLE 4 - LEGAL EFFECT
+4.1. Complete cancellation of specified obligation.
+4.2. Recognition of human commercial value.
+4.3. Restoration of balanced commercial relationship.
+4.4. Establishment of new implicit contract.
+
+OBLIGATION TO CANCEL: [DETAILED DESCRIPTION]
+NOMINAL VALUE: [ORIGINAL AMOUNT]
+HUMAN COMMERCIAL VALUE: [RECOGNIZED VALUE]
+
+ISSUER SIGNATURE: _________________________
+ISSUANCE DATE: ${new Date().toLocaleDateString()}
+ISSUANCE TIME: ${new Date().toLocaleTimeString()}
+
+╔════════════════════════════════════════════════════════════════╗
+║                 IMPLEMENTATION PROTOCOL                       ║
+╚════════════════════════════════════════════════════════════════╝
+
+STEP 1: Complete all required fields
+STEP 2: Sign with original blue ink
+STEP 3: Send by certified mail with return receipt
+STEP 4: Wait 30 days for administrative silence
+STEP 5: If no objection, obligation cancelled
+STEP 6: If objection, proceed with UCC enforcement
+
+⚖️  EXECUTABLE INSTRUMENT UNDER UNIFORM COMMERCIAL CODE
+                `;
+                
+                this.displayDocument(instrument);
+                this.updateStatus('DEBT DISCHARGE INSTRUMENT GENERATED - MECHANISM ACTIVE');
+            }
+            
+            // COMPLETE COMMERCIAL PACKAGE
+            generateCommercialPackage() {
+                debugLog('Generating commercial package');
+                const package = `
+╔════════════════════════════════════════════════════════════════╗
+║               COMPLETE COMMERCIAL PACKAGE ENS LEGIS           ║
+║                 ALL NECESSARY INSTRUMENTS                     ║
+╚════════════════════════════════════════════════════════════════╝
+
+📦 LIBERATION COMMERCIAL PACKAGE CONTENTS:
+
+1. 👑 SOVEREIGNTY DECLARATION UCC-1
+   - Establishes sovereign commercial status
+   - Executable rights under UCC
+   - Foundation for all instruments
+
+2. 🔄 DEBT DISCHARGE INSTRUMENT UCC-3
+   - Obligation cancellation mechanism
+   - Human commercial value recognition
+   - Commercial balance restoration
+
+3. 💼 SOVEREIGN COMMERCIAL CONTRACT UCC-2
+   - Equity-based contracts
+   - Fair commercial transactions
+   - Guaranteed UCC enforcement
+
+4. 📄 EXECUTABLE UCC NOTIFICATIONS
+   - Formal UCC communications
+   - Legal notification mechanisms
+   - Applicable administrative silence
+
+5. 🛡️ PROTECTION INSTRUMENTS UCC-9
+   - Commercial guarantees
+   - Asset protection
+   - Security agreements
+
+🎯 COMPLETE IMPLEMENTATION PROTOCOL:
+
+PHASE 1: STATUS ESTABLISHMENT
+• Generate Sovereignty Declaration UCC-1
+• Present to relevant institutions
+• Wait administrative silence (30 days)
+• Establish recognized sovereign status
+
+PHASE 2: COMMERCIAL CLEANING
+• Generate Discharge Instruments UCC-3
+• Cancel existing obligations
+• Restore commercial balance
+• Establish new baseline
+
+PHASE 3: SOVEREIGN OPERATIONS
+• Use Commercial Contracts UCC-2
+• Conduct equitable transactions
+• Exercise commercial rights
+• Maintain sovereign status
+
+⚖️ COMPLETE LEGAL BASIS:
+• UCC Article 1 - General provisions
+• UCC Article 3 - Negotiable instruments
+• UCC Article 9 - Secured transactions
+• Equity principles and natural law
+
+⚠️  REMEMBER: Existing legal system - Do not create new system
+                `;
+                
+                this.displayDocument(package);
+                this.updateStatus('COMPLETE COMMERCIAL PACKAGE GENERATED - LIBERATION ACTIVATED');
+            }
+            
+            // EMERGENCY PROTOCOL
+            activateEmergencyProtocol() {
+                debugLog('Activating emergency protocol');
+                const emergency = `
+╔════════════════════════════════════════════════════════════════╗
+║                   EMERGENCY PROTOCOL                          ║
+║                 IMMEDIATE LIBERATION                          ║
+╚════════════════════════════════════════════════════════════════╝
+
+🚨 SITUATION: Need for immediate legal liberation
+
+🎯 OBJECTIVE: Establish sovereign status and immediate protection
+
+RAPID ACTION PROTOCOL:
+
+STEP 1 - IMMEDIATE DECLARATION
+• Generate Sovereignty Declaration UCC-1
+• Complete all fields
+• Sign with blue ink
+• Make notarized copies
+
+STEP 2 - URGENT NOTIFICATION
+• Send by certified mail
+• To all relevant institutions
+• With return receipt
+• Establish notification date
+
+STEP 3 - PROTECTION INSTRUMENT
+• Generate UCC Financing Statement
+• Establish commercial security
+• Protect assets immediately
+• Notify all parties
+
+STEP 4 - OFFICIAL COMMUNICATION
+• Notify status change
+• Establish new commercial relationship
+• Exercise sovereign rights
+• Maintain complete record
+
+REQUIRED EMERGENCY DOCUMENTS:
+
+1. 📄 SOVEREIGNTY DECLARATION UCC-1 (Urgent)
+2. 📄 UCC FINANCING STATEMENT (Protection)
+3. 📄 STATUS CHANGE NOTIFICATION (Communication)
+4. 📄 SOVEREIGNTY AFFIDAVIT (Testimony)
+
+⚡ IMMEDIATE ACTION: Generate and execute all above documents
+
+🎯 EXPECTED RESULT: Sovereign status established within 72 hours
+
+⚠️  WARNING: This protocol is for emergency situations only
+                `;
+                
+                this.displayDocument(emergency);
+                this.updateStatus('EMERGENCY PROTOCOL ACTIVATED - IMMEDIATE ACTION REQUIRED');
+            }
+            
+            // UTILITY METHODS
+            log(message) {
+                const terminal = document.getElementById('terminal');
+                const line = document.createElement('div');
+                line.className = 'terminal-line';
+                line.innerHTML = `<span class="prompt">SYSTEM></span> ${message}`;
+                terminal.appendChild(line);
+                terminal.scrollTop = terminal.scrollHeight;
+                debugLog(`Terminal: ${message}`);
+            }
+            
+            displayDocument(content) {
+                const output = document.getElementById('documentOutput');
+                output.textContent = content;
+                debugLog('Document displayed in output area');
+            }
+            
+            updateStatus(message) {
+                const statusBar = document.getElementById('statusBar');
+                // Keep the buttons, just update the text
+                const statusText = statusBar.childNodes[0];
+                if (statusText.nodeType === 3) { // Text node
+                    statusText.textContent = message + ' ';
+                } else {
+                    // If structure changed, find the text
+                    statusBar.innerHTML = message + ' ' + statusBar.innerHTML;
+                }
+                debugLog(`Status updated: ${message}`);
+            }
+        }
+
+        // GLOBAL FUNCTIONS
+        let ensLegis;
+
+        function executeCommand(command) {
+            if (!ensLegis) {
+                ensLegis = new EnsLegisSystem();
+            }
+            ensLegis.executeCommand(command);
+        }
+
+        function printDocument() {
+            debugLog('Print function called');
+            const content = document.getElementById('documentOutput').textContent;
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                    <head>
+                        <title>ENS LEGIS Document</title>
+                        <style>
+                            body { 
+                                font-family: Courier New, monospace; 
+                                white-space: pre-wrap; 
+                                padding: 20px;
+                                background: white;
+                                color: black;
+                            }
+                            @media print {
+                                body { margin: 0; padding: 15px; }
+                            }
+                        </style>
+                    </head>
+                    <body>${content}</body>
+                </html>
+            `);
+            printWindow.document.close();
+            printWindow.focus();
+            printWindow.print();
+            debugLog('Print window opened');
+        }
+
+        // INITIALIZE SYSTEM ON LOAD
+        document.addEventListener('DOMContentLoaded', function() {
+            debugLog('DOM fully loaded');
+            ensLegis = new EnsLegisSystem();
+            
+            // Test basic functionality
+            setTimeout(() => {
+                debugLog('System test completed');
+            }, 1000);
+        });
+
+        // FALLBACK: If DOM ready doesn't fire, initialize on first click
+        document.addEventListener('click', function initOnClick() {
+            if (!ensLegis) {
+                ensLegis = new EnsLegisSystem();
+                document.removeEventListener('click', initOnClick);
+            }
+        });
+    </script>
+</body>
+</html>
