@@ -1,0 +1,1153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoCultura Andina - Emergency Response Companion</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #059669;
+            --primary-dark: #047857;
+            --secondary: #dc2626;
+            --accent: #d97706;
+            --gold: #f59e0b;
+            --dark: #0f172a;
+            --darker: #020617;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --gray-light: #e2e8f0;
+            --mountain: #1e293b;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--darker), var(--dark));
+            color: var(--light);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .language-switcher {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .lang-btn {
+            padding: 8px 16px;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--light);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .lang-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            padding: 100px 0 60px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .mountain-bg {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 150px;
+            background: linear-gradient(transparent, var(--mountain));
+            z-index: -1;
+        }
+        
+        .mountain-range {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 100px;
+            background: 
+                linear-gradient(75deg, transparent 30%, var(--mountain) 30%),
+                linear-gradient(-75deg, transparent 30%, var(--mountain) 30%);
+            background-size: 100px 100px;
+            z-index: -1;
+        }
+        
+        .logo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        
+        .logo-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(5, 150, 105, 0.3);
+        }
+        
+        .logo-icon::before {
+            content: '⛑️';
+            font-size: 40px;
+        }
+        
+        .logo-text {
+            text-align: center;
+        }
+        
+        .logo-title {
+            font-size: 3rem;
+            font-weight: 900;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, var(--primary), var(--gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .logo-subtitle {
+            font-size: 1.2rem;
+            color: var(--gray-light);
+            max-width: 600px;
+        }
+        
+        .branding {
+            margin-top: 20px;
+            font-size: 1rem;
+            color: var(--gray);
+        }
+        
+        .branding a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .emergency-quick-access {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 40px 0;
+        }
+        
+        .emergency-card {
+            background: rgba(30, 41, 59, 0.8);
+            border-radius: 16px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+        
+        .emergency-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 10px 30px rgba(5, 150, 105, 0.3);
+        }
+        
+        .emergency-card.critical {
+            border-color: var(--secondary);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4); }
+            70% { box-shadow: 0 0 0 15px rgba(220, 38, 38, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); }
+        }
+        
+        .emergency-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: rgba(220, 38, 38, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+        }
+        
+        .emergency-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 15px;
+            color: var(--light);
+        }
+        
+        .emergency-desc {
+            color: var(--gray-light);
+            margin-bottom: 20px;
+        }
+        
+        .guide-container {
+            background: rgba(30, 41, 59, 0.5);
+            border-radius: 20px;
+            padding: 40px;
+            margin: 40px 0;
+            backdrop-filter: blur(10px);
+        }
+        
+        .guide-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .guide-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .guide-subtitle {
+            font-size: 1.2rem;
+            color: var(--gray-light);
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .step-by-step {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .step {
+            background: rgba(15, 23, 42, 0.7);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--primary);
+            transition: all 0.3s ease;
+        }
+        
+        .step:hover {
+            transform: translateX(5px);
+        }
+        
+        .step-number {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 40px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        
+        .step-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--light);
+        }
+        
+        .step-content {
+            color: var(--gray-light);
+        }
+        
+        .warning {
+            background: rgba(220, 38, 38, 0.1);
+            border-left-color: var(--secondary);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .tip {
+            background: rgba(245, 158, 11, 0.1);
+            border-left-color: var(--accent);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            font-family: 'Inter', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .btn-emergency {
+            background: var(--secondary);
+            color: white;
+            font-weight: 700;
+            animation: pulse 2s infinite;
+        }
+        
+        .visual-guide {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .visual-item {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .visual-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 15px;
+            background: rgba(5, 150, 105, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+        }
+        
+        .visual-text {
+            font-size: 0.9rem;
+            color: var(--gray-light);
+        }
+        
+        .section {
+            margin: 60px 0;
+        }
+        
+        .section-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+        }
+        
+        .resources-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .resource-card {
+            background: rgba(30, 41, 59, 0.8);
+            border-radius: 12px;
+            padding: 25px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .resource-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .resource-icon {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 15px;
+            background: rgba(5, 150, 105, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .resource-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .resource-desc {
+            color: var(--gray-light);
+            font-size: 0.9rem;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 40px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--gray);
+            font-size: 0.9rem;
+            margin-top: 60px;
+        }
+        
+        .footer-brand {
+            margin-top: 10px;
+            font-size: 1rem;
+            color: var(--primary);
+        }
+        
+        .footer-brand a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .language-content {
+            display: none;
+        }
+        
+        .language-content.active {
+            display: block;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            .logo-title {
+                font-size: 2.2rem;
+            }
+            
+            .emergency-quick-access {
+                grid-template-columns: 1fr;
+            }
+            
+            .guide-container {
+                padding: 20px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="language-switcher">
+        <button class="lang-btn active" data-lang="en">English</button>
+        <button class="lang-btn" data-lang="es">Español</button>
+    </div>
+
+    <header>
+        <div class="mountain-bg"></div>
+        <div class="mountain-range"></div>
+        <div class="container">
+            <div class="logo">
+                <div class="logo-icon"></div>
+                <div class="logo-text">
+                    <h1 class="logo-title">EcoCultura Andina</h1>
+                    <p class="logo-subtitle">Emergency Response Companion - Life-Saving Techniques</p>
+                </div>
+            </div>
+            <div class="branding">
+                Brought to you by <a href="https://tripstocolombia.com" target="_blank">TripsToColombia.com</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- Quick Access Emergency Guides -->
+        <div class="emergency-quick-access">
+            <div class="emergency-card critical" data-guide="cpr">
+                <div class="emergency-icon">💓</div>
+                <h3 class="emergency-title lang-text" data-en="Cardiac Emergency & CPR" data-es="Emergencia Cardíaca y RCP">Cardiac Emergency & CPR</h3>
+                <p class="emergency-desc lang-text" data-en="Learn to perform CPR and use an AED to save someone in cardiac arrest" data-es="Aprende a realizar RCP y usar un DEA para salvar a alguien en paro cardíaco">Learn to perform CPR and use an AED to save someone in cardiac arrest</p>
+                <button class="btn btn-primary lang-text" data-en="View Guide" data-es="Ver Guía">View Guide</button>
+            </div>
+            
+            <div class="emergency-card" data-guide="choking">
+                <div class="emergency-icon">😶</div>
+                <h3 class="emergency-title lang-text" data-en="Choking Emergency" data-es="Emergencia por Atragantamiento">Choking Emergency</h3>
+                <p class="emergency-desc lang-text" data-en="Heimlich maneuver for adults, children, and infants" data-es="Maniobra de Heimlich para adultos, niños y bebés">Heimlich maneuver for adults, children, and infants</p>
+                <button class="btn btn-primary lang-text" data-en="View Guide" data-es="Ver Guía">View Guide</button>
+            </div>
+            
+            <div class="emergency-card" data-guide="allergic">
+                <div class="emergency-icon">🤧</div>
+                <h3 class="emergency-title lang-text" data-en="Severe Allergic Reaction" data-es="Reacción Alérgica Severa">Severe Allergic Reaction</h3>
+                <p class="emergency-desc lang-text" data-en="Recognize anaphylaxis and use epinephrine auto-injectors" data-es="Reconoce la anafilaxis y usa autoinyectores de epinefrina">Recognize anaphylaxis and use epinephrine auto-injectors</p>
+                <button class="btn btn-primary lang-text" data-en="View Guide" data-es="Ver Guía">View Guide</button>
+            </div>
+            
+            <div class="emergency-card" data-guide="bleeding">
+                <div class="emergency-icon">🩸</div>
+                <h3 class="emergency-title lang-text" data-en="Severe Bleeding Control" data-es="Control de Sangrado Severo">Severe Bleeding Control</h3>
+                <p class="emergency-desc lang-text" data-en="Stop life-threatening bleeding with direct pressure and tourniquets" data-es="Detén el sangrado potencialmente mortal con presión directa y torniquetes">Stop life-threatening bleeding with direct pressure and tourniquets</p>
+                <button class="btn btn-primary lang-text" data-en="View Guide" data-es="Ver Guía">View Guide</button>
+            </div>
+        </div>
+
+        <!-- CPR Guide -->
+        <div class="guide-container hidden" id="cpr-guide">
+            <div class="guide-header">
+                <h2 class="guide-title lang-text" data-en="Cardiac Emergency & CPR Response" data-es="Respuesta a Emergencia Cardíaca y RCP">Cardiac Emergency & CPR Response</h2>
+                <p class="guide-subtitle lang-text" data-en="Step-by-step instructions to perform CPR and use an AED when someone is unresponsive and not breathing" data-es="Instrucciones paso a paso para realizar RCP y usar un DEA cuando alguien no responde y no respira">Step-by-step instructions to perform CPR and use an AED when someone is unresponsive and not breathing</p>
+            </div>
+            
+            <div class="step-by-step">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3 class="step-title lang-text" data-en="Check for Responsiveness" data-es="Verificar la Capacidad de Respuesta">Check for Responsiveness</h3>
+                    <div class="step-content">
+                        <p class="lang-text" data-en="Tap the person's shoulder and shout 'Are you okay?' Look for any movement or response." data-es="Toca el hombro de la persona y grita '¿Estás bien?' Busca cualquier movimiento o respuesta.">Tap the person's shoulder and shout 'Are you okay?' Look for any movement or response.</p>
+                        <div class="warning">
+                            <strong class="lang-text" data-en="If no response:" data-es="Si no hay respuesta:">If no response:</strong>
+                            <p class="lang-text" data-en="Call emergency services immediately or have someone else call while you begin CPR." data-es="Llama a los servicios de emergencia inmediatamente o haz que alguien más llame mientras comienzas RCP.">Call emergency services immediately or have someone else call while you begin CPR.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3 class="step-title lang-text" data-en="Check Breathing" data-es="Verificar la Respiración">Check Breathing</h3>
+                    <div class="step-content">
+                        <p class="lang-text" data-en="Look for chest movement, listen for breathing sounds, and feel for breath on your cheek for no more than 10 seconds." data-es="Busca movimiento del pecho, escucha sonidos de respiración y siente el aliento en tu mejilla por no más de 10 segundos.">Look for chest movement, listen for breathing sounds, and feel for breath on your cheek for no more than 10 seconds.</p>
+                        <div class="warning">
+                            <strong class="lang-text" data-en="If not breathing or only gasping:" data-es="Si no respira o solo jadea:">If not breathing or only gasping:</strong>
+                            <p class="lang-text" data-en="Begin CPR immediately. Gasping is not normal breathing!" data-es="Comienza RCP inmediatamente. ¡Jadear no es respirar normalmente!">Begin CPR immediately. Gasping is not normal breathing!</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3 class="step-title lang-text" data-en="Begin Chest Compressions" data-es="Comenzar Compresiones Torácicas">Begin Chest Compressions</h3>
+                    <div class="step-content">
+                        <p class="lang-text" data-en="Place the heel of one hand on the center of the chest, place your other hand on top, and interlock fingers." data-es="Coloca la base de una mano en el centro del pecho, coloca tu otra mano encima y entrelaza los dedos.">Place the heel of one hand on the center of the chest, place your other hand on top, and interlock fingers.</p>
+                        <div class="visual-guide">
+                            <div class="visual-item">
+                                <div class="visual-icon">📏</div>
+                                <div class="visual-text lang-text" data-en="Position: Center of chest" data-es="Posición: Centro del pecho">Position: Center of chest</div>
+                            </div>
+                            <div class="visual-item">
+                                <div class="visual-icon">💪</div>
+                                <div class="visual-text lang-text" data-en="Depth: 2-2.4 inches" data-es="Profundidad: 5-6 cm">Depth: 2-2.4 inches</div>
+                            </div>
+                            <div class="visual-item">
+                                <div class="visual-icon">⚡</div>
+                                <div class="visual-text lang-text" data-en="Rate: 100-120/min" data-es="Ritmo: 100-120/min">Rate: 100-120/min</div>
+                            </div>
+                        </div>
+                        <div class="tip">
+                            <strong class="lang-text" data-en="Tip:" data-es="Consejo:">Tip:</strong>
+                            <p class="lang-text" data-en="Push hard and fast! Allow the chest to fully recoil between compressions. Use the beat of 'Stayin' Alive' (100-120 bpm) as your rhythm." data-es="¡Empuja fuerte y rápido! Permite que el pecho se recupere completamente entre compresiones. Usa el ritmo de 'Stayin' Alive' (100-120 bpm) como tu guía.">Push hard and fast! Allow the chest to fully recoil between compressions. Use the beat of 'Stayin' Alive' (100-120 bpm) as your rhythm.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <h3 class="step-title lang-text" data-en="Use AED if Available" data-es="Usar DEA si está Disponible">Use AED if Available</h3>
+                    <div class="step-content">
+                        <p class="lang-text" data-en="Turn on the AED and follow the voice prompts. Apply pads to bare chest as shown in diagrams." data-es="Enciende el DEA y sigue las instrucciones de voz. Aplica las almohadillas en el pecho desnudo como se muestra en los diagramas.">Turn on the AED and follow the voice prompts. Apply pads to bare chest as shown in diagrams.</p>
+                        <div class="warning">
+                            <strong class="lang-text" data-en="Important:" data-es="Importante:">Important:</strong>
+                            <p class="lang-text" data-en="Do not touch the person while the AED is analyzing or delivering a shock. Continue CPR until emergency services arrive." data-es="No toques a la persona mientras el DEA está analizando o administrando una descarga. Continúa RCP hasta que lleguen los servicios de emergencia.">Do not touch the person while the AED is analyzing or delivering a shock. Continue CPR until emergency services arrive.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn btn-secondary" onclick="showGuide(null)">
+                    <span class="lang-text" data-en="Back to Main Menu" data-es="Volver al Menú Principal">Back to Main Menu</span>
+                </button>
+                <button class="btn btn-emergency">
+                    <span class="lang-text" data-en="Call Emergency Services" data-es="Llamar a Servicios de Emergencia">Call Emergency Services</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Choking Guide -->
+        <div class="guide-container hidden" id="choking-guide">
+            <div class="guide-header">
+                <h2 class="guide-title lang-text" data-en="Choking Emergency Response" data-es="Respuesta a Emergencia por Atragantamiento">Choking Emergency Response</h2>
+                <p class="guide-subtitle lang-text" data-en="How to perform the Heimlich maneuver for adults, children, and infants" data-es="Cómo realizar la maniobra de Heimlich para adultos, niños y bebés">How to perform the Heimlich maneuver for adults, children, and infants</p>
+            </div>
+            
+            <div class="step-by-step">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3 class="step-title lang-text" data-en="Recognize Choking" data-es="Reconocer el Atragantamiento">Recognize Choking</h3>
+                    <div class="step-content">
+                        <p class="lang-text" data-en="Look for these signs: inability to speak, difficulty breathing, coughing weakly, clutching throat, skin turning blue." data-es="Busca estas señales: incapacidad para hablar, dificultad para respirar, tos débil, agarrarse la garganta, piel que se vuelve azul.">Look for these signs: inability to speak, difficulty breathing, coughing weakly, clutching throat, skin turning blue.</p>
+                        <div class="tip">
+                            <strong class="lang-text" data-en="Ask:" data-es="Pregunta:">Ask:</strong>
+                            <p class="lang-text" data-en="'Are you choking?' If they can speak or cough effectively, encourage them to keep coughing." data-es="'¿Te estás atragantando?' Si pueden hablar o toser efectivamente, anímalos a seguir tosiendo.">'Are you choking?' If they can speak or cough effectively, encourage them to keep coughing.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3 class="step-title lang-text" data-en="Abdominal Thrusts (Heimlich)" data-es="Compresiones Abdominales (Heimlich)">Abdominal Thrusts (Heimlich)</h3>
+                    <div class="step-content">
+                        <p class="lang-text" data-en="For adults and children over 1 year:" data-es="Para adultos y niños mayores de 1 año:">For adults and children over 1 year:</p>
+                        <ul style="color: var(--gray-light); margin-left: 20px; margin-top: 10px;">
+                            <li class="lang-text" data-en="Stand behind the person and wrap your arms around their waist" data-es="Párate detrás de la persona y envuelve tus brazos alrededor de su cintura">Stand behind the person and wrap your arms around their waist</li>
+                            <li class="lang-text" data-en="Make a fist with one hand and place it just above their navel" data-es="Haz un puño con una mano y colócalo justo encima de su ombligo">Make a fist with one hand and place it just above their navel</li>
+                            <li class="lang-text" data-en="Grab your fist with your other hand and give quick upward thrusts" data-es="Agarra tu puño con tu otra mano y da empujes rápidos hacia arriba">Grab your fist with your other hand and give quick upward thrusts</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3 class="step-title lang-text" data-en="For Infants Under 1 Year" data-es="Para Bebés Menores de 1 Año">For Infants Under 1 Year</h3>
+                    <div class="step-content">
+                        <p class="lang-text" data-en="Never perform abdominal thrusts on infants. Instead:" data-es="Nunca realices compresiones abdominales en bebés. En su lugar:">Never perform abdominal thrusts on infants. Instead:</p>
+                        <ul style="color: var(--gray-light); margin-left: 20px; margin-top: 10px;">
+                            <li class="lang-text" data-en="Place baby face down on your forearm, supporting head and jaw" data-es="Coloca al bebé boca abajo sobre tu antebrazo, sosteniendo cabeza y mandíbula">Place baby face down on your forearm, supporting head and jaw</li>
+                            <li class="lang-text" data-en="Give 5 back blows between shoulder blades with heel of hand" data-es="Da 5 golpes en la espalda entre los omóplatos con la base de la mano">Give 5 back blows between shoulder blades with heel of hand</li>
+                            <li class="lang-text" data-en="If object doesn't dislodge, turn baby over and give 5 chest thrusts" data-es="Si el objeto no se desaloja, voltea al bebé y da 5 compresiones torácicas">If object doesn't dislodge, turn baby over and give 5 chest thrusts</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <h3 class="step-title lang-text" data-en="If Person Becomes Unresponsive" data-es="Si la Persona Pierde el Conocimiento">If Person Becomes Unresponsive</h3>
+                    <div class="step-content">
+                        <p class="lang-text" data-en="If the choking person loses consciousness:" data-es="Si la persona que se atraganta pierde el conocimiento:">If the choking person loses consciousness:</p>
+                        <ul style="color: var(--gray-light); margin-left: 20px; margin-top: 10px;">
+                            <li class="lang-text" data-en="Carefully lower them to the ground" data-es="Bájales cuidadosamente al suelo">Carefully lower them to the ground</li>
+                            <li class="lang-text" data-en="Begin CPR starting with chest compressions" data-es="Comienza RCP comenzando con compresiones torácicas">Begin CPR starting with chest compressions</li>
+                            <li class="lang-text" data-en="Check mouth for object before giving breaths" data-es="Revisa la boca en busca de objetos antes de dar respiraciones">Check mouth for object before giving breaths</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn btn-secondary" onclick="showGuide(null)">
+                    <span class="lang-text" data-en="Back to Main Menu" data-es="Volver al Menú Principal">Back to Main Menu</span>
+                </button>
+                <button class="btn btn-emergency">
+                    <span class="lang-text" data-en="Call Emergency Services" data-es="Llamar a Servicios de Emergencia">Call Emergency Services</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Allergic Reaction Guide -->
+        <div class="guide-container hidden" id="allergic-guide">
+            <div class="guide-header">
+                <h2 class="guide-title lang-text" data-en="Severe Allergic Reaction Response" data-es="Respuesta a Reacción Alérgica Severa">Severe Allergic Reaction Response</h2>
+                <p class="guide-subtitle lang-text" data-en="How to recognize and treat anaphylaxis - a life-threatening allergic emergency" data-es="Cómo reconocer y tratar la anafilaxis - una emergencia alérgica potencialmente mortal">How to recognize and treat anaphylaxis - a life-threatening allergic emergency</p>
+            </div>
+            
+            <div class="step-by-step">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3 class="step-title lang-text" data-en="Recognize Anaphylaxis Symptoms" data-es="Reconocer los Síntomas de Anafilaxis">Recognize Anaphylaxis Symptoms</h3>
+                    <div class="step-content">
+                        <p class="lang-text" data-en="Look for these signs developing rapidly (within minutes to hours):" data-es="Busca estas señales que se desarrollan rápidamente (en minutos a horas):">Look for these signs developing rapidly (within minutes to hours):</p>
+                        <ul style="color: var(--gray-light); margin-left: 20px; margin-top: 10px;">
+                            <li class="lang-text" data-en="Difficulty breathing, wheezing, or tightness in throat" data-es="Dificultad para respirar, sibilancias o opresión en la garganta">Difficulty breathing, wheezing, or tightness in throat</li>
+                            <li class="lang-text" data-en="Swelling of lips, tongue, or face" data-es="Hinchazón de labios, lengua o cara">Swelling of lips, tongue, or face</li>
+                            <li class="lang-text" data-en="Hives, itching, or skin redness" data-es="Urticaria, picazón o enrojecimiento de la piel">Hives, itching, or skin redness</li>
+                            <li class="lang-text" data-en="Rapid heartbeat, dizziness, or fainting" data-es="Latidos cardíacos rápidos, mareos o desmayos">Rapid heartbeat, dizziness, or fainting</li>
+                            <li class="lang-text" data-en="Nausea, vomiting, or abdominal pain" data-es="Náuseas, vómitos o dolor abdominal">Nausea, vomiting, or abdominal pain</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3 class="step-title lang-text" data-en="Use Epinephrine Auto-Injector" data-es="Usar Autoinyector de Epinefrina">Use Epinephrine Auto-Injector</h3>
+                    <div class="step-content">
+                        <p class="lang-text" data-en="If available and prescribed to the person:" data-es="Si está disponible y recetado para la persona:">If available and prescribed to the person:</p>
+                        <div class="visual-guide">
+                            <div class="visual-item">
+                                <div class="visual-icon">1</div>
+                                <div class="visual-text lang-text" data-en="Remove safety cap" data-es="Quitar tapa de seguridad">Remove safety cap</div>
+                            </div>
+                            <div class="visual-item">
+                                <div class="visual-icon">2</div>
+                                <div class="visual-text lang-text" data-en="Press firmly against outer thigh" data-es="Presionar firmemente contra muslo externo">Press firmly against outer thigh</div>
+                            </div>
+                            <div class="visual-item">
+                                <div class="visual-icon">3</div>
+                                <div class="visual-text lang-text" data-en="Hold for 3-10 seconds" data-es="Mantener por 3-10 segundos">Hold for 3-10 seconds</div>
+                            </div>
+                        </div>
+                        <div class="warning">
+                            <strong class="lang-text" data-en="Important:" data-es="Importante:">Important:</strong>
+                            <p class="lang-text" data-en="Epinephrine can be injected through clothing. Do not inject into buttocks or other areas. Massage injection area for 10 seconds after." data-es="La epinefrina puede inyectarse a través de la ropa. No inyectar en glúteos u otras áreas. Masajear área de inyección por 10 segundos después.">Epinephrine can be injected through clothing. Do not inject into buttocks or other areas. Massage injection area for 10 seconds after.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3 class="step-title lang-text" data-en="Emergency Positioning & Monitoring" data-es="Posicionamiento de Emergencia y Monitoreo">Emergency Positioning & Monitoring</h3>
+                    <div class="step-content">
+                        <p class="lang-text" data-en="After administering epinephrine:" data-es="Después de administrar epinefrina:">After administering epinephrine:</p>
+                        <ul style="color: var(--gray-light); margin-left: 20px; margin-top: 10px;">
+                            <li class="lang-text" data-en="Have person lie flat on their back with feet elevated" data-es="Hacer que la persona se acueste boca arriba con pies elevados">Have person lie flat on their back with feet elevated</li>
+                            <li class="lang-text" data-en="If breathing is difficult, help them sit up" data-es="Si la respiración es difícil, ayudarlos a sentarse">If breathing is difficult, help them sit up</li>
+                            <li class="lang-text" data-en="If vomiting, turn them on their side" data-es="Si están vomitando, voltearlos de lado">If vomiting, turn them on their side</li>
+                            <li class="lang-text" data-en="Loosen tight clothing and cover with blanket" data-es="Aflojar ropa ajustada y cubrir con manta">Loosen tight clothing and cover with blanket</li>
+                            <li class="lang-text" data-en="Do not give anything to drink" data-es="No dar nada de beber">Do not give anything to drink</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <h3 class="step-title lang-text" data-en="Second Dose & Ongoing Care" data-es="Segunda Dosis y Cuidado Continuo">Second Dose & Ongoing Care</h3>
+                    <div class="step-content">
+                        <p class="lang-text" data-en="If symptoms persist or return:" data-es="Si los síntomas persisten o regresan:">If symptoms persist or return:</p>
+                        <ul style="color: var(--gray-light); margin-left: 20px; margin-top: 10px;">
+                            <li class="lang-text" data-en="Second epinephrine dose may be given after 5-15 minutes if needed" data-es="Se puede administrar una segunda dosis de epinefrina después de 5-15 minutos si es necesario">Second epinephrine dose may be given after 5-15 minutes if needed</li>
+                            <li class="lang-text" data-en="Continue monitoring breathing and consciousness" data-es="Continuar monitoreando respiración y conciencia">Continue monitoring breathing and consciousness</li>
+                            <li class="lang-text" data-en="Be prepared to perform CPR if breathing stops" data-es="Estar preparado para realizar RCP si la respiración se detiene">Be prepared to perform CPR if breathing stops</li>
+                            <li class="lang-text" data-en="Even if symptoms improve, medical evaluation is essential" data-es="Incluso si los síntomas mejoran, la evaluación médica es esencial">Even if symptoms improve, medical evaluation is essential</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn btn-secondary" onclick="showGuide(null)">
+                    <span class="lang-text" data-en="Back to Main Menu" data-es="Volver al Menú Principal">Back to Main Menu</span>
+                </button>
+                <button class="btn btn-emergency">
+                    <span class="lang-text" data-en="Call Emergency Services" data-es="Llamar a Servicios de Emergencia">Call Emergency Services</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Severe Bleeding Guide -->
+        <div class="guide-container hidden" id="bleeding-guide">
+            <div class="guide-header">
+                <h2 class="guide-title lang-text" data-en="Severe Bleeding Control" data-es="Control de Sangrado Severo">Severe Bleeding Control</h2>
+                <p class="guide-subtitle lang-text" data-en="How to stop life-threatening bleeding using direct pressure, wound packing, and tourniquets" data-es="Cómo detener el sangrado potencialmente mortal usando presión directa, empaquetamiento de heridas y torniquetes">How to stop life-threatening bleeding using direct pressure, wound packing, and tourniquets</p>
+            </div>
+            
+            <div class="step-by-step">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3 class="step-title lang-text" data-en="Ensure Safety & Expose Wound" data-es="Asegurar Seguridad y Exponer Herida">Ensure Safety & Expose Wound</h3>
+                    <div class="step-content">
+                        <p class="lang-text" data-en="Before approaching:" data-es="Antes de acercarse:">Before approaching:</p>
+                        <ul style="color: var(--gray-light); margin-left: 20px; margin-top: 10px;">
+                            <li class="lang-text" data-en="Ensure the scene is safe for you to help" data-es="Asegurar que la escena sea segura para que ayudes">Ensure the scene is safe for you to help</li>
+                            <li class="lang-text" data-en="Wear gloves if available to protect from bloodborne pathogens" data-es="Usar guantes si están disponibles para protegerte de patógenos transmitidos por la sangre">Wear gloves if available to protect from bloodborne pathogens</li>
+                            <li class="lang-text" data-en="Remove or cut away clothing to clearly see the wound" data-es="Quitar o cortar la ropa para ver claramente la herida">Remove or cut away clothing to clearly see the wound</li>
+                            <li class="lang-text" data-en="Look for the source of bleeding - don't be distracted by less serious injuries" data-es="Buscar la fuente del sangrado - no distraerse con lesiones menos graves">Look for the source of bleeding - don't be distracted by less serious injuries</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3 class="step-title lang-text" data-en="Apply Direct Pressure" data-es="Aplicar Presión Directa">Apply Direct Pressure</h3>
+                    <div class="step-content">
+                        <p class="lang-text" data-en="For most severe bleeding:" data-es="Para la mayoría de los sangrados severos:">For most severe bleeding:</p>
+                        <div class="visual-guide">
+                            <div class="visual-item">
+                                <div class="visual-icon">✋</div>
+                                <div class="visual-text lang-text" data-en="Use clean cloth or gauze" data-es="Usar tela limpia o gasa">Use clean cloth or gauze</div>
+                            </div>
+                            <div class="visual-item">
+                                <div class="visual-icon">🩹</div>
+                                <div class="visual-text lang-text" data-en="Press directly on wound" data-es="Presionar directamente sobre la herida">Press directly on wound</div>
+                            </div>
+                            <div class="visual-item">
+                                <div class="visual-icon">⏱️</div>
+                                <div class="visual-text lang-text" data-en="Maintain pressure" data-es="Mantener presión">Maintain pressure</div>
+                            </div>
+                        </div>
+                        <div class="tip">
+                            <strong class="lang-text" data-en="Technique:" data-es="Técnica:">Technique:</strong>
+                            <p class="lang-text" data-en="Use the palm of your hand and apply firm, steady pressure. Do not remove dressing to check bleeding - add more layers if blood soaks through." data-es="Usar la palma de la mano y aplicar presión firme y constante. No quitar el apósito para revisar el sangrado - agregar más capas si la sangre empapa.">Use the palm of your hand and apply firm, steady pressure. Do not remove dressing to check bleeding - add more layers if blood soaks through.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3 class="step-title lang-text" data-en="Use Tourniquet for Limb Bleeding" data-es="Usar Torniquete para Sangrado de Extremidades">Use Tourniquet for Limb Bleeding</h3>
+                    <div class="step-content">
+                        <p class="lang-text" data-en="For severe bleeding from arms or legs that doesn't stop with direct pressure:" data-es="Para sangrado severo de brazos o piernas que no se detiene con presión directa:">For severe bleeding from arms or legs that doesn't stop with direct pressure:</p>
+                        <ul style="color: var(--gray-light); margin-left: 20px; margin-top: 10px;">
+                            <li class="lang-text" data-en="Place tourniquet 2-3 inches above wound (closer to torso)" data-es="Colocar torniquete 5-7 cm arriba de la herida (más cerca del torso)">Place tourniquet 2-3 inches above wound (closer to torso)</li>
+                            <li class="lang-text" data-en="Pull strap tight and secure fastener" data-es="Jalar correa ajustada y asegurar cierre">Pull strap tight and secure fastener</li>
+                            <li class="lang-text" data-en="Twist rod until bleeding stops" data-es="Girar varilla hasta que el sangrado se detenga">Twist rod until bleeding stops</li>
+                            <li class="lang-text" data-en="Secure rod in place and note time applied" data-es="Asegurar varilla en su lugar y anotar hora de aplicación">Secure rod in place and note time applied</li>
+                        </ul>
+                        <div class="warning">
+                            <strong class="lang-text" data-en="Important:" data-es="Importante:">Important:</strong>
+                            <p class="lang-text" data-en="Once applied, do not remove tourniquet. Medical professionals will remove it in controlled setting. Tourniquets hurt but save lives!" data-es="Una vez aplicado, no quitar el torniquete. Profesionales médicos lo quitarán en un entorno controlado. ¡Los torniquetes duelen pero salvan vidas!">Once applied, do not remove tourniquet. Medical professionals will remove it in controlled setting. Tourniquets hurt but save lives!</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <h3 class="step-title lang-text" data-en="Wound Packing & Ongoing Care" data-es="Empaquetamiento de Heridas y Cuidado Continuo">Wound Packing & Ongoing Care</h3>
+                    <div class="step-content">
+                        <p class="lang-text" data-en="For deep wounds where direct pressure isn't effective:" data-es="Para heridas profundas donde la presión directa no es efectiva:">For deep wounds where direct pressure isn't effective:</p>
+                        <ul style="color: var(--gray-light); margin-left: 20px; margin-top: 10px;">
+                            <li class="lang-text" data-en="Pack wound tightly with gauze or clean cloth" data-es="Empacar herida firmemente con gasa o tela limpia">Pack wound tightly with gauze or clean cloth</li>
+                            <li class="lang-text" data-en="Apply direct pressure over packed wound" data-es="Aplicar presión directa sobre herida empacada">Apply direct pressure over packed wound</li>
+                            <li class="lang-text" data-en="Keep person warm and monitor for shock" data-es="Mantener a la persona caliente y monitorear por shock">Keep person warm and monitor for shock</li>
+                            <li class="lang-text" data-en="Do not give food or water" data-es="No dar comida ni agua">Do not give food or water</li>
+                            <li class="lang-text" data-en="Continue care until medical help arrives" data-es="Continuar cuidado hasta que llegue ayuda médica">Continue care until medical help arrives</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn btn-secondary" onclick="showGuide(null)">
+                    <span class="lang-text" data-en="Back to Main Menu" data-es="Volver al Menú Principal">Back to Main Menu</span>
+                </button>
+                <button class="btn btn-emergency">
+                    <span class="lang-text" data-en="Call Emergency Services" data-es="Llamar a Servicios de Emergencia">Call Emergency Services</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Additional Emergency Resources -->
+        <div class="section">
+            <h2 class="section-title lang-text" data-en="Additional Emergency Resources" data-es="Recursos de Emergencia Adicionales">Additional Emergency Resources</h2>
+            <div class="resources-grid">
+                <div class="resource-card" data-guide="hypothermia">
+                    <div class="resource-icon">🌡️</div>
+                    <h3 class="resource-title lang-text" data-en="Hypothermia & Altitude Sickness" data-es="Hipotermia y Mal de Altura">Hypothermia & Altitude Sickness</h3>
+                    <p class="resource-desc lang-text" data-en="Recognize and treat cold exposure and altitude-related illnesses common in mountain environments" data-es="Reconoce y trata la exposición al frío y enfermedades relacionadas con la altitud comunes en entornos montañosos">Recognize and treat cold exposure and altitude-related illnesses common in mountain environments</p>
+                    <button class="btn btn-primary" style="margin-top: 15px;">
+                        <span class="lang-text" data-en="Learn More" data-es="Aprender Más">Learn More</span>
+                    </button>
+                </div>
+                
+                <div class="resource-card" data-guide="bites">
+                    <div class="resource-icon">🐍</div>
+                    <h3 class="resource-title lang-text" data-en="Snake & Insect Bites" data-es="Mordeduras de Serpiente e Insectos">Snake & Insect Bites</h3>
+                    <p class="resource-desc lang-text" data-en="First aid for venomous bites and stings encountered in wilderness areas" data-es="Primeros auxilios para mordeduras y picaduras venenosas encontradas en áreas silvestres">First aid for venomous bites and stings encountered in wilderness areas</p>
+                    <button class="btn btn-primary" style="margin-top: 15px;">
+                        <span class="lang-text" data-en="Learn More" data-es="Aprender Más">Learn More</span>
+                    </button>
+                </div>
+                
+                <div class="resource-card" data-guide="fractures">
+                    <div class="resource-icon">🦴</div>
+                    <h3 class="resource-title lang-text" data-en="Fractures & Sprains" data-es="Fracturas y Esguinces">Fractures & Sprains</h3>
+                    <p class="resource-desc lang-text" data-en="Immobilization techniques and pain management for musculoskeletal injuries" data-es="Técnicas de inmovilización y manejo del dolor para lesiones musculoesqueléticas">Immobilization techniques and pain management for musculoskeletal injuries</p>
+                    <button class="btn btn-primary" style="margin-top: 15px;">
+                        <span class="lang-text" data-en="Learn More" data-es="Aprender Más">Learn More</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Hypothermia Guide -->
+        <div class="guide-container hidden" id="hypothermia-guide">
+            <div class="guide-header">
+                <h2 class="guide-title lang-text" data-en="Hypothermia & Altitude Sickness Response" data-es="Respuesta a Hipotermia y Mal de Altura">Hypothermia & Altitude Sickness Response</h2>
+                <p class="guide-subtitle lang-text" data-en="How to recognize and treat cold exposure and altitude-related emergencies in mountain environments" data-es="Cómo reconocer y tratar la exposición al frío y emergencias relacionadas con la altitud en entornos montañosos">How to recognize and treat cold exposure and altitude-related emergencies in mountain environments</p>
+            </div>
+            
+            <div class="step-by-step">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3 class="step-title lang-text" data-en="Recognize Hypothermia" data-es="Reconocer Hipotermia">Recognize Hypothermia</h3>
+                    <div class="step-content">
+                        <p class="lang-text" data-en="Look for these signs of dangerously low body temperature:" data-es="Busca estas señales de temperatura corporal peligrosamente baja:">Look for these signs of dangerously low body temperature:</p>
+                        <ul style="color: var(--gray-light); margin-left: 20px; margin-top: 10px;">
+                            <li class="lang-text" data-en="Shivering (may stop in severe cases)" data-es="Temblores (pueden detenerse en casos severos)">Shivering (may stop in severe cases)</li>
+                            <li class="lang-text" data-en="Confusion, drowsiness, or slurred speech" data-es="Confusión, somnolencia o habla arrastrada">Confusion, drowsiness, or slurred speech</li>
+                            <li class="lang-text" data-en="Slow, shallow breathing" data-es="Respiración lenta y superficial">Slow, shallow breathing</li>
+                            <li class="lang-text" data-en="Weak pulse, loss of coordination" data-es="Pulso débil, pérdida de coordinación">Weak pulse, loss of coordination</li>
+                            <li class="lang-text" data-en="Cold, pale skin" data-es="Piel fría y pálida">Cold, pale skin</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3 class="step-title lang-text" data-en="Treat Hypothermia" data-es="Tratar Hipotermia">Treat Hypothermia</h3>
+                    <div class="step-content">
+                        <p class="lang-text" data-en="For mild to moderate hypothermia:" data-es="Para hipotermia leve a moderada:">For mild to moderate hypothermia:</p>
+                        <ul style="color: var(--gray-light); margin-left: 20px; margin-top: 10px;">
+                            <li class="lang-text" data-en="Move to warm, dry shelter" data-es="Mover a refugio cálido y seco">Move to warm, dry shelter</li>
+                            <li class="lang-text" data-en="Remove wet clothing" data-es="Quitar ropa mojada">Remove wet clothing</li>
+                            <li class="lang-text" data-en="Warm center of body first (chest, neck, groin)" data-es="Calentar centro del cuerpo primero (pecho, cuello, ingle)">Warm center of body first (chest, neck, groin)</li>
+                            <li class="lang-text" data-en="Use skin-to-skin contact under loose layers" data-es="Usar contacto piel con piel bajo capas sueltas">Use skin-to-skin contact under loose layers</li>
+                            <li class="lang-text" data-en="Give warm, sweet drinks if person is alert" data-es="Dar bebidas calientes y dulces si la persona está alerta">Give warm, sweet drinks if person is alert</li>
+                        </ul>
+                        <div class="warning">
+                            <strong class="lang-text" data-en="Do Not:" data-es="No Hacer:">Do Not:</strong>
+                            <p class="lang-text" data-en="Do not rub or massage extremities. Do not use direct heat sources. Do not give alcohol. Handle gently to avoid cardiac arrest." data-es="No frotar ni masajear extremidades. No usar fuentes de calor directo. No dar alcohol. Manipular suavemente para evitar paro cardíaco.">Do not rub or massage extremities. Do not use direct heat sources. Do not give alcohol. Handle gently to avoid cardiac arrest.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3 class="step-title lang-text" data-en="Recognize Altitude Sickness" data-es="Reconocer Mal de Altura">Recognize Altitude Sickness</h3>
+                    <div class="step-content">
+                        <p class="lang-text" data-en="Symptoms of acute mountain sickness (AMS):" data-es="Síntomas del mal agudo de montaña (MAM):">Symptoms of acute mountain sickness (AMS):</p>
+                        <ul style="color: var(--gray-light); margin-left: 20px; margin-top: 10px;">
+                            <li class="lang-text" data-en="Headache (usually throbbing, worse at night)" data-es="Dolor de cabeza (usualmente pulsátil, peor por la noche)">Headache (usually throbbing, worse at night)</li>
+                            <li class="lang-text" data-en="Nausea, vomiting, loss of appetite" data-es="Náuseas, vómitos, pérdida de apetito">Nausea, vomiting, loss of appetite</li>
+                            <li class="lang-text" data-en="Fatigue, weakness, dizziness" data-es="Fatiga, debilidad, mareos">Fatigue, weakness, dizziness</li>
+                            <li class="lang-text" data-en="Difficulty sleeping" data-es="Dificultad para dormir">Difficulty sleeping</li>
+                        </ul>
+                        <div class="tip">
+                            <strong class="lang-text" data-en="Severe Symptoms (HAPE/HACE):" data-es="Síntomas Severos (HAPE/HACE):">Severe Symptoms (HAPE/HACE):</strong>
+                            <p class="lang-text" data-en="Cough with pink frothy sputum, confusion, loss of coordination, severe shortness of breath at rest - these require immediate descent!" data-es="Tos con esputo rosado espumoso, confusión, pérdida de coordinación, severa falta de aire en reposo - ¡estos requieren descenso inmediato!">Cough with pink frothy sputum, confusion, loss of coordination, severe shortness of breath at rest - these require immediate descent!</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <h3 class="step-title lang-text" data-en="Treat Altitude Sickness" data-es="Tratar Mal de Altura">Treat Altitude Sickness</h3>
+                    <div class="step-content">
+                        <p class="lang-text" data-en="For mild AMS:" data-es="Para MAM leve:">For mild AMS:</p>
+                        <ul style="color: var(--gray-light); margin-left: 20px; margin-top: 10px;">
+                            <li class="lang-text" data-en="Stop ascent and rest at current altitude" data-es="Detener ascenso y descansar en altitud actual">Stop ascent and rest at current altitude</li>
+                            <li class="lang-text" data-en="Drink plenty of fluids" data-es="Beber muchos líquidos">Drink plenty of fluids</li>
+                            <li class="lang-text" data-en="Take pain relievers for headache" data-es="Tomar analgésicos para dolor de cabeza">Take pain relievers for headache</li>
+                            <li class="lang-text" data-en="Consider descent if symptoms don't improve in 24 hours" data-es="Considerar descenso si síntomas no mejoran en 24 horas">Consider descent if symptoms don't improve in 24 hours</li>
+                        </ul>
+                        <p class="lang-text" data-en="For severe AMS (HAPE/HACE):" data-es="Para MAM severo (HAPE/HACE):">For severe AMS (HAPE/HACE):</p>
+                        <ul style="color: var(--gray-light); margin-left: 20px; margin-top: 10px;">
+                            <li class="lang-text" data-en="Immediate descent is the primary treatment" data-es="Descenso inmediato es el tratamiento primario">Immediate descent is the primary treatment</li>
+                            <li class="lang-text" data-en="Use oxygen if available" data-es="Usar oxígeno si está disponible">Use oxygen if available</li>
+                            <li class="lang-text" data-en="Medications may help but don't replace descent" data-es="Medicamentos pueden ayudar pero no reemplazan el descenso">Medications may help but don't replace descent</li>
+                            <li class="lang-text" data-en="Seek medical evacuation immediately" data-es="Buscar evacuación médica inmediatamente">Seek medical evacuation immediately</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn btn-secondary" onclick="showGuide(null)">
+                    <span class="lang-text" data-en="Back to Main Menu" data-es="Volver al Menú Principal">Back to Main Menu</span>
+                </button>
+                <button class="btn btn-emergency">
+                    <span class="lang-text" data-en="Call Emergency Services" data-es="Llamar a Servicios de Emergencia">Call Emergency Services</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Snake & Insect Bites Guide -->
+        <div class="guide-container hidden" id="bites-guide">
+            <div class="guide-header">
+                <h2 class="guide-title lang-text" data-en="Snake & Insect Bite Response" data-es="Respuesta a Mordeduras de Serpiente e Insectos">Snake & Insect Bite Response</h2>
+                <p class="guide-subtitle lang-text" data-en="First aid for venomous bites and stings encountered in wilderness areas" data-es="Primeros auxilios para mordeduras y picaduras venenosas encontradas en áreas silvestres">First aid for venomous bites and stings encountered in wilderness areas</p>
+            </div>
+            
+            <div class="step-by-step">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3 class="step-title lang-text" data-en="Snake Bite First Aid" data-es="Primeros Auxilios para Mordedura de Serpiente">Snake Bite First Aid</h3>
+                    <div class="step-content">
+                        <p class="lang-text" data-en="For venomous snake bites:" data-es="Para mordeduras de serpiente venenosa:">For venomous snake bites:</p>
+                        <ul style="color: var(--gray-light); margin-left: 20px; margin-top: 10px;">
+                            <li class="lang-text" data-en="Move away from the snake to avoid additional bites" data-es="Alejarse de la serpiente para evitar mordeduras adicionales">Move away from the snake to avoid additional bites</li>
+                            <li class="lang-text" data-en="Keep the person calm and still" data-es="Mantener a la persona calmada y quieta">Keep the person calm and still</li>
+                            <li class="lang-text" data-en="Position bite below heart level if possible" data-es="Posicionar mordedura bajo nivel del corazón si es posible">Position bite below heart level if possible</li>
+                            <li class="lang-text" data-en="Remove tight clothing or jewelry near bite" data-es="Quitar ropa ajustada o joyería cerca de la mordedura">Remove tight clothing or jewelry near bite</li>
+                            <li class="lang-text" data-en="Note snake appearance for identification" data-es="Notar apariencia de serpiente para identificación">Note snake appearance for identification</li>
+                        </ul>
+                        <div class="warning">
+                            <strong class="lang-text" data-en="Do Not:" data-es="No Hacer:">Do Not:</strong>
+                            <p class="lang-text" data-en="Do not cut the wound, suck out venom, use tourniquet, apply ice, or give alcohol/caffeine. These can cause more harm!" data-es="No cortar la herida, chupar veneno, usar torniquete, aplicar hielo, o dar alcohol/cafeína. ¡Estos pueden causar más daño!">Do not cut the wound, suck out venom, use tourniquet, apply ice, or give alcohol/caffeine. These can cause more harm!</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3 class="step-title lang-text" data-en="Spider & Scorpion Stings" data-es="Picaduras de Araña y Escorpión">Spider & Scorpion Stings</h3>
+                    <div class="step-content">
+                        <p class="lang-text" data-en="For venomous spider and scorpion stings:" data-es="Para picaduras de araña y escorpión venenosos:">For venomous spider and scorpion stings:</p>
+                        <ul style="color: var(--gray-light); margin-left: 20px; margin-top: 10px;">
+                            <li class="lang-text" data-en="Wash area with soap and water" data-es="Lavar área con jabón y agua">Wash area with soap and water</li>
+                            <li class="lang-text" data-en="Apply cool compress to reduce pain and swelling" data-es="Aplicar compresa fría para reducir dolor e hinchazón">Apply cool compress to reduce pain and swelling</li>
+                            <li class="lang-text" data-en="Elevate affected limb if possible" data-es="Elevar extremidad afectada si es posible">Elevate affected limb if possible</li>
+                            <li class="lang-text" data-en="Seek medical attention for severe reactions" data-es="Buscar atención médica para reacciones severas">Seek medical attention for severe reactions</li>
+                        </ul>
+                        <div class="tip">
+                            <strong class="lang-text" data-en="Severe Symptoms:" data-es="Síntomas Severos:">Severe Symptoms:</strong>
+                            <p class="lang-text" data-en="Difficulty breathing, muscle spasms, severe pain, nausea/vomiting, sweating - seek immediate medical care!" data-es="Dificultad para respirar, espasmos musculares, dolor severo, náuseas/vómitos, sudoración - ¡buscar atención médica inmediata!">Difficulty breathing, muscle spasms, severe pain, nausea/vomiting, sweating - seek immediate medical care!</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3 class="step-title lang-text" data-en="Bee & Wasp Stings" data-es="Picaduras de Abeja y Avispa">Bee & Wasp Stings</h3>
+                    <div class="step-content">
+                        <p class="lang-text" data-en="For bee and wasp stings:" data-es="Para picaduras de abeja y avispa:">For bee and wasp stings:</p>
+                        <ul style="color: var(--gray-light); margin-left: 20px; margin-top: 10px;">
+                            <li class="lang-text" data-en="Remove stinger by scraping with credit card or fingernail" data-es="Remover aguijón raspando con tarjeta de crédito o uña">Remove stinger by scraping with credit card or fingernail</li>
+                            <li class="lang-text" data-en="Wash area with soap and water" data-es="Lavar área con jabón y agua">Wash area with soap and water</li>
+                            <li class="lang-text" data-en="Apply cold pack to reduce swelling" data-es="Aplicar paquete frío para reducir hinchazón">Apply cold pack to reduce swelling</li>
+                            <li class="lang-text" data-en="Take antihistamine for itching if available" data-es="Tomar antihistamínico para picazón si está disponible">Take antihistamine for itching if available</li>
+                        </ul>
+                        <div class="warning">
+                            <strong class="lang-text" data-en="Allergic Reaction:" data-es="Reacción Alérgica:">Allergic Reaction:</strong>
+                            <p class="lang-text" data-en="If signs of severe allergic reaction develop (difficulty breathing, swelling, dizziness), use epinephrine auto-injector if available and seek emergency care immediately." data-es="Si se desarrollan signos de reacción alérgica severa (dificultad para respirar, hinchazón, mareos), usar autoinyector de epinefrina si está disponible y buscar cuidado de emergencia inmediatamente.">If signs of severe allergic reaction develop (difficulty breathing, swelling, dizziness), use epinephrine auto-injector if available and seek emergency care immediately.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <h3 class="step-title lang-text" data-en="Tick Bites & Prevention" data-es="Mordeduras de Garrapata y Prevención">Tick Bites & Prevention</h3>
+                    <div class="step-content">
+                        <p class="lang-text" data-en="For tick bites:" data-es="Para mordeduras de garrapata:">For tick bites:</p>
+                        <ul style="color: var(--gray-light); margin-left: 20px; margin-top: 10px;">
+                            <li class="lang-text" data-en="Use fine-tipped tweezers to grasp tick close to skin" data-es="Usar pinzas de punta fina para agarrar garrapata cerca de la piel">Use fine-tipped tweezers to grasp tick close to skin</li>
+                            <li class="lang-text" data-en="Pull upward with steady, even pressure" data-es="Jalar hacia arriba con presión constante y uniforme">Pull upward with steady, even pressure</li>
+                            <li class="lang-text" data-en="Clean bite area and hands thoroughly" data-es="Limpiar área de mordedura y manos thoroughly">Clean bite area and hands thoroughly</li>
+                            <li class="lang-text" data-en="Save tick in container for identification if possible" data-es="Guardar garrapata en contenedor para identificación si es posible">Save tick in container for identification if possible</li>
+                        </ul>
+                        <div class="tip">
+                            <strong class="lang-text" data-en="Watch for Symptoms:" data-es="Observar por Síntomas:">Watch for Symptoms:</strong>
+                            <p class="lang-text" data-en="Fever, rash, headache, fatigue, muscle/joint pain in weeks following bite may indicate tick-borne illness. Seek medical attention." data-es="Fiebre, sarpullido, dolor de cabeza, fatiga, dolor muscular/articular en semanas siguientes a mordedura pueden indicar enfermedad transmitida por garrapatas. Buscar atención médica.">Fever, rash, headache, fatigue, muscle/joint pain in weeks following bite may indicate tick-borne illness. Seek medical attention.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="btn btn-secondary" onclick="showGuide(null)">
+                    <span class="lang-text" data-en="Back to Main Menu" data-es="Volver al Menú Principal">Back to Main Menu</span>
+                </button>
+                <button class="btn btn-emergency">
+                    <span class="lang-text" data-en="Call Emergency Services" data-es="Llamar a Servicios de Emergencia">Call Emergency Services</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Fractures & Sprains Guide -->
+        <div class="guide-container hidden" id="fractures-guide">
+            <div class="guide-header">
+                <h2 class="guide-title lang-text" data-en="Fractures & Sprains Response" data-es="Respuesta a Fracturas y Esguinces">Fractures & Sprains Response</h2>
+                <p class="guide-subtitle lang-text" data-en="Immobilization techniques and pain management for musculoskeletal injuries" data-es="Técnicas de inmovilización y manejo del dolor para lesiones musculoesqueléticas">Immobilization techniques and pain management for musculoskeletal injuries</p>
+            </div>
+            
+            <div class="step-by-step">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3 class="step-title lang-text" data-en="Recognize Fractures vs Sprains" data-es="Reconocer Fracturas vs Esguinces">Recognize Fractures vs Sprains</h3>
+                    <div class="step-content">
+                        <p class="lang-text" data-en="Signs of possible fracture:" data-es="Señales de posible fractura:">Signs of possible fracture:</p>
+                        <ul style="color: var(--gray-light); margin-left: 20px; margin-top: 10px;">
+                            <li class="lang-text" data-en="Visible deformity or abnormal positioning" data-es="Deformidad visible o posicionamiento anormal">Visible deformity or abnormal positioning</li>
+                            <li class="lang-text" data-en="Bone protruding through skin (open fracture)" data-es="Hueso protruyendo a través de la piel (fractura abierta)">Bone protruding through skin (open fracture)</li>
+                            <li class="lang-text" data-en="Heard or felt a snap or grind at time of injury" data-es="Escuchado o sentido un chasquido o molienda al momento de la lesión">Heard or felt a snap or grind at time of injury</li>
+                            <li class="lang-text" data-en="Severe pain that worsens with movement" data-es="Dolor severo que empeora con movimiento">Severe pain that worsens with movement</li>
+                            <li class="lang-text" data-en="Inability to bear weight or use limb" data-es="Incapacidad para soportar peso o usar extremidad">Inability to bear weight or use limb</li>
+                        </ul>
+                        <p class="lang-text" data-en="Signs of sprain:" data-es="Señales de esguince:">Signs of sprain:</p>
+                        <ul style="color: var(--gray-light); margin-left: 20px; margin-top: 10px;">
+                            <li class="lang-text" data-en="Pain, swelling, and bruising around joint" data-es="Dolor, hinchazón y moretones alrededor de la articulación">Pain, swelling, and bruising around joint</li>
+                            <li class="lang-text" data-en="Limited ability to move joint" data-es="Capacidad limitada para mover articulación">Limited ability to move joint</li>
+                            <li class="lang-text" data-en="Feeling of looseness in joint" data-es="Sensación de soltura en articulación">Feeling of looseness in joint</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3 class="step-title lang-text" data-en="Initial Care for Suspected Fracture" data-es="Cuidado Inicial para Sospecha de Fractura">Initial Care for Suspected Fracture</h3>
+                    <div class="step-content">
+                        <p class="lang-text" data-en="For suspected fractures:" data-es="Para sospecha de fracturas:">For suspected fractures:</p>
+                        <ul style="color: var(--gray-light); margin-left: 20px; margin-top: 10px;">
+                            <li class="lang-text" data-en="Keep injured area still - don't try to realign bone" data-es="Mantener área lesionada quieta - no intentar realinear hueso">Keep injured area still - don't try to realigen bone</li>
+                            <li class="lang-text" data-en="Stop any bleeding with direct pressure" data-es="Detener cualquier sangrado con presión directa">Stop any bleeding with direct pressure</li>
+                            <li class="lang-text" data-en="Apply ice pack wrapped in cloth to reduce swelling" data-es="Aplicar paquete de hielo envuelto en tela para reducir hinchazón">Apply ice pack wrapped in cloth to reduce swelling</li>
+                            <li class="lang-text" data-en="Treat for shock if signs present" data-es="Tratar por shock si hay señales presentes">Treat for shock if signs present</li>
+                        </ul>
+                        <div class="warning">
+                            <strong class="lang-text" data-en="For Open Fractures:" data-es="Para Fracturas Abiertas:">For Open Fractures:</strong>
+                            <p class="lang-text" data-en="Cover wound with sterile dressing but do not attempt to push bone back under skin. Control bleeding with direct pressure around (not on) protruding bone." data-es="Cubrir herida con apósito estéril pero no intentar empujar hueso bajo la piel. Controlar sangrado con presión directa alrededor (no sobre) hueso protruyente.">Cover wound with sterile dressing but do not attempt to push bone back under skin. Control bleeding with direct pressure around (not on) protruding bone.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3 class="step-title lang-text" data-en="Immobilization Techniques" data-es="Técnicas de Inmovilización">Immobilization Techniques</h3>
+                    <div class="step-content">
+                        <p class="lang-text" data-en="How to immobilize injured limbs:" data-es="Cómo inmovilizar extremidades lesionadas:">How to immobilize injured limbs:</p>
+                        <div class="visual-guide">
+                            <div class="visual-item">
+                                <div class="visual-icon">🦵</div>
+                                <div class="visual-text lang-text" data-en="Splint above and below injury" data-es="Férula arriba y abajo de lesión">Splint above and below injury</div>
+                            </div>
+                            <div class="visual-item">
+                                <div class="visual-icon">📏</div>
+                                <div class="visual-text lang-text" data-en="Include joints in splint" data-es="Incluir articulaciones en férula">Include joints in splint</div>
+                            </div>
+                            <div class="visual-item">
+                                <div class="visual-icon">🩹</div>
+                                <div class="visual-text lang-text" data-en="Pad splint for comfort" data-es="Ac
