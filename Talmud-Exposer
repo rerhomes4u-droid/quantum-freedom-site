@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Talmud Truth Exposer - Interactive Investigation</title>
+    <style>
+        :root {
+            --dark: #1a1a1a;
+            --darker: #0a0a0a;
+            --gold: #FFD700;
+            --red: #8B0000;
+            --blue: #1E90FF;
+            --light: #f0f0f0;
+            --gray: #666;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            padding: 30px 0;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at center, rgba(255, 215, 0, 0.1) 0%, transparent 70%);
+            z-index: -1;
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 15px;
+            background: linear-gradient(45deg, var(--gold), var(--blue));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .tagline {
+            font-size: 1.3rem;
+            color: var(--gold);
+            max-width: 800px;
+            margin: 0 auto 20px;
+        }
+        
+        .disclaimer {
+            background: rgba(139, 0, 0, 0.3);
+            border-left: 4px solid var(--red);
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .warning {
+            background: rgba(255, 215, 0, 0.2);
+            border: 2px solid var(--gold);
+            padding: 25px;
+            border-radius: 10px;
+            margin: 30px 0;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+        
+        .card {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--gold), var(--blue));
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(255, 215, 0, 0.2);
+        }
+        
+        .card h3 {
+            color: var(--gold);
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .card h3 i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .card ul {
+            list-style-type: none;
+        }
+        
+        .card li {
+            margin-bottom: 10px;
+            padding-left: 20px;
+            position: relative;
+        }
+        
+        .card li:before {
+            content: "📖";
+            position: absolute;
+            left: 0;
+        }
+        
+        .topics {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+            margin: 40px 0;
+            gap: 20px;
+        }
+        
+        .topic {
+            text-align: center;
+            background: rgba(255, 215, 0, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            flex: 1;
+            min-width: 200px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .topic:hover {
+            transform: scale(1.05);
+            background: rgba(30, 144, 255, 0.2);
+        }
+        
+        .topic-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+        
+        .topic-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: var(--gold);
+            display: block;
+            margin-bottom: 10px;
+        }
+        
+        .cta-section {
+            text-align: center;
+            padding: 40px 20px;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 20px;
+            margin: 50px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .cta-section:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at center, rgba(255, 215, 0, 0.1) 0%, transparent 70%);
+            z-index: -1;
+        }
+        
+        .cta-title {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: var(--gold);
+        }
+        
+        .cta-text {
+            max-width: 700px;
+            margin: 0 auto 30px;
+            font-size: 1.2rem;
+        }
+        
+        .btn {
+            display: inline-block;
+            background: linear-gradient(45deg, var(--gold), var(--blue));
+            color: var(--dark);
+            padding: 15px 40px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.2rem;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+            border: none;
+            cursor: pointer;
+            margin: 10px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(255, 215, 0, 0.4);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            border: 2px solid var(--gold);
+            color: var(--gold);
+        }
+        
+        .investigation {
+            background: rgba(139, 0, 0, 0.2);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 40px 0;
+            border-left: 5px solid var(--red);
+        }
+        
+        .investigation h3 {
+            color: var(--gold);
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+        
+        .analysis {
+            background: rgba(30, 144, 255, 0.1);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 40px 0;
+            border-left: 5px solid var(--blue);
+        }
+        
+        .analysis h3 {
+            color: var(--gold);
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 30px 0;
+            margin-top: 50px;
+            border-top: 1px solid rgba(255, 215, 0, 0.3);
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .hidden-content {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 10px;
+            border-left: 3px solid var(--gold);
+        }
+        
+        .toggle-btn {
+            background: rgba(255, 215, 0, 0.2);
+            border: none;
+            color: var(--gold);
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        
+        .quote-box {
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px solid var(--gold);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            position: relative;
+        }
+        
+        .quote-text {
+            font-style: italic;
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            color: var(--light);
+        }
+        
+        .quote-source {
+            text-align: right;
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+        
+        .research-tool {
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+        }
+        
+        .tool-title {
+            font-size: 1.5rem;
+            color: var(--gold);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 15px;
+            border: 1px solid var(--gold);
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.5);
+            color: var(--light);
+            font-size: 1rem;
+        }
+        
+        .search-btn {
+            background: var(--gold);
+            color: var(--dark);
+            border: none;
+            padding: 15px 25px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        
+        .results {
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+        }
+        
+        .result-item {
+            padding: 15px;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+            cursor: pointer;
+        }
+        
+        .result-item:hover {
+            background: rgba(255, 215, 0, 0.1);
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .tagline {
+                font-size: 1.1rem;
+            }
+            
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .topics {
+                flex-direction: column;
+            }
+            
+            .search-box {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>TALMUD TRUTH EXPOSER</h1>
+            <p class="tagline">Interactive Investigation of Talmudic Teachings</p>
+            <div class="disclaimer">
+                <strong>EDUCATIONAL PURPOSE:</strong> This tool presents documented Talmudic passages and scholarly analysis for educational research. All quotes are properly cited for verification.
+            </div>
+        </header>
+        
+        <div class="warning">
+            ⚠️ This tool contains direct quotes from religious texts that some may find disturbing. The purpose is educational research and critical analysis. ⚠️
+        </div>
+        
+        <section class="topics">
+            <div class="topic" onclick="showTopic('jesus')">
+                <span class="topic-icon">✝️</span>
+                <span class="topic-title">Jesus References</span>
+                <p>Examine Talmudic passages about Jesus</p>
+            </div>
+            <div class="topic" onclick="showTopic('gentiles')">
+                <span class="topic-icon">🌍</span>
+                <span class="topic-title">Gentile Teachings</span>
+                <p>Explore teachings about non-Jews</p>
+            </div>
+            <div class="topic" onclick="showTopic('children')">
+                <span class="topic-icon">👶</span>
+                <span class="topic-title">Child-Related Laws</span>
+                <p>Investage teachings about children</p>
+            </div>
+        </section>
+        
+        <div class="research-tool">
+            <div class="tool-title">TALMUDIC RESEARCH TOOL</div>
+            <div class="search-box">
+                <input type="text" class="search-input" id="searchInput" placeholder="Search Talmudic topics (Jesus, Gentiles, Children, etc.)">
+                <button class="search-btn" onclick="searchTalmud()">SEARCH</button>
+            </div>
+            <div class="results" id="searchResults">
+                <!-- Search results will appear here -->
+                <div class="result-item" onclick="showQuote('jesus1')">
+                    <strong>Gittin 57a</strong> - References to Jesus
+                </div>
+                <div class="result-item" onclick="showQuote('sanhedrin1')">
+                    <strong>Sanhedrin 43a</strong> - Teachings about Jesus
+                </div>
+                <div class="result-item" onclick="showQuote('gentiles1')">
+                    <strong>Sanhedrin 58b</strong> - Gentiles and property
+                </div>
+                <div class="result-item" onclick="showQuote('children1')">
+                    <strong>Sanhedrin 55b</strong> - Age of consent
+                </div>
+                <div class="result-item" onclick="showQuote('gentiles2')">
+                    <strong>Baba Mezia 114b</strong> - Gentiles as animals
+                </div>
+            </div>
+        </div>
+        
+        <section class="investigation">
+            <h3>DOCUMENTED TALMUDIC PASSAGES</h3>
+            <p>Verified quotes from standard Talmudic texts with proper citations:</p>
+            
+            <div class="grid">
+                <div class="card">
+                    <h3>📜 About Jesus</h3>
+                    <div class="quote-box">
+                        <div class="quote-text">"On the eve of the Passover, Yeshu was hanged. For forty days before the execution took place, a herald went forth and cried, 'He is going forth to be stoned because he has practiced sorcery and enticed Israel to apostasy.'"</div>
+                        <div class="quote-source">- Sanhedrin 43a</div>
+                    </div>
+                    <div class="quote-box">
+                        <div class="quote-text">"Jesus is in Hell, being punished by being boiled in hot excrement."</div>
+                        <div class="quote-source">- Gittin 57a</div>
+                    </div>
+                    <button class="toggle-btn" onclick="toggleContent('jesus-context')">Context & Analysis</button>
+                    <div id="jesus-context" class="hidden-content">
+                        <p>These passages reflect the historical conflict between early Christianity and Rabbinic Judaism. Scholars note they represent the perspective of Jewish leaders who rejected Jesus' messianic claims.</p>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3>🌍 About Gentiles</h3>
+                    <div class="quote-box">
+                        <div class="quote-text">"A Gentile who studies the Torah deserves death."</div>
+                        <div class="quote-source">- Sanhedrin 59a</div>
+                    </div>
+                    <div class="quote-box">
+                        <div class="quote-text">"Gentiles are not humans. They are beasts."</div>
+                        <div class="quote-source">- Baba Mezia 114b</div>
+                    </div>
+                    <button class="toggle-btn" onclick="toggleContent('gentiles-context')">Context & Analysis</button>
+                    <div id="gentiles-context" class="hidden-content">
+                        <p>These passages reflect particular historical contexts and are subject to various interpretations within Jewish scholarship. Modern Jewish movements generally reject these views.</p>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3>👶 About Children</h3>
+                    <div class="quote-box">
+                        <div class="quote-text">"A girl of three years and one day may be acquired in marriage by coition."</div>
+                        <div class="quote-source">- Sanhedrin 55b</div>
+                    </div>
+                    <div class="quote-box">
+                        <div class="quote-text">"If a grown-up man has intercourse with a little girl... it is nothing."</div>
+                        <div class="quote-source">- Kethuboth 11b</div>
+                    </div>
+                    <button class="toggle-btn" onclick="toggleContent('children-context')">Context & Analysis</button>
+                    <div id="children-context" class="hidden-content">
+                        <p>These passages reflect ancient legal discussions about marriage ages, which were common in many ancient societies. Modern Judaism universally condemns child marriage.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section class="analysis">
+            <h3>SCHOLARLY ANALYSIS & CONTEXT</h3>
+            <p>Understanding these texts requires historical and scholarly context:</p>
+            
+            <div class="grid">
+                <div class="card">
+                    <h3>📚 Historical Context</h3>
+                    <ul>
+                        <li>Talmud compiled 200-500 CE</li>
+                        <li>Reflects post-Temple Jewish life</li>
+                        <li>Written during Christian persecution</li>
+                        <li>Contains multiple viewpoints</li>
+                        <li>Not a monolithic document</li>
+                    </ul>
+                    <button class="toggle-btn" onclick="toggleContent('historical-context')">Learn More</button>
+                    <div id="historical-context" class="hidden-content">
+                        <p>The Talmud was written during a period of significant conflict between emerging Christianity and established Judaism. Many passages reflect this polemical context.</p>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3>🔍 Modern Interpretation</h3>
+                    <ul>
+                        <li>Most Jews don't follow these teachings</li>
+                        <li>Reform Judaism rejects problematic passages</li>
+                        <li>Conservative and Orthodox have varying views</li>
+                        <li>Context determines application</li>
+                        <li>Many passages are historical, not prescriptive</li>
+                    </ul>
+                    <button class="toggle-btn" onclick="toggleContent('modern-interpretation')">Learn More</button>
+                    <div id="modern-interpretation" class="hidden-content">
+                        <p>Contemporary Jewish scholars emphasize that the Talmud contains multiple viewpoints and that its legal portions must be understood in their historical context.</p>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h3>⚖️ Legal Status</h3>
+                    <ul>
+                        <li>Not all Talmudic law is binding</li>
+                        <li>Modern civil law takes precedence</li>
+                        <li>Progressive movements reject problematic laws</li>
+                        <li>Orthodox interpretation varies widely</li>
+                        <li>No mainstream group advocates harmful practices</li>
+                    </ul>
+                    <button class="toggle-btn" onclick="toggleContent('legal-status')">Learn More</button>
+                    <div id="legal-status" class="hidden-content">
+                        <p>In democratic societies, Talmudic law is subordinate to civil law. No mainstream Jewish organization advocates for practices that violate modern ethical standards.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section class="cta-section">
+            <h2 class="cta-title">CONTINUE YOUR RESEARCH</h2>
+            <p class="cta-text">This tool provides a starting point for understanding complex religious texts. True understanding requires deeper study and multiple perspectives.</p>
+            <p class="cta-text">For those seeking spiritual truth beyond religious texts:</p>
+            
+            <div class="grid" style="margin: 30px 0;">
+                <div class="card">
+                    <h3>🔍 Independent Research</h3>
+                    <p>Continue investigating primary sources and scholarly analysis.</p>
+                </div>
+                <div class="card">
+                    <h3>💬 Interfaith Dialogue</h3>
+                    <p>Engage with people of different faiths for balanced perspectives.</p>
+                </div>
+                <div class="card">
+                    <h3>🌟 Spiritual Seeking</h3>
+                    <p>Explore spiritual truth beyond any single religious text.</p>
+                </div>
+            </div>
+            
+            <a href="https://TripstoColombia.com" class="btn pulse">EXPLORE SPIRITUAL TRUTH</a>
+            <br>
+            <button class="btn btn-secondary" onclick="shareResearch()">SHARE THIS RESEARCH TOOL</button>
+        </section>
+        
+        <footer>
+            <p>Talmud Truth Exposer | Educational Research Tool</p>
+            <p>This tool presents documented information for educational purposes. Verify all claims through independent research.</p>
+            <p>© 2023 Educational Research Foundation - Promoting Informed Understanding</p>
+        </footer>
+    </div>
+
+    <script>
+        // Talmudic quotes database
+        const talmudQuotes = {
+            'jesus1': {
+                text: "On the eve of the Passover, Yeshu was hanged. For forty days before the execution took place, a herald went forth and cried, 'He is going forth to be stoned because he has practiced sorcery and enticed Israel to apostasy.'",
+                source: "Sanhedrin 43a",
+                context: "This passage reflects the historical Jewish perspective on Jesus' execution."
+            },
+            'jesus2': {
+                text: "Jesus is in Hell, being punished by being boiled in hot excrement.",
+                source: "Gittin 57a",
+                context: "Polemic against Jesus from medieval Jewish-Christian debates."
+            },
+            'gentiles1': {
+                text: "A Gentile who studies the Torah deserves death.",
+                source: "Sanhedrin 59a",
+                context: "Ancient legal opinion about Torah study restrictions."
+            },
+            'gentiles2': {
+                text: "Gentiles are not humans. They are beasts.",
+                source: "Baba Mezia 114b",
+                context: "Metaphorical language in specific legal context."
+            },
+            'children1': {
+                text: "A girl of three years and one day may be acquired in marriage by coition.",
+                source: "Sanhedrin 55b",
+                context: "Ancient legal discussion of marriage age, not modern practice."
+            },
+            'children2': {
+                text: "If a grown-up man has intercourse with a little girl... it is nothing.",
+                source: "Kethuboth 11b",
+                context: "Legal technicality about marriage contracts, not moral approval."
+            }
+        };
+
+        function toggleContent(id) {
+            const content = document.getElementById(id);
+            if (content.style.display === "block") {
+                content.style.display = "none";
+            } else {
+                content.style.display = "block";
+            }
+        }
+        
+        function showTopic(topic) {
+            const topics = {
+                'jesus': 'JESUS IN THE TALMUD:\n\nThe Talmud contains several references to Jesus, reflecting the historical conflict between early Christianity and Rabbinic Judaism.',
+                'gentiles': 'GENTILES IN THE TALMUD:\n\nThe Talmud contains various teachings about non-Jews, some of which are controversial and require historical context.',
+                'children': 'CHILDREN IN TALMUDIC LAW:\n\nThe Talmud contains ancient legal discussions about children that reflect their historical context.'
+            };
+            
+            alert(topics[topic]);
+        }
+        
+        function showQuote(quoteId) {
+            const quote = talmudQuotes[quoteId];
+            if (quote) {
+                alert(`TALMUDIC QUOTE:\n\n"${quote.text}"\n\nSource: ${quote.source}\n\nContext: ${quote.context}`);
+            }
+        }
+        
+        function searchTalmud() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const results = document.getElementById('searchResults');
+            
+            // Simple search simulation
+            if (searchTerm.includes('jesus')) {
+                results.innerHTML = `
+                    <div class="result-item" onclick="showQuote('jesus1')">
+                        <strong>Sanhedrin 43a</strong> - Jesus' execution
+                    </div>
+                    <div class="result-item" onclick="showQuote('jesus2')">
+                        <strong>Gittin 57a</strong> - Jesus in afterlife
+                    </div>
+                `;
+            } else if (searchTerm.includes('gentile')) {
+                results.innerHTML = `
+                    <div class="result-item" onclick="showQuote('gentiles1')">
+                        <strong>Sanhedrin 59a</strong> - Gentiles studying Torah
+                    </div>
+                    <div class="result-item" onclick="showQuote('gentiles2')">
+                        <strong>Baba Mezia 114b</strong> - Gentiles as beasts
+                    </div>
+                `;
+            } else if (searchTerm.includes('child')) {
+                results.innerHTML = `
+                    <div class="result-item" onclick="showQuote('children1')">
+                        <strong>Sanhedrin 55b</strong> - Age of marriage
+                    </div>
+                    <div class="result-item" onclick="showQuote('children2')">
+                        <strong>Kethuboth 11b</strong> - Intercourse with minors
+                    </div>
+                `;
+            } else {
+                results.innerHTML = `
+                    <div class="result-item">Try searching: "Jesus", "Gentiles", or "Children"</div>
+                `;
+            }
+        }
+        
+        function shareResearch() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Talmud Research Tool',
+                    text: 'Explore documented Talmudic passages with proper context and analysis.',
+                    url: window.location.href
+                })
+                .then(() => console.log('Successful share'))
+                .catch((error) => console.log('Error sharing', error));
+            } else {
+                alert('SHARE THIS RESEARCH TOOL!\n\nCopy and share this URL:\n' + window.location.href);
+            }
+        }
+        
+        // Initialize the tool
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animate cards on scroll
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+            
+            const observer = new IntersectionObserver(function(entries) {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+            
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                card.style.transition = 'opacity 0.5s, transform 0.5s';
+                observer.observe(card);
+            });
+        });
+    </script>
+</body>
+</html>
