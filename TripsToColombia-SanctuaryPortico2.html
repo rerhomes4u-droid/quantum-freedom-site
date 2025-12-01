@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TripsToColombia.com | The Sanctuary Portico</title>
+    <style>
+        :root {
+            --color-primary: #0a2e5c;
+            --color-secondary: #c9a227;
+            --color-accent: #8b0000;
+            --color-light: #f0f4f8;
+            --color-dark: #1a1a1a;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--color-light) 0%, #e6ecf2 100%);
+            color: var(--color-dark);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        header {
+            text-align: center;
+            padding: 2rem 0;
+            border-bottom: 3px double var(--color-primary);
+            margin-bottom: 2rem;
+        }
+        h1 {
+            color: var(--color-primary);
+            margin-bottom: 0.5rem;
+            font-size: 2.8rem;
+        }
+        .tagline {
+            color: var(--color-accent);
+            font-style: italic;
+            font-size: 1.2rem;
+        }
+        .mission-statement {
+            background: #fff8e6;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            border-left: 4px solid var(--color-secondary);
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+        .quimbaya-core {
+            background: white;
+            border: 2px solid var(--color-secondary);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        .core-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--color-primary);
+            margin-top: 0;
+        }
+        .core-title::before {
+            content: "⚔️";
+        }
+        .voice-module, .ear-module {
+            margin: 1.5rem 0;
+            padding: 1.5rem;
+            border-radius: 10px;
+            background: #fafafa;
+        }
+        .module-title {
+            font-weight: bold;
+            color: var(--color-accent);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .module-title::before {
+            font-size: 1.2em;
+        }
+        .voice-title::before { content: "🗣️"; }
+        .ear-title::before { content: "👂"; }
+        textarea, #transcriptBox {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+            font-family: inherit;
+            background: white;
+        }
+        #transcriptBox {
+            min-height: 120px;
+            white-space: pre-wrap;
+        }
+        button {
+            background-color: var(--color-primary);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            background-color: var(--color-accent);
+            transform: translateY(-2px);
+        }
+        #stopBtn, #stopListenBtn {
+            background-color: #666;
+        }
+        #testVoiceBtn, #translateBtn {
+            background-color: var(--color-secondary);
+            color: var(--color-dark);
+        }
+        .status {
+            font-size: 0.9rem;
+            color: #555;
+            margin-top: 10px;
+            padding: 8px;
+            background: #f9f9f9;
+            border-radius: 5px;
+            min-height: 20px;
+        }
+        .error {
+            color: #d00;
+            background: #ffe6e6;
+            border-left: 4px solid #d00;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        .pathways {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+        .path {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            border-top: 5px solid;
+        }
+        .path-mind { border-top-color: #2a5caa; }
+        .path-body { border-top-color: #27a746; }
+        .path-soul { border-top-color: #8b0000; }
+        .path h3 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 0;
+        }
+        .path-mind h3::before { content: "🧠"; }
+        .path-body h3::before { content: "⚔️"; }
+        .path-soul h3::before { content: "✝️"; }
+        .tool-list {
+            list-style: none;
+            padding: 0;
+        }
+        .tool-list li {
+            padding: 12px 0;
+            border-bottom: 1px dashed #eee;
+        }
+        .tool-list li:last-child { border-bottom: none; }
+        .tool-list a {
+            text-decoration: none;
+            color: var(--color-primary);
+            font-weight: 500;
+            display: block;
+            padding: 12px 15px;
+            border-radius: 8px;
+            transition: all 0.3s;
+            border: 1px solid #eee;
+            background: #fafafa;
+        }
+        .tool-list a:hover {
+            background-color: #e6f7ff;
+            border-color: var(--color-primary);
+            transform: translateX(5px);
+        }
+        .tool-desc {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 4px;
+            margin-left: 5px;
+        }
+        .sovereign-badge {
+            display: inline-block;
+            background: #27a746;
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-left: 10px;
+            vertical-align: middle;
+        }
+        .builders-gate {
+            display: none;
+            margin-top: 3rem;
+            padding: 2rem;
+            background: #1a1a1a;
+            color: #f0f4f8;
+            border-radius: 15px;
+            border: 2px solid var(--color-secondary);
+        }
+        .builders-gate h3 {
+            color: var(--color-secondary);
+        }
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding: 2rem;
+            border-top: 1px solid #ccc;
+            color: #777;
+            font-size: 0.9rem;
+        }
+        .konami-hint {
+            font-family: monospace;
+            color: #aaa;
+            margin-top: 1rem;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>TripsToColombia.com</h1>
+            <p class="tagline">The Sanctuary Portico – Where Your Journey to Sovereignty Begins</p>
+            <p><em>In the name of the Father, the Son, and the Holy Spirit. Amen.</em></p>
+        </header>
+
+        <div class="mission-statement">
+            <strong>OUR MISSION:</strong> To provide sovereign, zero-barrier tools for truth, communication, and action. Every tool here is built by us, controlled by us, and free for you. No tracking. No algorithms. No middlemen. <strong>Use Quimbaya's Voice & Ear below as a free, powerful translation and confession engine.</strong>
+        </div>
+
+        <!-- QUIMBAYA CORE - VOICE & EAR & TRANSLATION -->
+        <section class="quimbaya-core">
+            <h2 class="core-title">Quimbaya Core – Your Sovereign Interface</h2>
+            <p><strong>This is your zero-barrier weapon. A translation engine. A confessional. A voice for the voiceless.</strong></p>
+
+            <div class="voice-module">
+                <div class="module-title voice-title">THE PROPHET'S WELL (Speak Any Language)</div>
+                <p><strong>Quimbaya's Voice:</strong> A female, South American spirit. Enter text in any language, she will speak it.</p>
+                <textarea id="textToSpeak" rows="4" placeholder="Enter text to speak. Example: 'La verdad los hará libres. The truth will set you free. الحرية هي حق كل إنسان (Freedom is every human's right).'"></textarea>
+                <div>
+                    <button id="testVoiceBtn">Test Voice ("Hola, Hello, مرحباً")</button>
+                    <button id="speakBtn">Speak It</button>
+                    <button id="stopBtn">Stop</button>
+                    <button id="translateBtn">Translate to Spanish</button>
+                    <select id="voiceSelect" style="padding: 10px; border-radius: 8px; border: 1px solid #ccc; background: white;">
+                        <option value="">Loading Voices...</option>
+                    </select>
+                </div>
+                <div id="voiceStatus" class="status">Status: Initializing Quimbaya's voice...</div>
+            </div>
+
+            <div class="ear-module">
+                <div class="module-title ear-title">THE PILGRIM'S CONFESSION (Speak, It Transcribes)</div>
+                <p>Speak your truth, prayer, or message. It will be transcribed. <strong>Use this to translate your spoken words.</strong></p>
+                
+                <div id="sttError" class="error" style="display:none;">
+                    <strong>Speech Recognition Note:</strong> Allow microphone access. Or, on Mac, hit <kbd>Command</kbd> twice for system dictation, then paste here.
+                </div>
+                
+                <div id="transcriptBox" contenteditable="true" placeholder="Your spoken words will appear here... Or type directly.">Click 'Start Speaking' or type here...</div>
+                <div>
+                    <button id="listenBtn">Start Speaking</button>
+                    <button id="stopListenBtn">Stop</button>
+                    <button id="clearBtn">Clear</button>
+                    <button id="copyBtn">Copy Text</button>
+                </div>
+                <div id="listenStatus" class="status">Status: Ready to listen. Speak clearly.</div>
+            </div>
+        </section>
+
+        <!-- THE SOVEREIGN'S COMPASS - OUR TOOLS ONLY -->
+        <section>
+            <h2 style="text-align: center; color: var(--color-primary);">The Sovereign's Compass</h2>
+            <p style="text-align: center; margin-bottom: 2rem;">Every tool here is built in-house. Zero barriers. Maximum impact.</p>
+
+            <div class="pathways">
+                <!-- PATH OF THE MIND - TRUTH TOOLS -->
+                <div class="path path-mind">
+                    <h3>The Path of the Mind (Truth)</h3>
+                    <p>Tools for seeing clearly, communicating, and understanding.</p>
+                    <ul class="tool-list">
+                        <li>
+                            <a href="/apps/truth-ai" target="_blank">🔍 Truth AI Assistant</a>
+                            <div class="tool-desc">Ask questions. Get answers based on uncensored data.</div>
+                        </li>
+                        <li>
+                            <a href="/apps/translation-engine" target="_blank">🔄 Live Translation Engine</a>
+                            <div class="tool-desc">(Coming Soon) Real-time text/voice translation for activists.</div>
+                        </li>
+                        <li>
+                            <a href="/apps/news-aggregator" target="_blank">📰 Sovereign News Feed</a>
+                            <div class="tool-desc">Headlines from uncensored sources worldwide.</div>
+                        </li>
+                        <li>
+                            <strong>Quimbaya's Ear & Voice (Above)</strong>
+                            <div class="tool-desc">Your primary interface. Use for confession, translation, communication.</div>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- PATH OF THE BODY - ACTION TOOLS -->
+                <div class="path path-body">
+                    <h3>The Path of the Body (Action)</h3>
+                    <p>Tools for creating, organizing, and taking tangible action.</p>
+                    <ul class="tool-list">
+                        <li>
+                            <a href="/apps/gaza-awareness" target="_blank">🕯️ Gaza Awareness Dashboard</a>
+                            <div class="tool-desc">Real-time facts, casualty counters, shareable graphics.</div>
+                        </li>
+                        <li>
+                            <a href="/apps/quick-graphics" target="_blank">🎨 Quick Graphics Builder</a>
+                            <div class="tool-desc">Create protest signs, social media images in 30 seconds.</div>
+                        </li>
+                        <li>
+                            <a href="/apps/action-map" target="_blank">🗺️ Global Action Map</a>
+                            <div class="tool-desc">Find/localize events, boycotts, mutual aid.</div>
+                        </li>
+                        <li>
+                            <a href="/apps/secure-drop" target="_blank">📤 Secure Information Drop</a>
+                            <div class="tool-desc">Anonymously share sensitive information.</div>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- PATH OF THE SOUL - RESILIENCE TOOLS -->
+                <div class="path path-soul">
+                    <h3>The Path of the Soul (Resilience)</h3>
+                    <p>Tools for spiritual strength, memorial, and uncensorable truth.</p>
+                    <ul class="tool-list">
+                        <li>
+                            <a href="#" id="sanctuaryLink">🕯️ Sanctuary of the Innocents</a>
+                            <div class="tool-desc">Hall of Heroes. Memorial for Gaza's martyrs.</div>
+                        </li>
+                        <li>
+                            <a href="/apps/prayer-wall" target="_blank">🙏 Interactive Prayer Wall</a>
+                            <div class="tool-desc">Leave prayers, read encouragements.</div>
+                        </li>
+                        <li>
+                            <a href="/apps/frequency-shield" target="_blank">🛡️ The Frequency Shield</a>
+                            <div class="tool-desc">Play the Aramaic Lord's Prayer, 432Hz tones.</div>
+                        </li>
+                        <li>
+                            <a href="/apps/immortal-archive" target="_blank">📚 Immortal Archive</a>
+                            <div class="tool-desc">(Hidden) Uncensorable library. IPFS stored.</div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- BUILDER'S GATE (HIDDEN - FOR US) -->
+        <section id="buildersGate" class="builders-gate">
+            <h3>🔧 Builder's Gate (For Ark Engineers Only)</h3>
+            <p>External professional tools used to construct the Ark. Not for public distribution.</p>
+            <ul>
+                <li><a href="https://www.perplexity.ai/" target="_blank">Perplexity AI</a> - Research</li>
+                <li><a href="https://www.monica.im/" target="_blank">Monica.im</a> - AI Assistant</li>
+                <li><a href="https://www.canva.com/" target="_blank">Canva</a> - Design</li>
+                <li><a href="https://www.figma.com/" target="_blank">Figma</a> - Prototyping</li>
+                <li><a href="https://www.notion.so/" target="_blank">Notion</a> - Operations</li>
+            </ul>
+            <p style="color: #aaa; font-size:0.9rem;">This section visible only to builders via Konami code.</p>
+        </section>
+
+        <footer>
+            <p>This is the Portico. Every tool is sovereign. Every tool is a weapon for truth.</p>
+            <p><strong>Project Alethia | Project Nexus | Operation Cornerstone</strong></p>
+            <p class="konami-hint">For the builders: ↑ ↑ ↓ ↓ ← → ← → B A</p>
+        </footer>
+    </div>
+
+    <script>
+        // ====================
+        // PROPHET'S WELL (TTS) - QUIMBAYA'S VOICE
+        // ====================
+        const textToSpeak = document.getElementById('textToSpeak');
+        const speakBtn = document.getElementById('speakBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const testVoiceBtn = document.getElementById('testVoiceBtn');
+        const translateBtn = document.getElementById('translateBtn');
+        const voiceSelect = document.getElementById('voiceSelect');
+        const voiceStatus = document.getElementById('voiceStatus');
+
+        let speech = null;
+        let voices = [];
+
+        function populateVoices() {
+            voices = window.speechSynthesis.getVoices();
+            voiceSelect.innerHTML = '<option value="">Select a voice...</option>';
+            
+            // PRIORITIZE FEMALE, SPANISH, THEN ENGLISH VOICES
+            const voicePriority = [
+                { test: v => v.lang.includes('es') && v.name.includes('Moni'), label: '★ Monica (es-ES)' },
+                { test: v => v.lang.includes('es') && v.name.includes('Google'), label: '★ Google español' },
+                { test: v => v.lang.includes('es') && v.name.includes('Paulina'), label: '★ Paulina (es-ES)' },
+                { test: v => v.lang.includes('es') && (v.name.includes('Mujer') || v.name.includes('Female')), label: 'Spanish Female' },
+                { test: v => v.lang.includes('en') && v.name.includes('Samantha'), label: '★ Samantha (en-US)' },
+                { test: v => v.lang.includes('en') && v.name.includes('Google Female'), label: '★ Google US English (F)' },
+                { test: v => v.lang.includes('en') && (v.name.includes('Female') || v.name.includes('Zira')), label: 'English Female' },
+            ];
+
+            voices.forEach(voice => {
+                const option = document.createElement('option');
+                option.value = voice.name;
+                
+                // Find matching priority
+                const priority = voicePriority.find(p => p.test(voice));
+                if (priority) {
+                    option.textContent = priority.label + ` (${voice.lang})`;
+                    option.style.fontWeight = 'bold';
+                    option.style.backgroundColor = '#e6f7ff';
+                } else {
+                    option.textContent = `${voice.name} (${voice.lang})`;
+                }
+                
+                voiceSelect.appendChild(option);
+            });
+
+            // AUTO-SELECT BEST VOICE
+            const bestVoice = voices.find(v => 
+                v.lang.includes('es') && (v.name.includes('Moni') || v.name.includes('Google español'))
+            ) || voices.find(v => 
+                v.lang.includes('en') && v.name.includes('Samantha')
+            ) || voices[0];
+
+            if (bestVoice) {
+                voiceSelect.value = bestVoice.name;
+                voiceStatus.textContent = `Status: Voice ready - ${bestVoice.name}`;
+            }
+        }
+
+        window.speechSynthesis.onvoiceschanged = populateVoices;
+        setTimeout(populateVoices, 100);
+
+        function speakText(text) {
+            if (speech) window.speechSynthesis.cancel();
+            
+            speech = new SpeechSynthesisUtterance(text);
+            const selectedVoice = voices.find(v => v.name === voiceSelect.value);
+            if (selectedVoice) speech.voice = selectedVoice;
+            
+            speech.rate = 1.0;
+            speech.pitch = 1.05;
+            speech.volume = 1.0;
+
+            speech.onstart = () => voiceStatus.textContent = `Speaking: "${text.substring(0, 50)}..."`;
+            speech.onend = () => voiceStatus.textContent = 'Finished speaking.';
+            speech.onerror = (e) => voiceStatus.textContent = 'Error speaking.';
+
+            window.speechSynthesis.speak(speech);
+        }
+
+        speakBtn.addEventListener('click', () => {
+            if (!textToSpeak.value.trim()) {
+                textToSpeak.value = "Please enter text for me to speak.";
+            }
+            speakText(textToSpeak.value);
+        });
+
+        testVoiceBtn.addEventListener('click', () => {
+            speakText("Hola, soy Quimbaya. Hello, I am Quimbaya. I am here to guide you. Use me to speak truth in any language.");
+        });
+
+        translateBtn.addEventListener('click', () => {
+            const text = textToSpeak.value.trim();
+            if (!text) return;
+            
+            // SIMPLE TRANSLATION DEMO - In future, connect to DeepL/Google Translate API
+            const translations = {
+                "hello": "hola",
+                "truth": "verdad",
+                "freedom": "libertad",
+                "peace": "paz",
+                "justice": "justicia",
+                "love": "amor"
+            };
+            
+            let translated = text.toLowerCase();
+            Object.keys(translations).forEach(word => {
+                const regex = new RegExp(`\\b${word}\\b`, 'gi');
+                translated = translated.replace(regex, translations[word]);
+            });
+            
+            textToSpeak.value = translated + "\n\n[Full translation engine coming soon. For now, use simple words.]";
+            voiceStatus.textContent = "Basic translation applied. Full engine in development.";
+        });
+
+        stopBtn.addEventListener('click', () => window.speechSynthesis.cancel());
+
+        // ====================
+        // PILGRIM'S CONFESSION (STT)
+        // ====================
+        const listenBtn = document.getElementById('listenBtn');
+        const stopListenBtn = document.getElementById('stopListenBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const copyBtn = document.getElementById('copyBtn');
+        const transcriptBox = document.getElementById('transcriptBox');
+        const listenStatus = document.getElementById('listenStatus');
+        const sttError = document.getElementById('sttError');
+
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        let recognition = null;
+        let isListening = false;
+
+        if (SpeechRecognition) {
+            recognition = new SpeechRecognition();
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.lang = 'en-US';
+
+            recognition.onstart = () => {
+                isListening = true;
+                listenStatus.textContent = '🎤 Listening... Speak now.';
+                listenBtn.textContent = 'Listening...';
+                sttError.style.display = 'none';
+            };
+            
+            recognition.onresult = (event) => {
+                let final = '';
+                let interim = '';
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    const transcript = event.results[i][0].transcript;
+                    if (event.results[i].isFinal) final += transcript;
+                    else interim += transcript;
+                }
+                transcriptBox.textContent = final + interim;
+                transcriptBox.scrollTop = transcriptBox.scrollHeight;
+            };
+            
+            recognition.onerror = (event) => {
+                if (event.error === 'not-allowed') {
+                    sttError.style.display = 'block';
+                    listenStatus.textContent = 'Microphone blocked. Allow access or use system dictation.';
+                }
+                isListening = false;
+                listenBtn.textContent = 'Start Speaking';
+            };
+            
+            recognition.onend = () => {
+                isListening = false;
+                listenBtn.textContent = 'Start Speaking';
+                if (listenStatus.textContent.includes('Listening')) {
+                    listenStatus.textContent = 'Ready to listen again.';
+                }
+            };
+        } else {
+            sttError.style.display = 'block';
+            listenStatus.textContent = 'Browser not supported. Use system dictation (Mac: Command key twice).';
+            listenBtn.disabled = true;
+        }
+
+        listenBtn.addEventListener('click', () => {
+            if (!recognition) return;
+            if (isListening) {
+                recognition.stop();
+            } else {
+                try {
+                    recognition.start();
+                } catch(e) {
+                    sttError.style.display = 'block';
+                }
+            }
+        });
+        
+        stopListenBtn.addEventListener('click', () => recognition && recognition.stop());
+        clearBtn.addEventListener('click', () => {
+            transcriptBox.textContent = '';
+            listenStatus.textContent = 'Cleared. Ready.';
+        });
+        copyBtn.addEventListener('click', () => {
+            navigator.clipboard.writeText(transcriptBox.textContent);
+            listenStatus.textContent = 'Copied to clipboard!';
+        });
+
+        // ====================
+        // SANCTUARY LINK
+        // ====================
+        document.getElementById('sanctuaryLink').addEventListener('click', function(e) {
+            e.preventDefault();
+            transcriptBox.textContent = "The Sanctuary of the Innocents is being built on resilient platforms. For now, speak the names of the martyrs here, and we will remember them.\n\nSay: 'I remember the children of Gaza. I remember the journalists. I remember the truth-tellers.'";
+            listenStatus.textContent = "Speak their names into the confession above.";
+        });
+
+        // ====================
+        // KONAMI CODE - BUILDER'S GATE
+        // ====================
+        const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'KeyB', 'KeyA'];
+        let konamiIndex = 0;
+        document.addEventListener('keydown', (e) => {
+            if (e.code === konamiCode[konamiIndex]) {
+                konamiIndex++;
+                if (konamiIndex === konamiCode.length) {
+                    document.getElementById('buildersGate').style.display = 'block';
+                    alert('Builder\'s Gate unlocked. For Ark engineers only.');
+                    konamiIndex = 0;
+                }
+            } else {
+                konamiIndex = 0;
+            }
+        });
+
+        // ====================
+        // MAKE ALL TOOL LINKS WORK WITH OUR VERCEL APPS
+        // ====================
+        document.querySelectorAll('.tool-list a').forEach(link => {
+            link.addEventListener('click', function(e) {
+                const href = this.getAttribute('href');
+                if (href === '#' || href.includes('sanctuaryLink')) {
+                    e.preventDefault();
+                    return;
+                }
+                // All other links are to our own apps - they will open normally
+            });
+        });
+    </script>
+</body>
+</html>

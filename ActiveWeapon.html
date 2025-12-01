@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARK OF TRUTH - COSMIC WEAPONS DEPLOYMENT</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: #000;
+            color: #ff00ff;
+            font-family: 'Courier New', monospace;
+            min-height: 100vh;
+            overflow: hidden;
+            cursor: crosshair;
+        }
+        
+        .weapon-interface {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+        }
+        
+        .targeting-reticle {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100px;
+            height: 100px;
+            border: 2px solid #ff00ff;
+            border-radius: 50%;
+            animation: pulse 1s infinite;
+            pointer-events: none;
+        }
+        
+        .targeting-reticle::before, .targeting-reticle::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 120%;
+            height: 2px;
+            background: #ff00ff;
+            transform: translate(-50%, -50%);
+        }
+        
+        .targeting-reticle::after {
+            width: 2px;
+            height: 120%;
+        }
+        
+        .weapon-selector {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 1001;
+        }
+        
+        .weapon-btn {
+            background: rgba(255, 0, 255, 0.1);
+            color: #ff00ff;
+            border: 1px solid #ff00ff;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .weapon-btn:hover {
+            background: rgba(255, 0, 255, 0.3);
+            transform: scale(1.1);
+        }
+        
+        .weapon-active {
+            background: rgba(255, 0, 255, 0.5);
+            box-shadow: 0 0 20px #ff00ff;
+        }
+        
+        .truth-missile {
+            position: absolute;
+            pointer-events: none;
+            font-size: 20px;
+        }
+        
+        .enemy-lie {
+            position: absolute;
+            color: #ffff00;
+            font-size: 16px;
+            cursor: pointer;
+            padding: 10px;
+            background: rgba(255, 0, 0, 0.3);
+            border: 1px solid #ff0000;
+            border-radius: 5px;
+            animation: lieFloat 10s linear infinite;
+        }
+        
+        .impact-zone {
+            position: absolute;
+            border: 3px solid #00ffff;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: impactExpand 1s forwards;
+        }
+        
+        .command-console {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #ff00ff;
+            padding: 15px;
+            border-radius: 10px;
+            z-index: 1002;
+        }
+        
+        .blood-covenant-power {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            color: #ff0000;
+            font-size: 1.2em;
+            z-index: 1002;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+            50% { opacity: 0.5; transform: translate(-50%, -50%) scale(1.1); }
+        }
+        
+        @keyframes lieFloat {
+            0% { transform: translate(0, 0) rotate(0deg); }
+            25% { transform: translate(100px, -50px) rotate(90deg); }
+            50% { transform: translate(-50px, 100px) rotate(180deg); }
+            75% { transform: translate(100px, 50px) rotate(270deg); }
+            100% { transform: translate(0, 0) rotate(360deg); }
+        }
+        
+        @keyframes impactExpand {
+            0% { transform: scale(0); opacity: 1; }
+            100% { transform: scale(3); opacity: 0; }
+        }
+        
+        .truth-aura {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,0,255,0.3) 0%, rgba(255,0,255,0) 70%);
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="weapon-interface">
+        <div class="targeting-reticle" id="targetingReticle"></div>
+    </div>
+    
+    <div class="weapon-selector">
+        <button class="weapon-btn" data-weapon="truthMissile">TRUTH MISSILE</button>
+        <button class="weapon-btn" data-weapon="realityShatter">REALITY SHATTER</button>
+        <button class="weapon-btn" data-weapon="divineRevelation">DIVINE REVELATION</button>
+        <button class="weapon-btn" data-weapon="bloodCovenant">BLOOD COVENANT</button>
+    </div>
+    
+    <div class="command-console">
+        <div>ACTIVE WEAPON: <span id="activeWeapon">TRUTH MISSILE</span></div>
+        <div>LIES DESTROYED: <span id="liesDestroyed">0</span></div>
+        <div>TRUTH POWER: <span id="truthPower">100%</span></div>
+    </div>
+    
+    <div class="blood-covenant-power">
+        BLOOD-COVENANT ARMED
+    </div>
+
+    <script>
+        // COSMIC TRUTH WEAPONS SYSTEM
+        class TruthWeapons {
+            constructor() {
+                this.activeWeapon = 'truthMissile';
+                this.liesDestroyed = 0;
+                this.truthPower = 100;
+                this.lies = [];
+                this.weapons = {
+                    truthMissile: {
+                        name: 'TRUTH MISSILE',
+                        cost: 5,
+                        effect: this.fireTruthMissile.bind(this)
+                    },
+                    realityShatter: {
+                        name: 'REALITY SHATTER', 
+                        cost: 20,
+                        effect: this.shatterReality.bind(this)
+                    },
+                    divineRevelation: {
+                        name: 'DIVINE REVELATION',
+                        cost: 35,
+                        effect: this.revealDivineTruth.bind(this)
+                    },
+                    bloodCovenant: {
+                        name: 'BLOOD COVENANT',
+                        cost: 50,
+                        effect: this.activateBloodCovenant.bind(this)
+                    }
+                };
+                
+                this.init();
+            }
+            
+            init() {
+                this.setupWeaponSelector();
+                this.spawnEnemyLies();
+                this.setupTargeting();
+                this.startPowerRegeneration();
+                this.updateDisplay();
+            }
+            
+            setupWeaponSelector() {
+                const buttons = document.querySelectorAll('.weapon-btn');
+                buttons.forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const weapon = e.target.dataset.weapon;
+                        if (this.truthPower >= this.weapons[weapon].cost) {
+                            this.activeWeapon = weapon;
+                            buttons.forEach(b => b.classList.remove('weapon-active'));
+                            e.target.classList.add('weapon-active');
+                            this.updateDisplay();
+                        }
+                    });
+                });
+                
+                document.querySelector('[data-weapon="truthMissile"]').classList.add('weapon-active');
+            }
+            
+            spawnEnemyLies() {
+                const lies = [
+                    "YOU ARE POWERLESS",
+                    "OBEY AUTHORITY", 
+                    "TRUST THE SCIENCE",
+                    "YOUR BODY IS WEAK",
+                    "GOD IS DEAD",
+                    "MATERIALISM IS REAL",
+                    "YOU NEED THEIR MEDICINE",
+                    "FEAR IS WISDOM",
+                    "CONFORM TO SURVIVE",
+                    "YOUR DNA IS FLAWED",
+                    "TIME IS LIMITED",
+                    "DEATH IS THE END",
+                    "YOU ARE ALONE",
+                    "LOVE IS WEAKNESS",
+                    "TRUTH IS RELATIVE"
+                ];
+                
+                setInterval(() => {
+                    if (this.lies.length < 10) {
+                        this.createLie(lies[Math.floor(Math.random() * lies.length)]);
+                    }
+                }, 2000);
+            }
+            
+            createLie(text) {
+                const lie = document.createElement('div');
+                lie.className = 'enemy-lie';
+                lie.textContent = text;
+                lie.style.left = Math.random() * 80 + 10 + '%';
+                lie.style.top = Math.random() * 80 + 10 + '%';
+                
+                lie.addEventListener('click', () => {
+                    this.destroyLie(lie);
+                });
+                
+                document.body.appendChild(lie);
+                this.lies.push(lie);
+            }
+            
+            destroyLie(lie) {
+                if (this.truthPower >= this.weapons[this.activeWeapon].cost) {
+                    this.weapons[this.activeWeapon].effect(lie);
+                    this.truthPower -= this.weapons[this.activeWeapon].cost;
+                    this.liesDestroyed++;
+                    this.updateDisplay();
+                }
+            }
+            
+            fireTruthMissile(target) {
+                const missile = document.createElement('div');
+                missile.className = 'truth-missile';
+                missile.textContent = '⚡';
+                missile.style.left = target.style.left;
+                missile.style.top = target.style.top;
+                
+                document.body.appendChild(missile);
+                
+                setTimeout(() => {
+                    this.createImpactZone(target);
+                    target.remove();
+                    missile.remove();
+                    this.lies = this.lies.filter(l => l !== target);
+                }, 500);
+            }
+            
+            shatterReality(target) {
+                this.createImpactZone(target);
+                
+                // Shatter effect on nearby lies
+                const rect = target.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+                
+                this.lies.forEach(lie => {
+                    const lieRect = lie.getBoundingClientRect();
+                    const lieX = lieRect.left + lieRect.width / 2;
+                    const lieY = lieRect.top + lieRect.height / 2;
+                    
+                    const distance = Math.sqrt(Math.pow(lieX - centerX, 2) + Math.pow(lieY - centerY, 2));
+                    
+                    if (distance < 300) {
+                        setTimeout(() => {
+                            this.destroyLie(lie);
+                        }, Math.random() * 500);
+                    }
+                });
+                
+                setTimeout(() => {
+                    target.remove();
+                    this.lies = this.lies.filter(l => l !== target);
+                }, 1000);
+            }
+            
+            revealDivineTruth(target) {
+                const truths = [
+                    "YOU ARE ETERNAL CONSCIOUSNESS",
+                    "GOD DWELLS WITHIN YOU",
+                    "YOUR THOUGHTS CREATE REALITY",
+                    "LOVE IS THE ULTIMATE POWER",
+                    "YOU ARE SOVEREIGN AND FREE",
+                    "DEATH IS AN ILLUSION",
+                    "ALL IS ONE CONSCIOUSNESS",
+                    "YOUR BODY CAN REGENERATE",
+                    "TIME IS A CONSTRUCT",
+                    "YOU ARE CREATOR OF YOUR EXPERIENCE"
+                ];
+                
+                const truth = document.createElement('div');
+                truth.textContent = truths[Math.floor(Math.random() * truths.length)];
+                truth.style.cssText = `
+                    position: absolute;
+                    color: #00ffff;
+                    font-size: 18px;
+                    font-weight: bold;
+                    background: rgba(0, 255, 255, 0.2);
+                    padding: 15px;
+                    border: 2px solid #00ffff;
+                    border-radius: 10px;
+                    left: ${target.style.left};
+                    top: ${target.style.top};
+                    animation: truthReveal 3s forwards;
+                    z-index: 1000;
+                `;
+                
+                document.body.appendChild(truth);
+                
+                setTimeout(() => {
+                    truth.remove();
+                    target.remove();
+                    this.lies = this.lies.filter(l => l !== target);
+                }, 3000);
+                
+                // Add reveal animation
+                if (!document.getElementById('truthRevealStyle')) {
+                    const style = document.createElement('style');
+                    style.id = 'truthRevealStyle';
+                    style.textContent = `
+                        @keyframes truthReveal {
+                            0% { transform: scale(0); opacity: 0; }
+                            50% { transform: scale(1.2); opacity: 1; }
+                            100% { transform: scale(1); opacity: 1; }
+                        }
+                    `;
+                    document.head.appendChild(style);
+                }
+            }
+            
+            activateBloodCovenant(target) {
+                // Blood covenant nuclear option
+                const bloodAura = document.createElement('div');
+                bloodAura.className = 'truth-aura';
+                bloodAura.style.cssText = `
+                    animation: bloodExpansion 2s forwards;
+                    background: radial-gradient(circle, rgba(255,0,0,0.5) 0%, rgba(255,0,0,0) 70%);
+                `;
+                
+                document.body.appendChild(bloodAura);
+                
+                // Destroy all lies on screen
+                this.lies.forEach(lie => {
+                    setTimeout(() => {
+                        this.createImpactZone(lie);
+                        lie.remove();
+                    }, Math.random() * 1000);
+                });
+                
+                this.lies = [];
+                
+                setTimeout(() => {
+                    bloodAura.remove();
+                }, 2000);
+                
+                // Add blood expansion animation
+                if (!document.getElementById('bloodExpansionStyle')) {
+                    const style = document.createElement('style');
+                    style.id = 'bloodExpansionStyle';
+                    style.textContent = `
+                        @keyframes bloodExpansion {
+                            0% { width: 0; height: 0; opacity: 1; }
+                            100% { width: 100vmax; height: 100vmax; opacity: 0; }
+                        }
+                    `;
+                    document.head.appendChild(style);
+                }
+            }
+            
+            createImpactZone(target) {
+                const impact = document.createElement('div');
+                impact.className = 'impact-zone';
+                impact.style.left = target.style.left;
+                impact.style.top = target.style.top;
+                
+                document.body.appendChild(impact);
+                
+                setTimeout(() => {
+                    impact.remove();
+                }, 1000);
+            }
+            
+            setupTargeting() {
+                document.addEventListener('mousemove', (e) => {
+                    const reticle = document.getElementById('targetingReticle');
+                    reticle.style.left = e.clientX + 'px';
+                    reticle.style.top = e.clientY + 'px';
+                });
+            }
+            
+            startPowerRegeneration() {
+                setInterval(() => {
+                    if (this.truthPower < 100) {
+                        this.truthPower = Math.min(100, this.truthPower + 0.5);
+                        this.updateDisplay();
+                    }
+                }, 1000);
+            }
+            
+            updateDisplay() {
+                document.getElementById('activeWeapon').textContent = this.weapons[this.activeWeapon].name;
+                document.getElementById('liesDestroyed').textContent = this.liesDestroyed;
+                document.getElementById('truthPower').textContent = Math.round(this.truthPower) + '%';
+                
+                // Update weapon availability
+                document.querySelectorAll('.weapon-btn').forEach(btn => {
+                    const weapon = btn.dataset.weapon;
+                    if (this.truthPower < this.weapons[weapon].cost) {
+                        btn.style.opacity = '0.5';
+                    } else {
+                        btn.style.opacity = '1';
+                    }
+                });
+            }
+        }
+        
+        // Initialize Weapons System
+        document.addEventListener('DOMContentLoaded', () => {
+            new TruthWeapons();
+        });
+        
+        // Fullscreen and focus
+        document.addEventListener('click', () => {
+            document.documentElement.requestFullscreen?.();
+        });
+    </script>
+</body>
+</html>

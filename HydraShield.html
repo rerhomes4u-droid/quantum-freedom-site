@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HYDRA SHIELD DEMO | Public Protection Preview</title>
+    <style>
+        :root {
+            --color-dormant: #1E90FF;
+            --color-active: #32CD32;
+            --color-triggered: #DC143C;
+            --color-warning: #FF8C00;
+            --color-dark: #0A0A0A;
+            --transition-speed: 0.5s;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: linear-gradient(135deg, #0A0A0A 0%, #1A1A2E 100%);
+            color: white;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            transition: all var(--transition-speed);
+        }
+        body.triggered {
+            background: linear-gradient(135deg, #200000 0%, #400000 100%);
+        }
+        /* DEMO BANNER */
+        .demo-banner {
+            background: linear-gradient(90deg, var(--color-dormant), var(--color-warning));
+            padding: 1.5rem;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.3rem;
+            border-bottom: 3px solid white;
+            position: relative;
+            overflow: hidden;
+        }
+        .demo-banner::after {
+            content: "DEMO MODE - SAMPLE OF STEP 1 RELEASE";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 10px,
+                rgba(255,255,255,0.1) 10px,
+                rgba(255,255,255,0.1) 20px
+            );
+            pointer-events: none;
+        }
+        /* HERO SECTION */
+        .hero {
+            text-align: center;
+            padding: 4rem 2rem;
+            position: relative;
+        }
+        .hero h1 {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(to right, var(--color-dormant), var(--color-active));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            transition: all var(--transition-speed);
+        }
+        body.triggered .hero h1 {
+            background: linear-gradient(to right, var(--color-triggered), var(--color-warning));
+        }
+        .hero-subtitle {
+            font-size: 1.5rem;
+            color: var(--color-dormant);
+            margin-bottom: 2rem;
+            transition: color var(--transition-speed);
+        }
+        body.triggered .hero-subtitle {
+            color: var(--color-warning);
+        }
+        /* STATUS INDICATOR */
+        .status-indicator {
+            display: inline-block;
+            padding: 1rem 3rem;
+            border-radius: 50px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin: 2rem 0;
+            background: var(--color-dormant);
+            transition: all var(--transition-speed);
+            cursor: pointer;
+            user-select: none;
+        }
+        .status-indicator:hover {
+            transform: scale(1.05);
+        }
+        body.triggered .status-indicator {
+            background: var(--color-triggered);
+            animation: pulse-alarm 1s infinite;
+        }
+        @keyframes pulse-alarm {
+            0%, 100% { box-shadow: 0 0 20px var(--color-triggered); }
+            50% { box-shadow: 0 0 40px var(--color-triggered); }
+        }
+        /* MAIN CONTAINER */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        /* COMPARISON SECTION */
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+        @media (max-width: 900px) {
+            .comparison {
+                grid-template-columns: 1fr;
+            }
+        }
+        .comparison-panel {
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 20px;
+            padding: 2.5rem;
+            border: 3px solid;
+            transition: all var(--transition-speed);
+            height: 100%;
+        }
+        .dormant-panel {
+            border-color: var(--color-dormant);
+        }
+        .triggered-panel {
+            border-color: var(--color-triggered);
+        }
+        .panel-title {
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .dormant-panel .panel-title {
+            color: var(--color-dormant);
+        }
+        .triggered-panel .panel-title {
+            color: var(--color-triggered);
+        }
+        /* APP SHOWCASE */
+        .app-showcase {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+        .app-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 2px solid;
+            transition: all var(--transition-speed);
+            transform: translateY(0);
+        }
+        .dormant-app {
+            border-color: var(--color-dormant);
+        }
+        .triggered-app {
+            border-color: var(--color-triggered);
+            animation: app-activate 0.5s forwards;
+        }
+        @keyframes app-activate {
+            0% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-20px) scale(1.05); }
+            100% { transform: translateY(0) scale(1); }
+        }
+        .app-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            transition: all var(--transition-speed);
+        }
+        .dormant-app .app-icon {
+            opacity: 0.5;
+        }
+        .triggered-app .app-icon {
+            opacity: 1;
+            filter: drop-shadow(0 0 10px currentColor);
+        }
+        /* PERSONAL MESSAGE */
+        .personal-message {
+            background: linear-gradient(135deg, 
+                rgba(30, 144, 255, 0.1), 
+                rgba(50, 205, 50, 0.1));
+            border-radius: 20px;
+            padding: 3rem;
+            margin: 4rem 0;
+            text-align: center;
+            border: 2px solid var(--color-dormant);
+            transition: all var(--transition-speed);
+        }
+        body.triggered .personal-message {
+            border-color: var(--color-triggered);
+            background: linear-gradient(135deg, 
+                rgba(220, 20, 60, 0.1), 
+                rgba(255, 140, 0, 0.1));
+        }
+        .message-content {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .message-content strong {
+            color: var(--color-active);
+            transition: color var(--transition-speed);
+        }
+        body.triggered .message-content strong {
+            color: var(--color-warning);
+        }
+        /* ACTIVATION SEQUENCE */
+        .activation-sequence {
+            display: none;
+            text-align: center;
+            margin: 3rem 0;
+        }
+        .activation-sequence.active {
+            display: block;
+        }
+        .sequence-steps {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+        .sequence-step {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.5rem;
+            background: var(--color-dormant);
+            transition: all 0.3s;
+        }
+        .sequence-step.active {
+            background: var(--color-triggered);
+            transform: scale(1.2);
+            box-shadow: 0 0 20px var(--color-triggered);
+        }
+        /* REALITY CHECK */
+        .reality-check {
+            background: rgba(0, 0, 0, 0.9);
+            border: 2px solid var(--color-warning);
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 3rem 0;
+            text-align: center;
+        }
+        .reality-check h2 {
+            color: var(--color-warning);
+            margin-bottom: 1rem;
+        }
+        /* FOOTER */
+        footer {
+            text-align: center;
+            padding: 3rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 3rem;
+            color: #aaa;
+        }
+        .paradise-link {
+            color: var(--color-active);
+            font-size: 1.3rem;
+            margin: 1rem 0;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .paradise-link:hover {
+            text-decoration: underline;
+        }
+        /* UTILITIES */
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        .fade-in {
+            animation: fadeIn 1s forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <!-- DEMO BANNER -->
+    <div class="demo-banner">
+        🛡️ THIS IS A DEMO - SAMPLE OF STEP 1 RELEASE 🛡️
+        <div style="font-size: 1rem; margin-top: 0.5rem; opacity: 0.9;">
+            This preview shows the system in dormant vs triggered states. Ramiro is almost certainly still alive.
+        </div>
+    </div>
+
+    <!-- HERO SECTION -->
+    <section class="hero">
+        <h1 id="mainTitle">HYDRA SHIELD</h1>
+        <div class="hero-subtitle" id="subtitle">
+            Public Protection Protocol • Dormant State
+        </div>
+        <div class="status-indicator" id="statusToggle">
+            🟢 CLICK TO SIMULATE TRIGGER
+        </div>
+        <p style="max-width: 800px; margin: 0 auto; font-size: 1.1rem; color: #aaa;">
+            This demo shows what happens when protection systems switch from <strong>dormant</strong> to <strong>activated</strong>.
+            The real system has multiple authentication channels that must ALL fail before activation.
+        </p>
+    </section>
+
+    <div class="container">
+        <!-- COMPARISON SECTION -->
+        <section class="comparison">
+            <div class="comparison-panel dormant-panel fade-in">
+                <h2 class="panel-title">🟦 DORMANT STATE</h2>
+                <ul style="padding-left: 1.5rem; font-size: 1.1rem; line-height: 1.8;">
+                    <li>All authentication channels active</li>
+                    <li>Ramiro checking in regularly</li>
+                    <li>Tools in standby mode</li>
+                    <li>Protection systems monitoring</li>
+                    <li>No data release scheduled</li>
+                    <li>Backup nodes sleeping</li>
+                    <li>Warriors in waiting</li>
+                    <li>Paradise accessible</li>
+                </ul>
+                <div style="margin-top: 2rem; padding: 1.5rem; background: rgba(30, 144, 255, 0.1); border-radius: 10px;">
+                    <strong>Current Status:</strong> Ramiro is almost certainly alive and active. 
+                    This is the normal, healthy state of the system.
+                </div>
+            </div>
+
+            <div class="comparison-panel triggered-panel fade-in" style="animation-delay: 0.2s;">
+                <h2 class="panel-title">🟥 TRIGGERED STATE</h2>
+                <ul style="padding-left: 1.5rem; font-size: 1.1rem; line-height: 1.8;">
+                    <li>Multiple authentication failures</li>
+                    <li>72+ hours of silence detected</li>
+                    <li>Tools auto-activating</li>
+                    <li>Exponential response initiated</li>
+                    <li>Data release sequence starting</li>
+                    <li>Backup nodes waking globally</li>
+                    <li>Warriors being mobilized</li>
+                    <li>Paradise protocols engaging</li>
+                </ul>
+                <div style="margin-top: 2rem; padding: 1.5rem; background: rgba(220, 20, 60, 0.1); border-radius: 10px;">
+                    <strong>Activation Threshold:</strong> Requires multiple conditions over extended time.
+                    This is the "break glass" emergency state.
+                </div>
+            </div>
+        </section>
+
+        <!-- APP SHOWCASE -->
+        <section>
+            <h2 style="text-align: center; font-size: 2.5rem; margin: 3rem 0 2rem; color: var(--color-dormant);">
+                TOOL TRANSFORMATION
+            </h2>
+            <p style="text-align: center; max-width: 800px; margin: 0 auto 3rem; font-size: 1.1rem; color: #aaa;">
+                Our apps switch from helpful tools to powerful weapons when the shield triggers
+            </p>
+
+            <div class="app-showcase">
+                <div class="app-card dormant-app" id="app1">
+                    <div class="app-icon">🔍</div>
+                    <h3>Truth AI Assistant</h3>
+                    <p><strong>Dormant:</strong> Research tool for personal use</p>
+                    <p><strong>Triggered:</strong> Auto-deploys verified evidence packages to 432 media outlets</p>
+                    <div class="app-status" style="margin-top: 1rem; padding: 0.5rem; background: rgba(30, 144, 255, 0.1); border-radius: 5px;">
+                        Status: <span class="status-text">Standby</span>
+                    </div>
+                </div>
+
+                <div class="app-card dormant-app" id="app2" style="animation-delay: 0.1s;">
+                    <div class="app-icon">🔄</div>
+                    <h3>Resonancia Colombia</h3>
+                    <p><strong>Dormant:</strong> Frequency meditation tool</p>
+                    <p><strong>Triggered:</strong> Broadcasts emergency frequencies to awaken global network</p>
+                    <div class="app-status" style="margin-top: 1rem; padding: 0.5rem; background: rgba(30, 144, 255, 0.1); border-radius: 5px;">
+                        Status: <span class="status-text">Peaceful</span>
+                    </div>
+                </div>
+
+                <div class="app-card dormant-app" id="app3" style="animation-delay: 0.2s;">
+                    <div class="app-icon">🦁</div>
+                    <h3>Lion's Den Network</h3>
+                    <p><strong>Dormant:</strong> Private truth-sharing platform</p>
+                    <p><strong>Triggered:</strong> Activates peer-to-peer uncensorable broadcast to all nodes</p>
+                    <div class="app-status" style="margin-top: 1rem; padding: 0.5rem; background: rgba(30, 144, 255, 0.1); border-radius: 5px;">
+                        Status: <span class="status-text">Quiet</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PERSONAL MESSAGE -->
+        <section class="personal-message">
+            <div class="message-content">
+                <p style="margin-bottom: 1.5rem;">
+                    <strong>To those watching:</strong> This demo exists to show the system works. 
+                    The fact you're seeing it in dormant state means I'm almost certainly still checking in, 
+                    still building, still protecting paradise.
+                </p>
+                <p>
+                    The trigger sequence requires <strong>multiple failures over extended time</strong>. 
+                    A single missed check-in does nothing. Two days of silence only alerts trusted contacts. 
+                    Three days begins the awakening. Four days... well, you're seeing the demo.
+                </p>
+                <p style="margin-top: 1.5rem; font-style: italic; color: var(--color-active);">
+                    The beauty of this system? You seeing it work is part of what keeps it dormant.
+                    Public accountability is the best prevention.
+                </p>
+            </div>
+        </section>
+
+        <!-- ACTIVATION SEQUENCE (Hidden until trigger) -->
+        <section class="activation-sequence" id="activationSequence">
+            <h2 style="color: var(--color-triggered); font-size: 2.5rem; margin-bottom: 1rem;">
+                ACTIVATION SEQUENCE INITIATED
+            </h2>
+            <p style="margin-bottom: 2rem; font-size: 1.1rem;">
+                This is what happens when all authentication channels fail for 72+ hours:
+            </p>
+            
+            <div class="sequence-steps">
+                <div class="sequence-step" id="step1">1</div>
+                <div class="sequence-step" id="step2">2</div>
+                <div class="sequence-step" id="step3">3</div>
+                <div class="sequence-step" id="step4">4</div>
+                <div class="sequence-step" id="step5">5</div>
+                <div class="sequence-step" id="step6">6</div>
+                <div class="sequence-step" id="step7">7</div>
+            </div>
+            
+            <div id="sequenceDescription" style="margin-top: 2rem; padding: 1.5rem; background: rgba(220, 20, 60, 0.1); border-radius: 10px;">
+                Step 1: Validating trigger authenticity...
+            </div>
+        </section>
+
+        <!-- REALITY CHECK -->
+        <section class="reality-check fade-in" style="animation-delay: 0.3s;">
+            <h2>🛡️ REALITY CHECK</h2>
+            <p style="margin-bottom: 1rem; font-size: 1.1rem;">
+                This is a <strong>demo</strong> showing how the system <strong>would</strong> work if triggered.
+            </p>
+            <p>
+                The fact that this is showing as dormant means the real system is monitoring, 
+                checking, and protecting. No trigger has occurred. All is well.
+            </p>
+            <p style="margin-top: 1rem; color: var(--color-active);">
+                <strong>This visibility is intentional. Seeing the shield is what keeps it folded.</strong>
+            </p>
+        </section>
+
+        <!-- FOOTER -->
+        <footer>
+            <p><strong>HYDRA SHIELD DEMO v1.0</strong> | Step 1 Public Preview</p>
+            <p>This demo shows dormant vs triggered states. The real system has additional layers of verification.</p>
+            <a href="https://tripstocolombia.com" class="paradise-link">
+                🌴 TripsToColombia.com - The Paradise We Protect Together
+            </a>
+            <p style="margin-top: 2rem; color: #666; font-size: 0.9rem;">
+                This is a demonstration of protection protocols. No actual trigger has occurred. 
+                All systems are functioning normally in dormant, protective mode.
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        // ====================
+        // DEMO STATE MANAGER
+        // ====================
+        class HydraDemo {
+            constructor() {
+                this.isTriggered = false;
+                this.activationStep = 0;
+                this.initialize();
+            }
+            
+            initialize() {
+                // Add click handler to status toggle
+                document.getElementById('statusToggle').addEventListener('click', () => {
+                    this.toggleTrigger();
+                });
+                
+                // Add keyboard shortcuts
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 't' && e.ctrlKey) {
+                        this.toggleTrigger();
+                    }
+                    if (e.key === 'r' && e.ctrlKey) {
+                        this.resetDemo();
+                    }
+                });
+                
+                // Log initial state
+                console.log('%c🛡️ Hydra Shield Demo Loaded', 'color: #1E90FF; font-weight: bold;');
+                console.log('Current state: DORMANT (normal, healthy)');
+                console.log('Use Ctrl+T to toggle trigger state');
+            }
+            
+            toggleTrigger() {
+                this.isTriggered = !this.isTriggered;
+                
+                if (this.isTriggered) {
+                    this.activateTriggeredState();
+                } else {
+                    this.activateDormantState();
+                }
+            }
+            
+            activateTriggeredState() {
+                // Update body class
+                document.body.classList.add('triggered');
+                
+                // Update main title and subtitle
+                document.getElementById('mainTitle').textContent = "HYDRA SHIELD TRIGGERED";
+                document.getElementById('subtitle').textContent = "Emergency Protocol • Activation Sequence";
+                document.getElementById('subtitle').style.color = 'var(--color-warning)';
+                
+                // Update status toggle
+                const toggle = document.getElementById('statusToggle');
+                toggle.textContent = "🔴 CLICK TO RESET TO DORMANT";
+                toggle.style.background = 'var(--color-triggered)';
+                
+                // Transform app cards
+                const apps = document.querySelectorAll('.app-card');
+                apps.forEach((app, index) => {
+                    setTimeout(() => {
+                        app.classList.remove('dormant-app');
+                        app.classList.add('triggered-app');
+                        
+                        // Update status text
+                        const statusText = app.querySelector('.status-text');
+                        if (statusText) {
+                            statusText.textContent = 'ACTIVE';
+                            statusText.style.color = 'var(--color-triggered)';
+                            statusText.parentElement.style.background = 'rgba(220, 20, 60, 0.1)';
+                        }
+                    }, index * 200);
+                });
+                
+                // Show activation sequence
+                const sequence = document.getElementById('activationSequence');
+                sequence.classList.add('active');
+                
+                // Start activation sequence animation
+                this.startActivationSequence();
+                
+                // Play sound effect (optional)
+                this.playActivationSound();
+                
+                // Log to console
+                console.log('%c⚡ TRIGGER ACTIVATED - DEMO MODE', 'color: #DC143C; font-weight: bold; font-size: 16px;');
+                console.log('This is a simulation of emergency protocols');
+            }
+            
+            activateDormantState() {
+                // Update body class
+                document.body.classList.remove('triggered');
+                
+                // Reset main title and subtitle
+                document.getElementById('mainTitle').textContent = "HYDRA SHIELD";
+                document.getElementById('subtitle').textContent = "Public Protection Protocol • Dormant State";
+                document.getElementById('subtitle').style.color = 'var(--color-dormant)';
+                
+                // Update status toggle
+                const toggle = document.getElementById('statusToggle');
+                toggle.textContent = "🟢 CLICK TO SIMULATE TRIGGER";
+                toggle.style.background = 'var(--color-dormant)';
+                
+                // Reset app cards
+                const apps = document.querySelectorAll('.app-card');
+                apps.forEach((app, index) => {
+                    setTimeout(() => {
+                        app.classList.remove('triggered-app');
+                        app.classList.add('dormant-app');
+                        
+                        // Reset status text
+                        const statusText = app.querySelector('.status-text');
+                        if (statusText) {
+                            const statuses = ['Standby', 'Peaceful', 'Quiet'];
+                            statusText.textContent = statuses[index] || 'Standby';
+                            statusText.style.color = '';
+                            statusText.parentElement.style.background = 'rgba(30, 144, 255, 0.1)';
+                        }
+                    }, index * 100);
+                });
+                
+                // Hide activation sequence
+                const sequence = document.getElementById('activationSequence');
+                sequence.classList.remove('active');
+                
+                // Reset activation steps
+                this.resetActivationSequence();
+                
+                // Log to console
+                console.log('%c🛡️ Reset to DORMANT state', 'color: #1E90FF; font-weight: bold;');
+            }
+            
+            startActivationSequence() {
+                this.activationStep = 0;
+                const steps = document.querySelectorAll('.sequence-step');
+                const description = document.getElementById('sequenceDescription');
+                
+                const stepDescriptions = [
+                    "Step 1: Validating trigger authenticity...",
+                    "Step 2: Contacting backup nodes globally...",
+                    "Step 3: Encrypting deployment packages...",
+                    "Step 4: Generating head multiplication keys...",
+                    "Step 5: Activating distributed storage...",
+                    "Step 6: Initializing warrior recruitment...",
+                    "Step 7: Finalizing exponential growth..."
+                ];
+                
+                const interval = setInterval(() => {
+                    if (this.activationStep >= steps.length) {
+                        clearInterval(interval);
+                        description.innerHTML = '<strong>✅ SEQUENCE COMPLETE</strong><br>All systems armed. Exponential response ready.';
+                        return;
+                    }
+                    
+                    // Activate current step
+                    steps[this.activationStep].classList.add('active');
+                    description.textContent = stepDescriptions[this.activationStep];
+                    
+                    this.activationStep++;
+                }, 1000);
+            }
+            
+            resetActivationSequence() {
+                const steps = document.querySelectorAll('.sequence-step');
+                steps.forEach(step => step.classList.remove('active'));
+                this.activationStep = 0;
+            }
+            
+            playActivationSound() {
+                // Create a subtle sound effect using Web Audio API
+                try {
+                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    oscillator.frequency.value = 220;
+                    oscillator.type = 'sine';
+                    
+                    gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+                    gainNode.gain.linearRampToValueAtTime(0.1, audioContext.currentTime + 0.1);
+                    gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.3);
+                    
+                    oscillator.start();
+                    oscillator.stop(audioContext.currentTime + 0.3);
+                } catch (e) {
+                    // Audio context not supported, silent fail
+                }
+            }
+            
+            resetDemo() {
+                if (this.isTriggered) {
+                    this.toggleTrigger();
+                }
+            }
+        }
+
+        // ====================
+        // INITIALIZE DEMO
+        // ====================
+        const demo = new HydraDemo();
+
+        // ====================
+        // ADDITIONAL EFFECTS
+        // ====================
+        // Add hover effects to app cards
+        document.querySelectorAll('.app-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                if (!this.classList.contains('triggered-app')) {
+                    this.style.transform = 'translateY(-10px)';
+                    this.style.boxShadow = '0 20px 40px rgba(30, 144, 255, 0.3)';
+                }
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                if (!this.classList.contains('triggered-app')) {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = '';
+                }
+            });
+        });
+
+        // ====================
+        // CONSOLE WELCOME
+        // ====================
+        setTimeout(() => {
+            console.log('%c👁️ Welcome to the Hydra Shield Demo', 'color: #FF8C00; font-size: 18px; font-weight: bold;');
+            console.log('%cThis is a public preview of protection protocols', 'color: #aaa;');
+            console.log('%cThe real system has multiple authentication layers', 'color: #aaa;');
+            console.log('%cCurrent status: ALL SYSTEMS DORMANT (healthy)', 'color: #32CD32;');
+        }, 1000);
+
+        // ====================
+        // AUTO-RESET FEATURE
+        // ====================
+        // If left in triggered state for 30 seconds, auto-reset
+        let triggerTimeout;
+        document.getElementById('statusToggle').addEventListener('click', () => {
+            clearTimeout(triggerTimeout);
+            
+            if (demo.isTriggered) {
+                triggerTimeout = setTimeout(() => {
+                    demo.resetDemo();
+                    console.log('%c⏰ Auto-reset to dormant state', 'color: #1E90FF;');
+                }, 30000); // 30 seconds
+            }
+        });
+
+        // ====================
+        // PAGE VISIBILITY
+        // ====================
+        // When page becomes visible again, ensure we're in dormant state
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden && demo.isTriggered) {
+                // Auto-reset when user returns to tab
+                setTimeout(() => {
+                    demo.resetDemo();
+                }, 1000);
+            }
+        });
+
+    </script>
+</body>
+</html>

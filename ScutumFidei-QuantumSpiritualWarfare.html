@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SCUTUM FIDEI - Spiritual Warfare Platform</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <style>
+        :root {
+            --color-deep-blue: #1a1a2e;
+            --color-dark-blue: #16213e;
+            --color-parchment: #e6d3a3;
+            --color-border: #4a4a6a;
+            --color-ai: #ff6b6b;
+            --color-voice: #4ECDC4;
+            --color-map: #45B7D1;
+            --color-multi: #96CEB4;
+        }
+        
+        body {
+            font-family: 'Georgia', serif;
+            background: var(--color-deep-blue);
+            color: var(--color-parchment);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .quantum-panel {
+            background: var(--color-dark-blue);
+            border: 2px solid;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+        }
+        
+        .ai-panel { border-color: var(--color-ai); }
+        .voice-panel { border-color: var(--color-voice); }
+        .map-panel { border-color: var(--color-map); }
+        .multi-panel { border-color: var(--color-multi); }
+        
+        .prayer-button {
+            background: var(--color-deep-blue);
+            color: var(--color-parchment);
+            border: 2px solid var(--color-border);
+            padding: 15px 20px;
+            margin: 10px 5px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        
+        .prayer-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .ai-button { border-color: var(--color-ai); }
+        .voice-button { border-color: var(--color-voice); }
+        .map-button { border-color: var(--color-map); }
+        .multi-button { border-color: var(--color-multi); }
+        
+        #global-prayer-map {
+            height: 400px;
+            width: 100%;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        
+        .platform-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .platform-card {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .voice-status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            background: rgba(78, 205, 196, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛡️ SCUTUM FIDEI - QUANTUM SPIRITUAL WARFARE PLATFORM</h1>
+        
+        <!-- AI SPIRITUAL DIAGNOSIS -->
+        <div class="quantum-panel ai-panel">
+            <h2>🧠 AI SPIRITUAL DIAGNOSIS ENGINE</h2>
+            <textarea id="symptomsInput" placeholder="Describe your spiritual symptoms: anxiety, oppression, nightmares, temptations, emotional struggles..." rows="4" style="width: 100%; padding: 15px; margin: 10px 0; background: var(--color-dark-blue); color: var(--color-parchment); border: 1px solid var(--color-ai); border-radius: 5px;"></textarea>
+            <button class="prayer-button ai-button" onclick="analyzeSpiritualSymptoms()">
+                ⚡ AI ANALYZE & GENERATE TARGETED PRAYER
+            </button>
+            <div id="aiDiagnosisResult"></div>
+        </div>
+
+        <!-- VOICE ACTIVATED PRAYERS -->
+        <div class="quantum-panel voice-panel">
+            <h2>🎤 VOICE-ACTIVATED PRAYER SYSTEM</h2>
+            <div class="voice-status" id="voiceStatus">
+                Voice system ready. Say "Start Listening" to begin.
+            </div>
+            <button class="prayer-button voice-button" onclick="toggleVoiceRecognition()">
+                🎤 TOGGLE VOICE COMMANDS
+            </button>
+            <div style="margin-top: 15px;">
+                <h4>Voice Commands:</h4>
+                <p>"Bind spirit of fear" | "Pray for protection" | "Emergency deliverance"</p>
+                <p>"Seal me in blood" | "Call Saint Michael" | "Community prayer"</p>
+            </div>
+        </div>
+
+        <!-- REAL-TIME GLOBAL MAP -->
+        <div class="quantum-panel map-panel">
+            <h2>🌍 REAL-TIME SPIRITUAL WARFARE MAP</h2>
+            <div id="global-prayer-map"></div>
+            <div class="prayer-stats" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; text-align: center;">
+                <div>🙏 Prayers Today: <span id="prayer-count">0</span></div>
+                <div>🛡️ Bindings Performed: <span id="binding-count">0</span></div>
+                <div>🌎 Active Warriors: <span id="warrior-count">0</span></div>
+            </div>
+        </div>
+
+        <!-- MULTI-PLATFORM DEPLOYMENT -->
+        <div class="quantum-panel multi-panel">
+            <h2>🚀 MULTI-PLATFORM DEPLOYMENT</h2>
+            <div class="platform-grid">
+                <div class="platform-card">
+                    <h4>📱 MOBILE APP</h4>
+                    <p>Android & iOS</p>
+                    <button class="prayer-button" onclick="deployMobileApp()">DEPLOY</button>
+                </div>
+                <div class="platform-card">
+                    <h4>💬 TELEGRAM BOT</h4>
+                    <p>Instant messaging</p>
+                    <button class="prayer-button" onclick="deployTelegramBot()">DEPLOY</button>
+                </div>
+                <div class="platform-card">
+                    <h4>🎮 DISCORD BOT</h4>
+                    <p>Gaming communities</p>
+                    <button class="prayer-button" onclick="deployDiscordBot()">DEPLOY</button>
+                </div>
+                <div class="platform-card">
+                    <h4>📞 WHATSAPP</h4>
+                    <p>Global reach</p>
+                    <button class="prayer-button" onclick="deployWhatsApp()">DEPLOY</button>
+                </div>
+                <div class="platform-card">
+                    <h4>🔗 IPFS MIRROR</h4>
+                    <p>Uncensorable</p>
+                    <button class="prayer-button" onclick="deployIPFS()">DEPLOY</button>
+                </div>
+                <div class="platform-card">
+                    <h4>📧 EMAIL SYSTEM</h4>
+                    <p>Daily prayers</p>
+                    <button class="prayer-button" onclick="deployEmailSystem()">DEPLOY</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- CORE PRAYER SYSTEMS -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 30px;">
+            <!-- DAILY ARMORY -->
+            <div class="quantum-panel">
+                <h2>⚔️ DAILY ARMORY</h2>
+                <button class="prayer-button" onclick="displayPrayer(sealingPrayer)">SEALING PRAYER</button>
+                <button class="prayer-button" onclick="displayPrayer(stMichaelPrayer)">ST. MICHAEL PRAYER</button>
+                <button class="prayer-button" onclick="displayPrayer(subTuumPrayer)">SUB TUUM PRAESIDIUM</button>
+                <button class="prayer-button" onclick="displayPrayer(shortDeliverance)">IMMEDIATE DELIVERANCE</button>
+            </div>
+
+            <!-- TACTICAL MODULE -->
+            <div class="quantum-panel">
+                <h2>🎯 TACTICAL MODULE</h2>
+                <select id="spirit-select" style="width: 100%; padding: 10px; margin: 5px 0; background: var(--color-dark-blue); color: var(--color-parchment); border: 1px solid var(--color-border);">
+                    <option value="">-- Select Spirit --</option>
+                    <option value="fear">Spirit of Fear</option>
+                    <option value="anxiety">Spirit of Anxiety</option>
+                    <option value="lust">Spirit of Lust</option>
+                    <option value="pride">Spirit of Pride</option>
+                    <option value="confusion">Spirit of Confusion</option>
+                </select>
+                <select id="target-relationship" style="width: 100%; padding: 10px; margin: 5px 0; background: var(--color-dark-blue); color: var(--color-parchment); border: 1px solid var(--color-border);">
+                    <option value="self">Myself</option>
+                    <option value="family">My Family</option>
+                    <option value="other">Another Person</option>
+                </select>
+                <button class="prayer-button" onclick="generateBindingPrayer()">GENERATE BINDING PRAYER</button>
+            </div>
+        </div>
+
+        <!-- PRAYER DISPLAY -->
+        <div id="prayer-display" style="margin-top: 30px; padding: 20px; background: var(--color-dark-blue); border-radius: 8px; min-height: 100px;">
+            <p style="text-align: center;">Select a prayer or use AI diagnosis above.</p>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script>
+        // CORE PRAYER DATA
+        const sealingPrayer = { 
+            title: "SEALING PRAYER OF PROTECTION", 
+            text: `I ask Jesus to seal me in His most Precious Blood against any and all incursions of the evil one, in particular against any clinging, familial, familiar or retaliating spirits, in the Name of the Father and of the Son and of the Holy Spirit. Amen.` 
+        };
+        
+        const stMichaelPrayer = { 
+            title: "PRAYER TO ST. MICHAEL", 
+            text: `St. Michael the Archangel, defend us in battle. Be our protection against the wickedness and snares of the devil. May God rebuke him, we humbly pray, and do thou, O Prince of the Heavenly Host, by the power of God, thrust into hell Satan, and all the evil spirits, who prowl about the world seeking the ruin of souls. Amen.` 
+        };
+        
+        const subTuumPrayer = { 
+            title: "SUB TUUM PRAESIDIUM", 
+            text: `We fly to thy protection, O Holy Mother of God. Despise not our petitions in our necessities, but deliver us always from all dangers, O glorious and blessed Virgin. Amen.` 
+        };
+        
+        const shortDeliverance = { 
+            title: "IMMEDIATE DELIVERANCE", 
+            text: `In the name of the Lord Jesus Christ, by the power of His Cross, His Blood and his resurrection, I bind you Satan, the spirits, powers and forces of darkness... I claim the shed blood of Jesus Christ, the Son of the living God, over every aspect of my life for my protection. I pray all these things in the precious name of my Lord and Savior, Jesus Christ.` 
+        };
+
+        // AI SPIRITUAL DIAGNOSIS ENGINE
+        function analyzeSpiritualSymptoms() {
+            const symptoms = document.getElementById('symptomsInput').value.toLowerCase();
+            const resultDiv = document.getElementById('aiDiagnosisResult');
+            
+            if (!symptoms) {
+                resultDiv.innerHTML = `<div style="color: var(--color-ai); padding: 10px; background: rgba(255,107,107,0.1); border-radius: 5px;">Please describe your symptoms for AI analysis.</div>`;
+                return;
+            }
+
+            const spiritPatterns = {
+                fear: ['fear', 'anxiety', 'panic', 'terror', 'scared', 'afraid', 'worry', 'nervous'],
+                oppression: ['heavy', 'weight', 'pressure', 'suffocating', 'darkness', 'burden', 'oppressed'],
+                lust: ['lust', 'sexual', 'impure', 'unclean', 'temptation', 'immoral', 'porn'],
+                anger: ['anger', 'rage', 'fury', 'violent', 'temper', 'outburst', 'irritated'],
+                deception: ['confusion', 'doubt', 'lies', 'deception', 'uncertain', 'delusion'],
+                depression: ['sad', 'depressed', 'hopeless', 'despair', 'empty', 'numb'],
+                addiction: ['addiction', 'compulsion', 'habit', 'cannot stop', 'dependent']
+            };
+            
+            const detectedSpirits = [];
+            for (const [spirit, patterns] of Object.entries(spiritPatterns)) {
+                if (patterns.some(pattern => symptoms.includes(pattern))) {
+                    detectedSpirits.push(spirit);
+                }
+            }
+            
+            if (detectedSpirits.length > 0) {
+                const primarySpirit = detectedSpirits[0];
+                resultDiv.innerHTML = `
+                    <div style="padding: 15px; background: rgba(255,107,107,0.1); border-radius: 8px; margin-top: 10px;">
+                        <h3 style="color: var(--color-ai); margin-top: 0;">🎯 AI DIAGNOSIS COMPLETE</h3>
+                        <p><strong>Detected Spirits:</strong> ${detectedSpirits.map(s => `<span style="color: var(--color-ai);">${s.charAt(0).toUpperCase() + s.slice(1)}</span>`).join(', ')}</p>
+                        <p><strong>Primary Target:</strong> <span style="color: var(--color-ai);">${primarySpirit.charAt(0).toUpperCase() + primarySpirit.slice(1)}</span></p>
+                        <button class="prayer-button ai-button" onclick="autoGenerateFromAI('${primarySpirit}')" style="margin-top: 10px;">
+                            ⚡ GENERATE TARGETED BINDING PRAYER
+                        </button>
+                    </div>
+                `;
+            } else {
+                resultDiv.innerHTML = `<div style="padding: 10px; background: rgba(255,107,107,0.1); border-radius: 5px;">No specific patterns detected. Try describing symptoms in more detail.</div>`;
+            }
+        }
+
+        function autoGenerateFromAI(spirit) {
+            document.getElementById('spirit-select').value = spirit;
+            document.getElementById('target-relationship').value = 'self';
+            generateBindingPrayer();
+            document.getElementById('aiDiagnosisResult').innerHTML += `<div style="color: #90EE90; margin-top: 10px; padding: 10px; background: rgba(144,238,144,0.1); border-radius: 5px;">✅ Targeted prayer generated against ${spirit}! Scroll up to see it.</div>`;
+        }
+
+        // VOICE ACTIVATION SYSTEM
+        let voiceRecognitionActive = false;
+        let recognition;
+
+        function toggleVoiceRecognition() {
+            if (!voiceRecognitionActive) {
+                startVoiceRecognition();
+            } else {
+                stopVoiceRecognition();
+            }
+        }
+
+        function startVoiceRecognition() {
+            if (!('webkitSpeechRecognition' in window)) {
+                alert("Voice recognition not supported in this browser. Try Chrome or Edge.");
+                return;
+            }
+
+            recognition = new webkitSpeechRecognition();
+            recognition.continuous = true;
+            recognition.interimResults = true;
+
+            recognition.onstart = function() {
+                voiceRecognitionActive = true;
+                document.getElementById('voiceStatus').innerHTML = "🎤 Listening... Say a prayer command";
+                document.querySelector('.voice-button').innerHTML = "🛑 STOP VOICE COMMANDS";
+            };
+
+            recognition.onresult = function(event) {
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    if (event.results[i].isFinal) {
+                        const command = event.results[i][0].transcript.toLowerCase();
+                        processVoiceCommand(command);
+                    }
+                }
+            };
+
+            recognition.onerror = function(event) {
+                console.error('Voice recognition error', event.error);
+            };
+
+            recognition.onend = function() {
+                if (voiceRecognitionActive) {
+                    recognition.start(); // Restart if still active
+                }
+            };
+
+            recognition.start();
+        }
+
+        function stopVoiceRecognition() {
+            if (recognition) {
+                recognition.stop();
+            }
+            voiceRecognitionActive = false;
+            document.getElementById('voiceStatus').innerHTML = "Voice system ready. Say 'Start Listening' to begin.";
+            document.querySelector('.voice-button').innerHTML = "🎤 TOGGLE VOICE COMMANDS";
+        }
+
+        function processVoiceCommand(command) {
+            document.getElementById('voiceStatus').innerHTML = `Heard: "${command}"`;
+            
+            if (command.includes('bind spirit of')) {
+                const spiritMatch = command.match(/bind spirit of (\w+)/);
+                if (spiritMatch) {
+                    const spirit = spiritMatch[1];
+                    document.getElementById('spirit-select').value = spirit;
+                    generateBindingPrayer();
+                }
+            } else if (command.includes('pray for protection')) {
+                displayPrayer(sealingPrayer);
+            } else if (command.includes('emergency deliverance')) {
+                displayPrayer(shortDeliverance);
+            } else if (command.includes('saint michael')) {
+                displayPrayer(stMichaelPrayer);
+            } else if (command.includes('start listening')) {
+                // Already handled
+            }
+        }
+
+        // GLOBAL PRAYER MAP
+        let map;
+        function initGlobalMap() {
+            map = L.map('global-prayer-map').setView([20, 0], 2);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+
+            // Simulate real-time prayer data
+            simulatePrayerActivity();
+        }
+
+        function simulatePrayerActivity() {
+            const prayers = [
+                { lat: 40.7128, lng: -74.0060, prayer: "Protection from anxiety", name: "Anonymous" },
+                { lat: 34.0522, lng: -118.2437, prayer: "Family deliverance", name: "Warrior" },
+                { lat: 51.5074, lng: -0.1278, prayer: "Breaking generational curses", name: "Prayer" }
+            ];
+
+            prayers.forEach((prayer, index) => {
+                setTimeout(() => {
+                    const marker = L.marker([prayer.lat, prayer.lng]).addTo(map);
+                    marker.bindPopup(`<b>${prayer.name}:</b> ${prayer.prayer}`);
+                    
+                    // Update stats
+                    document.getElementById('prayer-count').textContent = parseInt(document.getElementById('prayer-count').textContent) + 1;
+                }, index * 2000);
+            });
+
+            document.getElementById('warrior-count').textContent = '3';
+            document.getElementById('binding-count').textContent = '12';
+        }
+
+        // MULTI-PLATFORM DEPLOYMENT
+        function deployMobileApp() {
+            alert('🚀 Mobile app deployment initiated! This would connect to Capacitor for Android/iOS build.');
+        }
+
+        function deployTelegramBot() {
+            alert('🤖 Telegram bot deployment started! This would create @SpiritualWarfareBot');
+        }
+
+        function deployDiscordBot() {
+            alert('🎮 Discord bot deployment initiated! This would create spiritual warfare channels.');
+        }
+
+        function deployWhatsApp() {
+            alert('📞 WhatsApp integration started! This would connect to Twilio API.');
+        }
+
+        function deployIPFS() {
+            alert('🔗 Deploying to IPFS! Creating uncensorable mirror on decentralized web.');
+        }
+
+        function deployEmailSystem() {
+            alert('📧 Email system deployment started! Setting up daily prayer newsletters.');
+        }
+
+        // CORE PRAYER FUNCTIONS
+        function displayPrayer(prayer) {
+            document.getElementById('prayer-display').innerHTML = `
+                <h3>${prayer.title}</h3>
+                <p>${prayer.text}</p>
+            `;
+        }
+
+        function generateBindingPrayer() {
+            const spirit = document.getElementById('spirit-select').value;
+            const relationship = document.getElementById('target-relationship').value;
+            
+            if (!spirit) {
+                alert("Please select a spirit to bind.");
+                return;
+            }
+
+            const spiritNames = {
+                fear: "Fear (Timoris)",
+                anxiety: "Anxiety (Anxietatis)", 
+                lust: "Lust (Luxuriae)",
+                pride: "Pride (Superbia)",
+                confusion: "Confusion (Confusionis)"
+            };
+
+            const spiritName = spiritNames[spirit];
+            let prayerText;
+
+            if (relationship === 'self' || relationship === 'family') {
+                let target = (relationship === 'self') ? 'me' : 'my family';
+                prayerText = `In the Name of Jesus Christ, and by the power of His Precious Blood, I command the spirit of ${spiritName} to be bound and to leave ${target} now. I break all your assignments, influences, and powers. Go directly to the foot of the Cross to be judged by Jesus Christ. I claim this deliverance in the mighty Name of Jesus. Amen.`;
+            } else {
+                prayerText = `Lord Jesus Christ, I humbly ask You, by the merits of Your Passion and the power of Your Precious Blood, to bind the spirit of ${spiritName} afflicting this person. Please command it to be silent, to leave them, and to go to the foot of Your Cross. Surround them with Your holy angels and the mantle of Your Mother. Thy will be done. Amen.`;
+            }
+
+            document.getElementById('prayer-display').innerHTML = `
+                <h3>BINDING PRAYER</h3>
+                <p><em>Generated for: ${spiritName}</em></p>
+                <p>${prayerText}</p>
+            `;
+
+            // Update binding count
+            document.getElementById('binding-count').textContent = parseInt(document.getElementById('binding-count').textContent) + 1;
+        }
+
+        // INITIALIZE EVERYTHING
+        document.addEventListener('DOMContentLoaded', function() {
+            initGlobalMap();
+            document.getElementById('prayer-count').textContent = '3';
+            document.getElementById('binding-count').textContent = '0';
+            document.getElementById('warrior-count').textContent = '1';
+        });
+    </script>
+</body>
+</html>

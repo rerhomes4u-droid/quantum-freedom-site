@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Freedom OS - A Gift from TripsToColombia.com</title>
+    <style>
+        :root {
+            --colombia-yellow: #FCD116;
+            --colombia-blue: #003893;
+            --colombia-red: #CE1126;
+            --white: #FFFFFF;
+            --dark-text: #333333;
+            --light-gray: #f5f5f5;
+            --success-green: #28a745;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            color: var(--dark-text);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        /* Header with Version Badge */
+        header {
+            background: linear-gradient(135deg, var(--colombia-yellow) 0%, var(--colombia-blue) 50%, var(--colombia-red) 100%);
+            padding: 1rem 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .version-badge {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            background: var(--white);
+            color: var(--colombia-blue);
+            padding: 0.3rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-text {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--white);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .stars {
+            color: var(--white);
+            font-size: 1.4rem;
+            letter-spacing: 3px;
+        }
+
+        /* Tool Container */
+        .tool-container {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .tool-window {
+            background: white;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .tool-header {
+            background: linear-gradient(135deg, var(--colombia-yellow), var(--colombia-blue));
+            color: white;
+            padding: 1.5rem;
+            border-radius: 15px 15px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .close-tool {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        .tool-content {
+            padding: 2rem;
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--colombia-blue);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--colombia-blue);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, var(--colombia-yellow), var(--colombia-blue));
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Results Display */
+        .results {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            border-left: 4px solid var(--colombia-yellow);
+        }
+
+        .result-item {
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .result-item:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        /* Main Content */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .tool-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid #e9ecef;
+        }
+
+        .tool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .tool-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .tool-card h3 {
+            color: var(--colombia-blue);
+            margin-bottom: 1rem;
+        }
+
+        .tool-card p {
+            color: #666;
+            margin-bottom: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="version-badge">v1.3 - LIVE & WORKING</div>
+        <div class="header-container">
+            <div class="logo">
+                <div class="stars">★ ★ ★ ★ ★ ★ ★</div>
+                <div class="logo-text">Financial Freedom OS</div>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <h1 style="text-align: center; margin-bottom: 1rem; color: var(--colombia-blue);">Powerful Financial Tools</h1>
+        <p style="text-align: center; margin-bottom: 3rem; font-size: 1.2rem;">A Gift from TripsToColombia.com - Master your finances and join us in paradise</p>
+
+        <div class="tools-grid">
+            <!-- Debt Discharge Calculator -->
+            <div class="tool-card" onclick="openTool('debtCalculator')">
+                <div class="tool-icon">💰</div>
+                <h3>Debt Discharge Calculator</h3>
+                <p>Calculate your path to financial freedom and see exactly how to discharge your obligations</p>
+                <div class="btn">Launch Tool</div>
+            </div>
+
+            <!-- Document Generator -->
+            <div class="tool-card" onclick="openTool('documentGenerator')">
+                <div class="tool-icon">📄</div>
+                <h3>Legal Document Generator</h3>
+                <p>Create legally sound documents for financial discharge procedures</p>
+                <div class="btn">Launch Tool</div>
+            </div>
+
+            <!-- Payment Planner -->
+            <div class="tool-card" onclick="openTool('paymentPlanner')">
+                <div class="tool-icon">📊</div>
+                <h3>Payment Strategy Planner</h3>
+                <p>Plan your payment strategies and optimize your financial outflow</p>
+                <div class="btn">Launch Tool</div>
+            </div>
+
+            <!-- Colombian Cost Calculator -->
+            <div class="tool-card" onclick="openTool('colombiaCalculator')">
+                <div class="tool-icon">🌴</div>
+                <h3>Colombian Paradise Budget</h3>
+                <p>Calculate your cost of living in Colombia and plan your transition</p>
+                <div class="btn">Launch Tool</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Debt Calculator Tool -->
+    <div id="debtCalculator" class="tool-container">
+        <div class="tool-window">
+            <div class="tool-header">
+                <h2>💰 Debt Discharge Calculator</h2>
+                <button class="close-tool" onclick="closeTool('debtCalculator')">×</button>
+            </div>
+            <div class="tool-content">
+                <div class="form-group">
+                    <label>Total Debt Amount ($)</label>
+                    <input type="number" id="debtAmount" class="form-control" placeholder="Enter total debt amount">
+                </div>
+                <div class="form-group">
+                    <label>Monthly Income ($)</label>
+                    <input type="number" id="monthlyIncome" class="form-control" placeholder="Enter monthly income">
+                </div>
+                <div class="form-group">
+                    <label>Monthly Expenses ($)</label>
+                    <input type="number" id="monthlyExpenses" class="form-control" placeholder="Enter monthly expenses">
+                </div>
+                <button class="btn" onclick="calculateDebtDischarge()">Calculate Discharge Plan</button>
+                
+                <div id="debtResults" class="results" style="display: none;">
+                    <h3>Your Debt Discharge Plan</h3>
+                    <div class="result-item">
+                        <strong>Discharge Timeframe:</strong> <span id="dischargeTime"></span>
+                    </div>
+                    <div class="result-item">
+                        <strong>Monthly Payment Capacity:</strong> $<span id="paymentCapacity"></span>
+                    </div>
+                    <div class="result-item">
+                        <strong>Recommended Strategy:</strong> <span id="recommendedStrategy"></span>
+                    </div>
+                    <div class="result-item">
+                        <strong>Next Steps:</strong> <span id="nextSteps"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Document Generator Tool -->
+    <div id="documentGenerator" class="tool-container">
+        <div class="tool-window">
+            <div class="tool-header">
+                <h2>📄 Legal Document Generator</h2>
+                <button class="close-tool" onclick="closeTool('documentGenerator')">×</button>
+            </div>
+            <div class="tool-content">
+                <div class="form-group">
+                    <label>Document Type</label>
+                    <select id="docType" class="form-control">
+                        <option value="">Select document type</option>
+                        <option value="discharge">Debt Discharge Notice</option>
+                        <option value="validation">Debt Validation Request</option>
+                        <option value="settlement">Settlement Offer Letter</option>
+                        <option value="cease">Cease and Desist Letter</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Your Full Name</label>
+                    <input type="text" id="userName" class="form-control" placeholder="Enter your full name">
+                </div>
+                <div class="form-group">
+                    <label>Creditor Name</label>
+                    <input type="text" id="creditorName" class="form-control" placeholder="Enter creditor name">
+                </div>
+                <div class="form-group">
+                    <label>Debt Amount ($)</label>
+                    <input type="number" id="docDebtAmount" class="form-control" placeholder="Enter debt amount">
+                </div>
+                <button class="btn" onclick="generateDocument()">Generate Document</button>
+                
+                <div id="documentResults" class="results" style="display: none;">
+                    <h3>Your Generated Document</h3>
+                    <div id="generatedDocument" style="background: white; padding: 1.5rem; border-radius: 8px; border: 1px solid #ddd; font-family: monospace; white-space: pre-wrap;"></div>
+                    <button class="btn" onclick="downloadDocument()" style="margin-top: 1rem;">Download Document</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Planner Tool -->
+    <div id="paymentPlanner" class="tool-container">
+        <div class="tool-window">
+            <div class="tool-header">
+                <h2>📊 Payment Strategy Planner</h2>
+                <button class="close-tool" onclick="closeTool('paymentPlanner')">×</button>
+            </div>
+            <div class="tool-content">
+                <div class="form-group">
+                    <label>Total Monthly Income ($)</label>
+                    <input type="number" id="totalIncome" class="form-control" placeholder="Enter total monthly income">
+                </div>
+                <div class="form-group">
+                    <label>Essential Expenses ($)</label>
+                    <input type="number" id="essentialExpenses" class="form-control" placeholder="Rent, food, utilities, etc.">
+                </div>
+                <div class="form-group">
+                    <label>Total Debt Payments ($)</label>
+                    <input type="number" id="totalDebtPayments" class="form-control" placeholder="Current monthly debt payments">
+                </div>
+                <button class="btn" onclick="calculatePaymentPlan()">Generate Payment Plan</button>
+                
+                <div id="paymentResults" class="results" style="display: none;">
+                    <h3>Your Optimal Payment Strategy</h3>
+                    <div class="result-item">
+                        <strong>Available for Debt Discharge:</strong> $<span id="availableForDebt"></span>/month
+                    </div>
+                    <div class="result-item">
+                        <strong>Recommended Allocation:</strong>
+                        <ul style="margin-top: 0.5rem;">
+                            <li>High-interest debts: <span id="highInterestAllocation"></span></li>
+                            <li>Medium-priority debts: <span id="mediumPriorityAllocation"></span></li>
+                            <li>Negotiation buffer: <span id="negotiationBuffer"></span></li>
+                        </ul>
+                    </div>
+                    <div class="result-item">
+                        <strong>Strategy:</strong> <span id="paymentStrategy"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Colombia Cost Calculator -->
+    <div id="colombiaCalculator" class="tool-container">
+        <div class="tool-window">
+            <div class="tool-header">
+                <h2>🌴 Colombian Paradise Budget</h2>
+                <button class="close-tool" onclick="closeTool('colombiaCalculator')">×</button>
+            </div>
+            <div class="tool-content">
+                <div class="form-group">
+                    <label>Desired Colombian City</label>
+                    <select id="colombiaCity" class="form-control">
+                        <option value="medellin">Medellín</option>
+                        <option value="bogota">Bogotá</option>
+                        <option value="cartagena">Cartagena</option>
+                        <option value="cali">Cali</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Lifestyle Type</label>
+                    <select id="lifestyleType" class="form-control">
+                        <option value="budget">Budget Conscious</option>
+                        <option value="comfortable">Comfortable Living</option>
+                        <option value="luxury">Luxury Lifestyle</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Family Size</label>
+                    <input type="number" id="familySize" class="form-control" value="1" min="1">
+                </div>
+                <button class="btn" onclick="calculateColombiaCost()">Calculate Paradise Budget</button>
+                
+                <div id="colombiaResults" class="results" style="display: none;">
+                    <h3>Your Colombian Paradise Budget</h3>
+                    <div class="result-item">
+                        <strong>Monthly Cost Estimate:</strong> $<span id="monthlyCost"></span>
+                    </div>
+                    <div class="result-item">
+                        <strong>Breakdown:</strong>
+                        <ul style="margin-top: 0.5rem;">
+                            <li>Housing: $<span id="housingCost"></span></li>
+                            <li>Food: $<span id="foodCost"></span></li>
+                            <li>Transportation: $<span id="transportCost"></span></li>
+                            <li>Entertainment: $<span id="entertainmentCost"></span></li>
+                            <li>Healthcare: $<span id="healthcareCost"></span></li>
+                        </ul>
+                    </div>
+                    <div class="result-item">
+                        <strong>Savings vs. US:</strong> <span id="savingsPercentage"></span>% less than typical US costs
+                    </div>
+                    <div class="result-item">
+                        <button class="btn" onclick="window.open('https://tripstocolombia.com', '_blank')">Start Your Colombian Journey</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tool Management
+        function openTool(toolId) {
+            document.getElementById(toolId).style.display = 'flex';
+        }
+
+        function closeTool(toolId) {
+            document.getElementById(toolId).style.display = 'none';
+        }
+
+        // Debt Calculator Logic
+        function calculateDebtDischarge() {
+            const debt = parseFloat(document.getElementById('debtAmount').value);
+            const income = parseFloat(document.getElementById('monthlyIncome').value);
+            const expenses = parseFloat(document.getElementById('monthlyExpenses').value);
+            
+            if (!debt || !income || !expenses) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            const available = income - expenses;
+            const months = Math.ceil(debt / available);
+            
+            document.getElementById('paymentCapacity').textContent = available.toFixed(2);
+            document.getElementById('dischargeTime').textContent = `${months} months (${(months/12).toFixed(1)} years)`;
+            
+            if (months <= 12) {
+                document.getElementById('recommendedStrategy').textContent = 'Aggressive discharge - you can be debt-free within a year!';
+                document.getElementById('nextSteps').textContent = 'Focus on high-interest debts first while maintaining minimum payments on others.';
+            } else if (months <= 36) {
+                document.getElementById('recommendedStrategy').textContent = 'Balanced approach - steady progress with lifestyle maintenance';
+                document.getElementById('nextSteps').textContent = 'Consider debt consolidation and negotiate lower interest rates.';
+            } else {
+                document.getElementById('recommendedStrategy').textContent = 'Strategic negotiation required - consider settlement offers';
+                document.getElementById('nextSteps').textContent = 'Focus on debt validation and negotiate pay-for-delete agreements.';
+            }
+            
+            document.getElementById('debtResults').style.display = 'block';
+        }
+
+        // Document Generator Logic
+        function generateDocument() {
+            const docType = document.getElementById('docType').value;
+            const userName = document.getElementById('userName').value;
+            const creditor = document.getElementById('creditorName').value;
+            const amount = document.getElementById('docDebtAmount').value;
+            
+            if (!docType || !userName || !creditor || !amount) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            let documentText = '';
+            
+            switch(docType) {
+                case 'discharge':
+                    documentText = `DEBT DISCHARGE NOTICE
+
+To: ${creditor}
+From: ${userName}
+Date: ${new Date().toLocaleDateString()}
+
+I am writing to formally dispute the alleged debt of $${amount}. Please provide validation of this debt as required by law.
+
+If you cannot provide proper validation, consider this debt discharged and cease all collection activities.
+
+Sincerely,
+${userName}`;
+                    break;
+                    
+                case 'validation':
+                    documentText = `DEBT VALIDATION REQUEST
+
+To: ${creditor}
+From: ${userName}
+Date: ${new Date().toLocaleDateString()}
+
+I request validation of the alleged debt of $${amount} pursuant to the Fair Debt Collection Practices Act.
+
+Please provide:
+1. Original contract or agreement
+2. Complete payment history
+3. Proof of your right to collect
+
+Until validation is provided, cease all collection activities.
+
+Sincerely,
+${userName}`;
+                    break;
+                    
+                case 'settlement':
+                    documentText = `SETTLEMENT OFFER LETTER
+
+To: ${creditor}
+From: ${userName}
+Date: ${new Date().toLocaleDateString()}
+
+Re: Alleged Debt of $${amount}
+
+I propose to settle this matter for $${(amount * 0.3).toFixed(2)} (30% of the alleged amount).
+
+This offer is contingent upon:
+1. Complete deletion from credit reports
+2. Written confirmation of settlement
+3. Release from all further claims
+
+This offer expires in 30 days.
+
+Sincerely,
+${userName}`;
+                    break;
+                    
+                case 'cease':
+                    documentText = `CEASE AND DESIST LETTER
+
+To: ${creditor}
+From: ${userName}
+Date: ${new Date().toLocaleDateString()}
+
+I hereby demand that you immediately cease and desist all communication regarding the alleged debt of $${amount}.
+
+Any further communication must be in writing and limited to:
+1. Confirmation of cessation
+2. Notification of legal action
+
+Failure to comply will result in legal action.
+
+Sincerely,
+${userName}`;
+                    break;
+            }
+            
+            document.getElementById('generatedDocument').textContent = documentText;
+            document.getElementById('documentResults').style.display = 'block';
+        }
+
+        function downloadDocument() {
+            const text = document.getElementById('generatedDocument').textContent;
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'legal-document.txt';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Payment Planner Logic
+        function calculatePaymentPlan() {
+            const income = parseFloat(document.getElementById('totalIncome').value);
+            const expenses = parseFloat(document.getElementById('essentialExpenses').value);
+            const debtPayments = parseFloat(document.getElementById('totalDebtPayments').value);
+            
+            if (!income || !expenses || !debtPayments) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            const available = income - expenses - debtPayments;
+            const highInterest = available * 0.6;
+            const mediumPriority = available * 0.3;
+            const negotiation = available * 0.1;
+            
+            document.getElementById('availableForDebt').textContent = available.toFixed(2);
+            document.getElementById('highInterestAllocation').textContent = `$${highInterest.toFixed(2)}`;
+            document.getElementById('mediumPriorityAllocation').textContent = `$${mediumPriority.toFixed(2)}`;
+            document.getElementById('negotiationBuffer').textContent = `$${negotiation.toFixed(2)}`;
+            
+            if (available > 500) {
+                document.getElementById('paymentStrategy').textContent = 'Aggressive payoff strategy - focus on highest interest rates first';
+            } else if (available > 200) {
+                document.getElementById('paymentStrategy').textContent = 'Balanced approach - snowball method recommended';
+            } else {
+                document.getElementById('paymentStrategy').textContent = 'Strategic approach - consider debt settlement and negotiation';
+            }
+            
+            document.getElementById('paymentResults').style.display = 'block';
+        }
+
+        // Colombia Calculator Logic
+        function calculateColombiaCost() {
+            const city = document.getElementById('colombiaCity').value;
+            const lifestyle = document.getElementById('lifestyleType').value;
+            const familySize = parseInt(document.getElementById('familySize').value);
+            
+            let baseCost = 0;
+            
+            // Base monthly costs by city and lifestyle
+            const costs = {
+                medellin: { budget: 800, comfortable: 1200, luxury: 2500 },
+                bogota: { budget: 900, comfortable: 1400, luxury: 2800 },
+                cartagena: { budget: 850, comfortable: 1300, luxury: 2600 },
+                cali: { budget: 700, comfortable: 1100, luxury: 2200 }
+            };
+            
+            baseCost = costs[city][lifestyle] * familySize;
+            
+            // Calculate breakdown
+            const housing = baseCost * 0.35;
+            const food = baseCost * 0.25;
+            const transport = baseCost * 0.15;
+            const entertainment = baseCost * 0.15;
+            const healthcare = baseCost * 0.10;
+            
+            // Calculate savings vs US (average US cost for comparison: $3000 single, $6000 family)
+            const usComparison = familySize === 1 ? 3000 : 6000;
+            const savings = ((usComparison - baseCost) / usComparison * 100).toFixed(1);
+            
+            document.getElementById('monthlyCost').textContent = baseCost.toFixed(0);
+            document.getElementById('housingCost').textContent = housing.toFixed(0);
+            document.getElementById('foodCost').textContent = food.toFixed(0);
+            document.getElementById('transportCost').textContent = transport.toFixed(0);
+            document.getElementById('entertainmentCost').textContent = entertainment.toFixed(0);
+            document.getElementById('healthcareCost').textContent = healthcare.toFixed(0);
+            document.getElementById('savingsPercentage').textContent = savings;
+            
+            document.getElementById('colombiaResults').style.display = 'block';
+        }
+
+        // Close tool when clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('tool-container')) {
+                event.target.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

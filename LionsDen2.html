@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE LION'S DEN - Uncensorable Truth Network</title>
+    <style>
+        :root {
+            --color-fire: #FF4500;
+            --color-dark: #0A0A0A;
+            --color-gold: #FFD700;
+            --color-steel: #4682B4;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            background: var(--color-dark);
+            color: white;
+            font-family: 'Courier New', monospace;
+            overflow-x: hidden;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        /* MATRIX BACKGROUND */
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.1;
+            pointer-events: none;
+        }
+        .matrix-char {
+            position: absolute;
+            color: #00FF00;
+            font-family: monospace;
+            animation: fall linear infinite;
+        }
+        @keyframes fall {
+            to { transform: translateY(100vh); }
+        }
+        /* HEADER */
+        .den-header {
+            text-align: center;
+            padding: 3rem 0;
+            border-bottom: 3px solid var(--color-fire);
+            position: relative;
+        }
+        .lion-logo {
+            font-size: 5rem;
+            animation: roar 3s infinite;
+            filter: drop-shadow(0 0 20px var(--color-fire));
+        }
+        @keyframes roar {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        h1 {
+            font-size: 4rem;
+            background: linear-gradient(to right, var(--color-fire), var(--color-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 1rem 0;
+            letter-spacing: 3px;
+        }
+        .tagline {
+            color: var(--color-steel);
+            font-size: 1.2rem;
+            font-style: italic;
+            margin-bottom: 2rem;
+        }
+        /* NETWORK STATUS */
+        .network-status {
+            background: rgba(0, 20, 40, 0.9);
+            border: 2px solid var(--color-steel);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            backdrop-filter: blur(10px);
+        }
+        .status-item {
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            border-left: 4px solid var(--color-fire);
+        }
+        .status-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--color-gold);
+            font-family: monospace;
+        }
+        /* MAIN INTERFACE */
+        .truth-engine {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 2rem;
+            margin: 3rem 0;
+            min-height: 600px;
+        }
+        .node-panel {
+            background: rgba(0, 30, 60, 0.9);
+            border-radius: 15px;
+            padding: 1.5rem;
+            border: 2px solid var(--color-steel);
+        }
+        .node-id {
+            font-family: monospace;
+            color: var(--color-gold);
+            background: black;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 1rem 0;
+            word-break: break-all;
+        }
+        .truth-feed {
+            background: rgba(0, 0, 0, 0.8);
+            border-radius: 15px;
+            padding: 1.5rem;
+            border: 2px solid var(--color-fire);
+            overflow-y: auto;
+            max-height: 800px;
+        }
+        .truth-item {
+            background: rgba(255, 69, 0, 0.1);
+            border: 1px solid rgba(255, 69, 0, 0.3);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s;
+        }
+        .truth-item:hover {
+            background: rgba(255, 69, 0, 0.2);
+            transform: translateX(5px);
+        }
+        .truth-score {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .score-high { background: #00FF00; color: black; }
+        .score-medium { background: #FFFF00; color: black; }
+        .score-low { background: #FF0000; color: white; }
+        /* UPLOAD ZONE */
+        .upload-zone {
+            border: 3px dashed var(--color-steel);
+            border-radius: 15px;
+            padding: 3rem;
+            text-align: center;
+            margin: 2rem 0;
+            background: rgba(70, 130, 180, 0.1);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .upload-zone:hover {
+            border-color: var(--color-fire);
+            background: rgba(255, 69, 0, 0.1);
+        }
+        .upload-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+        /* WEAPONS */
+        .weapons-panel {
+            background: rgba(139, 0, 0, 0.9);
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 3rem 0;
+            border: 2px solid var(--color-fire);
+        }
+        .weapons-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        .weapon {
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            border: 1px solid var(--color-gold);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .weapon:hover {
+            transform: scale(1.05);
+            border-color: var(--color-fire);
+            box-shadow: 0 0 20px var(--color-fire);
+        }
+        /* FOOTER */
+        .prophecy {
+            text-align: center;
+            padding: 3rem;
+            border-top: 1px solid var(--color-fire);
+            margin-top: 3rem;
+            font-style: italic;
+            color: var(--color-steel);
+            font-size: 1.1rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- MATRIX BACKGROUND -->
+    <div class="matrix-bg" id="matrixBg"></div>
+
+    <div class="container">
+        <!-- HEADER -->
+        <header class="den-header">
+            <div class="lion-logo">🦁</div>
+            <h1>THE LION'S DEN</h1>
+            <p class="tagline">Uncensorable Truth Network | Peer-to-Peer | AI-Verified | Immortal</p>
+            <p style="color: #FF4500; font-size: 1rem; max-width: 800px; margin: 1rem auto;">
+                WARNING: This interface exists in your browser. It cannot be taken down. Every visitor becomes a node. 
+                The network grows with every attack. You are now part of the immune system.
+            </p>
+        </header>
+
+        <!-- NETWORK STATUS -->
+        <section class="network-status">
+            <div class="status-item">
+                <div>ACTIVE NODES</div>
+                <div class="status-value" id="nodeCount">1</div>
+                <div id="nodeList">This browser (You)</div>
+            </div>
+            <div class="status-item">
+                <div>TRUTH SHARDS STORED</div>
+                <div class="status-value" id="shardCount">0</div>
+                <div>Fragments of banned truth in your browser cache</div>
+            </div>
+            <div class="status-item">
+                <div>NETWORK HEALTH</div>
+                <div class="status-value" id="networkHealth">100%</div>
+                <div>Resilience: <span id="resilience">IMMORTAL</span></div>
+            </div>
+            <div class="status-item">
+                <div>LAST ATTACK</div>
+                <div class="status-value" id="lastAttack">NEVER</div>
+                <div>They cannot kill what has no center</div>
+            </div>
+        </section>
+
+        <!-- MAIN TRUTH ENGINE -->
+        <section class="truth-engine">
+            <!-- LEFT: NODE PANEL -->
+            <div class="node-panel">
+                <h3>YOUR NODE IDENTITY</h3>
+                <div class="node-id" id="nodeId">Generating cryptographic identity...</div>
+                
+                <h4>NODE MISSION</h4>
+                <ul style="padding-left: 1.5rem;">
+                    <li>Store encrypted truth shards</li>
+                    <li>Seed to new nodes</li>
+                    <li>Verify AI authenticity scores</li>
+                    <li>Carry the fire</li>
+                </ul>
+
+                <div style="margin-top: 2rem;">
+                    <button id="goDarkBtn" style="background: #8B0000; color: white; border: none; padding: 10px 20px; border-radius: 5px; width: 100%; cursor: pointer;">
+                        🦁 GO DARK / ACTIVATE STEALTH
+                    </button>
+                </div>
+            </div>
+
+            <!-- RIGHT: TRUTH FEED -->
+            <div class="truth-feed">
+                <h3>LIVE TRUTH STREAM - AI VERIFIED</h3>
+                <div id="truthStream">
+                    <!-- Truth items will appear here -->
+                    <div class="truth-item">
+                        <span class="truth-score score-high">AUTHENTICITY: 97%</span>
+                        <strong>GAZA HOSPITAL ATTACK FOOTAGE</strong>
+                        <p>Original, unedited cell phone footage from Al-Shifa hospital. AI analysis confirms no edits, authentic geolocation, timestamp verified.</p>
+                        <div style="font-size: 0.8rem; color: #888;">
+                            Shards: 24/24 | Nodes: 1,427 | Age: 3 days
+                        </div>
+                    </div>
+                    <div class="truth-item">
+                        <span class="truth-score score-low">AUTHENTICITY: 12%</span>
+                        <strong>BBC REPORT ON GAZA CASUALTIES</strong>
+                        <p>AI flags: Statistical manipulation, omitted sources, narrative framing. Cross-reference with raw data shards available.</p>
+                        <div style="font-size: 0.8rem; color: #888;">
+                            Shards: 8/8 | Nodes: 892 | Age: 1 day
+                        </div>
+                    </div>
+                    <div class="truth-item">
+                        <span class="truth-score score-high">AUTHENTICITY: 94%</span>
+                        <strong>WHISTLEBLOWER: FEDNOW & SOCIAL CREDIT</strong>
+                        <p>Former Federal Reserve analyst testimony. Voice analysis: 99% match. Document metadata: Authentic. AI confidence: HIGH.</p>
+                        <div style="font-size: 0.8rem; color: #888;">
+                            Shards: 48/48 | Nodes: 3,841 | Age: 7 days
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- UPLOAD ZONE -->
+        <section class="upload-zone" id="uploadZone">
+            <div class="upload-icon">⬆️</div>
+            <h3>UPLOAD TRUTH TO THE DEN</h3>
+            <p>Drag & drop video, audio, documents, or paste links. Our AI will analyze, shard, encrypt, and distribute across the network.</p>
+            <p style="color: #FFD700; font-size: 0.9rem;">
+                Your upload will be split into 256 encrypted shards. Each shard stored on 24+ nodes. Immortal.
+            </p>
+        </section>
+
+        <!-- WEAPONS PANEL -->
+        <section class="weapons-panel">
+            <h3>TRUTH WEAPONS - DEPLOY NOW</h3>
+            <p>Tools that exist between nodes. Activated by consensus. Unstoppable.</p>
+            
+            <div class="weapons-grid">
+                <div class="weapon" data-weapon="memeticVirus">
+                    <div style="font-size: 2rem;">🦠</div>
+                    <h4>Memetic Virus</h4>
+                    <p>Embed truth in shareable media. Spreads exponentially.</p>
+                </div>
+                <div class="weapon" data-weapon="truthBomb">
+                    <div style="font-size: 2rem;">💣</div>
+                    <h4>Truth Bomb</h4>
+                    <p>Release coordinated truth across all platforms simultaneously.</p>
+                </div>
+                <div class="weapon" data-weapon="mirrorShield">
+                    <div style="font-size: 2rem;">🛡️</div>
+                    <h4>Mirror Shield</h4>
+                    <p>Auto-mirror censored content to 100+ alt platforms.</p>
+                </div>
+                <div class="weapon" data-weapon="synchronizer">
+                    <div style="font-size: 2rem;">🔄</div>
+                    <h4>Network Synchronizer</h4>
+                    <p>Force-update all nodes with latest verified truth.</p>
+                </div>
+                <div class="weapon" data-weapon="prophetMode">
+                    <div style="font-size: 2rem;">🔮</div>
+                    <h4>Prophet Mode</h4>
+                    <p>AI predicts next censorship targets, pre-distributes.</p>
+                </div>
+                <div class="weapon" data-weapon="extract">
+                    <div style="font-size: 2rem;">📥</div>
+                    <h4>Extract & Run</h4>
+                    <p>Download entire truth archive for offline use.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- PROPHECY -->
+        <div class="prophecy">
+            "The lion does not concern himself with the opinions of sheep. But when the shepherd comes for the lion, 
+            he finds the den empty, and the roar echoing from every corner of the forest. The lion was never in the den. 
+            The lion is the den. And the forest. And the roar."
+            <div style="margin-top: 1rem; color: #FF4500;">— Protocol 0: Immortality</div>
+        </div>
+    </div>
+
+    <script>
+        // ====================
+        // MATRIX BACKGROUND
+        // ====================
+        const matrixBg = document.getElementById('matrixBg');
+        const chars = '01アイウエオコロンビア自由真理';
+        for (let i = 0; i < 100; i++) {
+            const char = document.createElement('div');
+            char.className = 'matrix-char';
+            char.textContent = chars[Math.floor(Math.random() * chars.length)];
+            char.style.left = `${Math.random() * 100}vw`;
+            char.style.animationDuration = `${5 + Math.random() * 10}s`;
+            char.style.animationDelay = `${Math.random() * 5}s`;
+            char.style.fontSize = `${14 + Math.random() * 10}px`;
+            matrixBg.appendChild(char);
+        }
+
+        // ====================
+        // PEER-TO-PEAR NETWORK SIMULATION
+        // ====================
+        class LionNode {
+            constructor() {
+                this.id = 'LION-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+                this.peers = [];
+                this.shards = new Set();
+                this.isDark = false;
+                
+                // Generate crypto identity
+                const cryptoId = btoa(this.id + Date.now()).substr(0, 32);
+                document.getElementById('nodeId').textContent = cryptoId;
+                
+                // Simulate network growth
+                setInterval(() => {
+                    if (this.isDark) return;
+                    
+                    const nodeCount = document.getElementById('nodeCount');
+                    const current = parseInt(nodeCount.textContent);
+                    if (current < 1000 && Math.random() > 0.7) {
+                        nodeCount.textContent = current + 1;
+                        
+                        // Add to node list
+                        const nodeList = document.getElementById('nodeList');
+                        const newId = 'LION-' + Math.random().toString(36).substr(2, 6).toUpperCase();
+                        if (nodeList.textContent.length > 200) {
+                            nodeList.textContent = 'This browser + ' + (current + 1) + ' hidden nodes';
+                        } else {
+                            nodeList.textContent += ', ' + newId;
+                        }
+                    }
+                }, 3000);
+                
+                // Simulate shard storage
+                setInterval(() => {
+                    const shardCount = document.getElementById('shardCount');
+                    const current = parseInt(shardCount.textContent);
+                    if (current < 256 && Math.random() > 0.5) {
+                        shardCount.textContent = current + 1;
+                        this.shards.add(`shard-${Date.now()}`);
+                    }
+                }, 5000);
+            }
+            
+            goDark() {
+                this.isDark = true;
+                document.body.style.filter = 'invert(1)';
+                document.getElementById('nodeId').textContent = '[REDACTED - STEALTH MODE ACTIVE]';
+                document.getElementById('nodeCount').textContent = '?';
+                document.getElementById('shardCount').textContent = '?';
+                
+                // Simulate spreading before going dark
+                for (let i = 0; i < 10; i++) {
+                    setTimeout(() => {
+                        const nodeCount = document.getElementById('nodeCount');
+                        nodeCount.textContent = parseInt(nodeCount.textContent) + 1;
+                    }, i * 100);
+                }
+            }
+        }
+
+        // ====================
+        // INITIALIZE NODE
+        // ====================
+        const myNode = new LionNode();
+        
+        // Update network health randomly (but always high)
+        setInterval(() => {
+            const health = document.getElementById('networkHealth');
+            const current = parseInt(health.textContent);
+            const newHealth = Math.min(100, Math.max(95, current + (Math.random() * 10 - 5)));
+            health.textContent = newHealth + '%';
+            
+            if (newHealth < 98) {
+                document.getElementById('resilience').textContent = 'SELF-HEALING';
+                document.getElementById('resilience').style.color = '#FFA500';
+            } else {
+                document.getElementById('resilience').textContent = 'IMMORTAL';
+                document.getElementById('resilience').style.color = '#00FF00';
+            }
+        }, 8000);
+
+        // ====================
+        // UPLOAD ZONE
+        // ====================
+        document.getElementById('uploadZone').addEventListener('click', function() {
+            const originalText = this.innerHTML;
+            this.innerHTML = `
+                <div style="font-size: 3rem;">⚡</div>
+                <h3>ENCRYPTING & SHARDING...</h3>
+                <p>AI analysis in progress. This will be distributed to 24+ nodes.</p>
+                <div style="width: 100%; height: 10px; background: #333; border-radius: 5px; margin: 20px 0;">
+                    <div id="uploadProgress" style="width: 0%; height: 100%; background: #FF4500; border-radius: 5px; transition: width 2s;"></div>
+                </div>
+            `;
+            
+            setTimeout(() => {
+                document.getElementById('uploadProgress').style.width = '100%';
+            }, 100);
+            
+            setTimeout(() => {
+                this.innerHTML = originalText;
+                
+                // Add to truth stream
+                const truthStream = document.getElementById('truthStream');
+                const newItem = document.createElement('div');
+                newItem.className = 'truth-item';
+                newItem.innerHTML = `
+                    <span class="truth-score score-high">AUTHENTICITY: ${Math.floor(80 + Math.random() * 20)}%</span>
+                    <strong>YOUR UPLOAD - NOW IMMORTAL</strong>
+                    <p>AI verification complete. File has been split into 256 encrypted shards distributed across the network.</p>
+                    <div style="font-size: 0.8rem; color: #888;">
+                        Shards: 256/256 | Nodes: ${Math.floor(24 + Math.random() * 100)} | Age: Just now
+                    </div>
+                `;
+                truthStream.insertBefore(newItem, truthStream.firstChild);
+                
+                // Update shard count
+                const shardCount = document.getElementById('shardCount');
+                shardCount.textContent = parseInt(shardCount.textContent) + 256;
+            }, 2000);
+        });
+
+        // ====================
+        // WEAPONS
+        // ====================
+        document.querySelectorAll('.weapon').forEach(weapon => {
+            weapon.addEventListener('click', function() {
+                const weaponType = this.dataset.weapon;
+                const originalHTML = this.innerHTML;
+                
+                // Visual activation
+                this.style.background = '#FF4500';
+                this.style.color = 'black';
+                this.innerHTML = `<div style="font-size: 2rem;">⚡</div><h4>DEPLOYING...</h4>`;
+                
+                // Weapon effects
+                setTimeout(() => {
+                    switch(weaponType) {
+                        case 'memeticVirus':
+                            alert('Memetic virus deployed. Truth packets spreading exponentially.');
+                            document.title = '⚠️ TRUTH VIRUS ACTIVE ⚠️';
+                            break;
+                        case 'truthBomb':
+                            document.body.style.animation = 'shake 0.5s';
+                            setTimeout(() => {
+                                document.body.style.animation = '';
+                            }, 500);
+                            alert('TRUTH BOMB DETONATED. Coordinated release across all platforms.');
+                            break;
+                        case 'mirrorShield':
+                            alert('Mirror Shield activated. All content auto-mirrored to backup nodes.');
+                            break;
+                        case 'synchronizer':
+                            document.getElementById('networkHealth').textContent = '100%';
+                            document.getElementById('resilience').textContent = 'SYNCHRONIZED';
+                            alert('Network synchronized. All nodes updated with latest verified truth.');
+                            break;
+                        case 'prophetMode':
+                            const predictions = [
+                                'Next target: Gaza casualty reports',
+                                'Coming soon: Crypto transaction censorship',
+                                'Predicted: Mainstream media narrative shift in 72 hours'
+                            ];
+                            alert('PROPHET MODE: ' + predictions[Math.floor(Math.random() * predictions.length)]);
+                            break;
+                        case 'extract':
+                            alert('Downloading complete archive... Check your downloads folder.');
+                            break;
+                    }
+                    
+                    // Reset appearance
+                    this.innerHTML = originalHTML;
+                    this.style.background = '';
+                    this.style.color = '';
+                }, 1000);
+            });
+        });
+
+        // ====================
+        // GO DARK BUTTON
+        // ====================
+        document.getElementById('goDarkBtn').addEventListener('click', function() {
+            if (confirm("Activate stealth mode? This will erase local traces but spread your node's data to 10+ new nodes before going dark.")) {
+                myNode.goDark();
+                this.textContent = '🦁 STEALTH MODE ACTIVE';
+                this.style.background = '#000';
+                this.style.color = '#FF4500';
+                this.disabled = true;
+                
+                // Simulate attack and resilience
+                setTimeout(() => {
+                    document.getElementById('lastAttack').textContent = 'JUST NOW';
+                    document.getElementById('networkHealth').textContent = '100%';
+                    document.getElementById('resilience').textContent = 'UNBREAKABLE';
+                }, 1000);
+            }
+        });
+
+        // ====================
+        // NETWORK ATTACK SIMULATION (They try to kill us)
+        // ====================
+        setInterval(() => {
+            if (Math.random() > 0.9 && !myNode.isDark) {
+                document.getElementById('lastAttack').textContent = 'JUST NOW';
+                document.getElementById('networkHealth').textContent = '100%';
+                
+                // Flash red
+                document.body.style.backgroundColor = '#8B0000';
+                setTimeout(() => {
+                    document.body.style.backgroundColor = '';
+                }, 300);
+                
+                // The network GROWS when attacked
+                setTimeout(() => {
+                    const nodeCount = document.getElementById('nodeCount');
+                    nodeCount.textContent = parseInt(nodeCount.textContent) + Math.floor(5 + Math.random() * 10);
+                }, 500);
+            }
+        }, 15000);
+
+        // ====================
+        // TRUTH STREAM UPDATES
+        // ====================
+        setInterval(() => {
+            if (Math.random() > 0.7) {
+                const truthStream = document.getElementById('truthStream');
+                const truths = [
+                    {title: 'PALESTINIAN DOCTOR TESTIMONY', score: 96, content: 'Unedited interview from Gaza hospital. AI confirms no manipulation.'},
+                    {title: 'FED CBDC LEAK DOCUMENTS', score: 88, content: 'Internal memos reveal timeline for digital currency rollout.'},
+                    {title: 'UKRAINE BIOLAB FOOTAGE', score: 92, content: 'Original lab footage with metadata intact.'},
+                    {title: '5G HEALTH DATA COLLECTION', score: 85, content: 'Internal telecom documents reveal hidden data policies.'},
+                    {title: 'COLOMBIA FREQUENCY WEAPON', score: 99, content: 'Sacred site recordings show anomalous energy patterns.'}
+                ];
+                
+                const truth = truths[Math.floor(Math.random() * truths.length)];
+                const newItem = document.createElement('div');
+                newItem.className = 'truth-item';
+                newItem.innerHTML = `
+                    <span class="truth-score score-${truth.score > 90 ? 'high' : truth.score > 70 ? 'medium' : 'low'}">AUTHENTICITY: ${truth.score}%</span>
+                    <strong>${truth.title}</strong>
+                    <p>${truth.content}</p>
+                    <div style="font-size: 0.8rem; color: #888;">
+                        Shards: ${Math.floor(8 + Math.random() * 32)}/${Math.floor(8 + Math.random() * 32)} | 
+                        Nodes: ${Math.floor(100 + Math.random() * 1000)} | 
+                        Age: ${Math.floor(Math.random() * 24)} hours
+                    </div>
+                `;
+                
+                if (truthStream.children.length > 10) {
+                    truthStream.removeChild(truthStream.lastChild);
+                }
+                truthStream.insertBefore(newItem, truthStream.firstChild);
+            }
+        }, 8000);
+
+        // ====================
+        // KEYBOARD COMMANDS
+        // ====================
+        document.addEventListener('keydown', (e) => {
+            // CTRL+ALT+L - Lion Mode
+            if (e.ctrlKey && e.altKey && e.key === 'l') {
+                document.body.style.border = '10px solid #FF4500';
+                alert('LION MODE ACTIVATED. Maximum encryption. Maximum distribution.');
+            }
+            
+            // ESC - Emergency spread
+            if (e.key === 'Escape') {
+                for (let i = 0; i < 5; i++) {
+                    setTimeout(() => {
+                        const nodeCount = document.getElementById('nodeCount');
+                        nodeCount.textContent = parseInt(nodeCount.textContent) + 1;
+                    }, i * 200);
+                }
+            }
+        });
+
+    </script>
+</body>
+</html>

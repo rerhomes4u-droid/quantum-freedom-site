@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Land Stewardship Agreement Helper</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .section { margin: 20px 0; padding: 15px; border-left: 4px solid #2d5016; background: #f9f9f9; }
+        input, textarea { width: 100%; padding: 8px; margin: 5px 0; }
+        .agreement { white-space: pre-wrap; font-family: monospace; background: #f5f5f5; padding: 15px; border: 1px solid #ddd; }
+        button { background: #2d5016; color: white; padding: 10px 20px; border: none; cursor: pointer; margin: 5px; }
+        button:hover { background: #3a6518; }
+    </style>
+</head>
+<body>
+    <h1>📄 Land Stewardship Agreement Helper</h1>
+    <p><em>Note: This generates templates. Consult a local lawyer for legally binding agreements.</em></p>
+    
+    <div class="section">
+        <h3>Basic Information</h3>
+        <input type="text" id="landowner" placeholder="Landowner Name">
+        <input type="text" id="location" placeholder="Land Location (Municipio, Departamento)">
+        <input type="text" id="size" placeholder="Land Size (hectares)">
+    </div>
+    
+    <div class="section">
+        <h3>Intended Use</h3>
+        <select id="useType">
+            <option value="conservation">Conservation / Reforestation</option>
+            <option value="education">Educational Workshops</option>
+            <option value="agriculture">Sustainable Agriculture</option>
+            <option value="research">Ecological Research</option>
+        </select>
+        <textarea id="specificUse" placeholder="Specific details about intended use..." rows="3"></textarea>
+    </div>
+    
+    <div class="section">
+        <h3>Duration & Terms</h3>
+        <select id="duration">
+            <option value="seasonal">Seasonal (3-6 months)</option>
+            <option value="annual">Annual (renewable)</option>
+            <option value="multi-year">Multi-year agreement</option>
+            <option value="permanent">Permanent easement</option>
+        </select>
+        <textarea id="responsibilities" placeholder="Steward responsibilities..." rows="3"></textarea>
+    </div>
+    
+    <button onclick="generateAgreement()">Generate Agreement Draft</button>
+    <button onclick="printAgreement()">Print/Save as PDF</button>
+    
+    <div id="agreementOutput" class="agreement" style="display:none; margin-top:20px;"></div>
+    
+    <script>
+        function generateAgreement() {
+            const template = `
+LAND STEWARDSHIP AGREEMENT DRAFT
+
+This document outlines a proposed stewardship arrangement for land conservation and community use.
+
+PARTIES:
+1. Landowner: ${document.getElementById('landowner').value || '[Name]'}
+2. Proposed Steward/Organization: [Community Group Name]
+
+PROPERTY DETAILS:
+Location: ${document.getElementById('location').value || '[Location]'}
+Size: ${document.getElementById('size').value || '[Size]'} hectares
+
+INTENDED USE:
+Primary Purpose: ${document.getElementById('useType').options[document.getElementById('useType').selectedIndex].text}
+Specific Activities: ${document.getElementById('specificUse').value || '[Details]'}
+
+TERMS:
+Duration: ${document.getElementById('duration').options[document.getElementById('duration').selectedIndex].text}
+Steward Responsibilities: ${document.getElementById('responsibilities').value || '[Responsibilities]'}
+
+KEY PRINCIPLES:
+1. Landowner retains ownership rights
+2. Steward maintains land according to agreed purposes
+3. Both parties prioritize ecological preservation
+4. Community access for educational purposes
+5. Transparent communication between parties
+
+NOTES:
+- This is a draft for discussion purposes
+- Final agreement should be reviewed by legal counsel
+- Local regulations must be respected
+- Insurance and liability considerations should be addressed
+
+Generated on: ${new Date().toLocaleDateString()}
+            `;
+            
+            const output = document.getElementById('agreementOutput');
+            output.textContent = template;
+            output.style.display = 'block';
+        }
+        
+        function printAgreement() {
+            const content = document.getElementById('agreementOutput').textContent;
+            if (!content) {
+                alert('Generate an agreement first');
+                return;
+            }
+            
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write('<pre>' + content + '</pre>');
+            printWindow.document.close();
+            printWindow.print();
+        }
+    </script>
+</body>
+</html>

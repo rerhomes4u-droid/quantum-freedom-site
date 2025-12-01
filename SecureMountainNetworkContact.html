@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mountain Network - Secure Contact</title>
+    <style>
+        body { font-family: sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; background: #f0f7f0; }
+        .message-box { background: white; border-radius: 10px; padding: 20px; margin: 20px 0; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        textarea { width: 100%; height: 150px; margin: 10px 0; padding: 10px; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .success { background: #d4edda; color: #155724; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        button { background: #2d5016; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #3a6518; }
+    </style>
+</head>
+<body>
+    <h1>🌲 Secure Mountain Network Contact</h1>
+    <div class="message-box">
+        <p><strong>This works without internet connection:</strong> Messages are saved locally and can be shared via USB or when connection is available.</p>
+        
+        <textarea id="message" placeholder="Type your message here..."></textarea>
+        
+        <button onclick="saveMessage()">💾 Save Message Locally</button>
+        <button onclick="loadMessages()">📁 View Saved Messages</button>
+        <button onclick="clearMessages()">🗑️ Clear All Messages</button>
+        
+        <div id="status" class="status"></div>
+        
+        <div id="messageList" style="margin-top: 20px;"></div>
+    </div>
+    
+    <script>
+        function saveMessage() {
+            const message = document.getElementById('message').value;
+            if (!message.trim()) {
+                showStatus('Please enter a message', 'info');
+                return;
+            }
+            
+            let messages = JSON.parse(localStorage.getItem('mountain_messages') || '[]');
+            messages.push({
+                text: message,
+                timestamp: new Date().toLocaleString(),
+                id: Date.now()
+            });
+            
+            localStorage.setItem('mountain_messages', JSON.stringify(messages));
+            document.getElementById('message').value = '';
+            showStatus('Message saved locally!', 'success');
+        }
+        
+        function loadMessages() {
+            const messages = JSON.parse(localStorage.getItem('mountain_messages') || '[]');
+            const list = document.getElementById('messageList');
+            
+            if (messages.length === 0) {
+                list.innerHTML = '<p>No saved messages yet.</p>';
+                return;
+            }
+            
+            let html = '<h3>Saved Messages:</h3><ul>';
+            messages.forEach(msg => {
+                html += `<li><strong>${msg.timestamp}:</strong> ${msg.text}</li>`;
+            });
+            html += '</ul>';
+            
+            list.innerHTML = html;
+        }
+        
+        function clearMessages() {
+            if (confirm('Delete all saved messages?')) {
+                localStorage.removeItem('mountain_messages');
+                document.getElementById('messageList').innerHTML = '';
+                showStatus('All messages cleared', 'info');
+            }
+        }
+        
+        function showStatus(text, type) {
+            const status = document.getElementById('status');
+            status.className = `status ${type}`;
+            status.textContent = text;
+            setTimeout(() => status.textContent = '', 3000);
+        }
+        
+        // Load existing messages on start
+        window.onload = loadMessages;
+    </script>
+</body>
+</html>

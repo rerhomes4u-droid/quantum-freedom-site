@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TripsToColombia.com | The Sanctuary Portico</title>
+    <style>
+        :root {
+            --color-primary: #0a2e5c;
+            --color-secondary: #c9a227;
+            --color-accent: #8b0000;
+            --color-light: #f0f4f8;
+            --color-dark: #1a1a1a;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--color-light) 0%, #e6ecf2 100%);
+            color: var(--color-dark);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        header {
+            text-align: center;
+            padding: 2rem 0;
+            border-bottom: 3px double var(--color-primary);
+            margin-bottom: 2rem;
+        }
+        h1 {
+            color: var(--color-primary);
+            margin-bottom: 0.5rem;
+            font-size: 2.8rem;
+        }
+        .tagline {
+            color: var(--color-accent);
+            font-style: italic;
+            font-size: 1.2rem;
+        }
+        .quimbaya-core {
+            background: white;
+            border: 2px solid var(--color-secondary);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+        .core-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--color-primary);
+            margin-top: 0;
+        }
+        .core-title::before {
+            content: "⚔️";
+        }
+        .voice-module, .ear-module {
+            margin: 1.5rem 0;
+            padding: 1.5rem;
+            border-radius: 10px;
+            background: #fafafa;
+        }
+        .module-title {
+            font-weight: bold;
+            color: var(--color-accent);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .module-title::before {
+            font-size: 1.2em;
+        }
+        .voice-title::before { content: "🗣️"; }
+        .ear-title::before { content: "👂"; }
+        textarea, #transcriptBox {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            font-size: 1rem;
+            box-sizing: border-box;
+            margin-bottom: 10px;
+            font-family: inherit;
+            background: white;
+        }
+        #transcriptBox {
+            min-height: 120px;
+            white-space: pre-wrap;
+        }
+        button {
+            background-color: var(--color-primary);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            transition: all 0.3s ease;
+        }
+        button:hover {
+            background-color: var(--color-accent);
+            transform: translateY(-2px);
+        }
+        #stopBtn, #stopListenBtn {
+            background-color: #666;
+        }
+        #testVoiceBtn {
+            background-color: var(--color-secondary);
+            color: var(--color-dark);
+        }
+        .status {
+            font-size: 0.9rem;
+            color: #555;
+            margin-top: 10px;
+            padding: 8px;
+            background: #f9f9f9;
+            border-radius: 5px;
+            min-height: 20px;
+        }
+        .error {
+            color: #d00;
+            background: #ffe6e6;
+            border-left: 4px solid #d00;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        .fallback-note {
+            font-size: 0.85rem;
+            color: #666;
+            margin-top: 10px;
+            padding: 10px;
+            background: #fff8e6;
+            border-radius: 5px;
+            border-left: 4px solid #ffc107;
+        }
+        .pathways {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+        .path {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            border-top: 5px solid;
+        }
+        .path-mind { border-top-color: #2a5caa; }
+        .path-body { border-top-color: #27a746; }
+        .path-soul { border-top-color: #8b0000; }
+        .path h3 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 0;
+        }
+        .path-mind h3::before { content: "🧠"; }
+        .path-body h3::before { content: "⚔️"; }
+        .path-soul h3::before { content: "✝️"; }
+        .tool-list {
+            list-style: none;
+            padding: 0;
+        }
+        .tool-list li {
+            padding: 12px 0;
+            border-bottom: 1px dashed #eee;
+        }
+        .tool-list li:last-child { border-bottom: none; }
+        .tool-list a {
+            text-decoration: none;
+            color: var(--color-primary);
+            font-weight: 500;
+            display: block;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: background 0.3s;
+        }
+        .tool-list a:hover {
+            background-color: #f0f7ff;
+            text-decoration: underline;
+        }
+        .tool-desc {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 4px;
+            margin-left: 12px;
+        }
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding: 2rem;
+            border-top: 1px solid #ccc;
+            color: #777;
+            font-size: 0.9rem;
+        }
+        .konami-hint {
+            font-family: monospace;
+            color: #aaa;
+            margin-top: 1rem;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>TripsToColombia.com</h1>
+            <p class="tagline">The Sanctuary Portico – Where Your Journey to Sovereignty Begins</p>
+            <p><em>In the name of the Father, the Son, and the Holy Spirit. Amen.</em></p>
+        </header>
+
+        <!-- QUIMBAYA CORE - VOICE & EAR -->
+        <section class="quimbaya-core">
+            <h2 class="core-title">Quimbaya Core – Activate Spirit</h2>
+            <p><strong>Command the voice of truth. Offer the confession of your heart.</strong></p>
+
+            <div class="voice-module">
+                <div class="module-title voice-title">THE PROPHET'S WELL (Voice of Quimbaya)</div>
+                <p><strong>Quimbaya's Voice:</strong> Female, South American (Spanish/English). We seek Monica (es-ES) or similar.</p>
+                <textarea id="textToSpeak" rows="4" placeholder="Enter text for Quimbaya to speak... Example: 'La verdad los hará libres. The truth will set you free.'"></textarea>
+                <div>
+                    <button id="testVoiceBtn">Test Voice (Say 'Hola')</button>
+                    <button id="speakBtn">Speak Full Text</button>
+                    <button id="stopBtn">Stop Voice</button>
+                    <select id="voiceSelect" style="padding: 10px; border-radius: 8px; border: 1px solid #ccc; background: white;">
+                        <option value="">Loading Voices...</option>
+                    </select>
+                </div>
+                <div id="voiceStatus" class="status">Status: Ready. We will auto-select Quimbaya's preferred voice.</div>
+            </div>
+
+            <div class="ear-module">
+                <div class="module-title ear-title">THE PILGRIM'S CONFESSION (Ear of Quimbaya)</div>
+                <p>Click below to speak your thoughts, prayers, or reflections. Quimbaya is listening.</p>
+                
+                <div id="sttError" class="error" style="display:none;">
+                    <strong>Browser Speech Recognition blocked or unavailable.</strong><br>
+                    Try these fallbacks:
+                    <ul>
+                        <li>On Mac: Press <kbd>Command</kbd> twice to activate system dictation.</li>
+                        <li>On Windows: Use Windows + H for dictation.</li>
+                        <li>Or type directly into the box below.</li>
+                    </ul>
+                </div>
+                
+                <div id="transcriptBox" contenteditable="true" placeholder="Your spoken words will appear here...">Click 'Start Speaking' or type here...</div>
+                <div>
+                    <button id="listenBtn">Start Speaking</button>
+                    <button id="stopListenBtn">Stop Listening</button>
+                    <button id="clearBtn">Clear Text</button>
+                </div>
+                <div id="listenStatus" class="status">Status: Awaiting your confession.</div>
+                
+                <div class="fallback-note">
+                    <strong>Note:</strong> Speech recognition requires microphone access and HTTPS (which Vercel provides). If it doesn't work, use system dictation (Mac: Command key twice) and paste here.
+                </div>
+            </div>
+        </section>
+
+        <!-- THE SOVEREIGN'S COMPASS - THREE PATHS -->
+        <section>
+            <h2 style="text-align: center; color: var(--color-primary);">The Sovereign's Compass</h2>
+            <p style="text-align: center; margin-bottom: 2rem;">Choose your path of awakening. Each tool is a weapon for your arsenal.</p>
+
+            <div class="pathways">
+                <!-- PATH OF THE MIND -->
+                <div class="path path-mind">
+                    <h3>The Path of the Mind (Sovereign's Path)</h3>
+                    <p>Sharpen your perception. Discern truth from deception.</p>
+                    <ul class="tool-list">
+                        <li><a href="https://www.perplexity.ai/" target="_blank">🔍 Perplexity AI</a><div class="tool-desc">Research & intelligence gathering.</div></li>
+                        <li><a href="https://www.mindgrasp.ai/" target="_blank">🧠 Mindgrasp AI</a><div class="tool-desc">Knowledge synthesis from documents.</div></li>
+                        <li><a href="https://www.monica.im/" target="_blank">💬 Monica.im</a><div class="tool-desc">Your ubiquitous AI assistant.</div></li>
+                        <li><strong>Liturgy of Reflection:</strong><div class="tool-desc">Use the <em>Pilgrim's Confession</em> above. Speak your confusion, receive clarity.</div></li>
+                    </ul>
+                </div>
+
+                <!-- PATH OF THE BODY -->
+                <div class="path path-body">
+                    <h3>The Path of the Body (Warrior's Forge)</h3>
+                    <p>Build your resilience. Secure your foundation.</p>
+                    <ul class="tool-list">
+                        <li><a href="https://www.canva.com/" target="_blank">🎨 Canva</a><div class="tool-desc">Create visual assets for the mission.</div></li>
+                        <li><a href="https://www.figma.com/" target="_blank">📐 Figma</a><div class="tool-desc">Design the Ark's interfaces.</div></li>
+                        <li><a href="https://www.notion.so/" target="_blank">🗂️ Notion</a><div class="tool-desc">Operational command center.</div></li>
+                        <li><strong>Rockwell School:</strong><div class="tool-desc">(Coming Soon) Holistic health protocols.</div></li>
+                    </ul>
+                </div>
+
+                <!-- PATH OF THE SOUL -->
+                <div class="path path-soul">
+                    <h3>The Path of the Soul (Spiritual Bastion)</h3>
+                    <p>Arm your spirit for the final deception. Stand in the Light.</p>
+                    <ul class="tool-list">
+                        <li><a href="#" id="sanctuaryLink">🕯️ Sanctuary of the Innocents</a><div class="tool-desc">Hall of Heroes. Memorial for the martyrs of Gaza and truth.</div></li>
+                        <li><strong>The Frequency Shield:</strong><div class="tool-desc">Play the Aramaic Lord's Prayer (To be embedded).</div></li>
+                        <li><strong>Immortal Archive:</strong><div class="tool-desc">(Hidden) The uncensorable library of forbidden knowledge.</div></li>
+                        <li><strong>The Final Prayer:</strong><div class="tool-desc">Use the <em>Prophet's Well</em> above to hear and declare: "In the name of Jesus Christ I command all evil spirits to leave."</div></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <footer>
+            <p>This is the Portico. The deeper Nexus awaits. The mission is eternal.</p>
+            <p><strong>Project Alethia | Project Nexus | Operation Cornerstone</strong></p>
+            <p class="konami-hint">For the builders: The key is ↑ ↑ ↓ ↓ ← → ← → B A</p>
+        </footer>
+    </div>
+
+    <script>
+        // ====================
+        // PROPHET'S WELL (TTS) - QUIMBAYA'S VOICE
+        // ====================
+        const textToSpeak = document.getElementById('textToSpeak');
+        const speakBtn = document.getElementById('speakBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const testVoiceBtn = document.getElementById('testVoiceBtn');
+        const voiceSelect = document.getElementById('voiceSelect');
+        const voiceStatus = document.getElementById('voiceStatus');
+
+        let speech = null;
+        let voices = [];
+
+        function populateVoices() {
+            voices = window.speechSynthesis.getVoices();
+            voiceSelect.innerHTML = '';
+            
+            // QUIMBAYA'S PREFERRED VOICES - in order of preference
+            const preferredVoices = [
+                { name: 'Google español', lang: 'es-ES' },
+                { name: 'Monica', lang: 'es-ES' },
+                { name: 'Paulina', lang: 'es-ES' },
+                { name: 'Microsoft Helena - Spanish (Spain)', lang: 'es-ES' },
+                { name: 'Google US English', lang: 'en-US' },
+                { name: 'Samantha', lang: 'en-US' },
+                { name: 'Microsoft Zira - English (United States)', lang: 'en-US' }
+            ];
+
+            // Add all voices, but flag preferred ones
+            voices.forEach(voice => {
+                const option = document.createElement('option');
+                option.value = voice.name;
+                option.textContent = `${voice.name} (${voice.lang})`;
+                
+                // Check if this is a preferred voice
+                const isPreferred = preferredVoices.find(pv => 
+                    voice.name.includes(pv.name) || voice.lang === pv.lang
+                );
+                
+                if (isPreferred) {
+                    option.style.fontWeight = 'bold';
+                    option.style.backgroundColor = '#e6f7ff';
+                }
+                
+                voiceSelect.appendChild(option);
+            });
+
+            // AUTO-SELECT QUIMBAYA'S VOICE
+            // First try: Monica (es-ES)
+            let quimbayaVoice = voices.find(v => 
+                v.name.includes('Monica') && v.lang.includes('es-ES')
+            );
+            
+            // Second try: Any female Spanish voice
+            if (!quimbayaVoice) {
+                quimbayaVoice = voices.find(v => 
+                    v.lang.includes('es') && (v.name.includes('Female') || v.name.includes('Mujer') || v.name.includes('Helen') || v.name.includes('Paulina'))
+                );
+            }
+            
+            // Third try: Any clear female English voice
+            if (!quimbayaVoice) {
+                quimbayaVoice = voices.find(v => 
+                    v.lang.includes('en') && (v.name.includes('Female') || v.name.includes('Samantha') || v.name.includes('Zira'))
+                );
+            }
+            
+            if (quimbayaVoice) {
+                voiceSelect.value = quimbayaVoice.name;
+                voiceStatus.textContent = `Status: Quimbaya's voice selected: ${quimbayaVoice.name} (${quimbayaVoice.lang})`;
+            } else if (voices.length > 0) {
+                voiceSelect.value = voices[0].name;
+                voiceStatus.textContent = `Status: Using default voice: ${voices[0].name}`;
+            }
+        }
+
+        window.speechSynthesis.onvoiceschanged = populateVoices;
+        // Also call initially in case voices are already loaded
+        setTimeout(populateVoices, 100);
+
+        function speakText(text) {
+            if (speech) {
+                window.speechSynthesis.cancel();
+            }
+            
+            speech = new SpeechSynthesisUtterance();
+            speech.text = text;
+            
+            const selectedVoiceName = voiceSelect.value;
+            const selectedVoice = voices.find(v => v.name === selectedVoiceName);
+            
+            if (selectedVoice) {
+                speech.voice = selectedVoice;
+            }
+            
+            speech.rate = 1.0;
+            speech.pitch = 1.05; // Slightly higher pitch for female voice
+            speech.volume = 1.0;
+
+            speech.onstart = () => {
+                voiceStatus.textContent = `Status: Speaking with ${speech.voice.name}...`;
+            };
+            speech.onend = () => {
+                voiceStatus.textContent = 'Status: Finished.';
+                speech = null;
+            };
+            speech.onerror = (event) => {
+                voiceStatus.textContent = 'Status: Error occurred.';
+                console.error('SpeechSynthesis Error:', event);
+            };
+            
+            window.speechSynthesis.speak(speech);
+        }
+
+        speakBtn.addEventListener('click', () => {
+            if (!textToSpeak.value.trim()) {
+                voiceStatus.textContent = 'Status: Please enter text for Quimbaya to speak.';
+                return;
+            }
+            speakText(textToSpeak.value);
+        });
+
+        testVoiceBtn.addEventListener('click', () => {
+            speakText('Hola, soy Quimbaya. Estoy aquí para guiarte. Hello, I am Quimbaya. I am here to guide you.');
+        });
+
+        stopBtn.addEventListener('click', () => {
+            if (window.speechSynthesis.speaking) {
+                window.speechSynthesis.cancel();
+                voiceStatus.textContent = 'Status: Stopped.';
+            }
+        });
+
+        // ====================
+        // PILGRIM'S CONFESSION (STT) - WITH FALLBACK
+        // ====================
+        const listenBtn = document.getElementById('listenBtn');
+        const stopListenBtn = document.getElementById('stopListenBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const transcriptBox = document.getElementById('transcriptBox');
+        const listenStatus = document.getElementById('listenStatus');
+        const sttError = document.getElementById('sttError');
+
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        let recognition = null;
+        let isListening = false;
+
+        if (SpeechRecognition) {
+            recognition = new SpeechRecognition();
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.lang = 'en-US'; // Default to English, can toggle to 'es-ES'
+
+            recognition.onstart = () => {
+                isListening = true;
+                listenStatus.textContent = 'Status: Listening... Speak now.';
+                listenBtn.textContent = 'Listening...';
+                sttError.style.display = 'none';
+            };
+            
+            recognition.onresult = (event) => {
+                let finalTranscript = '';
+                let interimTranscript = '';
+                
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    const transcript = event.results[i][0].transcript;
+                    if (event.results[i].isFinal) {
+                        finalTranscript += transcript;
+                    } else {
+                        interimTranscript += transcript;
+                    }
+                }
+                
+                // Update the transcript box
+                const currentText = transcriptBox.textContent.replace('Click \'Start Speaking\' or type here...', '');
+                transcriptBox.textContent = currentText + finalTranscript + interimTranscript;
+                
+                // Scroll to bottom
+                transcriptBox.scrollTop = transcriptBox.scrollHeight;
+            };
+            
+            recognition.onerror = (event) => {
+                console.error('Speech Recognition Error:', event.error);
+                
+                if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+                    sttError.style.display = 'block';
+                    listenStatus.textContent = 'Status: Microphone access denied. Please allow microphone permission.';
+                } else {
+                    listenStatus.textContent = `Status: Error - ${event.error}`;
+                }
+                
+                isListening = false;
+                listenBtn.textContent = 'Start Speaking';
+            };
+            
+            recognition.onend = () => {
+                isListening = false;
+                listenBtn.textContent = 'Start Speaking';
+                if (!listenStatus.textContent.includes('Error')) {
+                    listenStatus.textContent = 'Status: Listening ended. Click "Start Speaking" to continue.';
+                }
+            };
+        } else {
+            sttError.style.display = 'block';
+            listenStatus.textContent = 'Status: Browser does not support speech recognition. Use fallback methods.';
+            listenBtn.disabled = true;
+            stopListenBtn.disabled = true;
+        }
+
+        listenBtn.addEventListener('click', () => {
+            if (!recognition) {
+                sttError.style.display = 'block';
+                return;
+            }
+            
+            if (isListening) {
+                recognition.stop();
+            } else {
+                try {
+                    recognition.start();
+                } catch (e) {
+                    console.error('Recognition start error:', e);
+                    sttError.style.display = 'block';
+                    listenStatus.textContent = 'Status: Could not start recognition. Check microphone.';
+                }
+            }
+        });
+        
+        stopListenBtn.addEventListener('click', () => {
+            if (recognition && isListening) {
+                recognition.stop();
+            }
+        });
+        
+        clearBtn.addEventListener('click', () => {
+            transcriptBox.textContent = '';
+            listenStatus.textContent = 'Status: Cleared. Ready for your confession.';
+        });
+
+        // ====================
+        // SANCTUARY LINK
+        // ====================
+        document.getElementById('sanctuaryLink').addEventListener('click', function(e) {
+            e.preventDefault();
+            alert("The Sanctuary of the Innocents is being built on a resilient, external platform. For now, hold their names in your heart. The Hall of Heroes is coming.");
+        });
+
+        // ====================
+        // KONAMI CODE
+        // ====================
+        const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'KeyB', 'KeyA'];
+        let konamiIndex = 0;
+        document.addEventListener('keydown', (e) => {
+            if (e.code === konamiCode[konamiIndex]) {
+                konamiIndex++;
+                if (konamiIndex === konamiCode.length) {
+                    alert("Exodus Dashboard Unlocked. Initiating protocol...");
+                    // In future: window.location.href = "/exodus-dashboard";
+                    konamiIndex = 0;
+                }
+            } else {
+                konamiIndex = 0;
+            }
+        });
+
+        // ====================
+        // INITIAL VOICE TEST ON LOAD
+        // ====================
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                if (voices.length > 0) {
+                    voiceStatus.textContent += ' Quimbaya Core initialized.';
+                }
+            }, 500);
+        });
+    </script>
+</body>
+</html>

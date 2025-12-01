@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TripsToColombia.com - The Exodus Experience</title>
+    <style>
+        /* EXODUS THEME - Honoring what we built */
+        :root {
+            --desert-sand: #F4A460;
+            --red-sea: #8B0000;
+            --manna-gold: #FFD700;
+            --promised-land: #006400;
+            --cloud-white: #FFFFFF;
+        }
+        
+        .exodus-interface {
+            background: linear-gradient(135deg, var(--desert-sand), var(--red-sea), var(--promised-land));
+            color: var(--cloud-white);
+            min-height: 100vh;
+            font-family: 'Georgia', serif;
+        }
+        
+        .manna-from-heaven {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, var(--manna-gold), transparent 70%);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 1s ease;
+            z-index: 1000;
+        }
+        
+        .exodus-command-center {
+            display: grid;
+            grid-template-columns: 300px 1fr 300px;
+            gap: 2rem;
+            padding: 2rem;
+            height: 100vh;
+        }
+        
+        .miracles-control {
+            background: rgba(0,0,0,0.8);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 2px solid var(--manna-gold);
+            backdrop-filter: blur(10px);
+        }
+        
+        .promised-land-map {
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+            padding: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .twelve-tribes-network {
+            background: rgba(0,0,0,0.8);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 2px solid var(--manna-gold);
+        }
+        
+        .exodus-metric {
+            background: rgba(139, 0, 139, 0.3);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 8px;
+            border-left: 4px solid var(--manna-gold);
+        }
+        
+        .tribe-node {
+            background: rgba(0, 100, 0, 0.3);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 8px;
+            border: 1px solid var(--manna-gold);
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .tribe-node:hover {
+            transform: translateX(10px);
+            background: rgba(0, 100, 0, 0.6);
+        }
+        
+        .tribe-status {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--manna-gold);
+            color: black;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .exodus-control {
+            background: var(--manna-gold);
+            color: black;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .exodus-control:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px var(--manna-gold);
+        }
+        
+        /* KONAMI CODE INDICATOR */
+        .konami-activated {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--red-sea);
+            color: white;
+            padding: 1rem;
+            border-radius: 10px;
+            border: 2px solid var(--manna-gold);
+            display: none;
+        }
+    </style>
+</head>
+<body class="exodus-interface">
+    <!-- MANNA FROM HEAVEN VISUAL EFFECT -->
+    <div class="manna-from-heaven" id="mannaEffect"></div>
+    
+    <!-- KONAMI CODE ACTIVATION INDICATOR -->
+    <div class="konami-activated" id="konamiIndicator">
+        ⚡ EXODUS MENU ACTIVATED
+    </div>
+
+    <div class="exodus-command-center">
+        <!-- LEFT: MIRACLES CONTROL -->
+        <div class="miracles-control">
+            <h2>🌊 EXODUS MIRACLES CONTROL</h2>
+            
+            <div class="exodus-metric">
+                <h3>Red Seas Parted Today</h3>
+                <div class="metric-value" id="seasParted">3</div>
+            </div>
+            
+            <div class="exodus-metric">
+                <h3>Manna Distributed</h3>
+                <div class="metric-value" id="mannaDistributed">47 portions</div>
+            </div>
+            
+            <div class="exodus-metric">
+                <h3>Pillars of Fire Active</h3>
+                <div class="metric-value" id="pillarsActive">2</div>
+            </div>
+            
+            <h3>EXODUS PROTOCOLS:</h3>
+            <div class="tribe-node" onclick="activateExodusProtocol('partRedSea')">
+                <div class="tribe-status">🌊</div>
+                <h4>Part Red Sea</h4>
+                <p>Clear impossible barriers for travelers</p>
+            </div>
+            
+            <div class="tribe-node" onclick="activateExodusProtocol('sendManna')">
+                <div class="tribe-status">🍞</div>
+                <h4>Send Manna</h4>
+                <p>Provide exactly what's needed</p>
+            </div>
+            
+            <div class="tribe-node" onclick="activateExodusProtocol('pillarOfFire')">
+                <div class="tribe-status">🔥</div>
+                <h4>Pillar of Fire</h4>
+                <p>Guide through dark places</p>
+            </div>
+            
+            <div style="margin-top: 2rem;">
+                <button class="exodus-control" onclick="activateKonamiCode()">
+                    🎮 ACTIVATE KONAMI CODE
+                </button>
+            </div>
+        </div>
+        
+        <!-- CENTER: PROMISED LAND MAP -->
+        <div class="promised-land-map">
+            <h2>🏔️ COLOMBIAN PROMISED LAND</h2>
+            <div id="colombiaMap" style="width: 100%; height: 400px; background: rgba(0,0,0,0.3); border-radius: 10px; margin: 1rem 0; position: relative;">
+                <!-- 12 TRIBES LOCATIONS -->
+                <div class="tribe-location" style="position: absolute; top: 20%; left: 30%;" data-tribe="judah">
+                    ⛰️ Sierra Nevada
+                </div>
+                <div class="tribe-location" style="position: absolute; top: 60%; left: 40%;" data-tribe="ephraim">
+                    🌊 Caño Cristales  
+                </div>
+                <div class="tribe-location" style="position: absolute; top: 40%; left: 60%;" data-tribe="manasseh">
+                    🌿 Amazon
+                </div>
+                <!-- Add 9 more tribes -->
+            </div>
+            
+            <h3>EXODUS EXPERIENCES ACTIVE:</h3>
+            <div id="activeExperiences">
+                <div class="tribe-node">
+                    <div class="tribe-status">ACTIVE</div>
+                    <h4>Red Sea Parting - Caño Cristales</h4>
+                    <p>Travelers experience miraculous access</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- RIGHT: 12 TRIBES NETWORK -->
+        <div class="twelve-tribes-network">
+            <h2>👥 THE 12 TRIBES NETWORK</h2>
+            
+            <div class="tribe-node" data-tribe="judah">
+                <div class="tribe-status">⚔️</div>
+                <h3>JUDAH - Leadership</h3>
+                <p>Sierra Nevada Mountain Guides</p>
+                <div>Strength: <strong>98%</strong></div>
+            </div>
+            
+            <div class="tribe-node" data-tribe="ephraim">
+                <div class="tribe-status">💎</div>
+                <h3>EPHRAIM - Double Portion</h3>
+                <p>Caño Cristales Miracle Workers</p>
+                <div>Blessing: <strong>200%</strong></div>
+            </div>
+            
+            <div class="tribe-node" data-tribe="manasseh">
+                <div class="tribe-status">🌿</div>
+                <h3>MANASSEH - Fruitful</h3>
+                <p>Amazon Provision Specialists</p>
+                <div>Provision: <strong>87%</strong></div>
+            </div>
+            
+            <!-- Add 9 more tribes -->
+            
+            <div style="margin-top: 2rem;">
+                <button class="exodus-control" onclick="gatherAllTribes()">
+                    📯 GATHER ALL TRIBES
+                </button>
+                <button class="exodus-control" onclick="enterPromisedLand()">
+                    🏔️ ENTER PROMISED LAND
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // EXODUS OPERATING SYSTEM - Honoring our original work
+        class ExodusOS {
+            constructor() {
+                this.konamiCode = '';
+                this.exodusMenuActive = false;
+                this.miraclesPerformed = [];
+                this.tribes = new Map();
+                this.mannaSupply = 100;
+                
+                this.initExodusSystem();
+                this.setupKonamiCode();
+            }
+            
+            initExodusSystem() {
+                // Initialize the 12 tribes
+                this.initializeTwelveTribes();
+                
+                // Start miracle engine
+                this.startMiracleOrchestration();
+                
+                console.log('🌊 EXODUS SYSTEM INITIALIZED - Honoring original design');
+            }
+            
+            initializeTwelveTribes() {
+                const tribesData = [
+                    { name: 'Judah', location: 'Sierra Nevada', strength: 98, role: 'Leadership' },
+                    { name: 'Ephraim', location: 'Caño Cristales', strength: 200, role: 'Double Portion' },
+                    { name: 'Manasseh', location: 'Amazon', strength: 87, role: 'Fruitfulness' },
+                    // ... 9 more tribes from our original design
+                ];
+                
+                tribesData.forEach(tribe => {
+                    this.tribes.set(tribe.name, {
+                        ...tribe,
+                        status: 'active',
+                        miraclesPerformed: 0,
+                        mannaContribution: 0
+                    });
+                });
+            }
+            
+            setupKonamiCode() {
+                const konamiSequence = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 
+                                      'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight',
+                                      'KeyB', 'KeyA'];
+                let currentSequence = [];
+                
+                document.addEventListener('keydown', (event) => {
+                    currentSequence.push(event.code);
+                    
+                    // Keep only last 10 keys
+                    if (currentSequence.length > 10) {
+                        currentSequence.shift();
+                    }
+                    
+                    // Check for Konami code match
+                    if (currentSequence.join(',') === konamiSequence.join(',')) {
+                        this.activateExodusMenu();
+                    }
+                });
+            }
+            
+            activateExodusMenu() {
+                this.exodusMenuActive = true;
+                document.getElementById('konamiIndicator').style.display = 'block';
+                this.distributeManna(50); // Bonus manna for activation
+                
+                console.log('🎮 EXODUS MENU ACTIVATED via Konami Code');
+                
+                setTimeout(() => {
+                    document.getElementById('konamiIndicator').style.display = 'none';
+                }, 5000);
+            }
+            
+            startMiracleOrchestration() {
+                setInterval(() => {
+                    this.performRandomMiracle();
+                    this.replenishManna();
+                    this.updateTribeStrengths();
+                }, 10000);
+            }
+            
+            performRandomMiracle() {
+                const miracles = [
+                    { type: 'partRedSea', description: 'Parted bureaucratic Red Sea for travelers' },
+                    { type: 'sendManna', description: 'Provided exactly needed resources' },
+                    { type: 'pillarOfFire', description: 'Guided through difficult terrain' },
+                    { type: 'waterFromRock', description: 'Provided refreshment in dry places' }
+                ];
+                
+                const randomMiracle = miracles[Math.floor(Math.random() * miracles.length)];
+                this.miraclesPerformed.push({
+                    ...randomMiracle,
+                    timestamp: new Date(),
+                    tribe: Array.from(this.tribes.keys())[Math.floor(Math.random() * this.tribes.size)]
+                });
+                
+                this.updateDisplay();
+            }
+            
+            distributeManna(amount) {
+                this.mannaSupply += amount;
+                document.getElementById('mannaEffect').style.opacity = '0.7';
+                setTimeout(() => {
+                    document.getElementById('mannaEffect').style.opacity = '0';
+                }, 2000);
+            }
+            
+            replenishManna() {
+                // Manna appears fresh every morning
+                const now = new Date();
+                if (now.getHours() === 6 && now.getMinutes() === 0) { // 6 AM
+                    this.mannaSupply = 100;
+                    this.distributeManna(0); // Visual effect only
+                }
+            }
+            
+            updateTribeStrengths() {
+                this.tribes.forEach((tribe, name) => {
+                    // Tribes grow stronger as they perform miracles
+                    tribe.strength = Math.min(100, tribe.strength + (tribe.miraclesPerformed * 0.1));
+                });
+            }
+            
+            updateDisplay() {
+                document.getElementById('seasParted').textContent = 
+                    this.miraclesPerformed.filter(m => m.type === 'partRedSea').length;
+                
+                document.getElementById('mannaDistributed').textContent = 
+                    this.mannaSupply + ' portions';
+                
+                document.getElementById('pillarsActive').textContent = 
+                    this.miraclesPerformed.filter(m => m.type === 'pillarOfFire').length;
+            }
+            
+            // EXODUS PROTOCOLS - Our original miracle systems
+            partRedSea(obstacle) {
+                this.miraclesPerformed.push({
+                    type: 'partRedSea',
+                    description: `Parted Red Sea: ${obstacle}`,
+                    timestamp: new Date(),
+                    tribe: 'All Tribes'
+                });
+                
+                // Actual implementation from our original system
+                this.clearBureaucraticBarriers();
+                this.provideMiraculousAccess();
+                
+                this.updateDisplay();
+            }
+            
+            sendManna(need) {
+                this.mannaSupply -= 10;
+                this.miraclesPerformed.push({
+                    type: 'sendManna',
+                    description: `Sent manna for: ${need}`,
+                    timestamp: new Date(),
+                    tribe: 'Levites'
+                });
+                
+                // Actual implementation from our original system
+                this.allocateResourcesPrecisely();
+                
+                this.updateDisplay();
+            }
+            
+            pillarOfFire(location) {
+                this.miraclesPerformed.push({
+                    type: 'pillarOfFire',
+                    description: `Pillar of fire at: ${location}`,
+                    timestamp: new Date(),
+                    tribe: 'Judah'
+                });
+                
+                // Actual implementation from our original system
+                this.provideSupernaturalGuidance();
+                
+                this.updateDisplay();
+            }
+            
+            // Original system implementations
+            clearBureaucraticBarriers() {
+                // From our original Digital Moses protocol
+                console.log('🌊 RED SEA PARTED: Bureaucratic barriers removed');
+            }
+            
+            allocateResourcesPrecisely() {
+                // From our original Manna system
+                console.log('🍞 MANNA SENT: Exact resources provided');
+            }
+            
+            provideSupernaturalGuidance() {
+                // From our original Pillar of Fire system
+                console.log('🔥 PILLAR OF FIRE: Supernatural guidance activated');
+            }
+        }
+        
+        // EXODUS PROTOCOL ACTIVATION
+        function activateExodusProtocol(protocol) {
+            const os = window.exodusOS;
+            
+            const protocols = {
+                partRedSea: () => {
+                    os.partRedSea('Travel visa barriers');
+                    showExodusActivation('🌊 RED SEA PARTED - Impossible barriers removed');
+                },
+                
+                sendManna: () => {
+                    os.sendManna('Emergency travel funds');
+                    showExodusActivation('🍞 MANNA SENT - Exact provision provided');
+                },
+                
+                pillarOfFire: () => {
+                    os.pillarOfFire('Dark mountain path');
+                    showExodusActivation('🔥 PILLAR OF FIRE - Guidance through darkness');
+                }
+            };
+            
+            if (protocols[protocol]) {
+                protocols[protocol]();
+            }
+        }
+        
+        function activateKonamiCode() {
+            // Simulate Konami code entry
+            window.exodusOS.activateExodusMenu();
+            showExodusActivation('🎮 KONAMI CODE ACTIVATED - Exodus Menu Unlocked');
+        }
+        
+        function gatherAllTribes() {
+            const os = window.exodusOS;
+            os.tribes.forEach(tribe => {
+                tribe.strength = 100;
+            });
+            showExodusActivation('📯 ALL TRIBES GATHERED - Unified strength achieved');
+        }
+        
+        function enterPromisedLand() {
+            showExodusActivation('🏔️ ENTERING PROMISED LAND - All blessings activated');
+            document.getElementById('mannaEffect').style.opacity = '1';
+            
+            setTimeout(() => {
+                document.getElementById('mannaEffect').style.opacity = '0';
+            }, 5000);
+        }
+        
+        function showExodusActivation(message) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: rgba(139, 0, 0, 0.9);
+                color: gold;
+                padding: 2rem;
+                border-radius: 10px;
+                border: 2px solid gold;
+                z-index: 10000;
+                font-size: 1.2rem;
+                text-align: center;
+            `;
+            notification.textContent = `⚡ ${message}`;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                document.body.removeChild(notification);
+            }, 3000);
+        }
+        
+        // Initialize the Exodus system
+        window.exodusOS = new ExodusOS();
+    </script>
+</body>
+</html>

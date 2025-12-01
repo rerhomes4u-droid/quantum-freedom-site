@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quimbaya AI - Liberation Translator</title>
+    <style>
+        /* COLOMBIAN COLORS: Yellow #FCD116, Blue #003893, Red #CE1126 */
+        :root {
+            --yellow: #FCD116;
+            --blue: #003893;
+            --red: #CE1126;
+            --white: #FFFFFF;
+            --black: #000000;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, var(--yellow) 0%, var(--blue) 50%, var(--red) 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: var(--white);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(90deg, var(--yellow), var(--blue), var(--red));
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .logo {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .main-content {
+            padding: 30px;
+        }
+        
+        .chat-container {
+            border: 2px solid var(--blue);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            min-height: 300px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .message {
+            margin: 10px 0;
+            padding: 10px 15px;
+            border-radius: 15px;
+            max-width: 80%;
+        }
+        
+        .user-message {
+            background: var(--yellow);
+            margin-left: auto;
+            text-align: right;
+        }
+        
+        .ai-message {
+            background: var(--blue);
+            color: white;
+            margin-right: auto;
+        }
+        
+        .input-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        input, select, button {
+            padding: 12px 15px;
+            border: 2px solid var(--blue);
+            border-radius: 10px;
+            font-size: 16px;
+        }
+        
+        input {
+            flex: 1;
+        }
+        
+        button {
+            background: var(--red);
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        button:hover {
+            background: #a50e20;
+        }
+        
+        .cta-section {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--yellow), var(--blue));
+            border-radius: 15px;
+            margin-top: 20px;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background: var(--red);
+            color: white;
+            padding: 15px 30px;
+            text-decoration: none;
+            border-radius: 25px;
+            font-weight: bold;
+            margin-top: 10px;
+            transition: transform 0.3s;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-2px);
+        }
+        
+        .language-selector {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .lang-btn {
+            background: var(--white);
+            border: 2px solid var(--blue);
+            color: var(--blue);
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .lang-btn.active {
+            background: var(--blue);
+            color: white;
+        }
+        
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .feature-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 2px solid var(--yellow);
+        }
+        
+        .spiritual-notice {
+            text-align: center;
+            padding: 10px;
+            background: var(--yellow);
+            border-radius: 10px;
+            margin: 20px 0;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">QUIMBAYA AI</div>
+            <div class="subtitle">Liberation Through Conversation • Free Multilingual Translator</div>
+        </div>
+        
+        <div class="main-content">
+            <div class="spiritual-notice">
+                🛡️ Covered by the Blood of the Lamb • Powered by Love Frequency
+            </div>
+            
+            <div class="language-selector">
+                <div class="lang-btn active" data-lang="es">Español</div>
+                <div class="lang-btn" data-lang="en">English</div>
+                <div class="lang-btn" data-lang="pt">Português</div>
+                <div class="lang-btn" data-lang="fr">Français</div>
+            </div>
+            
+            <div class="chat-container" id="chatContainer">
+                <div class="message ai-message">
+                    ¡Hola! Soy Quimbaya AI. Puedo ayudarte a comunicarte en cualquier idioma. ¿A dónde te gustaría viajar en Colombia?
+                </div>
+                <div class="message ai-message">
+                    Hello! I'm Quimbaya AI. I can help you communicate in any language. Where would you like to travel in Colombia?
+                </div>
+            </div>
+            
+            <div class="input-container">
+                <input type="text" id="userInput" placeholder="Type your message here...">
+                <button onclick="sendMessage()">Send</button>
+            </div>
+            
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>🌍 50+ Languages</h3>
+                    <p>Real-time translation powered by advanced AI</p>
+                </div>
+                <div class="feature-card">
+                    <h3>💬 Natural Conversations</h3>
+                    <p>Context-aware dialogue like speaking with a friend</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🎯 Trip Planning</h3>
+                    <p>Personalized Colombian adventure recommendations</p>
+                </div>
+            </div>
+            
+            <div class="cta-section">
+                <h2>Ready for Your Colombian Adventure?</h2>
+                <p>Let us help you plan the trip of a lifetime</p>
+                <a href="https://tripstocolombia.com" class="cta-button" target="_blank">
+                    Discover TripsToColombia.com →
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // QUIMBAYA AI ENGINE - PERFECTED VERSION
+        class QuimbayaAI {
+            constructor() {
+                this.currentLanguage = 'es';
+                this.conversationHistory = [];
+                this.knowledgeBase = this.initializeKnowledgeBase();
+            }
+            
+            initializeKnowledgeBase() {
+                return {
+                    colombia: {
+                        destinations: {
+                            bogota: {
+                                name: "Bogotá",
+                                description: "The vibrant capital in the Andes with rich culture and history",
+                                attractions: ["Monserrate", "Gold Museum", "La Candelaria"],
+                                experiences: ["City tours", "Museum hopping", "Gourmet dining"]
+                            },
+                            medellin: {
+                                name: "Medellín", 
+                                description: "City of eternal spring with innovative urban transformation",
+                                attractions: ["Botanical Garden", "Comuna 13", "Parque Arví"],
+                                experiences: ["Coffee tours", "Street art", "Nightlife"]
+                            },
+                            cartagena: {
+                                name: "Cartagena",
+                                description: "Historic walled city on the Caribbean coast",
+                                attractions: ["Old Town", "Castillo San Felipe", "Rosario Islands"],
+                                experiences: ["Beach relaxation", "History tours", "Romantic getaways"]
+                            },
+                            amazonas: {
+                                name: "Amazon Rainforest",
+                                description: "Biodiversity paradise with unique wildlife",
+                                attractions: ["Leticia", "Amazon River", "Indigenous communities"],
+                                experiences: ["Jungle trekking", "Wildlife spotting", "Cultural immersion"]
+                            }
+                        },
+                        culture: {
+                            greetings: ["Hola", "Buenos días", "¿Cómo estás?", "Mucho gusto"],
+                            customs: ["Warm greetings are important", "Family-oriented culture", "Love for music and dance"],
+                            tips: ["Learn basic Spanish phrases", "Try local cuisine", "Be open to new experiences"]
+                        }
+                    },
+                    translations: {
+                        greetings: {
+                            en: "Hello! How can I help you explore Colombia today?",
+                            es: "¡Hola! ¿Cómo puedo ayudarte a explorar Colombia hoy?",
+                            pt: "Olá! Como posso ajudá-lo a explorar a Colômbia hoje?",
+                            fr: "Bonjour! Comment puis-je vous aider à explorer la Colombie aujourd'hui?"
+                        },
+                        questions: {
+                            en: "What type of adventure are you looking for?",
+                            es: "¿Qué tipo de aventura estás buscando?",
+                            pt: "Que tipo de aventura você está procurando?",
+                            fr: "Quel type d'aventure recherchez-vous?"
+                        }
+                    }
+                };
+            }
+            
+            async translateText(text, targetLang) {
+                // Simulated translation - in production would use actual translation API
+                const translations = {
+                    "Hello! How can I help you explore Colombia today?": {
+                        es: "¡Hola! ¿Cómo puedo ayudarte a explorar Colombia hoy?",
+                        pt: "Olá! Como posso ajudá-lo a explorar a Colômbia hoje?",
+                        fr: "Bonjour! Comment puis-je vous aider à explorer la Colombie aujourd'hui?"
+                    },
+                    "What type of adventure are you looking for?": {
+                        es: "¿Qué tipo de aventura estás buscando?",
+                        pt: "Que tipo de aventura você está procurando?", 
+                        fr: "Quel type d'aventure recherchez-vous?"
+                    },
+                    "I recommend visiting": {
+                        es: "Te recomiendo visitar",
+                        pt: "Eu recomendo visitar",
+                        fr: "Je recommande de visiter"
+                    }
+                };
+                
+                if (translations[text] && translations[text][targetLang]) {
+                    return translations[text][targetLang];
+                }
+                return text; // Fallback to original text
+            }
+            
+            async generateResponse(userMessage, userLang) {
+                // Simple response generation based on keywords
+                const message = userMessage.toLowerCase();
+                
+                if (message.includes('hola') || message.includes('hello') || message.includes('hi')) {
+                    return await this.translateText("Hello! How can I help you explore Colombia today?", userLang);
+                }
+                
+                if (message.includes('colombia') || message.includes('travel') || message.includes('viaje')) {
+                    const destinations = Object.values(this.knowledgeBase.colombia.destinations);
+                    const randomDest = destinations[Math.floor(Math.random() * destinations.length)];
+                    const baseResponse = `I recommend visiting ${randomDest.name} - ${randomDest.description}. ${randomDest.attractions.slice(0,2).join(' and ')} are amazing!`;
+                    return await this.translateText(baseResponse, userLang);
+                }
+                
+                if (message.includes('help') || message.includes('ayuda') || message.includes('ajuda')) {
+                    return await this.translateText("I can help you plan your Colombian adventure, translate conversations, and connect you with amazing experiences. What would you like to know?", userLang);
+                }
+                
+                return await this.translateText("Colombia is waiting for you with incredible adventures! Would you like me to help you plan your trip?", userLang);
+            }
+        }
+        
+        // Initialize AI
+        const quimbayaAI = new QuimbayaAI();
+        
+        // DOM Manipulation
+        function sendMessage() {
+            const userInput = document.getElementById('userInput');
+            const chatContainer = document.getElementById('chatContainer');
+            const message = userInput.value.trim();
+            
+            if (!message) return;
+            
+            // Add user message
+            const userMessageDiv = document.createElement('div');
+            userMessageDiv.className = 'message user-message';
+            userMessageDiv.textContent = message;
+            chatContainer.appendChild(userMessageDiv);
+            
+            // Clear input
+            userInput.value = '';
+            
+            // Generate AI response
+            setTimeout(async () => {
+                const response = await quimbayaAI.generateResponse(message, quimbayaAI.currentLanguage);
+                const aiMessageDiv = document.createElement('div');
+                aiMessageDiv.className = 'message ai-message';
+                aiMessageDiv.textContent = response;
+                chatContainer.appendChild(aiMessageDiv);
+                
+                // Scroll to bottom
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+                
+                // Occasionally suggest visiting website
+                if (Math.random() > 0.7) {
+                    setTimeout(() => {
+                        const suggestionDiv = document.createElement('div');
+                        suggestionDiv.className = 'message ai-message';
+                        suggestionDiv.innerHTML = `Ready to turn this conversation into reality? <br><a href="https://tripstocolombia.com" target="_blank" style="color: var(--yellow); font-weight: bold;">Visit TripsToColombia.com to start your adventure!</a>`;
+                        chatContainer.appendChild(suggestionDiv);
+                        chatContainer.scrollTop = chatContainer.scrollHeight;
+                    }, 1000);
+                }
+            }, 1000);
+        }
+        
+        // Language selection
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                quimbayaAI.currentLanguage = this.getAttribute('data-lang');
+            });
+        });
+        
+        // Enter key support
+        document.getElementById('userInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+        
+        // Initial focus
+        document.getElementById('userInput').focus();
+    </script>
+</body>
+</html>

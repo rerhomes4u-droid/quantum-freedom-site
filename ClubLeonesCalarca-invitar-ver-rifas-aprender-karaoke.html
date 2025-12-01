@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leones App - Con Karaoke Leonino</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-size: 18px;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #FFCC00, #8D6B3A);
+            color: white;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255,255,255,0.95);
+            color: #333;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .lion-header {
+            text-align: center;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, #FFCC00, #8D6B3A);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+        }
+        
+        .lion-header h1 {
+            color: white;
+            font-size: 2.5em;
+            margin: 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .big-button {
+            display: block;
+            width: 100%;
+            padding: 20px;
+            margin: 15px 0;
+            background: linear-gradient(135deg, #FFCC00, #8D6B3A);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.3em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 204, 0, 0.3);
+        }
+        
+        .big-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(255, 204, 0, 0.5);
+        }
+        
+        /* NUEVO ESTILO PARA EL KARAOKE */
+        .karaoke-container {
+            background: #2C3E50;
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 20px 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .lyrics-display {
+            font-size: 2em;
+            font-weight: bold;
+            line-height: 1.5;
+            height: 180px;
+            overflow: hidden;
+            position: relative;
+            margin: 20px 0;
+        }
+        
+        .current-line {
+            color: #FFCC00;
+            text-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
+            font-size: 1.2em;
+            transition: all 0.5s ease;
+        }
+        
+        .next-line {
+            color: #ECF0F1;
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+        
+        .karaoke-controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        
+        .control-button {
+            padding: 15px 25px;
+            background: #FFCC00;
+            color: #2C3E50;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1.1em;
+        }
+        
+        .singing-indicator {
+            background: #E74C3C;
+            color: white;
+            padding: 10px;
+            border-radius: 20px;
+            font-weight: bold;
+            animation: pulse 1s infinite;
+            margin-bottom: 15px;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- ENCABEZADO CON COLORES LEONES -->
+        <div class="lion-header">
+            <h1>🦁 CLUB DE LEONES CALARCÁ</h1>
+            <p><strong>Ahora con Karaoke Leonino Oficial</strong></p>
+            <p>¡Nunca más te pierdas la letra!</p>
+        </div>
+
+        <!-- NUEVO BOTÓN DE KARAOKE -->
+        <button class="big-button" onclick="showSection('karaoke')" style="background: linear-gradient(135deg, #E74C3C, #C0392B);">
+            🎵 CANTAR EL HIMNO LEONINO
+        </button>
+
+        <!-- BOTONES ORIGINALES -->
+        <button class="big-button" onclick="showSection('invitar')">
+            📧 INVITAR NUEVOS SOCIOS
+        </button>
+        
+        <button class="big-button" onclick="showSection('eventos')">
+            📅 VER PRÓXIMOS EVENTOS
+        </button>
+        
+        <button class="big-button" onclick="showSection('rifa')">
+            🎫 COMPRAR RIFAS
+        </button>
+
+        <!-- SECCIÓN KARAOKE (NUEVA) -->
+        <div id="karaoke" class="section">
+            <div class="karaoke-container">
+                <div class="singing-indicator">
+                    🎤 ¡ESTAMOS CANTANDO! 🎤
+                </div>
+                
+                <h2>HIMNO OFICIAL DEL CLUB DE LEONES</h2>
+                
+                <div class="lyrics-display" id="lyricsDisplay">
+                    <!-- La letra se mostrará aquí -->
+                </div>
+                
+                <div class="karaoke-controls">
+                    <button class="control-button" onclick="startKaraoke()">▶️ COMENZAR</button>
+                    <button class="control-button" onclick="pauseKaraoke()">⏸️ PAUSAR</button>
+                    <button class="control-button" onclick="resetKaraoke()">🔄 REPETIR</button>
+                </div>
+                
+                <p style="margin-top: 20px; font-size: 0.9em; color: #BDC3C7;">
+                    <strong>Instrucción:</strong> Presiona "Comenzar" cuando empiece la canción
+                </p>
+            </div>
+            
+            <div style="text-align: center; margin-top: 20px; padding: 15px; background: #FFF8E1; border-radius: 10px;">
+                <h3 style="color: #8D6B3A;">¿POR QUÉ ESTO ES GENIAL?</h3>
+                <p><strong>Los que no se saben la letra:</strong> ¡Ahora pueden cantar!</p>
+                <p><strong>Los que quieren el app:</strong> ¡Todos van a querer tenerlo!</p>
+                <p><strong>Nuestras reuniones:</strong> ¡Serán más unidas y divertidas!</p>
+            </div>
+        </div>
+
+        <!-- (LAS OTRAS SECCIONES SE MANTIENEN IGUAL) -->
+        <div id="invitar" class="section">
+            <!-- Contenido de invitaciones -->
+        </div>
+
+        <div id="eventos" class="section">
+            <!-- Contenido de eventos -->
+        </div>
+
+        <div id="rifa" class="section">
+            <!-- Contenido de rifas -->
+        </div>
+
+        <!-- MENSAJE ESPECIAL -->
+        <div style="text-align: center; margin-top: 30px; padding: 20px; background: #8D6B3A; color: white; border-radius: 15px;">
+            <h3>🎵 ¡EL KARAOKE QUE UNIRÁ A TODOS LOS LEONES!</h3>
+            <p>Ahora nadie se quedará callado en nuestro himno</p>
+        </div>
+    </div>
+
+    <script>
+        // LETRA OFICIAL DEL HIMNO LEONINO (Ajustar según la canción real)
+        const himnoLeonino = [
+            "¡LEONES DE CORAZÓN!",
+            "UNIDOS EN UNA MISIÓN",
+            "SERVIMOS CON DEVOCIÓN",
+            "Y GRAN COMPASIÓN",
+            "",
+            "CALARCÁ ES NUESTRO HOGAR",
+            "Y SIEMPRE LO VAMOS A HONRAR",
+            "CON FUERZA Y DIGNIDAD",
+            "Y MUCHA HUMILDAD",
+            "",
+            "¡LEONES SIEMPRE LEALES!",
+            "CON GARRAS ESPECIALES",
+            "PARA AYUDAR A LOS DEMÁS",
+            "ES NUESTRA VOCACIÓN",
+            "",
+            "¡QUE RUJA EL LEÓN!",
+            "CON ORGULLO Y EMOCIÓN",
+            "¡QUE RUJA EL LEÓN!",
+            "EN CADA CORAZÓN"
+        ];
+
+        let currentLine = 0;
+        let karaokeInterval;
+
+        // FUNCIÓN PARA INICIAR EL KARAOKE
+        function startKaraoke() {
+            clearInterval(karaokeInterval);
+            currentLine = 0;
+            updateLyricsDisplay();
+            
+            karaokeInterval = setInterval(() => {
+                currentLine++;
+                if (currentLine >= himnoLeonino.length) {
+                    clearInterval(karaokeInterval);
+                    // Repetir automáticamente
+                    setTimeout(startKaraoke, 2000);
+                    return;
+                }
+                updateLyricsDisplay();
+            }, 3000); // Cambia cada 3 segundos (ajustar según tempo real)
+        }
+
+        function pauseKaraoke() {
+            clearInterval(karaokeInterval);
+        }
+
+        function resetKaraoke() {
+            clearInterval(karaokeInterval);
+            currentLine = 0;
+            updateLyricsDisplay();
+        }
+
+        function updateLyricsDisplay() {
+            const display = document.getElementById('lyricsDisplay');
+            let html = '';
+            
+            // Línea actual (grande y destacada)
+            if (currentLine < himnoLeonino.length) {
+                html += `<div class="current-line">${himnoLeonino[currentLine]}</div>`;
+            }
+            
+            // Próximas líneas (más pequeñas)
+            for (let i = currentLine + 1; i < Math.min(currentLine + 3, himnoLeonino.length); i++) {
+                if (himnoLeonino[i].trim() !== '') {
+                    html += `<div class="next-line">${himnoLeonino[i]}</div>`;
+                }
+            }
+            
+            display.innerHTML = html;
+            
+            // Efecto visual de scroll suave
+            display.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // MOSTRAR SECCIÓN KARAOKE AL INICIO
+        document.getElementById('karaoke').style.display = 'block';
+
+        // FUNCIÓN PARA CAMBIAR SECCIONES
+        function showSection(nombreSeccion) {
+            document.querySelectorAll('.section').forEach(sec => {
+                sec.style.display = 'none';
+            });
+            document.getElementById(nombreSeccion).style.display = 'block';
+        }
+
+        // ALERTA ESPECIAL PARA EL KARAOKE
+        setTimeout(() => {
+            if (!localStorage.getItem('karaokeShown')) {
+                alert('🎵 ¡NUEVA FUNCIÓN EXCLUSIVA!\n\nAhora tenemos KARAOKE LEONINO en nuestra app.\n\nEn las reuniones, todos podremos cantar el himno juntos sin perderse la letra.\n\n¡Los que no tengan la app se la van a pedir!');
+                localStorage.setItem('karaokeShown', 'true');
+            }
+        }, 1000);
+    </script>
+</body>
+</html>

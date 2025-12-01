@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App Miembros - Lions Club Calarcá Monarca</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-purple: #7e287e;
+            --secondary-gold: #ffc72c;
+            --dark-purple: #5c1d5c;
+            --light-purple: #f5e6f5;
+            --white: #ffffff;
+            --light-gray: #f8f8f8;
+            --dark-gray: #333333;
+            --text-color: #444444;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            line-height: 1.6;
+            color: var(--text-color);
+            background: linear-gradient(135deg, var(--primary-purple), var(--dark-purple));
+            min-height: 100vh;
+        }
+        
+        .app-container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: var(--white);
+            min-height: 100vh;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        
+        .app-header {
+            background: var(--primary-purple);
+            color: var(--white);
+            padding: 20px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .back-btn {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--white);
+            text-decoration: none;
+            font-size: 1.2rem;
+        }
+        
+        .app-logo {
+            width: 60px;
+            height: 60px;
+            background: var(--secondary-gold);
+            border-radius: 50%;
+            margin: 0 auto 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: var(--primary-purple);
+        }
+        
+        .app-nav {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1px;
+            background: var(--light-gray);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .nav-item {
+            background: var(--white);
+            padding: 12px 8px;
+            text-align: center;
+            text-decoration: none;
+            color: var(--text-color);
+            transition: all 0.3s;
+            font-size: 0.8rem;
+        }
+        
+        .nav-item.active {
+            background: var(--light-purple);
+            color: var(--primary-purple);
+            border-bottom: 2px solid var(--secondary-gold);
+        }
+        
+        .nav-item:hover {
+            background: var(--light-purple);
+            color: var(--primary-purple);
+        }
+        
+        .nav-icon {
+            font-size: 1.2rem;
+            margin-bottom: 4px;
+            display: block;
+        }
+        
+        .app-content {
+            padding: 15px;
+            padding-bottom: 70px;
+        }
+        
+        .section-title {
+            color: var(--primary-purple);
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            border-bottom: 2px solid var(--secondary-gold);
+            padding-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .badge {
+            background: var(--secondary-gold);
+            color: var(--dark-gray);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .event-card {
+            background: var(--white);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            border-left: 4px solid var(--secondary-gold);
+            position: relative;
+        }
+        
+        .event-urgent {
+            border-left-color: var(--danger);
+        }
+        
+        .event-important {
+            border-left-color: var(--warning);
+        }
+        
+        .event-title {
+            color: var(--primary-purple);
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 1.1rem;
+        }
+        
+        .event-details {
+            font-size: 0.9rem;
+            color: var(--text-color);
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+        
+        .event-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--dark-gray);
+            margin-top: 10px;
+        }
+        
+        .event-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .btn {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+            flex: 1;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-primary {
+            background: var(--primary-purple);
+            color: var(--white);
+        }
+        
+        .btn-secondary {
+            background: var(--secondary-gold);
+            color: var(--dark-gray);
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: var(--white);
+        }
+        
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--primary-purple);
+            color: var(--primary-purple);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+        }
+        
+        .member-list {
+            list-style: none;
+        }
+        
+        .member-item {
+            padding: 12px;
+            border-bottom: 1px solid var(--light-gray);
+            display: flex;
+            align-items: center;
+            transition: background 0.3s;
+        }
+        
+        .member-item:hover {
+            background: var(--light-purple);
+        }
+        
+        .member-avatar {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-purple);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        
+        .member-info {
+            flex: 1;
+        }
+        
+        .member-info h4 {
+            color: var(--primary-purple);
+            margin-bottom: 2px;
+            font-size: 1rem;
+        }
+        
+        .member-info p {
+            font-size: 0.8rem;
+            color: var(--text-color);
+        }
+        
+        .member-contact {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .contact-btn {
+            background: var(--light-purple);
+            border: none;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-purple);
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .contact-btn:hover {
+            background: var(--primary-purple);
+            color: var(--white);
+        }
+        
+        .quick-action {
+            background: var(--light-purple);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .action-title {
+            color: var(--primary-purple);
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: var(--white);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border: 1px solid var(--light-gray);
+        }
+        
+        .stat-number {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--primary-purple);
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-color);
+        }
+        
+        .documents-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .doc-card {
+            background: var(--white);
+            border: 1px solid var(--light-gray);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .doc-card:hover {
+            border-color: var(--primary-purple);
+            transform: translateY(-2px);
+        }
+        
+        .doc-icon {
+            font-size: 2rem;
+            color: var(--primary-purple);
+            margin-bottom: 8px;
+        }
+        
+        .doc-title {
+            font-size: 0.9rem;
+            color: var(--primary-purple);
+            font-weight: bold;
+        }
+        
+        .news-card {
+            background: var(--white);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border-left: 4px solid var(--primary-purple);
+        }
+        
+        .news-title {
+            color: var(--primary-purple);
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+        
+        .news-meta {
+            font-size: 0.8rem;
+            color: var(--dark-gray);
+            margin-bottom: 10px;
+        }
+        
+        .news-link {
+            color: var(--secondary-gold);
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        .news-link i {
+            margin-left: 5px;
+            transition: transform 0.3s;
+        }
+        
+        .news-link:hover i {
+            transform: translateX(3px);
+        }
+        
+        .app-section {
+            display: none;
+        }
+        
+        .app-section.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .attendance-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--success);
+            color: var(--white);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: bold;
+        }
+        
+        .zoom-card {
+            background: linear-gradient(135deg, #2d8cff, #1e5cb3);
+            color: var(--white);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .zoom-title {
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        
+        .zoom-details {
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+        
+        .birthday-card {
+            background: linear-gradient(135deg, var(--secondary-gold), #e6b400);
+            color: var(--dark-gray);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .birthday-icon {
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+        
+        .condolence-card {
+            background: linear-gradient(135deg, #6c757d, #495057);
+            color: var(--white);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .search-box {
+            background: var(--light-gray);
+            border: none;
+            padding: 12px 15px;
+            border-radius: 25px;
+            width: 100%;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+        
+        .search-box:focus {
+            outline: none;
+            background: var(--white);
+            box-shadow: 0 0 0 2px var(--primary-purple);
+        }
+
+        /* Prayer and Blessing Section */
+        .blessing-card {
+            background: linear-gradient(135deg, #8B4513, #A0522D);
+            color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .blessing-card::before {
+            content: '🕊️';
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 1.5rem;
+            opacity: 0.3;
+        }
+
+        .blessing-text {
+            font-style: italic;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .blessing-reference {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- App Header -->
+        <div class="app-header">
+            <a href="index.html" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+            </a>
+            <div class="app-logo">L</div>
+            <h2>Miembros Lions</h2>
+            <p>Calarcá Monarca</p>
+        </div>
+        
+        <!-- App Navigation -->
+        <div class="app-nav">
+            <a href="#inicio" class="nav-item active" data-section="inicio">
+                <i class="fas fa-home nav-icon"></i>
+                Inicio
+            </a>
+            <a href="#eventos" class="nav-item" data-section="eventos">
+                <i class="fas fa-calendar nav-icon"></i>
+                Eventos
+            </a>
+            <a href="#miembros" class="nav-item" data-section="miembros">
+                <i class="fas fa-users nav-icon"></i>
+                Miembros
+            </a>
+            <a href="#recursos" class="nav-item" data-section="recursos">
+                <i class="fas fa-file-alt nav-icon"></i>
+                Recursos
+            </a>
+        </div>
+        
+        <!-- App Content -->
+        <div class="app-content">
+            <!-- Home Section -->
+            <div id="inicio" class="app-section active">
+                <h3 class="section-title">
+                    Dashboard
+                    <span class="badge">47 Activos</span>
+                </h3>
+                
+                <!-- Daily Blessing -->
+                <div class="blessing-card">
+                    <div class="blessing-text">
+                        "Que el León de Judá nos guíe, y que nuestro servicio multiplique el amor en cada corazón que tocamos"
+                    </div>
+                    <div class="blessing-reference">En servicio unificado</div>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">47</div>
+                        <div class="stat-label">Miembros Activos</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">12</div>
+                        <div class="stat-label">Eventos Este Mes</div>
+                    </div>
+                </div>
+                
+                <!-- Quick Actions -->
+                <div class="quick-action">
+                    <div class="action-title">📅 Próxima Reunión</div>
+                    <p><strong>Miércoles 7:00 PM</strong></p>
+                    <p>Centro Comunitario Calarcá</p>
+                    <div class="event-actions" style="margin-top: 15px;">
+                        <button class="btn btn-success" onclick="confirmAttendance('Reunión General')">✅ Confirmar Asistencia</button>
+                        <button class="btn btn-outline" onclick="requestProxy()">📋 Solicitar Poder</button>
+                    </div>
+                </div>
+                
+                <!-- Urgent Events -->
+                <div class="event-card event-urgent">
+                    <div class="attendance-badge">CONFIRMAR</div>
+                    <div class="event-title">🎨 Cartel de la Paz - Premiación</div>
+                    <div class="event-details">
+                        <i class="fas fa-map-marker-alt"></i> Colegio La Virginia<br>
+                        <i class="fas fa-clock"></i> Jueves 9:30 AM<br>
+                        <i class="fas fa-tshirt"></i> Chaleco obligatorio
+                    </div>
+                    <div class="event-meta">
+                        <span>📸 Fotos permitidas</span>
+                        <span>👥 15+ asistentes</span>
+                    </div>
+                </div>
+                
+                <!-- News -->
+                <div class="news-card">
+                    <div class="news-title">📰 Nueva Junta Directiva</div>
+                    <div class="news-meta">Publicado en El Quindiano</div>
+                    <p>El Club de Leones Calarcá Monarca cuenta con nueva junta directiva para el periodo 2025-2026.</p>
+                    <a href="https://elquindiano.com/noticia/240395/club-de-leones-calarca-monarca-cuenta-con-nueva-junta-directiva/" class="news-link" target="_blank">
+                        Leer noticia <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                
+                <!-- Birthday -->
+                <div class="birthday-card">
+                    <div class="birthday-icon">🎂</div>
+                    <div class="action-title">¡Cumpleaños de la Semana!</div>
+                    <p><strong>Luz Dary Sánchez</strong> - 20 Oct</p>
+                    <p><strong>María Cristina</strong> - 21 Oct</p>
+                    <button class="btn btn-primary" style="margin-top: 10px;" onclick="sendBirthdayWishes()">
+                        <i class="fas fa-gift"></i> Enviar Saludo
+                    </button>
+                </div>
+
+                <!-- Karaoke Quick Access -->
+                <div class="quick-action" style="background: linear-gradient(135deg, var(--primary-purple), var(--dark-purple)); color: white;">
+                    <div class="action-title">🎵 Himno Leonístico</div>
+                    <p>¿Listo para cantar nuestro himno oficial?</p>
+                    <button class="btn" onclick="openKaraoke()" style="background: var(--secondary-gold); color: var(--dark-gray); margin-top: 10px;">
+                        <i class="fas fa-music"></i> Abrir Karaoke
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Events Section -->
+            <div id="eventos" class="app-section">
+                <h3 class="section-title">
+                    Eventos y Reuniones
+                    <span class="badge">3 Próximos</span>
+                </h3>
+                
+                <input type="text" class="search-box" placeholder="🔍 Buscar eventos...">
+                
+                <div class="event-card event-important">
+                    <div class="event-title">🚗 Entrega de Vehículo Rifado</div>
+                    <div class="event-details">
+                        <i class="fas fa-map-marker-alt"></i> Parque Bolívar<br>
+                        <i class="fas fa-clock"></i> Miércoles 3:00 PM<br>
+                        <i class="fas fa-tshirt"></i> Chaleco requerido
+                    </div>
+                    <div class="event-actions">
+                        <button class="btn btn-primary" onclick="confirmAttendance('Entrega Vehículo')">Asistiré</button>
+                        <button class="btn btn-outline" onclick="shareEvent('Entrega Vehículo')">Compartir</button>
+                    </div>
+                </div>
+                
+                <div class="event-card">
+                    <div class="event-title">💻 Capacitación Virtual Jefes de Zona</div>
+                    <div class="event-details">
+                        <i class="fas fa-video"></i> Plataforma Zoom<br>
+                        <i class="fas fa-clock"></i> Miércoles 2:00 PM<br>
+                        <i class="fas fa-user"></i> Para Clarisa y Liliana
+                    </div>
+                    <div class="event-actions">
+                        <button class="btn btn-primary" onclick="joinZoom()">Unirme</button>
+                        <button class="btn btn-outline" onclick="setReminder('Capacitación Jefes de Zona')">Recordatorio</button>
+                    </div>
+                </div>
+                
+                <div class="zoom-card">
+                    <div class="zoom-title">🎯 Convención Extraordinaria Distrito F</div>
+                    <div class="zoom-details">
+                        <strong>ID Reunión:</strong> 881 7788 6022<br>
+                        <strong>Código:</strong> ConvExtra<br>
+                        <strong>Fecha:</strong> Sábado 9:00 AM
+                    </div>
+                    <button class="btn" style="background: white; color: #2d8cff;" onclick="joinZoom()">
+                        <i class="fas fa-video"></i> Unirse a Zoom
+                    </button>
+                </div>
+                
+                <div class="event-card">
+                    <div class="event-title">🦁 Reunión General Mensual</div>
+                    <div class="event-details">
+                        <i class="fas fa-map-marker-alt"></i> Oficina 201 (Salón alquilado)<br>
+                        <i class="fas fa-clock"></i> Viernes 3:00 PM<br>
+                        <i class="fas fa-star"></i> Tema: 9 Causas Globales
+                    </div>
+                    <div class="event-meta">
+                        <span>👩‍💼 María Isabel Valencia</span>
+                    </div>
+                    <div class="event-actions">
+                        <button class="btn btn-success" onclick="confirmAttendance('Reunión General')">Confirmado</button>
+                        <button class="btn btn-outline" onclick="viewAgenda()">Agenda</button>
+                    </div>
+                </div>
+
+                <!-- Service Prayer -->
+                <div class="blessing-card">
+                    <div class="blessing-text">
+                        "Que cada servicio que realicemos esté impregnado del amor que transforma y sana"
+                    </div>
+                    <div class="blessing-reference">Unidos en propósito sagrado</div>
+                </div>
+            </div>
+            
+            <!-- Members Section -->
+            <div id="miembros" class="app-section">
+                <h3 class="section-title">
+                    Directorio de Miembros
+                    <span class="badge">47</span>
+                </h3>
+                
+                <input type="text" class="search-box" placeholder="🔍 Buscar miembros...">
+                
+                <div class="quick-action">
+                    <div class="action-title">👥 Comunicación Rápida</div>
+                    <div class="event-actions">
+                        <button class="btn btn-primary" onclick="openWhatsAppGroup()">
+                            <i class="fab fa-whatsapp"></i> Grupo WhatsApp
+                        </button>
+                        <button class="btn btn-secondary" onclick="sendAnnouncement()">
+                            <i class="fas fa-bullhorn"></i> Anuncio General
+                        </button>
+                    </div>
+                </div>
+                
+                <h4 style="color: var(--primary-purple); margin: 20px 0 10px 0;">🎯 Junta Directiva</h4>
+                <ul class="member-list">
+                    <li class="member-item">
+                        <div class="member-avatar">FI</div>
+                        <div class="member-info">
+                            <h4>Fabio Iván</h4>
+                            <p>Presidente</p>
+                        </div>
+                        <div class="member-contact">
+                            <button class="contact-btn" onclick="contactMember('Fabio Iván')">
+                                <i class="fab fa-whatsapp"></i>
+                            </button>
+                            <button class="contact-btn" onclick="callMember('Fabio Iván')">
+                                <i class="fas fa-phone"></i>
+                            </button>
+                        </div>
+                    </li>
+                    <li class="member-item">
+                        <div class="member-avatar">JHT</div>
+                        <div class="member-info">
+                            <h4>Jose Herminsul Torres</h4>
+                            <p>Tesorero</p>
+                        </div>
+                        <div class="member-contact">
+                            <button class="contact-btn" onclick="contactMember('Jose Herminsul Torres')">
+                                <i class="fab fa-whatsapp"></i>
+                            </button>
+                        </div>
+                    </li>
+                    <li class="member-item">
+                        <div class="member-avatar">MIV</div>
+                        <div class="member-info">
+                            <h4>María Isabel Valencia</h4>
+                            <p>Consejera Delegada</p>
+                        </div>
+                        <div class="member-contact">
+                            <button class="contact-btn" onclick="contactMember('María Isabel Valencia')">
+                                <i class="fab fa-whatsapp"></i>
+                            </button>
+                        </div>
+                    </li>
+                </ul>
+                
+                <h4 style="color: var(--primary-purple); margin: 20px 0 10px 0;">🦁 Miembros Activos</h4>
+                <ul class="member-list">
+                    <li class="member-item">
+                        <div class="member-avatar">LH</div>
+                        <div class="member-info">
+                            <h4>Liliana Hurtado</h4>
+                            <p>Jefa de Zona</p>
+                        </div>
+                        <div class="member-contact">
+                            <button class="contact-btn" onclick="contactMember('Liliana Hurtado')">
+                                <i class="fab fa-whatsapp"></i>
+                            </button>
+                        </div>
+                    </li>
+                    <li class="member-item">
+                        <div class="member-avatar">CR</div>
+                        <div class="member-info">
+                            <h4>Clarisa Rodríguez</h4>
+                            <p>Jefa de Zona</p>
+                        </div>
+                        <div class="member-contact">
+                            <button class="contact-btn" onclick="contactMember('Clarisa Rodríguez')">
+                                <i class="fab fa-whatsapp"></i>
+                            </button>
+                        </div>
+                    </li>
+                </ul>
+                
+                <!-- Condolences Section -->
+                <div class="condolence-card">
+                    <div class="action-title">🤍 Solidaridad</div>
+                    <p>Nuestro apoyo a los compañeros Héctor Ángel y Luz Miryam por el fallecimiento de su hermana Irma Judith.</p>
+                    <button class="btn" style="background: rgba(255,255,255,0.2); color: white; margin-top: 10px;" onclick="sendCondolences()">
+                        <i class="fas fa-hands"></i> Mensaje de Condolencia
+                    </button>
+                </div>
+
+                <!-- Unity Prayer -->
+                <div class="blessing-card">
+                    <div class="blessing-text">
+                        "Que la fuerza del León nos una en propósito y el amor divino guíe cada acción de servicio"
+                    </div>
+                    <div class="blessing-reference">En fraternidad bendecida</div>
+                </div>
+            </div>
+            
+            <!-- Documents Section -->
+            <div id="recursos" class="app-section">
+                <h3 class="section-title">
+                    Recursos y Documentos
+                    <span class="badge">12</span>
+                </h3>
+                
+                <div class="quick-action">
+                    <div class="action-title">📋 Formatos Oficiales</div>
+                    <p>Documentos esenciales para la operación del club</p>
+                </div>
+                
+                <div class="documents-grid">
+                    <div class="doc-card">
+                        <div class="doc-icon">
+                            <i class="fas fa-file-powerpoint"></i>
+                        </div>
+                        <div class="doc-title">Formato de Poder</div>
+                        <button class="btn btn-outline" style="margin-top: 8px; padding: 6px 12px; font-size: 0.8rem;" onclick="downloadDocument('poder')">
+                            Descargar
+                        </button>
+                    </div>
+                    
+                    <div class="doc-card">
+                        <div class="doc-icon">
+                            <i class="fas fa-receipt"></i>
+                        </div>
+                        <div class="doc-title">Control Boletas</div>
+                        <button class="btn btn-outline" style="margin-top: 8px; padding: 6px 12px; font-size: 0.8rem;" onclick="downloadDocument('boletas')">
+                            Descargar
+                        </button>
+                    </div>
+                    
+                    <div class="doc-card">
+                        <div class="doc-icon">
+                            <i class="fas fa-tshirt"></i>
+                        </div>
+                        <div class="doc-title">Protocolo Chalecos</div>
+                        <button class="btn btn-outline" style="margin-top: 8px; padding: 6px 12px; font-size: 0.8rem;" onclick="viewDocument('chalecos')">
+                            Ver
+                        </button>
+                    </div>
+                    
+                    <div class="doc-card">
+                        <div class="doc-icon">
+                            <i class="fas fa-camera"></i>
+                        </div>
+                        <div class="doc-title">Política Fotos</div>
+                        <button class="btn btn-outline" style="margin-top: 8px; padding: 6px 12px; font-size: 0.8rem;" onclick="viewDocument('fotos')">
+                            Ver
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="news-card" style="margin-top: 20px;">
+                    <div class="news-title">📊 Portal Lions Internacional</div>
+                    <p>Acceso a las plataformas oficiales de Lions Clubs International</p>
+                    <div class="event-actions" style="margin-top: 10px;">
+                        <button class="btn btn-primary" onclick="openLionPortal()">
+                            <i class="fas fa-sign-in-alt"></i> Lion Portal
+                        </button>
+                        <button class="btn btn-secondary" onclick="reportDonation()">
+                            <i class="fas fa-chart-bar"></i> Reportar Donación
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Final Blessing -->
+                <div class="blessing-card">
+                    <div class="blessing-text">
+                        "Que cada herramienta aquí contenida sea instrumento de amor y cada servicio, semilla de transformación eterna"
+                    </div>
+                    <div class="blessing-reference">Guiados por amor infinito</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Navigation between app sections
+        document.addEventListener('DOMContentLoaded', function() {
+            const navItems = document.querySelectorAll('.nav-item');
+            const appSections = document.querySelectorAll('.app-section');
+            
+            function showAppSection(sectionId) {
+                // Hide all sections
+                appSections.forEach(section => {
+                    section.classList.remove('active');
+                });
+                
+                // Show target section
+                const targetSection = document.querySelector(sectionId);
+                if (targetSection) {
+                    targetSection.classList.add('active');
+                }
+                
+                // Update active nav
+                navItems.forEach(item => {
+                    item.classList.remove('active');
+                    if (item.getAttribute('href') === sectionId) {
+                        item.classList.add('active');
+                    }
+                });
+            }
+            
+            navItems.forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const targetId = this.getAttribute('href');
+                    showAppSection(targetId);
+                    
+                    // Scroll to top of content
+                    document.querySelector('.app-content').scrollTop = 0;
+                });
+            });
+
+            // Load member data
+            loadMemberData();
+        });
+
+        // Member Data Management
+        function loadMemberData() {
+            // In a real app, this would load from a database
+            console.log('Cargando datos de miembros...');
+            
+            // Set last login time
+            const lastLogin = new Date().toLocaleString('es-CO');
+            localStorage.setItem('lastLogin', lastLogin);
+        }
+
+        // Event Management Functions
+        function confirmAttendance(eventName) {
+            showNotification(`✅ Confirmada asistencia a: ${eventName}`);
+            // In real app, send to server
+        }
+
+        function requestProxy() {
+            showNotification('📋 Solicitud de poder enviada al secretario');
+        }
+
+        function joinZoom() {
+            showNotification('🎥 Redirigiendo a reunión Zoom...');
+            setTimeout(() => {
+                window.open('https://zoom.us/j/88177886022?pwd=5bUd66cVp0YHrXxFkhlCGaOcIml4Ie.1', '_blank');
+            }, 1000);
+        }
+
+        function setReminder(eventName) {
+            showNotification(`⏰ Recordatorio configurado para: ${eventName}`);
+        }
+
+        function shareEvent(eventName) {
+            showNotification(`📤 Compartiendo evento: ${eventName}`);
+        }
+
+        function viewAgenda() {
+            showNotification('📄 Descargando agenda de la reunión...');
+        }
+
+        // Member Communication Functions
+        function contactMember(memberName) {
+            showNotification(`💬 Abriendo chat con: ${memberName}`);
+        }
+
+        function callMember(memberName) {
+            showNotification(`📞 Llamando a: ${memberName}`);
+        }
+
+        function openWhatsAppGroup() {
+            showNotification('👥 Abriendo grupo de WhatsApp...');
+            // In real app, open WhatsApp group link
+        }
+
+        function sendAnnouncement() {
+            showNotification('📢 Preparando anuncio para todos los miembros...');
+        }
+
+        function sendBirthdayWishes() {
+            showNotification('🎂 Enviando saludos de cumpleaños...');
+        }
+
+        function sendCondolences() {
+            showNotification('🤍 Mensaje de condolencia enviado');
+        }
+
+        // Document Management
+        function downloadDocument(docType) {
+            showNotification(`📥 Descargando documento: ${docType}`);
+        }
+
+        function viewDocument(docType) {
+            showNotification(`👀 Mostrando documento: ${docType}`);
+        }
+
+        function openLionPortal() {
+            showNotification('🌐 Abriendo Portal Lions Internacional...');
+            setTimeout(() => {
+                window.open('https://www.lionsclubs.org/', '_blank');
+            }, 1000);
+        }
+
+        function reportDonation() {
+            showNotification('💰 Abriendo formulario de reporte de donaciones...');
+        }
+
+        // Karaoke Integration
+        function openKaraoke() {
+            showNotification('🎵 Abriendo karaoke del himno...');
+            setTimeout(() => {
+                window.open('index.html#karaoke', '_blank');
+            }, 1000);
+        }
+
+        // Notification System
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: var(--primary-purple);
+                color: white;
+                padding: 15px 20px;
+                border-radius: 10px;
+                z-index: 1000;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+                animation: fadeInOut 2s ease-in-out;
+                text-align: center;
+                max-width: 300px;
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 2000);
+        }
+
+        // Add CSS for notification animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeInOut {
+                0% { opacity: 0; transform: translate(-50%, -40%); }
+                20% { opacity: 1; transform: translate(-50%, -50%); }
+                80% { opacity: 1; transform: translate(-50%, -50%); }
+                100% { opacity: 0; transform: translate(-50%, -60%); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Daily inspirational message
+        const messages = [
+            "El servicio desinteresado es la mayor expresión de amor",
+            "Cada acto de bondad siembra semillas de esperanza",
+            "Unidos en servicio, transformamos comunidades",
+            "El León de Judá guía nuestros pasos de servicio",
+            "El amor en acción sana y transforma"
+        ];
+        
+        const dailyMessage = messages[Math.floor(Math.random() * messages.length)];
+        console.log(`💫 Mensaje del día: ${dailyMessage}`);
+    </script>
+</body>
+</html>

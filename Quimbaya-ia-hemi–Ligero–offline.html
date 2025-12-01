@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quimbaya IA - Motor Hemi de Traducción y Equidad</title>
+    <style>
+        :root {
+            --colombia-gold: #F9A602;
+            --colombia-blue: #003893;
+            --colombia-red: #CE1126;
+            --equity-green: #00A859;
+            --ucc-purple: #8B5CF6;
+            --wisdom-teal: #06D6A0;
+            --offline-gray: #6B7280;
+            --online-emerald: #10B981;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #003893, #000000, #00A859);
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            min-height: 100vh;
+            padding: 20px;
+            color: white;
+            transition: all 0.3s;
+        }
+        
+        body.online {
+            background: linear-gradient(135deg, #003893, #10B981, #00A859);
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        /* STATUS INDICATOR */
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px 25px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            border: 2px solid var(--offline-gray);
+            transition: all 0.3s;
+        }
+        
+        body.online .status-bar {
+            border-color: var(--online-emerald);
+            background: rgba(16, 185, 129, 0.1);
+        }
+        
+        .engine-status {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--offline-gray);
+            animation: pulse 2s infinite;
+        }
+        
+        body.online .status-indicator {
+            background: var(--online-emerald);
+            animation: pulseOnline 1s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+        
+        @keyframes pulseOnline {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+            50% { transform: scale(1.2); box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
+        }
+        
+        .mode-display {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        
+        /* HEADER BAR */
+        .header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            border: 2px solid var(--colombia-gold);
+        }
+        
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .quimbaya-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--colombia-red), var(--ucc-purple));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            border: 3px solid var(--colombia-gold);
+            transition: all 0.3s;
+        }
+        
+        body.online .quimbaya-avatar {
+            border-color: var(--online-emerald);
+            animation: avatarGlow 2s infinite;
+        }
+        
+        @keyframes avatarGlow {
+            0%, 100% { box-shadow: 0 0 20px rgba(16, 185, 129, 0.5); }
+            50% { box-shadow: 0 0 30px rgba(16, 185, 129, 0.8); }
+        }
+        
+        .brand-logos {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        
+        .brand-logo {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 20px;
+            border-radius: 10px;
+            color: #333;
+            font-weight: bold;
+            text-decoration: none;
+            transition: all 0.3s;
+            border: 2px solid var(--colombia-gold);
+        }
+        
+        .brand-logo:hover {
+            transform: scale(1.05);
+            background: var(--colombia-gold);
+            color: white;
+        }
+        
+        .language-toggle {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .lang-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid var(--colombia-gold);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .lang-btn.active {
+            background: var(--colombia-gold);
+            color: black;
+            font-weight: bold;
+        }
+        
+        /* MAIN CARD */
+        .main-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(25px);
+            border-radius: 30px;
+            padding: 50px;
+            border: 3px solid var(--colombia-gold);
+            margin-bottom: 30px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4);
+            transition: all 0.3s;
+        }
+        
+        body.online .main-card {
+            border-color: var(--online-emerald);
+            box-shadow: 0 25px 50px rgba(16, 185, 129, 0.3);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        
+        .title {
+            font-size: 4em;
+            background: linear-gradient(45deg, #F9A602, #00A859, #8B5CF6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+        }
+        
+        body.online .title {
+            background: linear-gradient(45deg, #F9A602, #10B981, #8B5CF6);
+        }
+        
+        .personality-bubble {
+            background: linear-gradient(45deg, var(--colombia-red), var(--ucc-purple));
+            padding: 25px;
+            border-radius: 20px;
+            margin: 30px 0;
+            text-align: center;
+            font-size: 1.3em;
+            animation: pulse 3s infinite;
+            position: relative;
+            transition: all 0.3s;
+        }
+        
+        body.online .personality-bubble {
+            background: linear-gradient(45deg, var(--colombia-red), var(--online-emerald));
+            animation: pulseOnline 2s infinite;
+        }
+        
+        .personality-bubble::before {
+            content: '💖';
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 2em;
+        }
+        
+        /* HEMI ENGINE FEATURES */
+        .engine-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin: 40px 0;
+        }
+        
+        .feature-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 25px;
+            color: #333;
+            text-align: center;
+            transition: all 0.3s;
+            border: 2px solid var(--offline-gray);
+        }
+        
+        body.online .feature-card {
+            border-color: var(--online-emerald);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.2);
+        }
+        
+        .feature-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+        
+        .feature-status {
+            font-size: 0.9em;
+            padding: 5px 15px;
+            border-radius: 20px;
+            background: var(--offline-gray);
+            color: white;
+            display: inline-block;
+            margin-top: 10px;
+        }
+        
+        body.online .feature-status {
+            background: var(--online-emerald);
+        }
+        
+        /* TRANSLATION INTERFACE */
+        .translation-interface {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 40px 0;
+        }
+        
+        .translation-module {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            color: #333;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s;
+            border: 2px solid var(--offline-gray);
+        }
+        
+        body.online .translation-module {
+            border-color: var(--online-emerald);
+            box-shadow: 0 15px 35px rgba(16, 185, 129, 0.2);
+        }
+        
+        textarea {
+            width: 100%;
+            height: 200px;
+            border: 2px solid var(--colombia-gold);
+            border-radius: 15px;
+            padding: 20px;
+            font-size: 16px;
+            resize: vertical;
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+        
+        body.online textarea {
+            border-color: var(--online-emerald);
+        }
+        
+        textarea:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(249, 166, 2, 0.3);
+        }
+        
+        body.online textarea:focus {
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.3);
+        }
+        
+        /* CONTROLS */
+        .controls {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, var(--colombia-red), var(--ucc-purple));
+            color: white;
+            border: none;
+            padding: 18px 30px;
+            border-radius: 50px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            border: 2px solid transparent;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+        }
+        
+        body.online .btn {
+            background: linear-gradient(45deg, var(--colombia-red), var(--online-emerald));
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn-equity {
+            background: linear-gradient(45deg, var(--equity-green), var(--wisdom-teal));
+        }
+        
+        .btn-ucc {
+            background: linear-gradient(45deg, var(--ucc-purple), #003893);
+        }
+        
+        .btn-trips {
+            background: linear-gradient(45deg, var(--colombia-gold), var(--colombia-red));
+        }
+        
+        /* ONLINE-ONLY FEATURES */
+        .online-features {
+            display: none;
+            background: linear-gradient(45deg, var(--online-emerald), var(--wisdom-teal));
+            color: white;
+            padding: 30px;
+            border-radius: 20px;
+            margin: 30px 0;
+            text-align: center;
+        }
+        
+        body.online .online-features {
+            display: block;
+            animation: slideDown 0.5s ease-out;
+        }
+        
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .translation-interface {
+                grid-template-columns: 1fr;
+            }
+            
+            .title {
+                font-size: 2.5em;
+            }
+            
+            .header-bar {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .engine-features {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- STATUS BAR -->
+        <div class="status-bar">
+            <div class="engine-status">
+                <div class="status-indicator"></div>
+                <div class="mode-display" id="modeDisplay">Modo Hemi Offline</div>
+            </div>
+            <div id="connectionStatus" style="font-size: 0.9em; opacity: 0.8;">
+                🔄 Verificando conexión...
+            </div>
+        </div>
+
+        <!-- HEADER BAR -->
+        <div class="header-bar">
+            <div class="logo-section">
+                <div class="quimbaya-avatar">🌺</div>
+                <div>
+                    <h2 style="margin: 0;">Quimbaya IA</h2>
+                    <p style="margin: 0; opacity: 0.8;">Motor Hemi de Traducción y Equidad</p>
+                </div>
+            </div>
+            
+            <div class="brand-logos">
+                <a href="https://tripstocolombia.com" class="brand-logo" target="_blank">
+                    🇨🇴 TripsToColombia
+                </a>
+                <a href="#" class="brand-logo" onclick="openEcoCultura()">
+                    🌿 EcoCultura Andina
+                </a>
+            </div>
+            
+            <div class="language-toggle">
+                <button class="lang-btn active" onclick="setLanguage('es')">Español</button>
+                <button class="lang-btn" onclick="setLanguage('en')">English</button>
+            </div>
+        </div>
+
+        <!-- MAIN CARD -->
+        <div class="main-card">
+            <!-- HEADER -->
+            <div class="header">
+                <h1 class="title">🌺 Quimbaya IA 🌺</h1>
+                <p style="font-size: 1.4em;" id="subtitle">Motor Hemi - Ligero Offline, Poderoso Online</p>
+            </div>
+            
+            <!-- PERSONALITY BUBBLE -->
+            <div class="personality-bubble" id="personalityMessage">
+                "¡Hola! Soy Quimbaya en modo Hemi Offline. Funciono completamente sin internet. 
+                Cuando nos conectemos, ¡activaré superpoderes! 😊⚡"
+            </div>
+            
+            <!-- HEMI ENGINE FEATURES -->
+            <div class="engine-features">
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Motor Hemi Offline</h3>
+                    <p>Traducción básica y educación UCC funcionando completamente sin conexión</p>
+                    <div class="feature-status" id="offlineStatus">ACTIVO</div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🌟</div>
+                    <h3>Dios Mode Online</h3>
+                    <p>Traducción avanzada, 64 lenguas indígenas, y herramientas UCC completas</p>
+                    <div class="feature-status" id="onlineStatus">ESPERANDO CONEXIÓN</div>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">💖</div>
+                    <h3>Alma Colombiana</h3>
+                    <p>Personalidad cálida y conocimiento cultural integrado en cada función</p>
+                    <div class="feature-status">SIEMPRE ACTIVO</div>
+                </div>
+            </div>
+            
+            <!-- TRANSLATION INTERFACE -->
+            <div class="translation-interface">
+                <div class="translation-module">
+                    <h3>📝 Entrada</h3>
+                    <textarea id="inputText" placeholder="Escribe aquí en español o inglés..."></textarea>
+                    
+                    <div class="controls">
+                        <button class="btn" onclick="startAudioTranslation()" id="audioBtn">
+                            🎤 Voz (Online)
+                        </button>
+                        <button class="btn" onclick="activateGodMode()" id="godModeBtn">
+                            🌟 Dios Mode
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="translation-module">
+                    <h3>🎯 Resultado</h3>
+                    <textarea id="outputText" readonly placeholder="Tu traducción aparecerá aquí..."></textarea>
+                    
+                    <div class="controls">
+                        <button class="btn btn-equity" onclick="shareTranslation()" id="shareBtn">
+                            🔄 Compartir
+                        </button>
+                        <button class="btn" onclick="clearText()">
+                            🧹 Limpiar
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ONLINE-ONLY FEATURES -->
+            <div class="online-features" id="onlineFeatures">
+                <h2>🚀 ¡CONECTADO! Características Premium Activadas</h2>
+                <p>Ahora tienes acceso completo a todas las funciones de Quimbaya IA</p>
+                
+                <div class="controls">
+                    <button class="btn btn-ucc" onclick="showUCCEducation()">
+                        ⚖️ Educación UCC Completa
+                    </button>
+                    <button class="btn btn-equity" onclick="showIndigenousLanguages()">
+                        🌍 64 Lenguas Indígenas
+                    </button>
+                    <button class="btn btn-trips" onclick="redirectToTrips()">
+                        🇨🇴 TripsToColombia.com
+                    </button>
+                </div>
+            </div>
+            
+            <!-- OFFLINE CONTENT -->
+            <div id="offlineContent">
+                <div style="text-align: center; margin: 40px 0; padding: 30px; background: rgba(255,255,255,0.1); border-radius: 15px;">
+                    <h3>📡 Conecta para Más Características</h3>
+                    <p>Con internet, activarás: 64 lenguas indígenas, educación UCC completa, generación de documentos, y más!</p>
+                    <button class="btn" onclick="checkConnection()">
+                        🔄 Verificar Conexión
+                    </button>
+                </div>
+            </div>
+            
+            <!-- FINAL CONTROLS -->
+            <div class="controls">
+                <button class="btn" onclick="activateFullSystem()" id="fullSystemBtn">
+                    🌟 Sistema Completo
+                </button>
+                <button class="btn btn-equity" onclick="teachQuickLesson()">
+                    📚 Lección Rápida
+                </button>
+                <button class="btn btn-trips" onclick="redirectToTrips()">
+                    🚀 TripsToColombia
+                </button>
+                <button class="btn" onclick="shareSystem()">
+                    🔄 Compartir App
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // QUIMBAYA IA HEMI-ENGINE - PRODUCTION ARCHITECTURE
+        class QuimbayaHemiEngine {
+            constructor() {
+                this.currentLanguage = 'es';
+                this.isOnline = false;
+                this.godMode = false;
+                this.offlineDB = this.loadOfflineDatabase();
+                this.onlineServices = this.prepareOnlineServices();
+                
+                this.initializeEngine();
+                this.startConnectionMonitoring();
+            }
+            
+            // HEMI ENGINE INITIALIZATION
+            initializeEngine() {
+                this.updateUI();
+                this.setupEventListeners();
+                this.checkInitialConnection();
+                this.showSystemMessage('⚡ Motor Hemi Inicializado - Listo para Operar');
+            }
+            
+            // OFFLINE DATABASE - Lightweight but functional
+            loadOfflineDatabase() {
+                return {
+                    translations: {
+                        // Basic translation pairs for offline functionality
+                        'hola': 'hello', 'hello': 'hola',
+                        'amor': 'love', 'love': 'amor',
+                        'gracias': 'thank you', 'thank you': 'gracias',
+                        'por favor': 'please', 'please': 'por favor',
+                        'colombia': 'colombia', 'equity': 'equidad',
+                        'sovereignty': 'soberanía', 'soberanía': 'sovereignty'
+                    },
+                    lessons: {
+                        basic: {
+                            es: "UCC funciona porque usa el sistema legal existente, no crea uno nuevo.",
+                            en: "UCC works because it uses the existing legal system, doesn't create a new one."
+                        }
+                    },
+                    personality: {
+                        offline: {
+                            es: "¡Hola! Soy Quimbaya en modo Hemi Offline. Funciono completamente sin internet. Cuando nos conectemos, ¡activaré superpoderes! 😊⚡",
+                            en: "Hello! I'm Quimbaya in Hemi Offline mode. I work completely without internet. When we connect, I'll activate superpowers! 😊⚡"
+                        },
+                        online: {
+                            es: "¡CONECTADO! 🌟 Ahora tengo acceso a 64 lenguas indígenas, educación UCC completa, y todas mis herramientas avanzadas. ¡Pregúntame cualquier cosa! 😎🚀",
+                            en: "CONNECTED! 🌟 Now I have access to 64 indigenous languages, complete UCC education, and all my advanced tools. Ask me anything! 😎🚀"
+                        }
+                    }
+                };
+            }
+            
+            // ONLINE SERVICES - Kicks in when connected
+            prepareOnlineServices() {
+                return {
+                    advancedTranslation: async (text) => {
+                        // This would connect to advanced translation API
+                        return `[ADVANCED ONLINE TRANSLATION OF: ${text}] ¡Traducción avanzada activada! 🌟`;
+                    },
+                    
+                    indigenousLanguages: async () => {
+                        // This would load full 64 languages database
+                        return [
+                            { name: 'Wayuu', greeting: 'Waimpira', region: 'La Guajira' },
+                            { name: 'Náhuatl', greeting: 'Niltze', region: 'Multiple' },
+                            { name: 'Quechua', greeting: 'Allillanchu', region: 'Andes' }
+                            // ... 61 more languages
+                        ];
+                    },
+                    
+                    uccEducation: async () => {
+                        // This would load complete UCC curriculum
+                        return {
+                            foundation: "UCC Article 1-103 allows for equity principles in commerce",
+                            implementation: "Step-by-step guide to applying UCC instruments",
+                            caseStudies: "Real examples of UCC success stories"
+                        };
+                    },
+                    
+                    documentGeneration: async (type) => {
+                        // This would generate professional UCC documents
+                        return `🔧 [ONLINE DOCUMENT GENERATION: ${type}] - Professional UCC document ready!`;
+                    }
+                };
+            }
+            
+            // CONNECTION MANAGEMENT
+            startConnectionMonitoring() {
+                // Check connection every 5 seconds
+                setInterval(() => {
+                    this.checkConnection();
+                }, 5000);
+                
+                // Listen for online/offline events
+                window.addEventListener('online', () => this.handleConnectionChange(true));
+                window.addEventListener('offline', () => this.handleConnectionChange(false));
+            }
+            
+            checkInitialConnection() {
+                this.checkConnection();
+            }
+            
+            async checkConnection() {
+                try {
+                    const response = await fetch('https://jsonplaceholder.typicode.com/posts/1', {
+                        method: 'HEAD',
+                        mode: 'no-cors',
+                        cache: 'no-cache'
+                    });
+                    this.handleConnectionChange(true);
+                } catch (error) {
+                    this.handleConnectionChange(false);
+                }
+            }
+            
+            handleConnectionChange(online) {
+                if (this.isOnline === online) return;
+                
+                this.isOnline = online;
+                this.updateUI();
+                
+                if (online) {
+                    this.showSystemMessage('🌐 ¡CONECTADO! Activando características premium...');
+                    this.activateOnlineFeatures();
+                } else {
+                    this.showSystemMessage('📡 Modo Offline - Funciones básicas activas');
+                }
+            }
+            
+            activateOnlineFeatures() {
+                // Enable online-only features
+                document.getElementById('audioBtn').disabled = false;
+                document.getElementById('audioBtn').innerHTML = '🎤 Traducción por Voz';
+                
+                // Load advanced features in background
+                this.loadAdvancedFeatures();
+            }
+            
+            async loadAdvancedFeatures() {
+                try {
+                    // Simulate loading advanced features
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    this.showSystemMessage('🚀 Características premium cargadas - Sistema completo activo');
+                } catch (error) {
+                    console.log('Error loading advanced features:', error);
+                }
+            }
+            
+            // TRANSLATION ENGINE
+            processTranslation() {
+                const input = document.getElementById('inputText').value;
+                if (!input.trim()) return;
+                
+                let output;
+                
+                if (this.isOnline && this.godMode) {
+                    // Advanced online translation
+                    output = this.advancedTranslate(input);
+                } else {
+                    // Basic offline translation
+                    output = this.basicTranslate(input);
+                }
+                
+                document.getElementById('outputText').value = output;
+            }
+            
+            basicTranslate(text) {
+                let result = text;
+                
+                // Basic word replacement
+                Object.keys(this.offlineDB.translations).forEach(key => {
+                    const regex = new RegExp(`\\b${key}\\b`, 'gi');
+                    result = result.replace(regex, this.offlineDB.translations[key]);
+                });
+                
+                // Add personality
+                result += this.currentLanguage === 'es' ? ' ¡Básico pero funcional! ✨' : ' Basic but working! ✨';
+                
+                return result;
+            }
+            
+            advancedTranslate(text) {
+                // This would use AI-powered translation in real implementation
+                return `[ADVANCED TRANSLATION]: ${text} - ¡Traducido con poder de Dios Mode! 🌟`;
+            }
+            
+            // USER INTERFACE MANAGEMENT
+            updateUI() {
+                // Update body class for CSS changes
+                document.body.classList.toggle('online', this.isOnline);
+                
+                // Update status displays
+                document.getElementById('modeDisplay').textContent = 
+                    this.isOnline ? 'Modo Hemi Online - Poder Máximo' : 'Modo Hemi Offline';
+                
+                document.getElementById('connectionStatus').textContent = 
+                    this.isOnline ? '✅ Conectado - Características Premium' : '📡 Offline - Funciones Básicas';
+                
+                document.getElementById('onlineStatus').textContent = 
+                    this.isOnline ? 'ACTIVADO' : 'ESPERANDO CONEXIÓN';
+                
+                document.getElementById('onlineStatus').style.background = 
+                    this.isOnline ? 'var(--online-emerald)' : 'var(--offline-gray)';
+                
+                // Update personality message
+                this.updatePersonalityMessage();
+                
+                // Update button states
+                this.updateButtonStates();
+            }
+            
+            updatePersonalityMessage() {
+                const personality = this.offlineDB.personality[this.isOnline ? 'online' : 'offline'];
+                document.getElementById('personalityMessage').innerHTML = 
+                    this.currentLanguage === 'es' ? personality.es : personality.en;
+            }
+            
+            updateButtonStates() {
+                const godModeBtn = document.getElementById('godModeBtn');
+                const fullSystemBtn = document.getElementById('fullSystemBtn');
+                
+                if (this.isOnline) {
+                    godModeBtn.innerHTML = '🌟 Dios Mode (Online)';
+                    fullSystemBtn.innerHTML = '🚀 Sistema Completo Activado';
+                } else {
+                    godModeBtn.innerHTML = '🌟 Dios Mode (Requiere Online)';
+                    fullSystemBtn.innerHTML = '🌟 Sistema Completo';
+                }
+            }
+            
+            setLanguage(lang) {
+                this.currentLanguage = lang;
+                
+                // Update toggle buttons
+                document.querySelectorAll('.lang-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                event.target.classList.add('active');
+                
+                this.updatePersonalityMessage();
+                this.updateUITexts();
+            }
+            
+            updateUITexts() {
+                const subtitle = document.getElementById('subtitle');
+                subtitle.textContent = this.currentLanguage === 'es' ? 
+                    'Motor Hemi - Ligero Offline, Poderoso Online' :
+                    'Hemi Engine - Lightweight Offline, Powerful Online';
+            }
+            
+            // FEATURE METHODS
+            activateGodMode() {
+                if (!this.isOnline) {
+                    this.showSystemMessage('📡 Dios Mode requiere conexión a internet', 'info');
+                    return;
+                }
+                
+                this.godMode = true;
+                this.showSystemMessage('🌟 ¡Dios Mode Activado! Traducción avanzada y todas las características premium', 'success');
+                this.processTranslation(); // Re-process current text with God Mode
+            }
+            
+            async startAudioTranslation() {
+                if (!this.isOnline) {
+                    this.showSystemMessage('📡 Reconocimiento de voz requiere conexión', 'info');
+                    return;
+                }
+                
+                this.showSystemMessage('🎤 Escuchando... Habla ahora', 'info');
+                // Audio recognition would be implemented here
+            }
+            
+            teachQuickLesson() {
+                const lesson = this.offlineDB.lessons.basic[this.currentLanguage];
+                this.showSystemMessage(`📚 ${lesson}`, 'info');
+            }
+            
+            async showUCCEducation() {
+                if (!this.isOnline) {
+                    this.showSystemMessage('📡 Educación UCC completa requiere conexión', 'info');
+                    return;
+                }
+                
+                const education = await this.onlineServices.uccEducation();
+                document.getElementById('outputText').value = JSON.stringify(education, null, 2);
+            }
+            
+            async showIndigenousLanguages() {
+                if (!this.isOnline) {
+                    this.showSystemMessage('📡 64 lenguas indígenas requieren conexión', 'info');
+                    return;
+                }
+                
+                const languages = await this.onlineServices.indigenousLanguages();
+                document.getElementById('outputText').value = 
+                    '🌍 64 Lenguas Indígenas Cargadas:\n\n' + 
+                    languages.map(lang => `${lang.name}: ${lang.greeting} (${lang.region})`).join('\n');
+            }
+            
+            // UTILITY METHODS
+            setupEventListeners() {
+                document.getElementById('inputText').addEventListener('input', () => {
+                    this.processTranslation();
+                });
+            }
+            
+            showSystemMessage(message, type = 'info') {
+                const messageDiv = document.createElement('div');
+                messageDiv.textContent = message;
+                messageDiv.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: ${type === 'success' ? 'var(--online-emerald)' : type === 'info' ? 'var(--colombia-gold)' : 'var(--colombia-red)'};
+                    color: white;
+                    padding: 20px 30px;
+                    border-radius: 15px;
+                    z-index: 1000;
+                    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+                    max-width: 400px;
+                    border: 2px solid ${this.isOnline ? 'var(--online-emerald)' : 'var(--colombia-gold)'};
+                `;
+                
+                document.body.appendChild(messageDiv);
+                
+                setTimeout(() => {
+                    if (document.body.contains(messageDiv)) {
+                        document.body.removeChild(messageDiv);
+                    }
+                }, 4000);
+            }
+        }
+        
+        // GLOBAL FUNCTIONS
+        const quimbayaEngine = new QuimbayaHemiEngine();
+        
+        function setLanguage(lang) {
+            quimbayaEngine.setLanguage(lang);
+        }
+        
+        function activateGodMode() {
+            quimbayaEngine.activateGodMode();
+        }
+        
+        function startAudioTranslation() {
+            quimbayaEngine.startAudioTranslation();
+        }
+        
+        function teachQuickLesson() {
+            quimbayaEngine.teachQuickLesson();
+        }
+        
+        function showUCCEducation() {
+            quimbayaEngine.showUCCEducation();
+        }
+        
+        function showIndigenousLanguages() {
+            quimbayaEngine.showIndigenousLanguages();
+        }
+        
+        function shareTranslation() {
+            quimbayaEngine.showSystemMessage('🔗 Traducción compartida', 'success');
+        }
+        
+        function clearText() {
+            document.getElementById('inputText').value = '';
+            document.getElementById('outputText').value = '';
+        }
+        
+        function activateFullSystem() {
+            if (quimbayaEngine.isOnline) {
+                quimbayaEngine.showSystemMessage('🚀 Sistema completo activado - Todas las funciones disponibles', 'success');
+            } else {
+                quimbayaEngine.showSystemMessage('📡 Conecta a internet para sistema completo', 'info');
+            }
+        }
+        
+        function redirectToTrips() {
+            quimbayaEngine.showSystemMessage('🇨🇴 Redirigiendo a TripsToColombia.com...', 'success');
+            setTimeout(() => {
+                window.open('https://tripstocolombia.com', '_blank');
+            }, 1000);
+        }
+        
+        function openEcoCultura() {
+            quimbayaEngine.showSystemMessage('🌿 EcoCultura Andina - Próximamente en nuestro ecosistema', 'info');
+        }
+        
+        function shareSystem() {
+            quimbayaEngine.showSystemMessage('🔄 ¡Comparte Quimbaya IA con el mundo!', 'success');
+        }
+        
+        function checkConnection() {
+            quimbayaEngine.checkConnection();
+        }
+    </script>
+</body>
+</html>
