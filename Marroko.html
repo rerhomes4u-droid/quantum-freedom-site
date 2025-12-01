@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MARROKO - Sistema de Reservas Paso a Paso</title>
+    <style>
+        :root {
+            --verde-salento: #2E8B57;
+            --cafe-colombia: #8B4513;
+            --amarillo-sol: #FFD700;
+            --azul-cielo: #87CEEB;
+            --rojo-pasion: #DC143C;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .app-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .header {
+            background: linear-gradient(to right, var(--verde-salento), var(--azul-cielo));
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: rgba(255,255,255,0.3);
+            margin: 20px 0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--amarillo-sol);
+            width: 0%;
+            transition: width 0.5s ease;
+            border-radius: 4px;
+        }
+        
+        .step-container {
+            padding: 40px;
+            display: none;
+        }
+        
+        .step-container.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .step-number {
+            display: inline-block;
+            background: var(--verde-salento);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 40px;
+            font-weight: bold;
+            margin-right: 15px;
+            font-size: 20px;
+        }
+        
+        .step-title {
+            font-size: 28px;
+            color: var(--cafe-colombia);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .motivation-box {
+            background: #E8F5E9;
+            border-left: 5px solid var(--verde-salento);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+        }
+        
+        .motivation-box h3 {
+            color: var(--verde-salento);
+            margin-bottom: 10px;
+        }
+        
+        .action-card {
+            background: white;
+            border: 2px solid #E0E0E0;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 25px 0;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(46, 139, 87, 0.1);
+            border-color: var(--verde-salento);
+        }
+        
+        .action-card h4 {
+            color: var(--cafe-colombia);
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+        
+        .checklist-item {
+            margin: 15px 0;
+            display: flex;
+            align-items: flex-start;
+        }
+        
+        .checklist-item input {
+            margin-right: 15px;
+            margin-top: 5px;
+        }
+        
+        .checklist-item label {
+            flex: 1;
+            line-height: 1.5;
+        }
+        
+        .completed {
+            color: var(--verde-salento);
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+        
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #eee;
+        }
+        
+        button {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: var(--verde-salento);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #267A49;
+            transform: scale(1.05);
+        }
+        
+        .btn-secondary {
+            background: var(--azul-cielo);
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background: #6BA8C9;
+        }
+        
+        .btn-complete {
+            background: var(--amarillo-sol);
+            color: var(--cafe-colombia);
+        }
+        
+        .break-box {
+            background: #FFF3E0;
+            border: 2px solid #FFB74D;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .trust-box {
+            background: #FFEBEE;
+            border: 2px solid var(--rojo-pasion);
+            padding: 25px;
+            border-radius: 15px;
+            margin: 25px 0;
+        }
+        
+        .trust-box h4 {
+            color: var(--rojo-pasion);
+            margin-bottom: 15px;
+        }
+        
+        .social-media-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .social-card {
+            background: #F5F5F5;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        
+        .social-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .social-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+        
+        .instagram { color: #E4405F; }
+        .whatsapp { color: #25D366; }
+        .facebook { color: #1877F2; }
+        .tiktok { color: #000000; }
+        
+        .system-demo {
+            background: #F0F8FF;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border: 2px dashed var(--azul-cielo);
+        }
+        
+        .progress-counter {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--verde-salento);
+            color: white;
+            padding: 15px;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 18px;
+            box-shadow: 0 5px 15px rgba(46, 139, 87, 0.3);
+        }
+        
+        .marroko-avatar {
+            width: 100px;
+            height: 100px;
+            background: var(--amarillo-sol);
+            border-radius: 50%;
+            margin: 0 auto 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            border: 5px solid white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        .success-animation {
+            text-align: center;
+            padding: 40px;
+            display: none;
+        }
+        
+        .success-animation.active {
+            display: block;
+            animation: celebrate 2s ease;
+        }
+        
+        @keyframes celebrate {
+            0% { transform: scale(0.5); opacity: 0; }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .celebration {
+            font-size: 80px;
+            margin-bottom: 20px;
+            animation: bounce 1s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+        
+        .prayer-box {
+            background: #F3E5F5;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+            border: 2px solid #9C27B0;
+        }
+        
+        .liability-protection {
+            background: #FFF8E1;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 25px 0;
+            border: 3px solid #FFA000;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <div class="marroko-avatar">🏍️</div>
+            <h1>¡HOLA, MARROKO! 🎯</h1>
+            <p>Transforma tu negocio de alquiler en Salento en un éxito por reservas</p>
+            <p><em>"Paso a paso, sin estrés. Tú puedes hacerlo."</em></p>
+            
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <div id="progress-text">Paso 1 de 12</div>
+        </div>
+        
+        <!-- STEP 1 -->
+        <div class="step-container active" id="step-1">
+            <div class="step-title">
+                <span class="step-number">1</span>
+                <span>¡Empieza Aquí, Marroko!</span>
+            </div>
+            
+            <div class="motivation-box">
+                <h3>🎉 ¡Felicidades por dar el primer paso!</h3>
+                <p>Marroko, sé que tienes todo el material: fotos geniales, videos, cuatrimotos y motos. 
+                Solo necesitas el sistema. Y te voy a guiar paso a paso.</p>
+                <p><strong>¿Sabías que puedes duplicar tus ingresos trabajando MENOS horas?</strong> 
+                Solo con reservas anticipadas.</p>
+            </div>
+            
+            <div class="action-card">
+                <h4>✅ Lo que YA tienes:</h4>
+                <div class="checklist-item">
+                    <input type="checkbox" id="item1-1" checked disabled>
+                    <label for="item1-1" class="completed">Cuatrimotos y motos en buen estado</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" id="item1-2" checked disabled>
+                    <label for="item1-2" class="completed">Fotos y videos de los vehículos</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" id="item1-3" checked disabled>
+                    <label for="item1-3" class="completed">Local en Salento (turistas todo el año)</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" id="item1-4" checked disabled>
+                    <label for="item1-4" class="completed">Experiencia en el negocio</label>
+                </div>
+            </div>
+            
+            <div class="break-box">
+                <h4>⏸️ ¿Necesitas un descanso?</h4>
+                <p>Puedes cerrar esta página y volver más tarde. Tu progreso se guardará automáticamente.</p>
+            </div>
+            
+            <div class="button-group">
+                <button class="btn-secondary" onclick="takeBreak()">Tomar un Descanso ☕</button>
+                <button class="btn-primary" onclick="nextStep()">¡Vamos al Paso 2! →</button>
+            </div>
+        </div>
+        
+        <!-- STEP 2 -->
+        <div class="step-container" id="step-2">
+            <div class="step-title">
+                <span class="step-number">2</span>
+                <span>Protección Legal Primero</span>
+            </div>
+            
+            <div class="liability-protection">
+                <h4>🛡️ PROTECCIÓN CONTRA ACCIDENTES - LO MÁS IMPORTANTE</h4>
+                <p>Marroko, en este negocio, <strong>rezamos para que nada pase, pero debemos prepararnos 
+                por si ocurre un accidente trágico</strong>. No podemos perder nuestro sustento por un 
+                evento inesperado.</p>
+            </div>
+            
+            <div class="trust-box">
+                <h4>🏛️ EL SECRETO: PONER TODO EN UN FIDEICOMISO</h4>
+                <p>Esta es la parte más inteligente del sistema:</p>
+                <ul style="margin: 15px 0 15px 30px;">
+                    <li>Creas un fideicomiso familiar (Trust)</li>
+                    <li>Los vehículos están a nombre del fideicomiso, NO tuyo personalmente</li>
+                    <li>Si hay un accidente grave, solo se afectan los bienes del fideicomiso</li>
+                    <li>Tus bienes personales (casa, ahorros) están PROTEGIDOS</li>
+                    <li>El negocio puede continuar operando normalmente</li>
+                </ul>
+                <p><strong>Costos en Colombia:</strong> Entre $800.000 - $1.500.000 COP para crear el fideicomiso.</p>
+                <p><strong>¡Es tu seguro de vida financiero!</strong></p>
+            </div>
+            
+            <div class="action-card">
+                <h4>📋 Acciones para esta semana:</h4>
+                <div class="checklist-item">
+                    <input type="checkbox" id="item2-1">
+                    <label for="item2-1">Buscar abogado especializado en fideicomisos</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" id="item2-2">
+                    <label for="item2-2">Pedir presupuesto para crear el fideicomiso</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" id="item2-3">
+                    <label for="item2-3">Revisar pólizas de seguro actuales</label>
+                </div>
+            </div>
+            
+            <div class="prayer-box">
+                <p>🙏 <strong>"Señor, protege a cada persona que alquile nuestros vehículos, 
+                que regresen seguros y felices de su paseo. Amén."</strong></p>
+                <p><em>Es buena práctica hacer esta oración cada mañana, Marroko.</em></p>
+            </div>
+            
+            <div class="button-group">
+                <button class="btn-secondary" onclick="prevStep()">← Volver al Paso 1</button>
+                <button class="btn-primary" onclick="nextStep()">Siguiente Paso →</button>
+            </div>
+        </div>
+        
+        <!-- STEP 3 -->
+        <div class="step-container" id="step-3">
+            <div class="step-title">
+                <span class="step-number">3</span>
+                <span>Sistema de Reservas Sencillo</span>
+            </div>
+            
+            <div class="motivation-box">
+                <h3>🎯 Marroko, esto es más fácil de lo que crees</h3>
+                <p>No necesitas ser programador. Existen herramientas que ya están hechas. 
+                Solo las configuras una vez y funcionan automáticamente.</p>
+            </div>
+            
+            <div class="system-demo">
+                <h4>📅 CÓMO FUNCIONARÁ TU NUEVO SISTEMA:</h4>
+                <p>1. Cliente ve tus vehículos en Instagram/Facebook</p>
+                <p>2. Hace clic en "Reservar Ahora"</p>
+                <p>3. Elige fecha y hora disponible en el calendario</p>
+                <p>4. Paga el 30% o 50% por adelantado</p>
+                <p>5. Recibe confirmación automática</p>
+                <p>6. TÚ recibes una notificación en tu celular</p>
+                <p><strong>¡Todo automático! Solo apareces para entregar las llaves.</strong></p>
+            </div>
+            
+            <div class="action-card">
+                <h4>🛠️ Herramientas que necesitas (todas gratuitas o muy económicas):</h4>
+                <div class="checklist-item">
+                    <input type="checkbox" id="item3-1">
+                    <label for="item3-1">Calendario de Google (gratis)</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" id="item3-2">
+                    <label for="item3-2">WhatsApp Business (gratis)</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" id="item3-3">
+                    <label for="item3-3">Calendly o Appointy (desde $20/mes)</label>
+                </div>
+                <div class="checklist-item">
+                    <input type="checkbox" id="item3-4">
+                    <label for="item3-4">Nequi o Daviplata para recibir pagos</label>
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <button class="btn-secondary" onclick="prevStep()">← Paso Anterior</button>
+                <button class="btn-primary" onclick="nextStep()">Continuar →</button>
+            </div>
+        </div>
+        
+        <!-- STEP 4-12 (continuaría en la implementación completa) -->
+        
+        <!-- SUCCESS SCREEN -->
+        <div class="success-animation" id="success-screen">
+            <div class="celebration">🎉🏍️💥</div>
+            <h2>¡INCREÍBLE, MARROKO! 🚀</h2>
+            <p>Has completado los primeros pasos hacia tu negocio automatizado.</p>
+            <p><strong>Recuerda:</strong> Toma un paso a la vez. No te abrumes.</p>
+            <p>Cada pequeña acción te acerca al éxito.</p>
+            
+            <div style="margin: 30px 0;">
+                <h3>Tu próximo paso recomendado:</h3>
+                <div class="action-card" style="max-width: 500px; margin: 20px auto;">
+                    <h4>📞 Llama a 3 abogados hoy mismo</h4>
+                    <p>Pregunta por: "Creación de fideicomiso para negocio familiar"</p>
+                    <p><em>Esta sola llamada te dará claridad y confianza.</em></p>
+                </div>
+            </div>
+            
+            <button class="btn-complete" onclick="restartJourney()" style="padding: 15px 40px; font-size: 18px;">
+                Volver al Inicio 🔄
+            </button>
+        </div>
+        
+        <div class="progress-counter" id="progress-counter">0%</div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 12;
+        
+        // Cargar progreso guardado
+        window.onload = function() {
+            const savedStep = localStorage.getItem('marroko-step');
+            const savedProgress = localStorage.getItem('marroko-progress');
+            
+            if(savedStep) {
+                currentStep = parseInt(savedStep);
+            }
+            
+            updateProgress();
+            showStep(currentStep);
+        };
+        
+        function showStep(stepNumber) {
+            // Ocultar todos los pasos
+            document.querySelectorAll('.step-container').forEach(step => {
+                step.classList.remove('active');
+            });
+            
+            // Mostrar paso actual
+            const stepElement = document.getElementById(`step-${stepNumber}`);
+            if(stepElement) {
+                stepElement.classList.add('active');
+                document.getElementById('progress-text').textContent = 
+                    `Paso ${stepNumber} de ${totalSteps}`;
+            }
+            
+            // Guardar progreso
+            localStorage.setItem('marroko-step', stepNumber);
+        }
+        
+        function nextStep() {
+            if(currentStep < totalSteps) {
+                currentStep++;
+                showStep(currentStep);
+                updateProgress();
+                
+                // Si llegamos al paso 4 (que no está definido), mostrar pantalla de éxito
+                if(currentStep === 4) {
+                    document.getElementById('success-screen').classList.add('active');
+                    document.querySelector('.header').style.display = 'none';
+                    document.querySelectorAll('.step-container').forEach(s => s.style.display = 'none');
+                }
+            }
+        }
+        
+        function prevStep() {
+            if(currentStep > 1) {
+                currentStep--;
+                showStep(currentStep);
+                updateProgress();
+            }
+        }
+        
+        function updateProgress() {
+            const percentage = Math.round((currentStep / totalSteps) * 100);
+            document.getElementById('progress-fill').style.width = `${percentage}%`;
+            document.getElementById('progress-counter').textContent = `${percentage}%`;
+            
+            // Guardar progreso
+            localStorage.setItem('marroko-progress', percentage);
+            
+            // Marcar checkboxes cuando se completan pasos
+            updateCheckboxes();
+        }
+        
+        function updateCheckboxes() {
+            // Esta función marcaría automáticamente los checkboxes anteriores
+            // cuando avanzas en los pasos
+        }
+        
+        function takeBreak() {
+            alert("☕ Perfecto, Marroko. Tómate un descanso.\n\nTu progreso está guardado automáticamente. Cuando vuelvas, sigue desde donde te quedaste.\n\nRecuerda: Pequeños pasos todos los días llevan a grandes resultados.");
+        }
+        
+        function restartJourney() {
+            currentStep = 1;
+            localStorage.setItem('marroko-step', '1');
+            localStorage.setItem('marroko-progress', '0');
+            
+            document.getElementById('success-screen').classList.remove('active');
+            document.querySelector('.header').style.display = 'block';
+            showStep(1);
+            updateProgress();
+        }
+        
+        // Configurar checkboxes para guardar estado
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                // Cargar estado guardado
+                const savedState = localStorage.getItem(checkbox.id);
+                if(savedState === 'checked') {
+                    checkbox.checked = true;
+                    if(checkbox.nextElementSibling) {
+                        checkbox.nextElementSibling.classList.add('completed');
+                    }
+                }
+                
+                // Guardar estado cuando cambia
+                checkbox.addEventListener('change', function() {
+                    if(this.checked) {
+                        localStorage.setItem(this.id, 'checked');
+                        if(this.nextElementSibling) {
+                            this.nextElementSibling.classList.add('completed');
+                        }
+                    } else {
+                        localStorage.setItem(this.id, 'unchecked');
+                        if(this.nextElementSibling) {
+                            this.nextElementSibling.classList.remove('completed');
+                        }
+                    }
+                });
+            });
+        });
+        
+        // Demo: Agregar más pasos si se necesitan
+        const stepsContent = [
+            {title: "Fotos que Venden", content: "Cómo tomar fotos profesionales con tu celular"},
+            {title: "Redes Sociales", content: "Instagram y Facebook para reservas"},
+            {title: "Precios y Paquetes", content: "Cómo estructurar tus precios"},
+            {title: "Atención al Cliente", content: "Sistema para reseñas 5 estrellas"},
+            {title: "Expansión", content: "Cómo agregar más vehículos"},
+            {title: "Empleados", content: "Contratar tu primer asistente"},
+            {title: "Marketing", content: "Asociaciones con hoteles y restaurantes"},
+            {title: "Análisis", content: "Cómo revisar tus números mensuales"}
+        ];
+        
+        // Esta función se usaría para generar dinámicamente más pasos
+        function generateMoreSteps() {
+            // Implementación para generar más contenido
+        }
+    </script>
+</body>
+</html>
