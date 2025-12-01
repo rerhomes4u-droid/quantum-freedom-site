@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pasaporte Sin SSN | Conocimiento Prohibido</title>
+    <style>
+        :root {
+            --primary: #1a237e;
+            --secondary: #283593;
+            --accent: #3949ab;
+            --light: #e8eaf6;
+            --dark: #0d1137;
+            --success: #2e7d32;
+            --warning: #f57c00;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 30px 0;
+            text-align: center;
+            border-radius: 0 0 10px 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto;
+            opacity: 0.9;
+        }
+        
+        .host {
+            margin-top: 15px;
+            font-style: italic;
+        }
+        
+        .progress-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 30px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background-color: var(--light);
+            border-radius: 5px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background-color: var(--success);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        
+        .step {
+            text-align: center;
+            flex: 1;
+            position: relative;
+        }
+        
+        .step-number {
+            width: 30px;
+            height: 30px;
+            background-color: var(--light);
+            color: var(--dark);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .step.active .step-number {
+            background-color: var(--accent);
+            color: white;
+        }
+        
+        .step.completed .step-number {
+            background-color: var(--success);
+            color: white;
+        }
+        
+        .step-content {
+            display: none;
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .step-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--light);
+            padding-bottom: 10px;
+        }
+        
+        h3 {
+            color: var(--secondary);
+            margin: 20px 0 10px;
+        }
+        
+        .important-note {
+            background-color: #fff8e1;
+            border-left: 4px solid var(--warning);
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 5px 5px 0;
+        }
+        
+        .entity-explanation {
+            background-color: var(--light);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .entity-name {
+            font-weight: bold;
+            color: var(--primary);
+            text-transform: uppercase;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        button {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: var(--secondary);
+        }
+        
+        .btn-next {
+            float: right;
+        }
+        
+        .btn-prev {
+            float: left;
+            background-color: #757575;
+        }
+        
+        .navigation {
+            overflow: hidden;
+            margin-top: 30px;
+        }
+        
+        .checklist {
+            list-style-type: none;
+        }
+        
+        .checklist li {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: flex-start;
+        }
+        
+        .checklist input[type="checkbox"] {
+            width: auto;
+            margin-right: 10px;
+            margin-top: 5px;
+        }
+        
+        .document-template {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+        }
+        
+        .download-btn {
+            display: inline-block;
+            background-color: var(--success);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        
+        .success-story {
+            background-color: #e8f5e9;
+            border-left: 4px solid var(--success);
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 5px 5px 0;
+            font-style: italic;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .disclaimer {
+            font-size: 0.8rem;
+            color: #999;
+            margin-top: 10px;
+        }
+        
+        .language-note {
+            background-color: #e3f2fd;
+            border-left: 4px solid var(--accent);
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 0 5px 5px 0;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 768px) {
+            .step-indicator {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Pasaporte Sin Número de Seguro Social</h1>
+            <p>Tu Guía Paso a Paso para Obtener un Pasaporte Estadounidense Sin Número de Seguro Social</p>
+            <p class="host">De Ramiro Ramirez de Conocimiento Prohibido</p>
+        </div>
+    </header>
+    
+    <div class="container">
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress" id="progress"></div>
+            </div>
+            <div class="step-indicator">
+                <div class="step active" data-step="1">
+                    <div class="step-number">1</div>
+                    <div>Mentalidad</div>
+                </div>
+                <div class="step" data-step="2">
+                    <div class="step-number">2</div>
+                    <div>Documentos</div>
+                </div>
+                <div class="step" data-step="3">
+                    <div class="step-number">3</div>
+                    <div>Formularios</div>
+                </div>
+                <div class="step" data-step="4">
+                    <div class="step-number">4</div>
+                    <div>Declaración</div>
+                </div>
+                <div class="step" data-step="5">
+                    <div class="step-number">5</div>
+                    <div>Enviar</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Step 1: Mentalidad -->
+        <div class="step-content active" id="step-1">
+            <h2>El Cambio de Mentalidad: Tú vs. La Entidad Legal</h2>
+            
+            <div class="important-note">
+                <strong>COMPRENSIÓN CRÍTICA:</strong> No estás solicitando un pasaporte para ti mismo. Estás solicitando un pasaporte para la entidad legal creada por tu certificado de nacimiento.
+            </div>
+            
+            <p>Este es el concepto más importante para comprender. Todo el sistema se basa en una distinción entre:</p>
+            
+            <div class="entity-explanation">
+                <h3>Los Dos "Tú"</h3>
+                <ul>
+                    <li><strong>TÚ</strong> - El hombre o mujer vivo, un ser soberano con derechos</li>
+                    <li><strong>LA ENTIDAD</strong> - La ficción legal creada cuando tu nacimiento fue registrado con el gobierno</li>
+                </ul>
+            </div>
+            
+            <h3>El Secreto del Certificado de Nacimiento</h3>
+            <p>Tu certificado de nacimiento no es prueba de tu existencia. Son los <strong>artículos de incorporación</strong> para la entidad legal que comparte tu nombre.</p>
+            
+            <p>Cuando naciste, tus padres sin saberlo registraron una corporación con el estado. Esta corporación:</p>
+            <ul>
+                <li>Tiene tu nombre en MAYÚSCULAS (ej. <span class="entity-name">JUAN PÉREZ GARCÍA</span>)</li>
+                <li>Se considera un "ciudadano estadounidense" en términos legales</li>
+                <li>Puede tener propiedades, contratos e identificación</li>
+                <li>Está sujeta a leyes federales e impuestos</li>
+            </ul>
+            
+            <p>Tú, el individuo soberano, eres el <strong>representante autorizado</strong> de esta entidad. Esta distinción es tu clave para obtener un pasaporte sin un NSS.</p>
+            
+            <div class="important-note">
+                <strong>IMPORTANTE:</strong> Esto no es un "vacío legal" - es comprender cómo funciona realmente el sistema. El pasaporte pertenece a la entidad, no a ti personalmente.
+            </div>
+            
+            <div class="navigation">
+                <button class="btn-next" onclick="nextStep(1)">Siguiente: Reunir Documentos</button>
+            </div>
+        </div>
+        
+        <!-- Step 2: Documentos -->
+        <div class="step-content" id="step-2">
+            <h2>Reunir Tus Documentos</h2>
+            
+            <p>Necesitarás estos 5 elementos para completar tu solicitud:</p>
+            
+            <ul class="checklist">
+                <li>
+                    <input type="checkbox" id="doc1">
+                    <label for="doc1">
+                        <strong>Certificado de Nacimiento Certificado</strong> - Estos son los "artículos de incorporación" para la entidad
+                        <div class="important-note" style="margin-top: 10px;">
+                            <strong>NOTA:</strong> ¡Si no tienes un certificado de nacimiento estadounidense, aún puedes usar este proceso! 
+                            La entidad se creó cuando se presentó cualquier registro de nacimiento ante un gobierno. Los principios siguen siendo los mismos.
+                        </div>
+                    </label>
+                </li>
+                <li>
+                    <input type="checkbox" id="doc2">
+                    <label for="doc2"><strong>Identificación Oficial con Foto</strong> (Licencia de Conducir, Identificación Estatal, etc.)</label>
+                </li>
+                <li>
+                    <input type="checkbox" id="doc3">
+                    <label for="doc3"><strong>Foto para Pasaporte</strong> (2x2 pulgadas, fondo blanco)</label>
+                </li>
+                <li>
+                    <input type="checkbox" id="doc4">
+                    <label for="doc4"><strong>Formulario DS-11 de Solicitud de Pasaporte</strong> (Lo llenaremos en el siguiente paso)</label>
+                </li>
+                <li>
+                    <input type="checkbox" id="doc5">
+                    <label for="doc5"><strong>Declaración Explicativa</strong> (La crearemos juntos)</label>
+                </li>
+                <li>
+                    <input type="checkbox" id="doc6">
+                    <label for="doc6">
+                        <strong>Formulario DS-10 - Afidávit de Nacimiento</strong> (Si no tienes certificado de nacimiento)
+                        <div class="important-note" style="margin-top: 10px;">
+                            <strong>NOTA:</strong> El DS-10 es una declaración jurada que puedes usar si no tienes un certificado de nacimiento. 
+                            Lo llenaremos más adelante.
+                        </div>
+                    </label>
+                </li>
+            </ul>
+            
+            <div class="important-note">
+                <strong>RECUERDA:</strong> Estos documentos son para la <span class="entity-name">ENTIDAD</span>, no para ti personalmente. 
+                Simplemente eres el representante que reúne el papeleo de la entidad.
+            </div>
+            
+            <div class="navigation">
+                <button class="btn-prev" onclick="prevStep(2)">Anterior</button>
+                <button class="btn-next" onclick="nextStep(2)">Siguiente: Formularios</button>
+            </div>
+        </div>
+        
+        <!-- Step 3: Formularios -->
+        <div class="step-content" id="step-3">
+            <h2>Completar los Formularios</h2>
+            
+            <p>Ahora llenaremos los formularios oficiales. Recuerda: estás llenando esto para la <span class="entity-name">ENTIDAD</span>, no para ti mismo.</p>
+            
+            <h3>Formulario DS-11 - Solicitud de Pasaporte</h3>
+            
+            <div class="form-group">
+                <label for="entity-name">Nombre de la Entidad (del certificado de nacimiento - MAYÚSCULAS)</label>
+                <input type="text" id="entity-name" placeholder="ej. JUAN PÉREZ GARCÍA">
+            </div>
+            
+            <div class="form-group">
+                <label for="ssn-field">Número de Seguro Social</label>
+                <input type="text" id="ssn-field" value="N/A - See Attached Explanatory Statement" readonly>
+                <small>Este campo está prellenado correctamente. La entidad no tiene un NSS.</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="date-of-birth">Fecha de Nacimiento (de la entidad)</label>
+                <input type="date" id="date-of-birth">
+            </div>
+            
+            <div class="form-group">
+                <label for="place-of-birth">Lugar de Nacimiento (de la entidad)</label>
+                <input type="text" id="place-of-birth" placeholder="Ciudad, Estado, País">
+            </div>
+            
+            <div class="form-group">
+                <label for="gender">Género</label>
+                <select id="gender">
+                    <option value="">Seleccionar</option>
+                    <option value="M">Masculino</option>
+                    <option value="F">Femenino</option>
+                    <option value="X">X (No especificado)</option>
+                </select>
+            </div>
+            
+            <div class="language-note">
+                <strong>Nota sobre el idioma:</strong> El formulario DS-11 debe completarse en inglés, que es el idioma oficial para solicitudes de pasaporte estadounidense.
+            </div>
+            
+            <h3>Formulario DS-10 - Afidávit de Nacimiento (Si no tienes certificado de nacimiento)</h3>
+            
+            <div class="form-group">
+                <label for="affiant-name">Nombre del Declarante (Persona que firma el afidávit)</label>
+                <input type="text" id="affiant-name" placeholder="Nombre completo del declarante">
+            </div>
+            
+            <div class="form-group">
+                <label for="affiant-address">Dirección del Declarante</label>
+                <input type="text" id="affiant-address" placeholder="Dirección completa">
+            </div>
+            
+            <div class="form-group">
+                <label for="affiant-relationship">Relación con el Solicitante</label>
+                <input type="text" id="affiant-relationship" placeholder="ej. Padre, Madre, Pariente">
+            </div>
+            
+            <div class="form-group">
+                <label for="affiant-ssn">Número de Seguro Social del Declarante</label>
+                <input type="text" id="affiant-ssn" value="N/A - See Attached Explanatory Statement" readonly>
+                <small>Este campo está prellenado. El declarante no proporciona un NSS.</small>
+            </div>
+            
+            <div class="important-note">
+                <strong>¡NO FIRMES LOS FORMULARIOS TODAVÍA!</strong> Debes firmarlos frente al agente de aceptación de pasaportes.
+            </div>
+            
+            <div class="navigation">
+                <button class="btn-prev" onclick="prevStep(3)">Anterior</button>
+                <button class="btn-next" onclick="nextStep(3)">Siguiente: Declaración</button>
+            </div>
+        </div>
+        
+        <!-- Step 4: Declaración Explicativa -->
+        <div class="step-content" id="step-4">
+            <h2>Crear Tu Declaración Explicativa</h2>
+            
+            <p>Esta es tu arma secreta. La declaración explicativa explica claramente la base legal para tu solicitud sin un NSS.</p>
+            
+            <div class="language-note">
+                <strong>Nota sobre el idioma:</strong> La declaración explicativa debe estar en inglés, ya que se adjunta a una solicitud oficial del gobierno estadounidense.
+            </div>
+            
+            <div class="document-template" id="statement-template">
+To Whom It May Concern:
+
+I, [Your True Name], a free sovereign individual and state citizen of [Your State], am the authorized representative for the legal entity [ENTITY NAME].
+
+I am hereby requesting a United States passport on behalf of this entity. The entity is a "person" as defined in 8 U.S.C. § 1101(a)(21) and is entitled to a passport under 22 U.S.C. § 212.
+
+The entity does not have a Social Security Number, as it is not engaged in taxable activities requiring such identification.
+
+This application is submitted under penalty of perjury, and all information provided is true and correct to the best of my knowledge.
+
+Sincerely,
+
+[Your Signature]
+[Printed Name]
+[Date]
+            </div>
+            
+            <p>Tu declaración personalizada se generará basada en la información que proporciones:</p>
+            
+            <div class="form-group">
+                <label for="your-name">Tu Verdadero Nombre (como normalmente lo escribes)</label>
+                <input type="text" id="your-name" placeholder="ej. Juan Pérez">
+            </div>
+            
+            <div class="form-group">
+                <label for="your-state">Tu Estado de Lealtad/Residencia</label>
+                <input type="text" id="your-state" placeholder="ej. California">
+            </div>
+            
+            <button onclick="generateStatement()">Generar Mi Declaración</button>
+            
+            <div id="generated-statement" style="display: none; margin-top: 20px;">
+                <h3>Tu Declaración Explicativa Personalizada</h3>
+                <div class="document-template" id="final-statement"></div>
+                <a href="#" class="download-btn" onclick="downloadStatement()">Descargar Declaración</a>
+                <div class="important-note">
+                    <strong>IMPORTANTE:</strong> Imprime esta declaración y hazla notariar antes de enviarla con tu solicitud.
+                </div>
+            </div>
+            
+            <h3>Declaración para el Formulario DS-10 (Si aplica)</h3>
+            
+            <div class="document-template">
+I, [Affiant Name], being first duly sworn, depose and say:
+
+I have personal knowledge of the birth of [ENTITY NAME] on [Date of Birth] at [Place of Birth].
+
+The information provided in this DS-10 form is true and correct to the best of my knowledge and belief.
+
+I do not provide a Social Security Number as I am not required to do so for this affidavit.
+
+[Signature of Affiant]
+[Printed Name of Affiant]
+[Date]
+            </div>
+            
+            <div class="navigation">
+                <button class="btn-prev" onclick="prevStep(4)">Anterior</button>
+                <button class="btn-next" onclick="nextStep(4)">Siguiente: Enviar Solicitud</button>
+            </div>
+        </div>
+        
+        <!-- Step 5: Enviar -->
+        <div class="step-content" id="step-5">
+            <h2>Enviar Tu Solicitud</h2>
+            
+            <p>¡Ya casi estás ahí! Ahora es el momento de enviar tu paquete de solicitud completo.</p>
+            
+            <h3>Lista de Verificación Final</h3>
+            <ul class="checklist">
+                <li>
+                    <input type="checkbox" id="final1">
+                    <label for="final1"><strong>Formulario DS-11 Completado</strong> (sin firmar)</label>
+                </li>
+                <li>
+                    <input type="checkbox" id="final2">
+                    <label for="final2"><strong>Declaración Explicativa Notariada</strong></label>
+                </li>
+                <li>
+                    <input type="checkbox" id="final3">
+                    <label for="final3"><strong>Certificado de Nacimiento Original</strong> (los artículos de incorporación de la entidad)</label>
+                </li>
+                <li>
+                    <input type="checkbox" id="final4">
+                    <label for="final4"><strong>Formulario DS-10 Completado</strong> (si no tienes certificado de nacimiento)</label>
+                </li>
+                <li>
+                    <input type="checkbox" id="final5">
+                    <label for="final5"><strong>Identificación Oficial con Foto</strong></label>
+                </li>
+                <li>
+                    <input type="checkbox" id="final6">
+                    <label for="final6"><strong>Foto para Pasaporte</strong></label>
+                </li>
+                <li>
+                    <input type="checkbox" id="final7">
+                    <label for="final7"><strong>Tarifas del Pasaporte</strong> (cheque o giro postal a nombre de "U.S. Department of State")</label>
+                </li>
+            </ul>
+            
+            <h3>Dónde Enviar</h3>
+            <p>Lleva tu paquete completo a una <strong>Instalación de Aceptación de Pasaportes</strong>. Estas suelen estar ubicadas en:</p>
+            <ul>
+                <li>Oficinas de Correos</li>
+                <li>Oficinas del Secretario de la Corte</li>
+                <li>Bibliotecas públicas (en algunas áreas)</li>
+            </ul>
+            
+            <div class="form-group">
+                <label for="zip-code">Encuentra la instalación más cercana (ingresa tu código postal):</label>
+                <div style="display: flex;">
+                    <input type="text" id="zip-code" placeholder="ej. 90210" style="flex: 1; margin-right: 10px;">
+                    <button onclick="findFacility()">Buscar</button>
+                </div>
+            </div>
+            
+            <div id="facility-results"></div>
+            
+            <h3>En la Instalación</h3>
+            <ul>
+                <li>Presenta tu paquete completo</li>
+                <li>Firma el formulario DS-11 frente al agente</li>
+                <li>Presta juramento (esto es para la entidad, no para ti personalmente)</li>
+                <li>Paga las tarifas</li>
+                <li>Obtén un recibo con tu número de seguimiento de solicitud</li>
+            </ul>
+            
+            <div class="success-story">
+                "Tenía mucho miedo de solicitar sin un NSS, ¡pero este proceso funcionó perfectamente! Mi pasaporte llegó en solo 5 semanas sin problemas. Esta información realmente es conocimiento prohibido que te libera." - María, California
+            </div>
+            
+            <div class="important-note">
+                <strong>¡FELICITACIONES!</strong> Has dado un paso poderoso hacia la liberación. Este pasaporte te permitirá viajar internacionalmente mientras mantienes tu estatus soberano.
+            </div>
+            
+            <div class="navigation">
+                <button class="btn-prev" onclick="prevStep(5)">Anterior</button>
+                <button onclick="restartProcess()">Comenzar de Nuevo</button>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="container">
+            <p>Presentado por Ramiro Ramirez | Podcast Conocimiento Prohibido</p>
+            <p>Sistema proporcionado por TripsToColombia.com</p>
+            <p class="disclaimer">
+                Descargo de responsabilidad: Esta información es solo para fines educativos. No proporcionamos asesoramiento legal. 
+                Consulta con un profesional calificado para tu situación específica.
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 5;
+        
+        function updateProgress() {
+            const progress = document.getElementById('progress');
+            const percentage = ((currentStep - 1) / (totalSteps - 1)) * 100;
+            progress.style.width = percentage + '%';
+            
+            // Update step indicators
+            document.querySelectorAll('.step').forEach((step, index) => {
+                const stepNumber = index + 1;
+                if (stepNumber < currentStep) {
+                    step.classList.add('completed');
+                    step.classList.remove('active');
+                } else if (stepNumber === currentStep) {
+                    step.classList.add('active');
+                    step.classList.remove('completed');
+                } else {
+                    step.classList.remove('active', 'completed');
+                }
+            });
+        }
+        
+        function showStep(stepNumber) {
+            document.querySelectorAll('.step-content').forEach(step => {
+                step.classList.remove('active');
+            });
+            
+            document.getElementById('step-' + stepNumber).classList.add('active');
+            currentStep = stepNumber;
+            updateProgress();
+            
+            // Scroll to top of step content
+            document.getElementById('step-' + stepNumber).scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function nextStep(current) {
+            if (current < totalSteps) {
+                showStep(current + 1);
+            }
+        }
+        
+        function prevStep(current) {
+            if (current > 1) {
+                showStep(current - 1);
+            }
+        }
+        
+        function generateStatement() {
+            const yourName = document.getElementById('your-name').value || '[Your True Name]';
+            const yourState = document.getElementById('your-state').value || '[Your State]';
+            const entityName = document.getElementById('entity-name').value || '[ENTITY NAME]';
+            
+            const statement = `To Whom It May Concern:
+
+I, ${yourName}, a free sovereign individual and state citizen of ${yourState}, am the authorized representative for the legal entity ${entityName}.
+
+I am hereby requesting a United States passport on behalf of this entity. The entity is a "person" as defined in 8 U.S.C. § 1101(a)(21) and is entitled to a passport under 22 U.S.C. § 212.
+
+The entity does not have a Social Security Number, as it is not engaged in taxable activities requiring such identification.
+
+This application is submitted under penalty of perjury, and all information provided is true and correct to the best of my knowledge.
+
+Sincerely,
+
+[Your Signature]
+${yourName}
+[Date]`;
+            
+            document.getElementById('final-statement').textContent = statement;
+            document.getElementById('generated-statement').style.display = 'block';
+            
+            // Scroll to the generated statement
+            document.getElementById('generated-statement').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function downloadStatement() {
+            const statement = document.getElementById('final-statement').textContent;
+            const blob = new Blob([statement], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'Explanatory_Statement.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        
+        function findFacility() {
+            const zipCode = document.getElementById('zip-code').value;
+            const results = document.getElementById('facility-results');
+            
+            if (!zipCode || zipCode.length !== 5) {
+                results.innerHTML = '<div class="important-note">Por favor, ingresa un código postal válido de 5 dígitos.</div>';
+                return;
+            }
+            
+            // In a real app, this would call an API
+            // For demo purposes, we'll show a mock result
+            results.innerHTML = `
+                <div class="important-note" style="background-color: #e8f5e9; border-left-color: #2e7d32;">
+                    <strong>Instalación de Aceptación de Pasaportes Más Cercana:</strong><br>
+                    Oficina Principal de Correos<br>
+                    123 Calle Gobierno<br>
+                    Ciudad, ${zipCode}<br>
+                    Teléfono: (555) 123-4567<br>
+                    Horario: Lun-Vie 9am-4pm<br>
+                    <em>Nota: Este es un resultado simulado. Visita travel.state.gov para ubicaciones reales.</em>
+                </div>
+            `;
+        }
+        
+        function restartProcess() {
+            // Reset form fields
+            document.getElementById('your-name').value = '';
+            document.getElementById('your-state').value = '';
+            document.getElementById('entity-name').value = '';
+            document.getElementById('date-of-birth').value = '';
+            document.getElementById('place-of-birth').value = '';
+            document.getElementById('gender').value = '';
+            document.getElementById('zip-code').value = '';
+            document.getElementById('affiant-name').value = '';
+            document.getElementById('affiant-address').value = '';
+            document.getElementById('affiant-relationship').value = '';
+            
+            // Reset checkboxes
+            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            
+            // Hide generated statement
+            document.getElementById('generated-statement').style.display = 'none';
+            
+            // Go back to first step
+            showStep(1);
+        }
+        
+        // Initialize the app
+        updateProgress();
+    </script>
+</body>
+</html>

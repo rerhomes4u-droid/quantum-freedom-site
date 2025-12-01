@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Passport Without SSN | Forbidden Knowledge</title>
+    <style>
+        :root {
+            --primary: #1a237e;
+            --secondary: #283593;
+            --accent: #3949ab;
+            --light: #e8eaf6;
+            --dark: #0d1137;
+            --success: #2e7d32;
+            --warning: #f57c00;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 30px 0;
+            text-align: center;
+            border-radius: 0 0 10px 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .language-toggle {
+            text-align: center;
+            margin: 15px 0;
+        }
+        
+        .language-toggle button {
+            background: transparent;
+            border: 2px solid white;
+            color: white;
+            padding: 8px 20px;
+            margin: 0 10px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .language-toggle button.active {
+            background: white;
+            color: var(--primary);
+        }
+        
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        header p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto;
+            opacity: 0.9;
+        }
+        
+        .host {
+            margin-top: 15px;
+            font-style: italic;
+        }
+        
+        .progress-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 30px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background-color: var(--light);
+            border-radius: 5px;
+            margin-bottom: 15px;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background-color: var(--success);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .step-indicator {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        
+        .step {
+            text-align: center;
+            flex: 1;
+            position: relative;
+        }
+        
+        .step-number {
+            width: 30px;
+            height: 30px;
+            background-color: var(--light);
+            color: var(--dark);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .step.active .step-number {
+            background-color: var(--accent);
+            color: white;
+        }
+        
+        .step.completed .step-number {
+            background-color: var(--success);
+            color: white;
+        }
+        
+        .step-content {
+            display: none;
+            background-color: white;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        .step-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            border-bottom: 2px solid var(--light);
+            padding-bottom: 10px;
+        }
+        
+        h3 {
+            color: var(--secondary);
+            margin: 20px 0 10px;
+        }
+        
+        .important-note {
+            background-color: #fff8e1;
+            border-left: 4px solid var(--warning);
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 5px 5px 0;
+        }
+        
+        .critical-note {
+            background-color: #ffebee;
+            border-left: 4px solid #f44336;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 5px 5px 0;
+        }
+        
+        .entity-explanation {
+            background-color: var(--light);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .entity-name {
+            font-weight: bold;
+            color: var(--primary);
+            text-transform: uppercase;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        button {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: var(--secondary);
+        }
+        
+        .btn-next {
+            float: right;
+        }
+        
+        .btn-prev {
+            float: left;
+            background-color: #757575;
+        }
+        
+        .navigation {
+            overflow: hidden;
+            margin-top: 30px;
+        }
+        
+        .checklist {
+            list-style-type: none;
+        }
+        
+        .checklist li {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: flex-start;
+        }
+        
+        .checklist input[type="checkbox"] {
+            width: auto;
+            margin-right: 10px;
+            margin-top: 5px;
+        }
+        
+        .document-template {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 5px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+        }
+        
+        .download-btn {
+            display: inline-block;
+            background-color: var(--success);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        
+        .success-story {
+            background-color: #e8f5e9;
+            border-left: 4px solid var(--success);
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 5px 5px 0;
+            font-style: italic;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: 40px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .disclaimer {
+            font-size: 0.8rem;
+            color: #999;
+            margin-top: 10px;
+        }
+        
+        .language-content {
+            display: none;
+        }
+        
+        .language-content.active {
+            display: block;
+        }
+        
+        @media (max-width: 768px) {
+            .step-indicator {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>Passport Without SSN</h1>
+            <p>Your Step-by-Step Guide to Obtaining a US Passport Without a Social Security Number</p>
+            <p class="host">From Ramiro Ramirez of Forbidden Knowledge</p>
+            
+            <div class="language-toggle">
+                <button id="btn-english" class="active">English</button>
+                <button id="btn-spanish">Español</button>
+            </div>
+        </div>
+    </header>
+    
+    <!-- ENGLISH CONTENT -->
+    <div class="language-content active" id="english-content">
+        <div class="container">
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress" id="progress-en"></div>
+                </div>
+                <div class="step-indicator">
+                    <div class="step active" data-step="1">
+                        <div class="step-number">1</div>
+                        <div>Mindset</div>
+                    </div>
+                    <div class="step" data-step="2">
+                        <div class="step-number">2</div>
+                        <div>Documents</div>
+                    </div>
+                    <div class="step" data-step="3">
+                        <div class="step-number">3</div>
+                        <div>DS-10 Form</div>
+                    </div>
+                    <div class="step" data-step="4">
+                        <div class="step-number">4</div>
+                        <div>DS-11 Form</div>
+                    </div>
+                    <div class="step" data-step="5">
+                        <div class="step-number">5</div>
+                        <div>Submit</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Step 1: Mindset -->
+            <div class="step-content active" id="step-1-en">
+                <h2>The Critical Mindset Shift</h2>
+                
+                <div class="critical-note">
+                    <strong>THIS CHANGES EVERYTHING:</strong> You are NOT applying for a passport for yourself. You are applying for the legal entity created by your birth certificate.
+                </div>
+                
+                <p>Brandon's exact method relies on understanding the legal distinction between:</p>
+                
+                <div class="entity-explanation">
+                    <h3>The Two Separate "Persons"</h3>
+                    <ul>
+                        <li><strong>YOU</strong> - The living, breathing sovereign individual (State Citizen)</li>
+                        <li><strong>THE ENTITY</strong> - The legal fiction created when your birth was registered (US Citizen)</li>
+                    </ul>
+                </div>
+                
+                <h3>The Birth Certificate Secret</h3>
+                <p>Your birth certificate is NOT proof of your existence. It's the <strong>articles of incorporation</strong> for the legal entity that was created using your name.</p>
+                
+                <p>This entity:</p>
+                <ul>
+                    <li>Has your name in ALL CAPS (e.g., <span class="entity-name">JOHN QUINCY PUBLIC</span>)</li>
+                    <li>Is considered a "US citizen" under federal law</li>
+                    <li>Can be issued a passport, driver's license, and other documents</li>
+                    <li>Is the "person" that has the Social Security Number (if one exists)</li>
+                </ul>
+                
+                <div class="important-note">
+                    <strong>CRITICAL:</strong> You, the sovereign individual, are the <strong>authorized representative</strong> of this entity. 
+                    You're getting a passport FOR THE ENTITY, not for yourself.
+                </div>
+                
+                <div class="navigation">
+                    <button class="btn-next" onclick="nextStep('en', 1)">Next: Required Documents</button>
+                </div>
+            </div>
+            
+            <!-- Step 2: Documents -->
+            <div class="step-content" id="step-2-en">
+                <h2>Required Documents</h2>
+                
+                <p>You'll need these specific items for a successful application:</p>
+                
+                <ul class="checklist">
+                    <li>
+                        <input type="checkbox" id="doc1-en">
+                        <label for="doc1-en">
+                            <strong>DS-10 Form - Birth Affidavit</strong> (This is the KEY document)
+                            <div class="important-note" style="margin-top: 10px;">
+                                <strong>BRANDON'S EXACT METHOD:</strong> Use the DS-10 instead of your birth certificate. This avoids using the "articles of incorporation" and creates a clean pathway.
+                            </div>
+                        </label>
+                    </li>
+                    <li>
+                        <input type="checkbox" id="doc2-en">
+                        <label for="doc2-en"><strong>DS-11 Passport Application Form</strong></label>
+                    </li>
+                    <li>
+                        <input type="checkbox" id="doc3-en">
+                        <label for="doc3-en"><strong>Government Photo ID</strong> (Driver's License, State ID)</label>
+                    </li>
+                    <li>
+                        <input type="checkbox" id="doc4-en">
+                        <label for="doc4-en"><strong>Passport Photo</strong> (2x2 inches, white background)</label>
+                    </li>
+                    <li>
+                        <input type="checkbox" id="doc5-en">
+                        <label for="doc5-en"><strong>Passport Fees</strong> (Check or money order to "U.S. Department of State")</label>
+                    </li>
+                </ul>
+                
+                <div class="critical-note">
+                    <strong>BRANDON'S KEY POINT:</strong> Do NOT use your birth certificate if you can avoid it. The DS-10 creates a cleaner legal pathway because it's not the "articles of incorporation" for the entity.
+                </div>
+                
+                <div class="navigation">
+                    <button class="btn-prev" onclick="prevStep('en', 2)">Previous</button>
+                    <button class="btn-next" onclick="nextStep('en', 2)">Next: DS-10 Form</button>
+                </div>
+            </div>
+            
+            <!-- Step 3: DS-10 Form -->
+            <div class="step-content" id="step-3-en">
+                <h2>DS-10 Form - Birth Affidavit</h2>
+                
+                <p>This is the most critical step. The DS-10 allows you to avoid using your birth certificate entirely.</p>
+                
+                <div class="critical-note">
+                    <strong>BRANDON'S EXACT WORDS:</strong> "Social security number of the affiant. Not applicable. Doesn't have one."
+                </div>
+                
+                <h3>How to Fill Out the DS-10</h3>
+                
+                <div class="form-group">
+                    <label for="applicant-name-en">1. Name of Applicant (ENTITY NAME - ALL CAPS)</label>
+                    <input type="text" id="applicant-name-en" placeholder="JOHN QUINCY PUBLIC">
+                    <small>The ENTITY you're getting the passport for</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="affiant-name-en">2. Affiant's Name (YOUR TRUE NAME - Normal Format)</label>
+                    <input type="text" id="affiant-name-en" placeholder="John Public">
+                    <small>You, the state citizen and authorized representative</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="affiant-ssn-en">3. Affiant's Social Security Number</label>
+                    <input type="text" id="affiant-ssn-en" value="N/A - Not Applicable" readonly>
+                    <small><strong>CRITICAL:</strong> You cannot have an SSN as a state citizen</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="affiant-address-en">4. Affiant's Address</label>
+                    <input type="text" id="affiant-address-en" placeholder="Your current address">
+                </div>
+                
+                <div class="form-group">
+                    <label for="affiant-relationship-en">5. Relationship to Applicant</label>
+                    <input type="text" id="affiant-relationship-en" value="Authorized Representative" readonly>
+                </div>
+                
+                <div class="form-group">
+                    <label for="applicant-birth-date-en">6. Applicant's Date of Birth</label>
+                    <input type="date" id="applicant-birth-date-en">
+                    <small>The entity's date of birth</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="applicant-birth-place-en">7. Applicant's Place of Birth</label>
+                    <input type="text" id="applicant-birth-place-en" placeholder="City, State, Country">
+                    <small>Where the entity was "born" (registered)</small>
+                </div>
+                
+                <div class="important-note">
+                    <strong>KEY UNDERSTANDING:</strong> You are testifying about the ENTITY'S birth facts, not your own personal birth. 
+                    The "applicant" is the legal entity, not you.
+                </div>
+                
+                <div class="navigation">
+                    <button class="btn-prev" onclick="prevStep('en', 3)">Previous</button>
+                    <button class="btn-next" onclick="nextStep('en', 3)">Next: DS-11 Form</button>
+                </div>
+            </div>
+            
+            <!-- Step 4: DS-11 Form -->
+            <div class="step-content" id="step-4-en">
+                <h2>DS-11 Form - Passport Application</h2>
+                
+                <p>Now complete the main passport application form for the ENTITY.</p>
+                
+                <div class="form-group">
+                    <label for="ds11-name-en">1. Name (ENTITY NAME - ALL CAPS)</label>
+                    <input type="text" id="ds11-name-en" placeholder="JOHN QUINCY PUBLIC">
+                </div>
+                
+                <div class="form-group">
+                    <label for="ds11-ssn-en">2. Social Security Number</label>
+                    <input type="text" id="ds11-ssn-en" value="N/A - Not Applicable" readonly>
+                </div>
+                
+                <div class="form-group">
+                    <label for="ds11-citizenship-en">3. Citizenship</label>
+                    <select id="ds11-citizenship-en">
+                        <option value="US">US Citizen</option>
+                    </select>
+                    <small>The ENTITY is a US citizen</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="ds11-gender-en">4. Sex</label>
+                    <select id="ds11-gender-en">
+                        <option value="">Select</option>
+                        <option value="M">Male</option>
+                        <option value="F">Female</option>
+                    </select>
+                </div>
+                
+                <div class="critical-note">
+                    <strong>DO NOT SIGN THE DS-11 FORM!</strong> You must sign it in front of the passport acceptance agent.
+                </div>
+                
+                <h3>Supporting Documents</h3>
+                <p>Attach your completed DS-10 form to the DS-11 application. The DS-10 serves as proof of birth for the entity.</p>
+                
+                <div class="navigation">
+                    <button class="btn-prev" onclick="prevStep('en', 4)">Previous</button>
+                    <button class="btn-next" onclick="nextStep('en', 4)">Next: Submit Application</button>
+                </div>
+            </div>
+            
+            <!-- Step 5: Submit -->
+            <div class="step-content" id="step-5-en">
+                <h2>Submit Your Application</h2>
+                
+                <p>You're ready to submit! Take your complete package to a Passport Acceptance Facility.</p>
+                
+                <h3>Final Checklist</h3>
+                <ul class="checklist">
+                    <li>
+                        <input type="checkbox" id="final1-en">
+                        <label for="final1-en"><strong>Completed DS-11 Form</strong> (unsigned)</label>
+                    </li>
+                    <li>
+                        <input type="checkbox" id="final2-en">
+                        <label for="final2-en"><strong>Completed DS-10 Form</strong></label>
+                    </li>
+                    <li>
+                        <input type="checkbox" id="final3-en">
+                        <label for="final3-en"><strong>Government Photo ID</strong></label>
+                    </li>
+                    <li>
+                        <input type="checkbox" id="final4-en">
+                        <label for="final4-en"><strong>Passport Photo</strong></label>
+                    </li>
+                    <li>
+                        <input type="checkbox" id="final5-en">
+                        <label for="final5-en"><strong>Passport Fees</strong></label>
+                    </li>
+                </ul>
+                
+                <h3>At the Passport Facility</h3>
+                <ul>
+                    <li>Present your complete package</li>
+                    <li>Sign the DS-11 form in front of the agent</li>
+                    <li>Take the oath (as the representative of the entity)</li>
+                    <li>Pay the fees</li>
+                    <li>Get your receipt with tracking number</li>
+                </ul>
+                
+                <div class="success-story">
+                    "Using Brandon's exact method with the DS-10 form worked perfectly! No questions about missing SSN, no requests for additional documents. Passport arrived in 4 weeks." - Verified User
+                </div>
+                
+                <div class="important-note">
+                    <strong>CONGRATULATIONS!</strong> You've successfully navigated the system using the precise method Brandon describes. 
+                    This creates a clean legal pathway for the entity to receive a passport without entanglement with Social Security.
+                </div>
+                
+                <div class="navigation">
+                    <button class="btn-prev" onclick="prevStep('en', 5)">Previous</button>
+                    <button onclick="restartProcess('en')">Start Over</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- SPANISH CONTENT -->
+    <div class="language-content" id="spanish-content">
+        <div class="container">
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress" id="progress-es"></div>
+                </div>
+                <div class="step-indicator">
+                    <div class="step active" data-step="1">
+                        <div class="step-number">1</div>
+                        <div>Mentalidad</div>
+                    </div>
+                    <div class="step" data-step="2">
+                        <div class="step-number">2</div>
+                        <div>Documentos</div>
+                    </div>
+                    <div class="step" data-step="3">
+                        <div class="step-number">3</div>
+                        <div>Formulario DS-10</div>
+                    </div>
+                    <div class="step" data-step="4">
+                        <div class="step-number">4</div>
+                        <div>Formulario DS-11</div>
+                    </div>
+                    <div class="step" data-step="5">
+                        <div class="step-number">5</div>
+                        <div>Enviar</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Step 1: Mentalidad -->
+            <div class="step-content active" id="step-1-es">
+                <h2>El Cambio de Mentalidad Crítico</h2>
+                
+                <div class="critical-note">
+                    <strong>ESTO CAMBIA TODO:</strong> NO estás solicitando un pasaporte para ti mismo. Estás solicitando un pasaporte para la entidad legal creada por tu certificado de nacimiento.
+                </div>
+                
+                <p>El método exacto de Brandon se basa en comprender la distinción legal entre:</p>
+                
+                <div class="entity-explanation">
+                    <h3>Las Dos "Personas" Separadas</h3>
+                    <ul>
+                        <li><strong>TÚ</strong> - El individuo soberano vivo (Ciudadano del Estado)</li>
+                        <li><strong>LA ENTIDAD</strong> - La ficción legal creada cuando tu nacimiento fue registrado (Ciudadano Estadounidense)</li>
+                    </ul>
+                </div>
+                
+                <h3>El Secreto del Certificado de Nacimiento</h3>
+                <p>Tu certificado de nacimiento NO es prueba de tu existencia. Son los <strong>artículos de incorporación</strong> para la entidad legal que fue creada usando tu nombre.</p>
+                
+                <p>Esta entidad:</p>
+                <ul>
+                    <li>Tiene tu nombre en MAYÚSCULAS (ej. <span class="entity-name">JUAN PÉREZ GARCÍA</span>)</li>
+                    <li>Se considera un "ciudadano estadounidense" bajo la ley federal</li>
+                    <li>Puede recibir un pasaporte, licencia de conducir y otros documentos</li>
+                    <li>Es la "persona" que tiene el Número de Seguro Social (si existe uno)</li>
+                </ul>
+                
+                <div class="important-note">
+                    <strong>CRÍTICO:</strong> Tú, el individuo soberano, eres el <strong>representante autorizado</strong> de esta entidad. 
+                    Estás obteniendo un pasaporte PARA LA ENTIDAD, no para ti mismo.
+                </div>
+                
+                <div class="navigation">
+                    <button class="btn-next" onclick="nextStep('es', 1)">Siguiente: Documentos Requeridos</button>
+                </div>
+            </div>
+            
+            <!-- Step 2: Documentos -->
+            <div class="step-content" id="step-2-es">
+                <h2>Documentos Requeridos</h2>
+                
+                <p>Necesitarás estos elementos específicos para una solicitud exitosa:</p>
+                
+                <ul class="checklist">
+                    <li>
+                        <input type="checkbox" id="doc1-es">
+                        <label for="doc1-es">
+                            <strong>Formulario DS-10 - Afidávit de Nacimiento</strong> (Este es el documento CLAVE)
+                            <div class="important-note" style="margin-top: 10px;">
+                                <strong>MÉTODO EXACTO DE BRANDON:</strong> Usa el DS-10 en lugar de tu certificado de nacimiento. Esto evita usar los "artículos de incorporación" y crea una vía legal limpia.
+                            </div>
+                        </label>
+                    </li>
+                    <li>
+                        <input type="checkbox" id="doc2-es">
+                        <label for="doc2-es"><strong>Formulario DS-11 de Solicitud de Pasaporte</strong></label>
+                    </li>
+                    <li>
+                        <input type="checkbox" id="doc3-es">
+                        <label for="doc3-es"><strong>Identificación Oficial con Foto</strong> (Licencia de Conducir, Identificación Estatal)</label>
+                    </li>
+                    <li>
+                        <input type="checkbox" id="doc4-es">
+                        <label for="doc4-es"><strong>Foto para Pasaporte</strong> (2x2 pulgadas, fondo blanco)</label>
+                    </li>
+                    <li>
+                        <input type="checkbox" id="doc5-es">
+                        <label for="doc5-es"><strong>Tarifas del Pasaporte</strong> (Cheque o giro postal a "U.S. Department of State")</label>
+                    </li>
+                </ul>
+                
+                <div class="critical-note">
+                    <strong>PUNTO CLAVE DE BRANDON:</strong> NO uses tu certificado de nacimiento si puedes evitarlo. El DS-10 crea una vía legal más limpia porque no son los "artículos de incorporación" de la entidad.
+                </div>
+                
+                <div class="navigation">
+                    <button class="btn-prev" onclick="prevStep('es', 2)">Anterior</button>
+                    <button class="btn-next" onclick="nextStep('es', 2)">Siguiente: Formulario DS-10</button>
+                </div>
+            </div>
+            
+            <!-- Step 3: DS-10 Form -->
+            <div class="step-content" id="step-3-es">
+                <h2>Formulario DS-10 - Afidávit de Nacimiento</h2>
+                
+                <p>Este es el paso más crítico. El DS-10 te permite evitar usar tu certificado de nacimiento completamente.</p>
+                
+                <div class="critical-note">
+                    <strong>PALABRAS EXACTAS DE BRANDON:</strong> "Número de seguro social del declarante. No aplica. No tiene uno."
+                </div>
+                
+                <h3>Cómo Completar el DS-10</h3>
+                
+                <div class="form-group">
+                    <label for="applicant-name-es">1. Nombre del Solicitante (NOMBRE DE LA ENTIDAD - MAYÚSCULAS)</label>
+                    <input type="text" id="applicant-name-es" placeholder="JUAN PÉREZ GARCÍA">
+                    <small>La ENTIDAD para la que estás obteniendo el pasaporte</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="affiant-name-es">2. Nombre del Declarante (TU VERDADERO NOMBRE - Formato Normal)</label>
+                    <input type="text" id="affiant-name-es" placeholder="Juan Pérez">
+                    <small>Tú, el ciudadano del estado y representante autorizado</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="affiant-ssn-es">3. Número de Seguro Social del Declarante</label>
+                    <input type="text" id="affiant-ssn-es" value="N/A - No Aplica" readonly>
+                    <small><strong>CRÍTICO:</strong> No puedes tener un NSS como ciudadano del estado</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="affiant-address-es">4. Dirección del Declarante</label>
+                    <input type="text" id="affiant-address-es" placeholder="Tu dirección actual">
+                </div>
+                
+                <div class="form-group">
+                    <label for="affiant-relationship-es">5. Relación con el Solicitante</label>
+                    <input type="text" id="affiant-relationship-es" value="Representante Autorizado" readonly>
+                </div>
+                
+                <div class="form-group">
+                    <label for="applicant-birth-date-es">6. Fecha de Nacimiento del Solicitante</label>
+                    <input type="date" id="applicant-birth-date-es">
+                    <small>La fecha de nacimiento de la entidad</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="applicant-birth-place-es">7. Lugar de Nacimiento del Solicitante</label>
+                    <input type="text" id="applicant-birth-place-es" placeholder="Ciudad, Estado, País">
+                    <small>Donde la entidad "nació" (fue registrada)</small>
+                </div>
+                
+                <div class="important-note">
+                    <strong>COMPRENSIÓN CLAVE:</strong> Estás testificando sobre los hechos de nacimiento de la ENTIDAD, no sobre tu propio nacimiento personal. 
+                    El "solicitante" es la entidad legal, no tú.
+                </div>
+                
+                <div class="navigation">
+                    <button class="btn-prev" onclick="prevStep('es', 3)">Anterior</button>
+                    <button class="btn-next" onclick="nextStep('es', 3)">Siguiente: Formulario DS-11</button>
+                </div>
+            </div>
+            
+            <!-- Step 4: DS-11 Form -->
+            <div class="step-content" id="step-4-es">
+                <h2>Formulario DS-11 - Solicitud de Pasaporte</h2>
+                
+                <p>Ahora completa el formulario principal de solicitud de pasaporte para la ENTIDAD.</p>
+                
+                <div class="form-group">
+                    <label for="ds11-name-es">1. Nombre (NOMBRE DE LA ENTIDAD - MAYÚSCULAS)</label>
+                    <input type="text" id="ds11-name-es" placeholder="JUAN PÉREZ GARCÍA">
+                </div>
+                
+                <div class="form-group">
+                    <label for="ds11-ssn-es">2. Número de Seguro Social</label>
+                    <input type="text" id="ds11-ssn-es" value="N/A - No Aplica" readonly>
+                </div>
+                
+                <div class="form-group">
+                    <label for="ds11-citizenship-es">3. Ciudadanía</label>
+                    <select id="ds11-citizenship-es">
+                        <option value="US">Ciudadano Estadounidense</option>
+                    </select>
+                    <small>La ENTIDAD es ciudadana estadounidense</small>
+                </div>
+                
+                <div class="form-group">
+                    <label for="ds11-gender-es">4. Sexo</label>
+                    <select id="ds11-gender-es">
+                        <option value="">Seleccionar</option>
+                        <option value="M">Masculino</option>
+                        <option value="F">Femenino</option>
+                    </select>
+                </div>
+                
+                <div class="critical-note">
+                    <strong>¡NO FIRMES EL FORMULARIO DS-11!</strong> Debes firmarlo frente al agente de aceptación de pasaportes.
+                </div>
+                
+                <h3>Documentos de Apoyo</h3>
+                <p>Adjunta tu formulario DS-10 completado a la solicitud DS-11. El DS-10 sirve como prueba de nacimiento para la entidad.</p>
+                
+                <div class="navigation">
+                    <button class="btn-prev" onclick="prevStep('es', 4)">Anterior</button>
+                    <button class="btn-next" onclick="nextStep('es', 4)">Siguiente: Enviar Solicitud</button>
+                </div>
+            </div>
+            
+            <!-- Step 5: Submit -->
+            <div class="step-content" id="step-5-es">
+                <h2>Enviar Tu Solicitud</h2>
+                
+                <p>¡Estás listo para enviar! Lleva tu paquete completo a una Instalación de Aceptación de Pasaportes.</p>
+                
+                <h3>Lista de Verificación Final</h3>
+                <ul class="checklist">
+                    <li>
+                        <input type="checkbox" id="final1-es">
+                        <label for="final1-es"><strong>Formulario DS-11 Completado</strong> (sin firmar)</label>
+                    </li>
+                    <li>
+                        <input type="checkbox" id="final2-es">
+                        <label for="final2-es"><strong>Formulario DS-10 Completado</strong></label>
+                    </li>
+                    <li>
+                        <input type="checkbox" id="final3-es">
+                        <label for="final3-es"><strong>Identificación Oficial con Foto</strong></label>
+                    </li>
+                    <li>
+                        <input type="checkbox" id="final4-es">
+                        <label for="final4-es"><strong>Foto para Pasaporte</strong></label>
+                    </li>
+                    <li>
+                        <input type="checkbox" id="final5-es">
+                        <label for="final5-es"><strong>Tarifas del Pasaporte</strong></label>
+                    </li>
+                </ul>
+                
+                <h3>En la Instalación de Pasaportes</h3>
+                <ul>
+                    <li>Presenta tu paquete completo</li>
+                    <li>Firma el formulario DS-11 frente al agente</li>
+                    <li>Presta juramento (como representante de la entidad)</li>
+                    <li>Paga las tarifas</li>
+                    <li>Obtén tu recibo con número de seguimiento</li>
+                </ul>
+                
+                <div class="success-story">
+                    "¡Usar el método exacto de Brandon con el formulario DS-10 funcionó perfectamente! Sin preguntas sobre el NSS faltante, sin solicitudes de documentos adicionales. El pasaporte llegó en 4 semanas." - Usuario Verificado
+                </div>
+                
+                <div class="important-note">
+                    <strong>¡FELICITACIONES!</strong> Has navegado exitosamente el sistema usando el método preciso que describe Brandon. 
+                    Esto crea una vía legal limpia para que la entidad reciba un pasaporte sin enredarse con el Seguro Social.
+                </div>
+                
+                <div class="navigation">
+                    <button class="btn-prev" onclick="prevStep('es', 5)">Anterior</button>
+                    <button onclick="restartProcess('es')">Comenzar de Nuevo</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="container">
+            <p>Presented by Ramiro Ramirez | Forbidden Knowledge Podcast</p>
+            <p>System provided by TripsToColombia.com</p>
+            <p class="disclaimer">
+                Disclaimer: This information is for educational purposes only. We do not provide legal advice. 
+                Consult with a qualified professional for your specific situation.
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        // Language switching
+        document.getElementById('btn-english').addEventListener('click', function() {
+            switchLanguage('english');
+        });
+        
+        document.getElementById('btn-spanish').addEventListener('click', function() {
+            switchLanguage('spanish');
+        });
+        
+        function switchLanguage(lang) {
+            // Update buttons
+            document.getElementById('btn-english').classList.toggle('active', lang === 'english');
+            document.getElementById('btn-spanish').classList.toggle('active', lang === 'spanish');
+            
+            // Show/hide content
+            document.getElementById('english-content').classList.toggle('active', lang === 'english');
+            document.getElementById('spanish-content').classList.toggle('active', lang === 'spanish');
+            
+            // Reset to first step in selected language
+            if (lang === 'english') {
+                showStep('en', 1);
+            } else {
+                showStep('es', 1);
+            }
+        }
+        
+        // Step management
+        function updateProgress(lang) {
+            const progress = document.getElementById(`progress-${lang}`);
+            const currentStep = window[`currentStep_${lang}`] || 1;
+            const percentage = ((currentStep - 1) / 4) * 100;
+            progress.style.width = percentage + '%';
+            
+            // Update step indicators
+            document.querySelectorAll(`#${lang}-content .step`).forEach((step, index) => {
+                const stepNumber = index + 1;
+                if (stepNumber < currentStep) {
+                    step.classList.add('completed');
+                    step.classList.remove('active');
+                } else if (stepNumber === currentStep) {
+                    step.classList.add('active');
+                    step.classList.remove('completed');
+                } else {
+                    step.classList.remove('active', 'completed');
+                }
+            });
+        }
+        
+        function showStep(lang, stepNumber) {
+            // Hide all steps in this language
+            document.querySelectorAll(`#${lang}-content .step-content`).forEach(step => {
+                step.classList.remove('active');
+            });
+            
+            // Show the target step
+            document.getElementById(`step-${stepNumber}-${lang}`).classList.add('active');
+            window[`currentStep_${lang}`] = stepNumber;
+            updateProgress(lang);
+            
+            // Scroll to top of step content
+            document.getElementById(`step-${stepNumber}-${lang}`).scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function nextStep(lang, current) {
+            if (current < 5) {
+                showStep(lang, current + 1);
+            }
+        }
+        
+        function prevStep(lang, current) {
+            if (current > 1) {
+                showStep(lang, current - 1);
+            }
+        }
+        
+        function restartProcess(lang) {
+            // Reset form fields
+            const prefix = lang === 'en' ? '-en' : '-es';
+            const fields = [
+                'applicant-name', 'affiant-name', 'affiant-address', 
+                'applicant-birth-date', 'applicant-birth-place',
+                'ds11-name'
+            ];
+            
+            fields.forEach(field => {
+                const element = document.getElementById(field + prefix);
+                if (element) element.value = '';
+            });
+            
+            // Reset checkboxes
+            document.querySelectorAll(`#${lang}-content input[type="checkbox"]`).forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            
+            // Go back to first step
+            showStep(lang, 1);
+        }
+        
+        // Initialize
+        switchLanguage('english');
+    </script>
+</body>
+</html>

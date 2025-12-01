@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>POWER AUDIT - Master The 48 Laws</title>
+    <style>
+        :root {
+            --deep: #0a0a0a;
+            --dark: #1a1a1a;
+            --gold: #ffd700;
+            --blood: #8b0000;
+            --silver: #c0c0c0;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Georgia', serif;
+        }
+        
+        body {
+            background: var(--deep);
+            color: var(--silver);
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(139, 0, 0, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(255, 215, 0, 0.1) 0%, transparent 20%);
+        }
+        
+        .war-room {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .command-header {
+            text-align: center;
+            padding: 40px 0;
+            border-bottom: 1px solid var(--blood);
+            margin-bottom: 40px;
+            position: relative;
+        }
+        
+        .command-header::before {
+            content: "⚔️";
+            position: absolute;
+            left: 50%;
+            top: -10px;
+            transform: translateX(-50%);
+            font-size: 2rem;
+            background: var(--deep);
+            padding: 0 20px;
+        }
+        
+        h1 {
+            font-size: 3.5rem;
+            color: var(--gold);
+            text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+            letter-spacing: 3px;
+            margin-bottom: 10px;
+        }
+        
+        .tagline {
+            font-style: italic;
+            color: var(--silver);
+            font-size: 1.2rem;
+            opacity: 0.8;
+        }
+        
+        .tactical-interface {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 30px;
+            min-height: 600px;
+        }
+        
+        .strategy-board {
+            background: var(--dark);
+            border: 1px solid var(--blood);
+            border-radius: 8px;
+            padding: 20px;
+            position: relative;
+            box-shadow: 0 0 20px rgba(139, 0, 0, 0.2);
+        }
+        
+        .situation-input {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--silver);
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        textarea {
+            width: 100%;
+            height: 120px;
+            background: transparent;
+            border: 1px solid var(--silver);
+            border-radius: 3px;
+            padding: 10px;
+            color: var(--silver);
+            font-size: 0.9rem;
+            resize: vertical;
+        }
+        
+        .power-metrics {
+            display: grid;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .metric {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 10px;
+            border-radius: 3px;
+            border-left: 3px solid var(--gold);
+        }
+        
+        .metric label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+            color: var(--silver);
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            background: transparent;
+        }
+        
+        .analysis-panel {
+            background: var(--dark);
+            border: 1px solid var(--gold);
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.1);
+            position: relative;
+            overflow-y: auto;
+            max-height: 600px;
+        }
+        
+        .law-card {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--silver);
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .law-card:hover {
+            border-color: var(--gold);
+            transform: translateX(5px);
+        }
+        
+        .law-card.active {
+            border-color: var(--blood);
+            background: rgba(139, 0, 0, 0.1);
+        }
+        
+        .law-number {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            background: var(--blood);
+            color: white;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+        }
+        
+        .law-title {
+            color: var(--gold);
+            font-weight: bold;
+            margin-bottom: 5px;
+            padding-right: 30px;
+        }
+        
+        .law-description {
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+        
+        .tactical-display {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 5px;
+            border: 1px solid var(--silver);
+        }
+        
+        .tactical-display h3 {
+            color: var(--blood);
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--blood);
+            padding-bottom: 5px;
+        }
+        
+        .action-steps {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        
+        .action-steps li {
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+        
+        button {
+            background: linear-gradient(45deg, var(--blood), #a52a2a);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-weight: bold;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            margin: 10px 5px 0 0;
+        }
+        
+        button:hover {
+            background: linear-gradient(45deg, #a52a2a, var(--blood));
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(139, 0, 0, 0.4);
+        }
+        
+        .generate-btn {
+            background: linear-gradient(45deg, var(--gold), #daa520);
+            color: black;
+            width: 100%;
+            margin-top: 20px;
+        }
+        
+        .generate-btn:hover {
+            background: linear-gradient(45deg, #daa520, var(--gold));
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid var(--blood);
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+        
+        .footer a {
+            color: var(--gold);
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="war-room">
+        <div class="command-header">
+            <h1>POWER AUDIT</h1>
+            <p class="tagline">Strategic Command Center for The 48 Laws of Power</p>
+        </div>
+        
+        <div class="tactical-interface">
+            <!-- Left: Strategy Input -->
+            <div class="strategy-board">
+                <div class="situation-input">
+                    <h3>YOUR CURRENT BATTLEFIELD</h3>
+                    <textarea id="situation" placeholder="Describe your current power dynamic: Who are the players? What do you want? What obstacles stand in your way? Be brutally specific..."></textarea>
+                </div>
+                
+                <div class="power-metrics">
+                    <div class="metric">
+                        <label>Your Current Power Position (1=Weak, 10=Dominant)</label>
+                        <input type="range" min="1" max="10" value="5" id="powerPosition">
+                    </div>
+                    
+                    <div class="metric">
+                        <label>Opposition Strength (1=Weak, 10=Formidable)</label>
+                        <input type="range" min="1" max="10" value="5" id="oppositionStrength">
+                    </div>
+                    
+                    <div class="metric">
+                        <label>Time Pressure (1=Years, 10=Hours)</label>
+                        <input type="range" min="1" max="10" value="5" id="timePressure">
+                    </div>
+                    
+                    <div class="metric">
+                        <label>Visibility (1=Operating in Shadows, 10=Center Stage)</label>
+                        <input type="range" min="1" max="10" value="5" id="visibility">
+                    </div>
+                </div>
+                
+                <button class="generate-btn" onclick="generateStrategy()">GENERATE POWER PROTOCOL</button>
+            </div>
+            
+            <!-- Right: Analysis & Laws -->
+            <div class="analysis-panel">
+                <h3>STRATEGIC LAWS ANALYSIS</h3>
+                
+                <div class="law-card" onclick="selectLaw(1)">
+                    <div class="law-number">1</div>
+                    <div class="law-title">Never Outshine the Master</div>
+                    <div class="law-description">Make your superiors appear more brilliant than they are...</div>
+                </div>
+                
+                <div class="law-card" onclick="selectLaw(3)">
+                    <div class="law-number">3</div>
+                    <div class="law-title">Conceal Your Intentions</div>
+                    <div class="law-description">Keep people off-balance and in the dark by never revealing the purpose behind your actions...</div>
+                </div>
+                
+                <div class="law-card" onclick="selectLaw(6)">
+                    <div class="law-number">6</div>
+                    <div class="law-title">Court Attention at All Cost</div>
+                    <div class="law-description">Everything is judged by its appearance; what is unseen counts for nothing...</div>
+                </div>
+                
+                <div class="law-card" onclick="selectLaw(9)">
+                    <div class="law-number">9</div>
+                    <div class="law-title">Win Through Your Actions, Never Through Argument</div>
+                    <div class="law-description">Demonstrate, do not explicate...</div>
+                </div>
+                
+                <div class="law-card" onclick="selectLaw(13)">
+                    <div class="law-number">13</div>
+                    <div class="law-title">When Asking for Help, Appeal to People's Self-Interest</div>
+                    <div class="law-description">Never to their mercy or gratitude...</div>
+                </div>
+                
+                <div class="law-card" onclick="selectLaw(25)">
+                    <div class="law-number">25</div>
+                    <div class="law-title">Re-Create Yourself</div>
+                    <div class="law-description">Do not accept the roles that society foists on you...</div>
+                </div>
+                
+                <div class="law-card" onclick="selectLaw(33)">
+                    <div class="law-number">33</div>
+                    <div class="law-title">Discover Each Man's Thumbscrew</div>
+                    <div class="law-description">Find the weakness that cannot be resisted...</div>
+                </div>
+                
+                <div class="law-card" onclick="selectLaw(48)">
+                    <div class="law-number">48</div>
+                    <div class="law-title">Assume Formlessness</div>
+                    <div class="law-description">Be fluid and unpredictable to keep opponents off balance...</div>
+                </div>
+                
+                <div class="tactical-display" id="tacticalDisplay">
+                    <h3>TACTICAL BRIEFING</h3>
+                    <p>Select a law to view detailed strategic implementation...</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Built for strategic dominance. Use with precision.</p>
+            <p>Explore tactical retreat locations: <a href="https://TripstoColombia.com" target="_blank">TripsToColombia.com</a></p>
+        </div>
+    </div>
+
+    <script>
+        const lawData = {
+            1: {
+                title: "Never Outshine the Master",
+                briefing: "When dealing with superiors, make them appear more brilliant than they are. Your talents should make them look good, not threaten their position.",
+                actions: [
+                    "Identify what makes your superior feel insecure",
+                    "Publicly attribute your successes to their guidance",
+                    "Ask for their advice even when you don't need it",
+                    "Let them take credit for your best ideas when it serves your long-term position"
+                ],
+                whenToUse: "When dealing with insecure bosses, jealous superiors, or in hierarchical organizations",
+                whenToAvoid: "When the master is already falling and you're positioned to replace them"
+            },
+            3: {
+                title: "Conceal Your Intentions",
+                briefing: "Keep people off-balance and in the dark by never revealing the purpose behind your actions. Lead them down the garden path.",
+                actions: [
+                    "Create a red herring - a false goal that draws attention from your real objective",
+                    "Use patterns of behavior that mislead about your true intentions",
+                    "Speak vaguely about your plans while being specific about irrelevant details",
+                    "Use sincerity as a decoy - appear open while concealing your true agenda"
+                ],
+                whenToUse: "In negotiations, competitive environments, or when you have vulnerable positions",
+                whenToAvoid: "When absolute transparency builds more trust and power"
+            },
+            6: {
+                title: "Court Attention at All Cost",
+                briefing: "Everything is judged by its appearance; what is unseen counts for nothing. Better to be slandered and attacked than ignored.",
+                actions: [
+                    "Create memorable moments that people will talk about",
+                    "Associate yourself with quality and status symbols",
+                    "Become the face of a movement or trend",
+                    "Use controversy strategically to maintain visibility"
+                ],
+                whenToUse: "When building a personal brand, seeking promotion, or competing for limited opportunities",
+                whenToAvoid: "When you need to operate secretly or when attention would expose vulnerable positions"
+            },
+            9: {
+                title: "Win Through Your Actions, Never Through Argument",
+                briefing: "Demonstrate, do not explicate. Any momentary triumph you gain through argument will be offset by the resentment and resistance you create.",
+                actions: [
+                    "When challenged, say 'Let me show you' instead of 'Let me tell you'",
+                    "Create undeniable demonstrations of your capability",
+                    "Let your results speak so loudly people can't ignore them",
+                    "When others argue, remain silent and produce overwhelming evidence"
+                ],
+                whenToUse: "In technical fields, when dealing with stubborn opponents, or when credibility is questioned",
+                whenToAvoid: "When quick persuasion is needed and actions would take too long to demonstrate"
+            },
+            13: {
+                title: "When Asking for Help, Appeal to People's Self-Interest",
+                briefing: "Never to their mercy or gratitude. Find what benefits them in helping you and present your request in those terms.",
+                actions: [
+                    "Before asking, determine what the other person truly values",
+                    "Frame your request as an opportunity for them, not a favor to you",
+                    "Show how helping you solves a problem or creates advantage for them",
+                    "Create win-win scenarios rather than begging for charity"
+                ],
+                whenToUse: "When seeking favors, partnerships, or support from those who don't owe you anything",
+                whenToAvoid: "When dealing with true friends or family where emotional appeals may be more effective"
+            },
+            25: {
+                title: "Re-Create Yourself",
+                briefing: "Do not accept the roles that society foists on you. Forge a new identity that commands attention and never betrays your past.",
+                actions: [
+                    "Consciously design your personal brand and narrative",
+                    "Break patterns that keep you in old, limiting roles",
+                    "Adopt the mannerisms and speech of who you want to become",
+                    "Cut ties with people who reinforce your old identity"
+                ],
+                whenToUse: "During career changes, after failures, or when breaking into new social circles",
+                whenToAvoid: "When your current identity provides significant advantages or trust"
+            },
+            33: {
+                title: "Discover Each Man's Thumbscrew",
+                briefing: "Find the weakness that cannot be resisted. Usually an insecurity, an untamed emotion, or a secret desire.",
+                actions: [
+                    "Observe what makes people emotional, defensive, or unusually eager",
+                    "Notice what they boast about - it often reveals hidden insecurities",
+                    "Identify their compulsive behaviors and patterns",
+                    "Find what they would do anything to protect or obtain"
+                ],
+                whenToUse: "In negotiations, competitive situations, or when you need leverage",
+                whenToAvoid: "With true allies where trust is more valuable than leverage"
+            },
+            48: {
+                title: "Assume Formlessness",
+                briefing: "Be fluid and unpredictable to keep opponents off balance. Accept that nothing is certain and no law is fixed.",
+                actions: [
+                    "Avoid set patterns in your behavior and decisions",
+                    "Keep multiple options open simultaneously",
+                    "Be willing to abandon plans that aren't working without attachment",
+                    "Adapt your strategy to the terrain rather than forcing your will upon it"
+                ],
+                whenToUse: "In rapidly changing environments, against stronger opponents, or when your position is vulnerable",
+                whenToAvoid: "When consistency builds trust or when established processes create efficiency"
+            }
+        };
+
+        let selectedLaw = null;
+
+        function selectLaw(lawNumber) {
+            selectedLaw = lawNumber;
+            
+            // Update UI
+            document.querySelectorAll('.law-card').forEach(card => {
+                card.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+            
+            // Display tactical briefing
+            const law = lawData[lawNumber];
+            const display = document.getElementById('tacticalDisplay');
+            display.innerHTML = `
+                <h3>LAW ${lawNumber}: ${law.title}</h3>
+                <p><strong>Strategic Briefing:</strong> ${law.briefing}</p>
+                
+                <h4>IMMEDIATE ACTIONS:</h4>
+                <ul class="action-steps">
+                    ${law.actions.map(action => `<li>${action}</li>`).join('')}
+                </ul>
+                
+                <p><strong>When to deploy:</strong> ${law.whenToUse}</p>
+                <p><strong>When to avoid:</strong> ${law.whenToAvoid}</p>
+            `;
+        }
+
+        function generateStrategy() {
+            const situation = document.getElementById('situation').value;
+            const powerPos = parseInt(document.getElementById('powerPosition').value);
+            const opposition = parseInt(document.getElementById('oppositionStrength').value);
+            const timePressure = parseInt(document.getElementById('timePressure').value);
+            const visibility = parseInt(document.getElementById('visibility').value);
+            
+            // Strategic analysis based on inputs
+            let recommendedLaws = [];
+            
+            if (powerPos < 5) {
+                recommendedLaws.push(48, 33, 13); // Weaker position - need fluidity and leverage
+            }
+            
+            if (opposition > 7) {
+                recommendedLaws.push(3, 9, 48); // Strong opposition - conceal intentions and be formless
+            }
+            
+            if (timePressure > 7) {
+                recommendedLaws.push(6, 13); // Urgent - need attention and quick alliances
+            }
+            
+            if (visibility < 4) {
+                recommendedLaws.push(6, 25); // Low visibility - need to court attention and recreate image
+            }
+            
+            // Remove duplicates
+            recommendedLaws = [...new Set(recommendedLaws)];
+            
+            // If no specific recommendations, provide general power-building laws
+            if (recommendedLaws.length === 0) {
+                recommendedLaws = [1, 25, 9];
+            }
+            
+            // Create strategic report
+            const display = document.getElementById('tacticalDisplay');
+            display.innerHTML = `
+                <h3>STRATEGIC POWER PROTOCOL</h3>
+                <p><strong>Situation Analysis:</strong> ${situation || "No specific situation provided"}</p>
+                <p><strong>Power Assessment:</strong> You are operating from a ${powerPos < 4 ? 'WEAK' : powerPos < 7 ? 'NEUTRAL' : 'STRONG'} position against ${opposition < 4 ? 'WEAK' : opposition < 7 ? 'MODERATE' : 'STRONG'} opposition.</p>
+                
+                <h4>RECOMMENDED LAWS TO DEPLOY:</h4>
+                ${recommendedLaws.map(lawNum => {
+                    const law = lawData[lawNum];
+                    return `<div style="margin: 10px 0; padding: 10px; background: rgba(0,0,0,0.3); border-left: 3px solid var(--blood);">
+                        <strong>Law ${lawNum}:</strong> ${law.title}<br>
+                        <em>${law.briefing}</em>
+                    </div>`;
+                }).join('')}
+                
+                <h4>EXECUTION TIMELINE:</h4>
+                <ul class="action-steps">
+                    <li><strong>IMMEDIATE (Next 24 hours):</strong> ${lawData[recommendedLaws[0]].actions[0]}</li>
+                    <li><strong>SHORT-TERM (This week):</strong> Deploy Law ${recommendedLaws[1]} - ${lawData[recommendedLaws[1]].actions[0]}</li>
+                    <li><strong>STRATEGIC (This month):</strong> Implement Law ${recommendedLaws[2]} as your foundation</li>
+                </ul>
+                
+                <p style="margin-top: 20px; font-style: italic;">The superior man understands that power is a game of perception and strategy. Execute with precision.</p>
+            `;
+        }
+
+        // Initialize with first law selected
+        selectLaw(1);
+    </script>
+</body>
+</html>

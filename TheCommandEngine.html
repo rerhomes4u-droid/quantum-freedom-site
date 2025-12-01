@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Command Engine - Stop Serving, Start Commanding</title>
+    <style>
+        :root {
+            --primary: #1a1a2e;
+            --secondary: #16213e;
+            --accent: #e94560;
+            --light: #f1f1f1;
+            --gold: #ffd700;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: var(--light);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        h1 {
+            color: var(--gold);
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+        }
+        
+        .tagline {
+            font-style: italic;
+            opacity: 0.8;
+            font-size: 1.2rem;
+        }
+        
+        .step {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .step.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        h2 {
+            color: var(--accent);
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+        
+        .quote {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-left: 4px solid var(--gold);
+            margin: 20px 0;
+            font-style: italic;
+        }
+        
+        .question {
+            margin: 25px 0;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            margin: 10px 0;
+        }
+        
+        .range-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            opacity: 0.7;
+        }
+        
+        textarea {
+            width: 100%;
+            height: 120px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            padding: 10px;
+            color: var(--light);
+            font-size: 1rem;
+        }
+        
+        button {
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin: 10px 5px 0 0;
+        }
+        
+        button:hover {
+            background: #ff2e4f;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(233, 69, 96, 0.4);
+        }
+        
+        button.secondary {
+            background: transparent;
+            border: 1px solid var(--accent);
+        }
+        
+        button.secondary:hover {
+            background: rgba(233, 69, 96, 0.2);
+        }
+        
+        .results {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .score-display {
+            font-size: 3rem;
+            text-align: center;
+            color: var(--gold);
+            margin: 20px 0;
+        }
+        
+        .command-statement {
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid var(--gold);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .action-plan {
+            margin: 20px 0;
+        }
+        
+        .action-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid var(--accent);
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+        
+        .footer a {
+            color: var(--gold);
+            text-decoration: none;
+        }
+        
+        .progress-bar {
+            height: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background: var(--accent);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>THE COMMAND ENGINE</h1>
+            <p class="tagline">Stop serving. Start commanding.</p>
+        </header>
+        
+        <div class="progress-bar">
+            <div class="progress" id="progress"></div>
+        </div>
+        
+        <!-- Step 1: The Wake-Up Call -->
+        <div class="step active" id="step1">
+            <h2>THE WAKE-UP CALL</h2>
+            
+            <div class="quote">
+                "If 40 years of labor ends in dependency, then who truly owned your life? The chains are no longer metal. They are made of routine, of debt, of low expectation."
+            </div>
+            
+            <div class="question">
+                <label>On a scale of 1-10, if you lost your primary income tomorrow, how long could you maintain your current lifestyle?</label>
+                <input type="range" min="1" max="10" value="5" class="slider" id="q1">
+                <div class="range-labels">
+                    <span>1 week (1)</span>
+                    <span>6 months (10)</span>
+                </div>
+            </div>
+            
+            <div class="question">
+                <label>What percentage of your daily work builds assets YOU own versus maintaining assets someone else owns?</label>
+                <input type="range" min="0" max="100" value="30" class="slider" id="q2">
+                <div class="range-labels">
+                    <span>0% Slave (0)</span>
+                    <span>100% Owner (100)</span>
+                </div>
+            </div>
+            
+            <button onclick="nextStep(2)">FACE THE TRUTH →</button>
+        </div>
+        
+        <!-- Step 2: The Habit Audit -->
+        <div class="step" id="step2">
+            <h2>THE HABIT AUDIT</h2>
+            
+            <div class="quote">
+                "Slavery in this age is not enforced by force. It is enforced by familiarity, by repetition, by rhythm gone wrong."
+            </div>
+            
+            <div class="question">
+                <label>Rate your daily rhythm: I begin each day with intentional command of my thoughts and actions.</label>
+                <input type="range" min="1" max="10" value="5" class="slider" id="q3">
+                <div class="range-labels">
+                    <span>Reactive (1)</span>
+                    <span>Commanding (10)</span>
+                </div>
+            </div>
+            
+            <div class="question">
+                <label>My leisure time is primarily spent:</label>
+                <input type="range" min="1" max="10" value="5" class="slider" id="q4">
+                <div class="range-labels">
+                    <span>Consuming (1)</span>
+                    <span>Creating (10)</span>
+                </div>
+            </div>
+            
+            <div class="question">
+                <label>I have a written definite chief aim that I review daily:</label>
+                <input type="range" min="1" max="10" value="5" class="slider" id="q5">
+                <div class="range-labels">
+                    <span>No clarity (1)</span>
+                    <span>Absolute focus (10)</span>
+                </div>
+            </div>
+            
+            <button class="secondary" onclick="prevStep(1)">← BACK</button>
+            <button onclick="nextStep(3)">COMMAND YOUR HABITS →</button>
+        </div>
+        
+        <!-- Step 3: The Mindset Command -->
+        <div class="step" id="step3">
+            <h2>THE MINDSET COMMAND</h2>
+            
+            <div class="quote">
+                "The man who refuses to serve becomes the one who commands. Write your definite chief aim, not tomorrow. Now."
+            </div>
+            
+            <div class="question">
+                <label>YOUR DEFINITE CHIEF AIM:</label>
+                <textarea id="chiefAim" placeholder="I command myself to... I will achieve... by... This is my purpose and I will not be denied."></textarea>
+            </div>
+            
+            <div class="question">
+                <label>THE PRICE I'M WILLING TO PAY:</label>
+                <textarea id="thePrice" placeholder="I will stop... I will start... I will persist until..."></textarea>
+            </div>
+            
+            <button class="secondary" onclick="prevStep(2)">← BACK</button>
+            <button onclick="generateResults()">GENERATE COMMAND PROTOCOL →</button>
+        </div>
+        
+        <!-- Results Section -->
+        <div class="step" id="results">
+            <h2>YOUR COMMAND PROTOCOL</h2>
+            
+            <div class="quote">
+                "The chains are in your habits. The key is in your mind. This is your last warning before time makes the decision for you."
+            </div>
+            
+            <div class="score-display" id="finalScore">
+                SCORE
+            </div>
+            
+            <div class="command-statement">
+                <h3>YOUR COMMAND IDENTITY:</h3>
+                <p id="commandIdentity">[Your definite chief aim will appear here]</p>
+            </div>
+            
+            <div class="results">
+                <h3>YOUR SERVITUDE AUDIT:</h3>
+                <p id="servitudeScore">Servitude analysis will appear here</p>
+                
+                <h3>YOUR COMMAND SCORE:</h3>
+                <p id="commandAnalysis">Command analysis will appear here</p>
+            </div>
+            
+            <div class="action-plan">
+                <h3>IMMEDIATE COMMAND ACTIONS:</h3>
+                <div class="action-item" id="action1">First action will appear here</div>
+                <div class="action-item" id="action2">Second action will appear here</div>
+                <div class="action-item" id="action3">Third action will appear here</div>
+            </div>
+            
+            <button onclick="resetApp()">START OVER</button>
+            <button onclick="window.print()">PRINT YOUR PROTOCOL</button>
+        </div>
+        
+        <div class="footer">
+            <p>Built with <span style="color: var(--accent)">♥</span> for those who refuse to die without building something the world cannot erase.</p>
+            <p>Explore paradise while you build: <a href="https://TripstoColombia.com" target="_blank">TripsToColombia.com</a></p>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 3;
+        
+        function updateProgress() {
+            const progress = ((currentStep - 1) / totalSteps) * 100;
+            document.getElementById('progress').style.width = `${progress}%`;
+        }
+        
+        function nextStep(step) {
+            document.getElementById(`step${currentStep}`).classList.remove('active');
+            currentStep = step;
+            document.getElementById(`step${currentStep}`).classList.add('active');
+            updateProgress();
+        }
+        
+        function prevStep(step) {
+            document.getElementById(`step${currentStep}`).classList.remove('active');
+            currentStep = step;
+            document.getElementById(`step${currentStep}`).classList.add('active');
+            updateProgress();
+        }
+        
+        function generateResults() {
+            // Calculate scores
+            const q1 = parseInt(document.getElementById('q1').value);
+            const q2 = parseInt(document.getElementById('q2').value);
+            const q3 = parseInt(document.getElementById('q3').value);
+            const q4 = parseInt(document.getElementById('q4').value);
+            const q5 = parseInt(document.getElementById('q5').value);
+            
+            const servitudeScore = Math.round((100 - q2) + (10 - q1) * 5);
+            const commandScore = Math.round((q3 + q4 + q5) * 3.33);
+            const finalScore = Math.round((commandScore / 100) * 100);
+            
+            // Get user inputs
+            const chiefAim = document.getElementById('chiefAim').value || "I have not yet defined my definite chief aim. This is my first failure to command.";
+            const thePrice = document.getElementById('thePrice').value || "I have not defined what I'm willing to sacrifice. This reveals my lack of commitment.";
+            
+            // Display results
+            document.getElementById('finalScore').textContent = `${finalScore}% COMMAND`;
+            document.getElementById('commandIdentity').textContent = chiefAim;
+            
+            // Servitude analysis
+            let servitudeText = "";
+            if (servitudeScore > 70) {
+                servitudeText = "HIGH SERVITUDE - You are trading your life for security. The system owns most of your output.";
+            } else if (servitudeScore > 40) {
+                servitudeText = "MODERATE SERVITUDE - You're building some ownership but still primarily serving others' visions.";
+            } else {
+                servitudeText = "LOW SERVITUDE - You're building substantial ownership and command over your life.";
+            }
+            document.getElementById('servitudeScore').textContent = servitudeText;
+            
+            // Command analysis
+            let commandText = "";
+            if (commandScore > 70) {
+                commandText = "HIGH COMMAND - Your habits and mindset are aligned with ownership and purpose.";
+            } else if (commandScore > 40) {
+                commandText = "MODERATE COMMAND - You have elements of command but need more consistency and clarity.";
+            } else {
+                commandText = "LOW COMMAND - You're primarily reactive rather than commanding. This must change immediately.";
+            }
+            document.getElementById('commandAnalysis').textContent = commandText;
+            
+            // Generate actions based on scores
+            const actions = generateActions(servitudeScore, commandScore, q1, q2, q3, q4, q5);
+            document.getElementById('action1').textContent = actions[0];
+            document.getElementById('action2').textContent = actions[1];
+            document.getElementById('action3').textContent = actions[2];
+            
+            // Show results
+            document.getElementById(`step${currentStep}`).classList.remove('active');
+            document.getElementById('results').classList.add('active');
+            document.getElementById('progress').style.width = `100%`;
+        }
+        
+        function generateActions(servitude, command, q1, q2, q3, q4, q5) {
+            const actions = [];
+            
+            // Action 1 based on lowest score
+            const scores = [q1, q2/10, q3, q4, q5];
+            const minScore = Math.min(...scores);
+            const minIndex = scores.indexOf(minScore);
+            
+            if (minIndex === 0 || q1 < 5) {
+                actions.push("IMMEDIATE: Build a 90-day survival fund. Allocate 10% of all income to this until complete.");
+            } else if (minIndex === 1 || q2 < 50) {
+                actions.push("IMMEDIATE: Dedicate 1 hour daily to building an income stream you own. No exceptions.");
+            } else if (minIndex === 2 || q3 < 6) {
+                actions.push("IMMEDIATE: Implement morning command ritual: 5 minutes of reading your definite aim aloud.");
+            } else if (minIndex === 3 || q4 < 6) {
+                actions.push("IMMEDIATE: Convert 30 minutes of consumption time to creation time daily.");
+            } else {
+                actions.push("IMMEDIATE: Write and review your definite chief aim 3x daily for 21 days.");
+            }
+            
+            // Action 2 based on command score
+            if (command < 40) {
+                actions.push("WEEKLY: Join or form a mastermind group that meets weekly to enforce accountability.");
+            } else if (command < 70) {
+                actions.push("WEEKLY: Conduct a Sunday night planning session to command the upcoming week.");
+            } else {
+                actions.push("WEEKLY: Teach the principles of command to someone else to strengthen your mastery.");
+            }
+            
+            // Action 3 based on servitude score
+            if (servitude > 60) {
+                actions.push("MONTHLY: Eliminate one major expense that keeps you dependent on your current income.");
+            } else if (servitude > 30) {
+                actions.push("MONTHLY: Invest in one asset that generates income without your direct time.");
+            } else {
+                actions.push("MONTHLY: Scale your ownership systems to 3x their current output.");
+            }
+            
+            return actions;
+        }
+        
+        function resetApp() {
+            document.getElementById('results').classList.remove('active');
+            currentStep = 1;
+            document.getElementById(`step${currentStep}`).classList.add('active');
+            updateProgress();
+            
+            // Reset form values
+            document.getElementById('q1').value = 5;
+            document.getElementById('q2').value = 30;
+            document.getElementById('q3').value = 5;
+            document.getElementById('q4').value = 5;
+            document.getElementById('q5').value = 5;
+            document.getElementById('chiefAim').value = '';
+            document.getElementById('thePrice').value = '';
+        }
+        
+        // Initialize progress bar
+        updateProgress();
+    </script>
+</body>
+</html>

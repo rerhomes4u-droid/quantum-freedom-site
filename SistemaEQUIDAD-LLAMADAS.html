@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Equidad - Manejo de Llamadas de Cobranza</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #003893;
+            --secondary: #FCD116;
+            --accent: #CE1126;
+            --success: #28a745;
+            --dark: #1a1a2e;
+            --light: #f8f9fa;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f0f23 0%, var(--dark) 100%);
+            color: white;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+        }
+        
+        .title {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.8);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .call-manager {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        @media (max-width: 768px) {
+            .call-manager {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .info-panel, .script-panel {
+            background: rgba(30, 30, 46, 0.8);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .panel-title {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--secondary);
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            font-size: 1rem;
+            color: white;
+            transition: all 0.3s ease;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(0, 56, 147, 0.3);
+        }
+        
+        .script-container {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            line-height: 1.8;
+        }
+        
+        .script-step {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .script-step:last-child {
+            border-bottom: none;
+        }
+        
+        .step-title {
+            font-weight: 700;
+            color: var(--secondary);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .step-content {
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        .response-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+            text-align: center;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+        
+        .call-status {
+            background: rgba(30, 30, 46, 0.8);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 1rem 0;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .status-label {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        .status-value {
+            font-weight: 600;
+            color: var(--secondary);
+        }
+        
+        .notes-panel {
+            background: rgba(30, 30, 46, 0.8);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .notes-area {
+            width: 100%;
+            height: 200px;
+            padding: 1rem;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: white;
+            font-size: 1rem;
+            resize: vertical;
+        }
+        
+        .legal-principles {
+            background: rgba(30, 30, 46, 0.8);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-top: 2rem;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .principle-card {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-left: 4px solid var(--secondary);
+        }
+        
+        .principle-title {
+            font-weight: 700;
+            color: var(--secondary);
+            margin-bottom: 0.5rem;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--success);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            transform: translateX(150%);
+            transition: transform 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .timer {
+            font-size: 1.5rem;
+            text-align: center;
+            margin: 1rem 0;
+            color: var(--secondary);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1 class="title">Sistema de Equidad - Manejo de Llamadas</h1>
+            <p class="subtitle">Herramienta para manejar llamadas de cobranza usando principios de equidad y Código de Comercio</p>
+        </header>
+        
+        <div class="call-status">
+            <h2 class="panel-title"><i class="fas fa-phone"></i> Estado de la Llamada</h2>
+            <div class="status-item">
+                <span class="status-label">Duración de la llamada:</span>
+                <span class="status-value" id="callTimer">00:00</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Estado:</span>
+                <span class="status-value" id="callStatus">No iniciada</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">Información recopilada:</span>
+                <span class="status-value" id="infoCollected">0/5</span>
+            </div>
+        </div>
+        
+        <div class="call-manager">
+            <div class="info-panel">
+                <h2 class="panel-title"><i class="fas fa-user-tie"></i> Información del Cobrador</h2>
+                <div class="form-group">
+                    <label>Nombre del representante</label>
+                    <input type="text" class="form-input" id="repName" placeholder="Ej: Carlos Rodríguez">
+                </div>
+                <div class="form-group">
+                    <label>ID de empleado</label>
+                    <input type="text" class="form-input" id="empId" placeholder="Ej: CR-7845">
+                </div>
+                <div class="form-group">
+                    <label>Empresa</label>
+                    <input type="text" class="form-input" id="company" placeholder="Ej: Cobranzas Colombia S.A.">
+                </div>
+                <div class="form-group">
+                    <label>Dirección postal</label>
+                    <input type="text" class="form-input" id="mailingAddress" placeholder="Ej: Calle 45 #26-85, Bogotá">
+                </div>
+                <div class="form-group">
+                    <label>Nombre del supervisor</label>
+                    <input type="text" class="form-input" id="supervisor" placeholder="Ej: María González">
+                </div>
+                <button class="btn btn-primary" id="startCallBtn">
+                    <i class="fas fa-play-circle"></i> Iniciar Llamada
+                </button>
+                <button class="btn btn-secondary" id="endCallBtn" style="margin-top: 0.5rem;">
+                    <i class="fas fa-stop-circle"></i> Finalizar Llamada
+                </button>
+            </div>
+            
+            <div class="script-panel">
+                <h2 class="panel-title"><i class="fas fa-scroll"></i> Guión de la Llamada</h2>
+                <div class="script-container">
+                    <div class="script-step" id="step1">
+                        <div class="step-title"><i class="fas fa-1"></i> Inicio de la Llamada</div>
+                        <div class="step-content">Cuando el cobrador se presente, responder con tono amable:</div>
+                        <div class="step-content" style="background: rgba(252, 209, 22, 0.1); padding: 1rem; border-radius: 8px; margin-top: 0.5rem;">
+                            "¡Muchas gracias por llamar! ¿Con quién tengo el gusto de hablar?"
+                        </div>
+                        <div class="response-buttons">
+                            <button class="btn btn-primary" onclick="nextStep(1)">He dicho esto</button>
+                        </div>
+                    </div>
+                    
+                    <div class="script-step" id="step2" style="display: none;">
+                        <div class="step-title"><i class="fas fa-2"></i> Recopilar Información</div>
+                        <div class="step-content">Una vez que te den su nombre, continúa preguntando amablemente:</div>
+                        <div class="step-content" style="background: rgba(252, 209, 22, 0.1); padding: 1rem; border-radius: 8px; margin-top: 0.5rem;">
+                            "¿Tiene un número de identificación de empleado?"
+                        </div>
+                        <div class="step-content" style="background: rgba(252, 209, 22, 0.1); padding: 1rem; border-radius: 8px; margin-top: 0.5rem;">
+                            "¿Para qué empresa trabaja?"
+                        </div>
+                        <div class="step-content" style="background: rgba(252, 209, 22, 0.1); padding: 1rem; border-radius: 8px; margin-top: 0.5rem;">
+                            "¿Cuál es su dirección postal?"
+                        </div>
+                        <div class="step-content" style="background: rgba(252, 209, 22, 0.1); padding: 1rem; border-radius: 8px; margin-top: 0.5rem;">
+                            "¿Puedo tener el nombre de su supervisor?"
+                        </div>
+                        <div class="response-buttons">
+                            <button class="btn btn-primary" onclick="nextStep(2)">He recopilado esta información</button>
+                        </div>
+                    </div>
+                    
+                    <div class="script-step" id="step3" style="display: none;">
+                        <div class="step-title"><i class="fas fa-3"></i> Preguntar lo que Necesitan</div>
+                        <div class="step-content">Una vez que tengas toda la información, pregunta:</div>
+                        <div class="step-content" style="background: rgba(252, 209, 22, 0.1); padding: 1rem; border-radius: 8px; margin-top: 0.5rem;">
+                            "Excelente. Entonces, ¿qué es lo que necesita de mí?"
+                        </div>
+                        <div class="response-buttons">
+                            <button class="btn btn-primary" onclick="nextStep(3)">He preguntado esto</button>
+                        </div>
+                    </div>
+                    
+                    <div class="script-step" id="step4" style="display: none;">
+                        <div class="step-title"><i class="fas fa-4"></i> Solicitar Presentación por Escrito</div>
+                        <div class="step-content">Cuando el cobrador te pida el pago, responde amablemente:</div>
+                        <div class="step-content" style="background: rgba(252, 209, 22, 0.1); padding: 1rem; border-radius: 8px; margin-top: 0.5rem;">
+                            "Muchas gracias por llamar. Si pudiera poner eso por escrito y enviármelo por correo, lo honraré inmediatamente una vez que lo reciba; ¿podría hacer eso por favor?"
+                        </div>
+                        <div class="response-buttons">
+                            <button class="btn btn-primary" onclick="nextStep(4)">He solicitado el escrito</button>
+                        </div>
+                    </div>
+                    
+                    <div class="script-step" id="step5" style="display: none;">
+                        <div class="step-title"><i class="fas fa-5"></i> Manejar Objeciones</div>
+                        <div class="step-content">Si el cobrador se queja de que no has pagado, pregunta:</div>
+                        <div class="step-content" style="background: rgba(252, 209, 22, 0.1); padding: 1rem; border-radius: 8px; margin-top: 0.5rem;">
+                            "¿Reflejan sus registros que he aceptado y devuelto todas las presentaciones que me han enviado para la liquidación y cierre de este asunto?"
+                        </div>
+                        <div class="step-content">Repite esto hasta que entiendan. Luego repite la solicitud de envío por escrito.</div>
+                        <div class="response-buttons">
+                            <button class="btn btn-primary" onclick="nextStep(5)">He manejado la objeción</button>
+                        </div>
+                    </div>
+                    
+                    <div class="script-step" id="step6" style="display: none;">
+                        <div class="step-title"><i class="fas fa-flag-checkered"></i> Finalizar la Llamada</div>
+                        <div class="step-content">Una vez que hayas solicitado el documento por escrito, finaliza la llamada amablemente:</div>
+                        <div class="step-content" style="background: rgba(252, 209, 22, 0.1); padding: 1rem; border-radius: 8px; margin-top: 0.5rem;">
+                            "Muchas gracias, que tenga un día maravilloso."
+                        </div>
+                        <div class="response-buttons">
+                            <button class="btn btn-primary" onclick="completeCall()">Finalizar Llamada</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="notes-panel">
+            <h2 class="panel-title"><i class="fas fa-sticky-note"></i> Notas de la Llamada</h2>
+            <textarea class="notes-area" id="callNotes" placeholder="Toma notas importantes durante la llamada..."></textarea>
+        </div>
+        
+        <div class="legal-principles">
+            <h2 class="panel-title"><i class="fas fa-balance-scale"></i> Principios Legales Aplicados</h2>
+            <div class="principle-card">
+                <div class="principle-title">Principio de Equidad</div>
+                <div class="step-content">La equidad busca justicia basada en principios de imparcialidad, no solo en reglas técnicas. Al ofrecer "honrar" la deuda, estás operando bajo principios equitativos.</div>
+            </div>
+            <div class="principle-card">
+                <div class="principle-title">Presentación por Escrito</div>
+                <div class="step-content">El Código de Comercio y principios del derecho comercial requieren presentación adecuada de reclamos. Al solicitar documentación por escrito, te aseguras un proceso formal.</div>
+            </div>
+            <div class="principle-card">
+                <div class="principle-title">Honor vs. Pago</div>
+                <div class="step-content">"Honor" no significa necesariamente pagar con dinero. Significa resolver el asunto de manera equitativa, lo que puede incluir compensación, trueque o liquidación.</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Notification System -->
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i>
+        <span id="notificationText">Operación completada con éxito!</span>
+    </div>
+
+    <script>
+        // Estado de la aplicación
+        const appState = {
+            callActive: false,
+            callStartTime: null,
+            timerInterval: null,
+            currentStep: 1,
+            infoCollected: 0
+        };
+        
+        // Elementos DOM
+        const callTimerEl = document.getElementById('callTimer');
+        const callStatusEl = document.getElementById('callStatus');
+        const infoCollectedEl = document.getElementById('infoCollected');
+        const startCallBtn = document.getElementById('startCallBtn');
+        const endCallBtn = document.getElementById('endCallBtn');
+        const notificationEl = document.getElementById('notification');
+        const notificationTextEl = document.getElementById('notificationText');
+        
+        // Iniciar llamada
+        startCallBtn.addEventListener('click', function() {
+            if (!validateInfo()) {
+                showNotification('Por favor, completa toda la información del cobrador antes de iniciar la llamada.');
+                return;
+            }
+            
+            appState.callActive = true;
+            appState.callStartTime = new Date();
+            appState.currentStep = 1;
+            appState.infoCollected = 0;
+            
+            callStatusEl.textContent = 'En progreso';
+            startCallBtn.disabled = true;
+            endCallBtn.disabled = false;
+            
+            // Iniciar temporizador
+            startTimer();
+            
+            // Mostrar primer paso
+            showStep(1);
+            
+            showNotification('Llamada iniciada. Sigue el guión paso a paso.');
+        });
+        
+        // Finalizar llamada
+        endCallBtn.addEventListener('click', function() {
+            appState.callActive = false;
+            callStatusEl.textContent = 'Finalizada';
+            startCallBtn.disabled = false;
+            endCallBtn.disabled = true;
+            
+            // Detener temporizador
+            clearInterval(appState.timerInterval);
+            
+            showNotification('Llamada finalizada. Revisa tus notas y prepara el seguimiento por escrito.');
+        });
+        
+        // Validar información del cobrador
+        function validateInfo() {
+            const repName = document.getElementById('repName').value;
+            const empId = document.getElementById('empId').value;
+            const company = document.getElementById('company').value;
+            const mailingAddress = document.getElementById('mailingAddress').value;
+            const supervisor = document.getElementById('supervisor').value;
+            
+            return repName && empId && company && mailingAddress && supervisor;
+        }
+        
+        // Iniciar temporizador
+        function startTimer() {
+            appState.timerInterval = setInterval(function() {
+                const now = new Date();
+                const diff = now - appState.callStartTime;
+                const minutes = Math.floor(diff / 60000);
+                const seconds = Math.floor((diff % 60000) / 1000);
+                
+                callTimerEl.textContent = 
+                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+        
+        // Mostrar paso específico
+        function showStep(stepNumber) {
+            // Ocultar todos los pasos
+            for (let i = 1; i <= 6; i++) {
+                document.getElementById(`step${i}`).style.display = 'none';
+            }
+            
+            // Mostrar el paso actual
+            document.getElementById(`step${stepNumber}`).style.display = 'block';
+            appState.currentStep = stepNumber;
+        }
+        
+        // Avanzar al siguiente paso
+        function nextStep(currentStep) {
+            if (currentStep === 2) {
+                // Actualizar contador de información recopilada
+                updateInfoCollected();
+            }
+            
+            if (currentStep < 6) {
+                showStep(currentStep + 1);
+            }
+        }
+        
+        // Actualizar información recopilada
+        function updateInfoCollected() {
+            const fields = [
+                document.getElementById('repName'),
+                document.getElementById('empId'),
+                document.getElementById('company'),
+                document.getElementById('mailingAddress'),
+                document.getElementById('supervisor')
+            ];
+            
+            let collected = 0;
+            fields.forEach(field => {
+                if (field.value.trim() !== '') {
+                    collected++;
+                }
+            });
+            
+            appState.infoCollected = collected;
+            infoCollectedEl.textContent = `${collected}/5`;
+        }
+        
+        // Completar llamada
+        function completeCall() {
+            appState.callActive = false;
+            callStatusEl.textContent = 'Completada con éxito';
+            startCallBtn.disabled = false;
+            endCallBtn.disabled = true;
+            
+            // Detener temporizador
+            clearInterval(appState.timerInterval);
+            
+            showNotification('¡Llamada manejada exitosamente! Has aplicado los principios de equidad correctamente.');
+        }
+        
+        // Mostrar notificación
+        function showNotification(message) {
+            notificationTextEl.textContent = message;
+            notificationEl.classList.add('show');
+            
+            setTimeout(() => {
+                notificationEl.classList.remove('show');
+            }, 3000);
+        }
+        
+        // Actualizar información recopilada cuando se modifiquen los campos
+        document.querySelectorAll('.form-input').forEach(input => {
+            input.addEventListener('input', updateInfoCollected);
+        });
+        
+        // Inicializar aplicación
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Sistema de Equidad - Listo para manejar llamadas');
+            endCallBtn.disabled = true;
+        });
+    </script>
+</body>
+</html>

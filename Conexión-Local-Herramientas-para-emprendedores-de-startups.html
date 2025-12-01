@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conexión Local - Herramientas para Emprendedores</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --success: #2ecc71;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f9f9f9;
+            color: #333;
+            line-height: 1.6;
+        }
+        
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 2rem 1rem;
+            text-align: center;
+        }
+        
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        header p {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+        
+        .section {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        h2 {
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid var(--light);
+        }
+        
+        h3 {
+            color: var(--secondary);
+            margin: 1.5rem 0 1rem;
+        }
+        
+        .phase-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 1.5rem;
+        }
+        
+        .phase-tab {
+            padding: 10px 20px;
+            background-color: var(--light);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+        
+        .phase-tab.active {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .phase-content {
+            display: none;
+        }
+        
+        .phase-content.active {
+            display: block;
+        }
+        
+        .checklist {
+            list-style: none;
+            margin: 1rem 0;
+        }
+        
+        .checklist li {
+            padding: 0.5rem 0;
+            display: flex;
+            align-items: flex-start;
+        }
+        
+        .checklist input[type="checkbox"] {
+            margin-right: 10px;
+            margin-top: 5px;
+        }
+        
+        .tool-card {
+            background: var(--light);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+        
+        .tool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .calculator {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .calculator {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .calc-input {
+            margin-bottom: 1rem;
+        }
+        
+        .calc-input label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+        
+        .calc-input input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        
+        .calc-result {
+            background: var(--success);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 8px;
+            text-align: center;
+        }
+        
+        .calc-result h4 {
+            margin-bottom: 0.5rem;
+        }
+        
+        .calc-result .amount {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background-color: var(--success);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+        
+        .btn:hover {
+            background-color: var(--primary);
+        }
+        
+        .btn-accent {
+            background-color: var(--accent);
+        }
+        
+        .btn-accent:hover {
+            background-color: #c0392b;
+        }
+        
+        footer {
+            background-color: var(--primary);
+            color: white;
+            text-align: center;
+            padding: 2rem 1rem;
+            margin-top: 2rem;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .quote {
+            font-style: italic;
+            border-left: 4px solid var(--secondary);
+            padding-left: 1rem;
+            margin: 1.5rem 0;
+            color: #555;
+        }
+        
+        .success-story {
+            background: linear-gradient(135deg, #e3f2fd, #f3e5f5);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Conexión Local</h1>
+        <p>Herramientas para emprendedores de startups - Plan completo para lanzar y escalar tu negocio de descuentos en Colombia</p>
+    </header>
+
+    <div class="container">
+        <section class="section">
+            <h2>Tu Plan de Negocio Paso a Paso</h2>
+            <p>Implementa el modelo "Conexión Local" con estas herramientas diseñadas específicamente para emprendedores colombianos.</p>
+            
+            <div class="phase-tabs">
+                <div class="phase-tab active" data-phase="phase1">Fase 1: Fundación</div>
+                <div class="phase-tab" data-phase="phase2">Fase 2: Lanzamiento</div>
+                <div class="phase-tab" data-phase="phase3">Fase 3: Escalación</div>
+            </div>
+            
+            <div id="phase1" class="phase-content active">
+                <h3>Fase 1: Fundación y Estrategia (Pre-Lanzamiento)</h3>
+                
+                <div class="tool-card">
+                    <h4>Propuesta de Valor Personalizada</h4>
+                    <p>Crea tu propuesta de valor específica para comercios y clientes.</p>
+                    
+                    <div class="calc-input">
+                        <label for="business-type">Tipo de Negocio:</label>
+                        <input type="text" id="business-type" placeholder="Ej: Tours de aventura">
+                    </div>
+                    
+                    <div class="calc-input">
+                        <label for="target-client">Cliente Objetivo:</label>
+                        <input type="text" id="target-client" placeholder="Ej: Viajeros jóvenes">
+                    </div>
+                    
+                    <button class="btn" id="generate-proposal">Generar Propuesta</button>
+                    
+                    <div id="proposal-result" class="hidden">
+                        <div class="quote">
+                            <h4>Tu Propuesta de Valor para Comercios:</h4>
+                            <p id="proposal-business"></p>
+                            
+                            <h4>Tu Propuesta de Valor para Clientes:</h4>
+                            <p id="proposal-client"></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tool-card">
+                    <h4>Checklist de Fundación</h4>
+                    <p>Marca las tareas completadas para llevar un control de tu progreso:</p>
+                    
+                    <ul class="checklist">
+                        <li><input type="checkbox"> Definir propuesta de valor clara</li>
+                        <li><input type="checkbox"> Investigar mercado objetivo</li>
+                        <li><input type="checkbox"> Estructurar modelo de negocio</li>
+                        <li><input type="checkbox"> Constituir SAS</li>
+                        <li><input type="checkbox"> Redactar contratos con abogado</li>
+                        <li><input type="checkbox"> Definir proceso de cobro automatizado</li>
+                        <li><input type="checkbox"> Planificar desarrollo de plataforma</li>
+                        <li><input type="checkbox"> Segmentar mercado inicial</li>
+                        <li><input type="checkbox"> Preparar material de ventas</li>
+                    </ul>
+                    
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="phase1-progress"></div>
+                    </div>
+                    <p id="phase1-progress-text">Progreso: 0%</p>
+                </div>
+            </div>
+            
+            <div id="phase2" class="phase-content">
+                <h3>Fase 2: Lanzamiento y Crecimiento</h3>
+                
+                <div class="tool-card">
+                    <h4>Simulador de Comisiones</h4>
+                    <p>Calcula cuánto puedes ganar con diferentes volúmenes de ventas:</p>
+                    
+                    <div class="calculator">
+                        <div>
+                            <div class="calc-input">
+                                <label for="monthly-sales">Ventas Mensuales Totales (COP):</label>
+                                <input type="number" id="monthly-sales" placeholder="Ej: 50000000" min="0">
+                            </div>
+                            
+                            <div class="calc-input">
+                                <label for="commission-rate">Porcentaje de Comisión (%):</label>
+                                <input type="number" id="commission-rate" value="10" min="1" max="30">
+                            </div>
+                            
+                            <div class="calc-input">
+                                <label for="provider-count">Número de Proveedores Activos:</label>
+                                <input type="number" id="provider-count" placeholder="Ej: 25" min="1">
+                            </div>
+                            
+                            <button class="btn" id="calculate-commission">Calcular</button>
+                        </div>
+                        
+                        <div class="calc-result">
+                            <h4>Tu Ingreso Mensual Estimado:</h4>
+                            <div class="amount" id="commission-result">$0</div>
+                            <p>Basado en <span id="commission-sales">0</span> ventas procesadas</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="tool-card">
+                    <h4>Plan de Marketing para Usuarios</h4>
+                    <p>Genera ideas específicas para atraer clientes a tu plataforma:</p>
+                    
+                    <div class="calc-input">
+                        <label for="city">Ciudad de Enfoque:</label>
+                        <input type="text" id="city" placeholder="Ej: Medellín">
+                    </div>
+                    
+                    <div class="calc-input">
+                        <label for="budget">Presupuesto Mensual de Marketing (COP):</label>
+                        <input type="number" id="budget" placeholder="Ej: 2000000" min="0">
+                    </div>
+                    
+                    <button class="btn" id="generate-marketing">Generar Ideas</button>
+                    
+                    <div id="marketing-result" class="hidden">
+                        <h4>Ideas de Marketing para <span id="city-name"></span>:</h4>
+                        <ul class="checklist">
+                            <li><input type="checkbox"> Colaboración con influencers locales de viajes</li>
+                            <li><input type="checkbox"> Publicidad geolocalizada en redes sociales</li>
+                            <li><input type="checkbox"> Contenido visual en TikTok/Instagram mostrando experiencias</li>
+                            <li><input type="checkbox"> Alianzas con hostales y hoteles</li>
+                            <li><input type="checkbox"> Programa de referidos con créditos en la app</li>
+                            <li><input type="checkbox"> Guías de viaje en blog con proveedores destacados</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="phase3" class="phase-content">
+                <h3>Fase 3: Escalación y Dominio del Mercado</h3>
+                
+                <div class="tool-card">
+                    <h4>Simulador de Expansión</h4>
+                    <p>Planifica tu expansión a nuevas ciudades o categorías:</p>
+                    
+                    <div class="calculator">
+                        <div>
+                            <div class="calc-input">
+                                <label for="current-cities">Ciudades Actuales:</label>
+                                <input type="number" id="current-cities" value="1" min="1">
+                            </div>
+                            
+                            <div class="calc-input">
+                                <label for="new-cities">Nuevas Ciudades a Expandir:</label>
+                                <input type="number" id="new-cities" value="1" min="1">
+                            </div>
+                            
+                            <div class="calc-input">
+                                <label for="cost-per-city">Costo de Expansión por Ciudad (COP):</label>
+                                <input type="number" id="cost-per-city" placeholder="Ej: 5000000" min="0">
+                            </div>
+                            
+                            <div class="calc-input">
+                                <label for="expected-growth">Crecimiento Esperado por Ciudad (%):</label>
+                                <input type="number" id="expected-growth" value="20" min="0">
+                            </div>
+                            
+                            <button class="btn" id="calculate-expansion">Calcular</button>
+                        </div>
+                        
+                        <div class="calc-result">
+                            <h4>Inversión y Retorno Estimado:</h4>
+                            <p>Inversión Total: <span id="expansion-cost">$0</span></p>
+                            <p>Crecimiento Esperado: <span id="expansion-growth">0%</span></p>
+                            <p>ROI Estimado: <span id="expansion-roi">0%</span></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="success-story">
+                    <h4>Ejemplo de Caso de Éxito</h4>
+                    <p>"Implementamos Conexión Local en Cartagena con 15 proveedores iniciales. En 6 meses, logramos:</p>
+                    <ul>
+                        <li>+120 proveedores activos</li>
+                        <li>+5,000 usuarios registrados</li>
+                        <li>+$150 millones COP en ventas procesadas</li>
+                        <li>+$15 millones COP en comisiones mensuales</li>
+                    </ul>
+                    <p>La clave fue enfocarnos inicialmente en el sector de tours acuáticos y alquiler de equipos de buceo."</p>
+                </div>
+                
+                <div class="tool-card">
+                    <h4>Plan de Fidelización de Proveedores</h4>
+                    <p>Estrategias para retener y hacer crecer a tus proveedores más valiosos:</p>
+                    
+                    <ul class="checklist">
+                        <li><input type="checkbox"> Crear programa de proveedores premium</li>
+                        <li><input type="checkbox"> Desarrollar casos de éxito con testimonios</li>
+                        <li><input type="checkbox"> Ofrecer webinars de capacitación</li>
+                        <li><input type="checkbox"> Proporcionar datos de mercado exclusivos</li>
+                        <li><input type="checkbox"> Implementar sistema de recompensas por volumen</li>
+                        <li><input type="checkbox"> Crear comunidad exclusiva para proveedores</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+        
+        <section class="section">
+            <h2>Herramientas Adicionales</h2>
+            
+            <div class="tool-card">
+                <h4>Calculadora de Pitch para Inversionistas</h4>
+                <p>Prepara tu presentación para inversionistas con datos concretos:</p>
+                
+                <div class="calc-input">
+                    <label for="current-users">Usuarios Actuales:</label>
+                    <input type="number" id="current-users" placeholder="Ej: 1500" min="0">
+                </div>
+                
+                <div class="calc-input">
+                    <label for="monthly-growth">Crecimiento Mensual de Usuarios (%):</label>
+                    <input type="number" id="monthly-growth" placeholder="Ej: 15" min="0">
+                </div>
+                
+                <div class="calc-input">
+                    <label for="current-revenue">Ingresos Mensuales Actuales (COP):</label>
+                    <input type="number" id="current-revenue" placeholder="Ej: 5000000" min="0">
+                </div>
+                
+                <button class="btn" id="generate-pitch">Generar Proyección</button>
+                
+                <div id="pitch-result" class="hidden">
+                    <h4>Tu Proyección a 12 Meses:</h4>
+                    <p>Usuarios en 12 meses: <strong id="projected-users">0</strong></p>
+                    <p>Ingresos mensuales en 12 meses: <strong id="projected-revenue">$0</strong></p>
+                    <p>Valoración estimada: <strong id="projected-valuation">$0</strong></p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <footer>
+        <p>© 2023 Conexión Local - Herramientas para Emprendedores de Startups</p>
+        <p>¡Construye tu negocio de descuentos en Colombia con este plan probado!</p>
+    </footer>
+
+    <script>
+        // Cambio entre fases
+        document.querySelectorAll('.phase-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remover clase active de todas las pestañas y contenidos
+                document.querySelectorAll('.phase-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.phase-content').forEach(c => c.classList.remove('active'));
+                
+                // Agregar clase active a la pestaña clickeada y su contenido correspondiente
+                tab.classList.add('active');
+                const phaseId = tab.getAttribute('data-phase');
+                document.getElementById(phaseId).classList.add('active');
+            });
+        });
+        
+        // Actualizar progreso de la fase 1
+        document.querySelectorAll('#phase1 input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', updatePhase1Progress);
+        });
+        
+        function updatePhase1Progress() {
+            const checkboxes = document.querySelectorAll('#phase1 input[type="checkbox"]');
+            const checked = document.querySelectorAll('#phase1 input[type="checkbox"]:checked');
+            const progress = (checked.length / checkboxes.length) * 100;
+            
+            document.getElementById('phase1-progress').style.width = `${progress}%`;
+            document.getElementById('phase1-progress-text').textContent = `Progreso: ${Math.round(progress)}%`;
+        }
+        
+        // Generar propuesta de valor
+        document.getElementById('generate-proposal').addEventListener('click', () => {
+            const businessType = document.getElementById('business-type').value || 'negocios locales';
+            const targetClient = document.getElementById('target-client').value || 'clientes';
+            
+            document.getElementById('proposal-business').textContent = 
+                `Le enviamos ${targetClient} nuevos que pagan completo, y usted solo nos paga el 10% sobre las ventas que realmente concretamos. Sin costo fijo, sin riesgo. Especialmente diseñado para ${businessType} como el suyo.`;
+            
+            document.getElementById('proposal-client').textContent = 
+                `Acceda a descuentos exclusivos del 10% en una red cuidadosamente seleccionada de los mejores ${businessType} de Colombia. Todo en una sola app, diseñada para ${targetClient} como usted.`;
+            
+            document.getElementById('proposal-result').classList.remove('hidden');
+        });
+        
+        // Calcular comisiones
+        document.getElementById('calculate-commission').addEventListener('click', () => {
+            const sales = parseFloat(document.getElementById('monthly-sales').value) || 0;
+            const rate = parseFloat(document.getElementById('commission-rate').value) || 10;
+            const providers = parseFloat(document.getElementById('provider-count').value) || 1;
+            
+            const commission = (sales * rate / 100);
+            const avgSales = sales / providers;
+            
+            document.getElementById('commission-result').textContent = `$${commission.toLocaleString('es-CO')}`;
+            document.getElementById('commission-sales').textContent = sales.toLocaleString('es-CO');
+        });
+        
+        // Generar ideas de marketing
+        document.getElementById('generate-marketing').addEventListener('click', () => {
+            const city = document.getElementById('city').value || 'tu ciudad';
+            const budget = parseFloat(document.getElementById('budget').value) || 0;
+            
+            document.getElementById('city-name').textContent = city;
+            
+            // Ajustar ideas según presupuesto
+            const ideasList = document.querySelectorAll('#marketing-result input[type="checkbox"]');
+            
+            if (budget < 1000000) {
+                ideasList[0].parentElement.textContent = "Colaboración con micro-influencers locales a cambio de exposición";
+                ideasList[1].parentElement.textContent = "Publicidad orgánica en grupos de Facebook de viajeros en " + city;
+                ideasList[2].parentElement.textContent = "Contenido de usuario con hashtag específico para " + city;
+            } else if (budget < 5000000) {
+                ideasList[0].parentElement.textContent = "Colaboración pagada con influencers de viajes con seguidores en " + city;
+                ideasList[1].parentElement.textContent = "Campañas de publicidad segmentada por ubicación en redes sociales";
+                ideasList[2].parentElement.textContent = "Producción de contenido profesional mostrando experiencias en " + city;
+            } else {
+                ideasList[0].parentElement.textContent = "Colaboración con influencers reconocidos a nivel nacional con presencia en " + city;
+                ideasList[1].parentElement.textContent = "Campaña integral de marketing digital con geolocalización precisa";
+                ideasList[2].parentElement.textContent = "Producción de video profesional para TikTok/Instagram Reels";
+            }
+            
+            document.getElementById('marketing-result').classList.remove('hidden');
+        });
+        
+        // Calcular expansión
+        document.getElementById('calculate-expansion').addEventListener('click', () => {
+            const currentCities = parseFloat(document.getElementById('current-cities').value) || 1;
+            const newCities = parseFloat(document.getElementById('new-cities').value) || 1;
+            const costPerCity = parseFloat(document.getElementById('cost-per-city').value) || 0;
+            const growth = parseFloat(document.getElementById('expected-growth').value) || 0;
+            
+            const totalCost = newCities * costPerCity;
+            const totalGrowth = (currentCities + newCities) * growth;
+            const roi = (totalGrowth / 100) * (totalCost > 0 ? totalCost : 1);
+            
+            document.getElementById('expansion-cost').textContent = `$${totalCost.toLocaleString('es-CO')}`;
+            document.getElementById('expansion-growth').textContent = `${totalGrowth.toFixed(1)}%`;
+            document.getElementById('expansion-roi').textContent = `${(roi / totalCost * 100).toFixed(1)}%`;
+        });
+        
+        // Generar proyección para pitch
+        document.getElementById('generate-pitch').addEventListener('click', () => {
+            const currentUsers = parseFloat(document.getElementById('current-users').value) || 0;
+            const monthlyGrowth = parseFloat(document.getElementById('monthly-growth').value) || 0;
+            const currentRevenue = parseFloat(document.getElementById('current-revenue').value) || 0;
+            
+            // Proyección exponencial
+            let projectedUsers = currentUsers;
+            let projectedRevenue = currentRevenue;
+            
+            for (let i = 0; i < 12; i++) {
+                projectedUsers *= (1 + monthlyGrowth / 100);
+                projectedRevenue *= (1 + monthlyGrowth / 100);
+            }
+            
+            // Valoración típica: 5-10x ingresos anuales
+            const annualRevenue = projectedRevenue * 12;
+            const valuation = annualRevenue * 7; // 7x como punto medio
+            
+            document.getElementById('projected-users').textContent = Math.round(projectedUsers).toLocaleString('es-CO');
+            document.getElementById('projected-revenue').textContent = `$${Math.round(projectedRevenue).toLocaleString('es-CO')}`;
+            document.getElementById('projected-valuation').textContent = `$${Math.round(valuation).toLocaleString('es-CO')}`;
+            
+            document.getElementById('pitch-result').classList.remove('hidden');
+        });
+    </script>
+</body>
+</html>
