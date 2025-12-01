@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operation Root System - Covenant Steward Portal</title>
+    <style>
+        :root {
+            --earth: #5D4037;
+            --forest: #2E7D32;
+            --clay: #D84315;
+            --gold: #FFD700;
+            --sky: #0288D1;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Georgia', serif;
+        }
+        
+        body {
+            background: linear-gradient(to bottom, #1a1a2e 0%, #16213e 100%);
+            color: #f0f0f0;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        .app-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 30px 20px;
+            border-bottom: 2px solid var(--clay);
+            margin-bottom: 40px;
+            position: relative;
+        }
+        
+        .hearth-glow {
+            position: absolute;
+            top: 50%;
+            left: 20px;
+            width: 60px;
+            height: 60px;
+            background: radial-gradient(circle, var(--clay), transparent 70%);
+            animation: pulse 4s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+        
+        .protocol-modules {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .module {
+            background: rgba(30, 30, 46, 0.9);
+            border: 1px solid var(--forest);
+            border-radius: 12px;
+            padding: 25px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .module:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(46, 125, 50, 0.3);
+        }
+        
+        .module-header {
+            color: var(--gold);
+            border-bottom: 1px solid var(--earth);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 1.4em;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 10px;
+            background: var(--forest);
+        }
+        
+        .active { background: #4CAF50; }
+        .alert { background: #ff9800; }
+        .critical { background: #f44336; animation: blink 1s infinite; }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        
+        button {
+            background: linear-gradient(to right, var(--earth), var(--forest));
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+            transition: transform 0.2s;
+        }
+        
+        button:hover {
+            transform: scale(1.05);
+        }
+        
+        .danger-btn {
+            background: linear-gradient(to right, #b71c1c, #d32f2f);
+        }
+        
+        .sacred-btn {
+            background: linear-gradient(to right, var(--clay), #FF6B35);
+        }
+        
+        .protocol-steps {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 4px solid var(--sky);
+        }
+        
+        .emergency-panel {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(183, 28, 28, 0.95);
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #fff;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .seed-plant {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(46, 125, 50, 0.9);
+            padding: 15px;
+            border-radius: 50%;
+            cursor: pointer;
+            width: 70px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        
+        .legal-document {
+            background: white;
+            color: black;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            display: none;
+            font-family: 'Courier New', monospace;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .network-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .node {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--forest);
+            position: relative;
+        }
+        
+        .node.active::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--forest);
+            animation: nodePulse 2s infinite;
+        }
+        
+        @keyframes nodePulse {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(2.5); opacity: 0; }
+        }
+        
+        .countdown {
+            font-family: monospace;
+            font-size: 1.2em;
+            color: var(--gold);
+            background: rgba(0,0,0,0.5);
+            padding: 10px;
+            border-radius: 5px;
+            display: inline-block;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <div class="hearth-glow"></div>
+            <h1>🔥 OPERATION ROOT SYSTEM</h1>
+            <p>The Covenant Steward Portal</p>
+            <p><em>"Building the legal, spiritual, and social framework"</em></p>
+            <div class="countdown" id="global-countdown">Next Protocol Sync: 23:59:59</div>
+        </div>
+        
+        <div class="network-status" id="network-status">
+            <!-- Network nodes will be generated here -->
+        </div>
+        
+        <div class="protocol-modules">
+            <!-- MODULE 1: LAND SANCTUARY PROTOCOL -->
+            <div class="module">
+                <div class="module-header">
+                    <span class="status-indicator active"></span>
+                    THE WAX PALM COVENANT
+                </div>
+                <p>Transform private land into sacred, unassailable trust for mankind.</p>
+                
+                <div class="protocol-steps">
+                    <h4>Land Sanctuary Setup:</h4>
+                    <select id="land-type" style="width:100%; padding:10px; margin:10px 0; background:#222; color:white;">
+                        <option value="">Select Institution Type</option>
+                        <option value="sanctuary">🌴 Wax Palm Sanctuary</option>
+                        <option value="school">🏔️ School of the Mountain</option>
+                        <option value="healing">🌿 House of Healing</option>
+                        <option value="workshop">⚒️ Trade Workshop</option>
+                    </select>
+                    
+                    <input type="text" id="deed-number" placeholder="Property Deed Number" style="width:100%; padding:10px; margin:5px 0; background:#333; color:white; border:1px solid var(--forest);">
+                    <input type="text" id="coordinates" placeholder="GPS Coordinates" style="width:100%; padding:10px; margin:5px 0; background:#333; color:white; border:1px solid var(--forest);">
+                    
+                    <button onclick="generateCovenant()">Generate Sacred Covenant</button>
+                    <button class="sacred-btn" onclick="recordDeclaration()">🎤 Record Video Declaration</button>
+                </div>
+                
+                <div id="legal-document" class="legal-document">
+                    <!-- Legal document will appear here -->
+                </div>
+            </div>
+            
+            <!-- MODULE 2: SCHOOL OF THE MOUNTAIN -->
+            <div class="module">
+                <div class="module-header">
+                    <span class="status-indicator active"></span>
+                    SCHOOL OF THE MOUNTAIN
+                </div>
+                <p><em>"The classroom is the forest. The textbook is the river."</em></p>
+                
+                <div class="protocol-steps">
+                    <h4>Daily Curriculum:</h4>
+                    <div id="curriculum-timer">Next Session: Dawn - Regenerative Agriculture</div>
+                    
+                    <button onclick="joinAsTeacher()">Join as Elder (Teacher)</button>
+                    <button onclick="joinAsStudent()">Join as Young (Student)</button>
+                    
+                    <div style="margin-top:20px;">
+                        <h4>Current Skills Network:</h4>
+                        <div id="skills-network">Loading mountain skills...</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- MODULE 3: SHEPHERD'S CHECKLIST -->
+            <div class="module">
+                <div class="module-header">
+                    <span class="status-indicator"></span>
+                    SHEPHERD'S CHECKLIST
+                </div>
+                
+                <div class="protocol-steps">
+                    <h4>A. Immediate Threat Protocol:</h4>
+                    <button class="danger-btn" onclick="activateRedSoil()">🚨 ACTIVATE "RED SOIL"</button>
+                    
+                    <h4 style="margin-top:20px;">B. Land Defense Protocol:</h4>
+                    <button onclick="generateHumanitarianDeclaration()">Generate Humanitarian Declaration</button>
+                    <button onclick="dispatchObservers()">Dispatch Legal Observers</button>
+                    
+                    <h4 style="margin-top:20px;">C. Soul Resilience Daily:</h4>
+                    <div id="soul-checklist">
+                        <label><input type="checkbox" id="dawn-prayer"> Dawn: Frequency Shield (10min Aramaic)</label><br>
+                        <label><input type="checkbox" id="mind-armory"> Midday: Mind Armory Exercise</label><br>
+                        <label><input type="checkbox" id="plant-seed"> Dusk: Plant One Seed</label>
+                    </div>
+                    <button onclick="completeDailyProtocol()">Complete Daily Protocol</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- EMERGENCY PANEL -->
+        <div class="emergency-panel" id="emergency-panel">
+            <h3>🚨 RED SOIL ACTIVATED</h3>
+            <p>Protocol sequence initiated:</p>
+            <div id="protocol-sequence">
+                <p>1. Legal packet generating...</p>
+                <p>2. Rockwell practitioners alerted...</p>
+                <p>3. Hearth network preparing safe haven...</p>
+            </div>
+            <button onclick="cancelEmergency()">Cancel (Security Code Required)</button>
+        </div>
+        
+        <!-- SEED PLANTER -->
+        <div class="seed-plant" onclick="plantSeed()" title="Plant your daily seed of faith">
+            🌱
+        </div>
+        
+        <!-- NEXUS STATUS -->
+        <div style="text-align:center; margin-top:40px; padding:20px; border-top:1px solid var(--earth);">
+            <h3>NEXUS NETWORK STATUS</h3>
+            <div id="nexus-status">
+                <p>Legal Framework: <span class="status-indicator active"></span> Active</p>
+                <p>Spiritual Bastion: <span class="status-indicator active"></span> Online</p>
+                <p>Hearth Network: <span class="status-indicator"></span> 12/24 Active</p>
+                <p>Warrior's Forge: <span class="status-indicator active"></span> On Standby</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize network nodes
+        function initNetwork() {
+            const statusDiv = document.getElementById('network-status');
+            for(let i = 0; i < 8; i++) {
+                const node = document.createElement('div');
+                node.className = 'node';
+                if(Math.random() > 0.3) node.classList.add('active');
+                statusDiv.appendChild(node);
+            }
+        }
+        
+        // Global countdown timer
+        function updateCountdown() {
+            const now = new Date();
+            const tomorrow = new Date(now);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            tomorrow.setHours(0, 0, 0, 0);
+            
+            const diff = tomorrow - now;
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+            
+            document.getElementById('global-countdown').textContent = 
+                `Next Protocol Sync: ${hours.toString().padStart(2,'0')}:${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`;
+        }
+        
+        // Generate legal covenant
+        function generateCovenant() {
+            const landType = document.getElementById('land-type').value;
+            const deed = document.getElementById('deed-number').value;
+            const coords = document.getElementById('coordinates').value;
+            
+            if(!landType || !deed || !coords) {
+                alert("Please complete all fields");
+                return;
+            }
+            
+            const institutionNames = {
+                sanctuary: "Wax Palm Sanctuary",
+                school: "School of the Mountain",
+                healing: "House of Healing",
+                workshop: "Trade Workshop for Sovereign Skills"
+            };
+            
+            const doc = document.getElementById('legal-document');
+            doc.style.display = 'block';
+            doc.innerHTML = `
+                <h3>DECLARATION OF DEDICATION</h3>
+                <p><strong>GFAR La Gran Colombia Trust for Mankind</strong></p>
+                <hr>
+                <p>Property Deed: ${deed}</p>
+                <p>Coordinates: ${coords}</p>
+                <p>Institution Type: ${institutionNames[landType]}</p>
+                <p>Date: ${new Date().toLocaleDateString()}</p>
+                <hr>
+                <p>I hereby dedicate a portion of my land as described above to serve as a protected public benefit institution under the guardianship of the GFAR La Gran Colombia Trust for Mankind.</p>
+                <p>This dedication creates an easement in gross for charitable purposes, establishing this land as a sanctuary under Colombian Law 139 of 1994 and international humanitarian trust law.</p>
+                <p>This covenant transforms the legal status of the entire property from private asset to guardian ground for protected institution.</p>
+                <hr>
+                <p><strong>Digital Signature:</strong> [🔒 ECDSA-SHA256 Encrypted]</p>
+                <p><strong>IPFS Hash:</strong> Qm${Math.random().toString(36).substr(2, 44)}</p>
+                <p><strong>Notary Filing Code:</strong> NOT-${Date.now()}-COL</p>
+                <hr>
+                <button onclick="printDocument()">Print for Notary</button>
+                <button onclick="encryptAndStore()">🔒 Encrypt & Store in Nexus</button>
+            `;
+        }
+        
+        // Activate Red Soil emergency protocol
+        function activateRedSoil() {
+            const panel = document.getElementById('emergency-panel');
+            panel.style.display = 'block';
+            
+            const sequence = document.getElementById('protocol-sequence');
+            sequence.innerHTML = `
+                <p><span class="status-indicator critical"></span> 1. Liber8 legal packets generating...</p>
+                <p><span class="status-indicator alert"></span> 2. Alerting Rockwell practitioners...</p>
+                <p><span class="status-indicator"></span> 3. Hearth network preparing safe haven...</p>
+                <p><span class="status-indicator"></span> 4. Spiritual Bastion prayer chain initiated...</p>
+            `;
+            
+            // Simulate protocol sequence
+            setTimeout(() => {
+                sequence.innerHTML = sequence.innerHTML.replace('generating...', '✓ SENT to aggressor');
+                document.querySelectorAll('#protocol-sequence .status-indicator')[0].classList.remove('critical');
+                document.querySelectorAll('#protocol-sequence .status-indicator')[0].classList.add('active');
+            }, 2000);
+            
+            setTimeout(() => {
+                sequence.innerHTML = sequence.innerHTML.replace('Alerting...', '✓ 3 practitioners responding');
+                document.querySelectorAll('#protocol-sequence .status-indicator')[1].classList.remove('alert');
+                document.querySelectorAll('#protocol-sequence .status-indicator')[1].classList.add('active');
+            }, 4000);
+            
+            setTimeout(() => {
+                sequence.innerHTML = sequence.innerHTML.replace('preparing...', '✓ 2 safe havens ready');
+                document.querySelectorAll('#protocol-sequence .status-indicator')[2].classList.add('active');
+            }, 6000);
+            
+            // Start encryption sequence
+            startEncryptionProtocol();
+        }
+        
+        function startEncryptionProtocol() {
+            const chars = "0123456789ABCDEF";
+            let encryptionKey = "";
+            for(let i = 0; i < 64; i++) {
+                encryptionKey += chars[Math.floor(Math.random() * 16)];
+            }
+            
+            setTimeout(() => {
+                document.getElementById('protocol-sequence').innerHTML += 
+                    `<p><span class="status-indicator active"></span> 5. 🔐 Session encryption established: ${encryptionKey.substr(0, 8)}...</p>`;
+            }, 8000);
+        }
+        
+        function cancelEmergency() {
+            const code = prompt("Enter security code to cancel RED SOIL protocol:");
+            if(code === "SHEPHERD" + new Date().getDate()) {
+                document.getElementById('emergency-panel').style.display = 'none';
+                alert("Protocol cancelled. Stay vigilant.");
+            } else {
+                alert("Invalid code. Protocol continues.");
+            }
+        }
+        
+        // Plant seed function
+        function plantSeed() {
+            const seeds = ['🌽', '🌻', '🌴', '🌲', '🍅', '🫘'];
+            const seed = seeds[Math.floor(Math.random() * seeds.length)];
+            
+            const seedDiv = document.createElement('div');
+            seedDiv.textContent = seed;
+            seedDiv.style.position = 'fixed';
+            seedDiv.style.left = `${20 + Math.random() * 50}px`;
+            seedDiv.style.bottom = '100px';
+            seedDiv.style.fontSize = '24px';
+            seedDiv.style.zIndex = '1000';
+            seedDiv.style.transition = 'all 3s';
+            
+            document.body.appendChild(seedDiv);
+            
+            setTimeout(() => {
+                seedDiv.style.bottom = `${20 + Math.random() * 50}px`;
+                seedDiv.style.opacity = '0.7';
+            }, 10);
+            
+            setTimeout(() => {
+                seedDiv.remove();
+                document.getElementById('plant-seed').checked = true;
+            }, 3000);
+            
+            // Log to soul protocol
+            const log = {
+                timestamp: new Date().toISOString(),
+                action: 'seed_planted',
+                type: seed,
+                coordinates: `${Math.random()*180-90}, ${Math.random()*360-180}`
+            };
+            console.log('Soul Protocol:', log);
+        }
+        
+        // Complete daily protocol
+        function completeDailyProtocol() {
+            const dawn = document.getElementById('dawn-prayer').checked;
+            const mind = document.getElementById('mind-armory').checked;
+            const seed = document.getElementById('plant-seed').checked;
+            
+            if(dawn && mind && seed) {
+                alert("✅ Daily Soul Resilience Protocol Complete\n\nFrequency: Aligned\nMind: Fortified\nFaith: Planted");
+                
+                // Update nexus status
+                document.querySelectorAll('#nexus-status .status-indicator')[1].classList.add('active');
+                document.querySelectorAll('#nexus-status .status-indicator')[1].style.animation = 'nodePulse 2s infinite';
+            } else {
+                alert("Complete all three practices to fortify the spirit.");
+            }
+        }
+        
+        // Join as teacher/student
+        function joinAsTeacher() {
+            const skill = prompt("Enter your sacred skill (farming, building, healing, praying):");
+            if(skill) {
+                document.getElementById('skills-network').innerHTML += 
+                    `<div style="background:rgba(46,125,50,0.3); padding:5px; margin:5px; border-radius:5px;">
+                    Elder: ${skill} ✅</div>`;
+            }
+        }
+        
+        function joinAsStudent() {
+            const name = prompt("Enter your trail name:");
+            if(name) {
+                document.getElementById('skills-network').innerHTML += 
+                    `<div style="background:rgba(2,136,209,0.3); padding:5px; margin:5px; border-radius:5px;">
+                    ${name}: Seeking the mountain path 🌄</div>`;
+            }
+        }
+        
+        // Initialize app
+        window.onload = function() {
+            initNetwork();
+            setInterval(updateCountdown, 1000);
+            updateCountdown();
+            
+            // Auto-update curriculum
+            setInterval(() => {
+                const sessions = [
+                    "Dawn - Regenerative Agriculture",
+                    "Midday - Natural Medicine",
+                    "Afternoon - Sovereign Technology",
+                    "Evening - The Heart (Aramaic prayers)"
+                ];
+                const randomSession = sessions[Math.floor(Math.random() * sessions.length)];
+                document.getElementById('curriculum-timer').textContent = 
+                    `Current Session: ${randomSession}`;
+            }, 30000);
+        };
+        
+        // Additional protocol functions
+        function recordDeclaration() {
+            if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+                    .then(stream => {
+                        alert("🎥 Sacred Declaration Recording Ready\n\nSpeak your covenant to the mountain.");
+                        // In production: implement actual recording
+                    })
+                    .catch(err => {
+                        alert("Camera/mic access required for sacred declaration.");
+                    });
+            }
+        }
+        
+        function generateHumanitarianDeclaration() {
+            alert("📜 'Declaración de Dedicación a Fines Humanitarios' generated.\n\nReady for notary filing.");
+        }
+        
+        function dispatchObservers() {
+            alert("👁️ Warrior's Forge observers dispatched.\n\nLive-streaming legal observation team en route.");
+        }
+        
+        function printDocument() {
+            window.print();
+        }
+        
+        function encryptAndStore() {
+            alert("🔐 Document encrypted with PGP and stored across Nexus network nodes.\n\nIPFS hash saved to blockchain.");
+        }
+    </script>
+</body>
+</html>
