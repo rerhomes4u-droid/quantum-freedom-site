@@ -1,0 +1,898 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Operación Sistema Raíz - Colombia Soberana</title>
+    <style>
+        :root {
+            --amarillo: #FCD116;
+            --azul: #003893;
+            --rojo: #CE1126;
+            --verde: #007A33;
+            --tierra: #8B4513;
+            --cafe: #964B00;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(to bottom, #003893 0%, #007A33 100%);
+            color: #f0f0f0;
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(252, 209, 22, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(206, 17, 38, 0.1) 0%, transparent 20%);
+        }
+        
+        .app-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 30px 20px;
+            margin-bottom: 40px;
+            position: relative;
+            border-bottom: 3px solid var(--amarillo);
+            background: rgba(0, 56, 147, 0.8);
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .escudo-colombia {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(45deg, var(--amarillo), var(--azul), var(--rojo));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            animation: rotarEscudo 20s infinite linear;
+        }
+        
+        @keyframes rotarEscudo {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .titulo-principal {
+            font-family: 'Georgia', serif;
+            font-size: 2.5em;
+            color: var(--amarillo);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            margin-bottom: 10px;
+        }
+        
+        .subtitulo {
+            color: white;
+            font-size: 1.2em;
+            font-style: italic;
+        }
+        
+        .bandera-linea {
+            height: 8px;
+            background: linear-gradient(to right, var(--amarillo) 33%, var(--azul) 33%, var(--azul) 66%, var(--rojo) 66%);
+            margin: 15px auto;
+            width: 300px;
+            border-radius: 4px;
+        }
+        
+        .protocol-modules {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .module {
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid var(--verde);
+            border-radius: 15px;
+            padding: 25px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            color: #333;
+            box-shadow: 0 5px 15px rgba(0, 122, 51, 0.2);
+        }
+        
+        .module:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(252, 209, 22, 0.3);
+            border-color: var(--amarillo);
+        }
+        
+        .module-header {
+            color: var(--rojo);
+            border-bottom: 2px solid var(--azul);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .icono-colombiano {
+            font-size: 1.8em;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+        
+        .active { background: var(--verde); }
+        .alert { background: var(--amarillo); }
+        .critical { 
+            background: var(--rojo); 
+            animation: parpadeo 1s infinite;
+        }
+        
+        @keyframes parpadeo {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        
+        button {
+            background: linear-gradient(to right, var(--azul), var(--verde));
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+            transition: all 0.3s;
+            font-weight: bold;
+            border: 2px solid transparent;
+        }
+        
+        button:hover {
+            transform: scale(1.05);
+            border-color: var(--amarillo);
+            box-shadow: 0 0 15px rgba(252, 209, 22, 0.5);
+        }
+        
+        .danger-btn {
+            background: linear-gradient(to right, var(--rojo), #FF6B35);
+        }
+        
+        .sacred-btn {
+            background: linear-gradient(to right, var(--tierra), var(--cafe));
+        }
+        
+        .protocol-steps {
+            background: rgba(0, 122, 51, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 4px solid var(--azul);
+        }
+        
+        .emergency-panel {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(45deg, var(--rojo), #b30000);
+            padding: 25px;
+            border-radius: 15px;
+            border: 3px solid var(--amarillo);
+            z-index: 1000;
+            display: none;
+            color: white;
+            max-width: 400px;
+            box-shadow: 0 0 30px rgba(206, 17, 38, 0.8);
+        }
+        
+        .semilla-diaria {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            background: linear-gradient(45deg, var(--verde), #006400);
+            padding: 20px;
+            border-radius: 50%;
+            cursor: pointer;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            border: 2px solid var(--amarillo);
+            box-shadow: 0 0 20px rgba(252, 209, 22, 0.5);
+            transition: transform 0.3s;
+        }
+        
+        .semilla-diaria:hover {
+            transform: rotate(15deg) scale(1.1);
+        }
+        
+        .legal-document {
+            background: white;
+            color: black;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 10px;
+            display: none;
+            font-family: 'Courier New', monospace;
+            max-height: 400px;
+            overflow-y: auto;
+            border: 2px solid var(--azul);
+        }
+        
+        .network-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            background: rgba(0, 56, 147, 0.9);
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid var(--amarillo);
+        }
+        
+        .node {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--verde);
+            position: relative;
+        }
+        
+        .node.active::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--verde);
+            animation: pulsoNodo 2s infinite;
+        }
+        
+        @keyframes pulsoNodo {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(2.5); opacity: 0; }
+        }
+        
+        .countdown {
+            font-family: monospace;
+            font-size: 1.3em;
+            color: var(--amarillo);
+            background: rgba(0, 56, 147, 0.8);
+            padding: 12px;
+            border-radius: 8px;
+            display: inline-block;
+            margin: 10px 0;
+            border: 1px solid var(--amarillo);
+        }
+        
+        .flora-colombiana {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        
+        .flora-icon {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 15px;
+            border-radius: 50%;
+            width: 70px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid var(--verde);
+        }
+        
+        .flora-icon:hover {
+            transform: translateY(-5px);
+            border-color: var(--amarillo);
+            box-shadow: 0 5px 15px rgba(252, 209, 22, 0.5);
+        }
+        
+        .mapa-colombia {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(45deg, var(--verde), var(--azul));
+            border-radius: 10px;
+            margin: 20px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .punto-sanctuario {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: var(--amarillo);
+            border-radius: 50%;
+            animation: brillar 2s infinite;
+        }
+        
+        @keyframes brillar {
+            0%, 100% { box-shadow: 0 0 5px var(--amarillo); }
+            50% { box-shadow: 0 0 20px var(--amarillo); }
+        }
+        
+        .himno-btn {
+            background: linear-gradient(45deg, var(--amarillo), var(--rojo));
+            margin: 10px auto;
+            display: block;
+            font-size: 1.1em;
+            padding: 15px 30px;
+        }
+        
+        .orgullo-colombiano {
+            text-align: center;
+            padding: 20px;
+            background: rgba(0, 56, 147, 0.8);
+            border-radius: 15px;
+            margin: 30px 0;
+            border: 2px solid var(--amarillo);
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="header">
+            <div class="escudo-colombia">🇨🇴</div>
+            <h1 class="titulo-principal">OPERACIÓN SISTEMA RAÍZ</h1>
+            <p class="subtitulo">Portal del Guardián del Pacto - Colombia Soberana</p>
+            <div class="bandera-linea"></div>
+            <p><em>"Protegemos la tierra, honramos los ancestros, construimos la nueva Colombia"</em></p>
+            
+            <div class="countdown" id="global-countdown">Próxima Sincronización: 23:59:59</div>
+            
+            <div class="flora-colombiana">
+                <div class="flora-icon" title="Ceroxylon quindiuense - Palma de Cera" onclick="seleccionarFlora('palma')">🌴</div>
+                <div class="flora-icon" title="Cecropia - Yarumo" onclick="seleccionarFlora('yarumo')">🌿</div>
+                <div class="flora-icon" title="Orquídea - Flor Nacional" onclick="seleccionarFlora('orquidea')">🌸</div>
+                <div class="flora-icon" title="Frailejón - Paramo Colombiano" onclick="seleccionarFlora('frailejon')">🌱</div>
+                <div class="flora-icon" title="Caoba - Madera Noble" onclick="seleccionarFlora('caoba')">🪵</div>
+            </div>
+        </div>
+        
+        <div class="network-status" id="network-status">
+            <!-- Nodos de red serán generados aquí -->
+        </div>
+        
+        <div class="orgullo-colombiano">
+            <h2 style="color: var(--amarillo);">🇨🇴 ¡ORGULLO COLOMBIANO! 🇨🇴</h2>
+            <p>Esta tierra sagrada nos llama a protegerla. Somos hijos de los Andes, guardianes del Amazonas, protectores del páramo.</p>
+            <button class="himno-btn" onclick="tocarHimno()">🎵 ¡Viva Colombia! 🎵</button>
+        </div>
+        
+        <div class="protocol-modules">
+            <!-- MÓDULO 1: PACTO DE LA PALMA DE CERA -->
+            <div class="module">
+                <div class="module-header">
+                    <span class="icono-colombiano">🌴</span>
+                    PACTO DE LA PALMA DE CERA
+                </div>
+                <p><strong>Transformar tierra privada en santuario sagrado e inalienable para la humanidad.</strong></p>
+                
+                <div class="protocol-steps">
+                    <h4>Configuración del Santuario:</h4>
+                    <select id="land-type" style="width:100%; padding:10px; margin:10px 0; background:white; color:#333; border:2px solid var(--azul); border-radius:5px;">
+                        <option value="">Seleccione Tipo de Institución</option>
+                        <option value="palma">🌴 Santuario de Palma de Cera (Ceroxylon quindiuense)</option>
+                        <option value="yarumo">🌿 Casa del Yarumo (Medicina Ancestral)</option>
+                        <option value="escuela">🏔️ Escuela de la Montaña Andina</option>
+                        <option value="taller">⚒️ Taller de Oficios Soberanos</option>
+                        <option value="orquideario">🌸 Orquideario de la Biodiversidad</option>
+                    </select>
+                    
+                    <input type="text" id="deed-number" placeholder="Número de Escritura Pública" style="width:100%; padding:10px; margin:5px 0; background:white; color:#333; border:2px solid var(--verde); border-radius:5px;">
+                    <input type="text" id="departamento" placeholder="Departamento" style="width:48%; padding:10px; margin:5px 1%; background:white; color:#333; border:2px solid var(--verde); border-radius:5px; display: inline-block;">
+                    <input type="text" id="municipio" placeholder="Municipio" style="width:48%; padding:10px; margin:5px 1%; background:white; color:#333; border:2px solid var(--verde); border-radius:5px; display: inline-block;">
+                    
+                    <button onclick="generarPactoSagrado()">Generar Pacto Sagrado</button>
+                    <button class="sacred-btn" onclick="grabarDeclaracion()">🎤 Grabar Declaración de Protección</button>
+                </div>
+                
+                <div class="mapa-colombia" id="mapa-colombia">
+                    <!-- Puntos de santuario aparecerán aquí -->
+                </div>
+                
+                <div id="legal-document" class="legal-document">
+                    <!-- Documento legal aparecerá aquí -->
+                </div>
+            </div>
+            
+            <!-- MÓDULO 2: ESCUELA DE LA MONTAÑA ANDINA -->
+            <div class="module">
+                <div class="module-header">
+                    <span class="icono-colombiano">🏔️</span>
+                    ESCUELA DE LA MONTAÑA ANDINA
+                </div>
+                <p><em>"El aula es la selva. El libro de texto es el río. El currículo es sobrevivir, ser soberano y santificar."</em></p>
+                
+                <div class="protocol-steps">
+                    <h4>Currículo Diario Andino:</h4>
+                    <div id="curriculum-timer">Próxima Sesión: Amanecer - Agricultura Regenerativa</div>
+                    
+                    <button onclick="unirseComoMayor()">Unirse como Mayor (Sabio Ancestral)</button>
+                    <button onclick="unirseComoJoven()">Unirse como Joven (Aprendiz)</button>
+                    
+                    <div style="margin-top:20px;">
+                        <h4>Saberes de la Montaña:</h4>
+                        <div id="saberes-red">Cargando saberes ancestrales...</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- MÓDULO 3: LISTA DEL PASTOR -->
+            <div class="module">
+                <div class="module-header">
+                    <span class="icono-colombiano">🛡️</span>
+                    LISTA DEL PASTOR
+                </div>
+                
+                <div class="protocol-steps">
+                    <h4>A. Protocolo de Amenaza Inmediata:</h4>
+                    <button class="danger-btn" onclick="activarTierraRoja()">🚨 ACTIVAR "TIERRA ROJA"</button>
+                    
+                    <h4 style="margin-top:20px;">B. Protocolo de Defensa Territorial:</h4>
+                    <button onclick="generarDeclaracionHumanitaria()">Generar Declaración Humanitaria</button>
+                    <button onclick="despacharObservadores()">Despachar Observadores Legales</button>
+                    
+                    <h4 style="margin-top:20px;">C. Resiliencia del Alma - Diario:</h4>
+                    <div id="lista-alma">
+                        <label><input type="checkbox" id="oracion-amanecer"> Amanecer: Escudo de Frecuencia (10min de oración)</label><br>
+                        <label><input type="checkbox" id="armamento-mental"> Mediodía: Ejercicio de Armamento Mental</label><br>
+                        <label><input type="checkbox" id="semilla-dia"> Atardecer: Sembrar Una Semilla Nativa</label>
+                    </div>
+                    <button onclick="completarProtocoloDiario()">Completar Protocolo Diario</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- PANEL DE EMERGENCIA -->
+        <div class="emergency-panel" id="emergency-panel">
+            <h3>🚨 TIERRA ROJA ACTIVADA</h3>
+            <p>Secuencia de protocolo iniciada:</p>
+            <div id="protocol-sequence">
+                <p>1. Generando paquete legal Liber8...</p>
+                <p>2. Alertando practicantes Rockwell...</p>
+                <p>3. Red Hearth preparando refugio seguro...</p>
+            </div>
+            <button onclick="cancelarEmergencia()">Cancelar (Código de Seguridad Requerido)</button>
+        </div>
+        
+        <!-- SEMILLA DIARIA -->
+        <div class="semilla-diaria" onclick="sembrarSemilla()" title="Siembra tu semilla diaria de fe">
+            🌱
+        </div>
+        
+        <!-- ESTADO DEL NEXUS -->
+        <div style="text-align:center; margin-top:40px; padding:25px; border-top:3px solid var(--amarillo); background:rgba(0,56,147,0.8); border-radius:15px;">
+            <h3 style="color:var(--amarillo);">ESTADO DEL NEXUS COLOMBIANO</h3>
+            <div id="nexus-status">
+                <p>Marco Legal: <span class="status-indicator active"></span> Activo</p>
+                <p>Bastión Espiritual: <span class="status-indicator active"></span> Conectado</p>
+                <p>Red Hearth: <span class="status-indicator active"></span> 15/30 Activos</p>
+                <p>Forja del Guerrero: <span class="status-indicator"></span> En Espera</p>
+                <p>Guardianes del Páramo: <span class="status-indicator active"></span> Patrullando</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Flora protegida de Colombia
+        const floraColombiana = {
+            palma: {
+                nombre: "Palma de Cera del Quindío",
+                cientifico: "Ceroxylon quindiuense",
+                region: "Eje Cafetero",
+                altura: "60 metros",
+                estado: "Árbol Nacional"
+            },
+            yarumo: {
+                nombre: "Yarumo Blanco",
+                cientifico: "Cecropia peltata",
+                region: "Andes y Amazonía",
+                uso: "Medicinal ancestral",
+                estado: "Protegido"
+            },
+            orquidea: {
+                nombre: "Flor de Mayo",
+                cientifico: "Cattleya trianae",
+                region: "Nacional",
+                altura: "Flor Nacional",
+                estado: "Símbolo Patrio"
+            },
+            frailejon: {
+                nombre: "Frailejón",
+                cientifico: "Espeletia spp.",
+                region: "Páramos Andinos",
+                altura: "3-5 metros",
+                estado: "Protector del agua"
+            },
+            caoba: {
+                nombre: "Caoba Colombiana",
+                cientifico: "Swietenia macrophylla",
+                region: "Amazonía y Caribe",
+                altura: "40-50 metros",
+                estado: "Madera noble protegida"
+            }
+        };
+
+        // Inicializar nodos de red
+        function initNetwork() {
+            const statusDiv = document.getElementById('network-status');
+            const departamentos = ['ANT', 'CUN', 'BOY', 'VAL', 'CAL', 'NSA', 'SAN', 'RIS', 'MAG', 'CHO'];
+            
+            departamentos.forEach(depto => {
+                const node = document.createElement('div');
+                node.className = 'node';
+                node.title = `Nodo ${depto}`;
+                if(Math.random() > 0.4) node.classList.add('active');
+                statusDiv.appendChild(node);
+            });
+        }
+        
+        // Temporizador global
+        function updateCountdown() {
+            const now = new Date();
+            const tomorrow = new Date(now);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            tomorrow.setHours(0, 0, 0, 0);
+            
+            const diff = tomorrow - now;
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+            
+            document.getElementById('global-countdown').textContent = 
+                `Próxima Sincronización: ${hours.toString().padStart(2,'0')}:${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`;
+        }
+        
+        // Seleccionar flora colombiana
+        function seleccionarFlora(tipo) {
+            const planta = floraColombiana[tipo];
+            if(planta) {
+                alert(`🌿 ${planta.nombre}\n\n📚 Nombre Científico: ${planta.cientifico}\n📍 Región: ${planta.region}\n📏 ${tipo === 'palma' ? 'Altura: ' + planta.altura : 'Estado: ' + planta.estado}\n\n¡Especie protegida de Colombia!`);
+                
+                // Actualizar el selector en el módulo de pacto
+                document.getElementById('land-type').value = tipo;
+            }
+        }
+        
+        // Generar pacto sagrado
+        function generarPactoSagrado() {
+            const landType = document.getElementById('land-type').value;
+            const deed = document.getElementById('deed-number').value;
+            const depto = document.getElementById('departamento').value;
+            const muni = document.getElementById('municipio').value;
+            
+            if(!landType || !deed || !depto || !muni) {
+                alert("Por favor complete todos los campos requeridos");
+                return;
+            }
+            
+            const nombresInstitucion = {
+                palma: "Santuario de Palma de Cera del Quindío",
+                yarumo: "Casa del Yarumo - Medicina Ancestral",
+                escuela: "Escuela de la Montaña Andina",
+                taller: "Taller de Oficios Soberanos",
+                orquideario: "Orquideario de la Biodiversidad Colombiana"
+            };
+            
+            const doc = document.getElementById('legal-document');
+            doc.style.display = 'block';
+            doc.innerHTML = `
+                <h3 style="color: var(--azul); text-align:center;">DECLARACIÓN DE DEDICACIÓN</h3>
+                <p style="text-align:center;"><strong>Fideicomiso GFAR La Gran Colombia para la Humanidad</strong></p>
+                <hr style="border-color: var(--amarillo);">
+                <p><strong>📍 Ubicación:</strong> ${muni}, ${depto}, Colombia</p>
+                <p><strong>📄 Escritura:</strong> ${deed}</p>
+                <p><strong>🏛️ Institución:</strong> ${nombresInstitucion[landType]}</p>
+                <p><strong>📅 Fecha:</strong> ${new Date().toLocaleDateString('es-CO')}</p>
+                <p><strong>🌿 Flora Protegida:</strong> ${floraColombiana[landType]?.nombre || 'Especie nativa'}</p>
+                <hr style="border-color: var(--amarillo);">
+                <p>Por la presente dedico una porción de mi tierra para servir como institución de beneficio público protegida bajo la custodia del Fideicomiso GFAR La Gran Colombia para la Humanidad.</p>
+                <p>Esta dedicación crea una servidumbre de conservación para fines caritativos, estableciendo esta tierra como santuario bajo la Ley 139 de 1994, Ley 99 de 1993 (Ambiental), y el derecho internacional humanitario.</p>
+                <p>Este pacto transforma el estatus legal de la propiedad completa de activo privado a territorio guardián de institución protegida.</p>
+                <hr style="border-color: var(--amarillo);">
+                <p><strong>🔏 Firma Digital:</strong> [ECDSA-SHA256 Cifrado]</p>
+                <p><strong>📡 Hash IPFS:</strong> Qm${Math.random().toString(36).substr(2, 44)}</p>
+                <p><strong>🏛️ Código Notaría:</strong> NOT-${Date.now()}-COL</p>
+                <p><strong>🇨🇴 Registro Nacional:</strong> RN-${Math.floor(Math.random()*10000)}-2024</p>
+                <hr style="border-color: var(--amarillo);">
+                <button onclick="imprimirDocumento()" style="background:var(--azul); color:white; padding:10px; margin:5px;">Imprimir para Notaría</button>
+                <button onclick="cifrarYAlmacenar()" style="background:var(--verde); color:white; padding:10px; margin:5px;">🔒 Cifrar & Almacenar en Nexus</button>
+                <button onclick="registrarEnRUNAP()" style="background:var(--rojo); color:white; padding:10px; margin:5px;">📋 Registrar en RUNAP</button>
+            `;
+            
+            // Agregar punto al mapa
+            agregarPuntoMapa(depto, muni);
+        }
+        
+        function agregarPuntoMapa(depto, muni) {
+            const mapa = document.getElementById('mapa-colombia');
+            const punto = document.createElement('div');
+            punto.className = 'punto-sanctuario';
+            punto.title = `Santuario en ${muni}, ${depto}`;
+            
+            // Posiciones aproximadas en el mapa
+            const posiciones = {
+                'ANT': {x: 30, y: 40},
+                'CUN': {x: 40, y: 60},
+                'BOY': {x: 50, y: 50},
+                'VAL': {x: 25, y: 30},
+                'CAL': {x: 20, y: 50},
+                'NSA': {x: 45, y: 70},
+                'SAN': {x: 60, y: 40},
+                'RIS': {x: 35, y: 55},
+                'MAG': {x: 15, y: 20},
+                'CHO': {x: 10, y: 35}
+            };
+            
+            const deptoCode = Object.keys(posiciones).find(key => 
+                depto.toUpperCase().includes(key) || key.includes(depto.toUpperCase().substr(0,3))
+            );
+            
+            if(deptoCode && posiciones[deptoCode]) {
+                punto.style.left = `${posiciones[deptoCode].x}%`;
+                punto.style.top = `${posiciones[deptoCode].y}%`;
+            } else {
+                punto.style.left = `${20 + Math.random() * 60}%`;
+                punto.style.top = `${20 + Math.random() * 60}%`;
+            }
+            
+            mapa.appendChild(punto);
+        }
+        
+        // Activar protocolo Tierra Roja
+        function activarTierraRoja() {
+            const panel = document.getElementById('emergency-panel');
+            panel.style.display = 'block';
+            
+            const sequence = document.getElementById('protocol-sequence');
+            sequence.innerHTML = `
+                <p><span class="status-indicator critical"></span> 1. Generando paquetes legales Liber8...</p>
+                <p><span class="status-indicator alert"></span> 2. Alertando practicantes Rockwell...</p>
+                <p><span class="status-indicator"></span> 3. Red Hearth preparando refugio seguro...</p>
+                <p><span class="status-indicator"></span> 4. Cadena de oración del Bastión Espiritual iniciada...</p>
+            `;
+            
+            // Simular secuencia del protocolo
+            setTimeout(() => {
+                sequence.innerHTML = sequence.innerHTML.replace('generando...', '✓ ENVIADO al agresor');
+                document.querySelectorAll('#protocol-sequence .status-indicator')[0].classList.remove('critical');
+                document.querySelectorAll('#protocol-sequence .status-indicator')[0].classList.add('active');
+            }, 2000);
+            
+            setTimeout(() => {
+                sequence.innerHTML = sequence.innerHTML.replace('Alertando...', '✓ 3 practicantes respondiendo');
+                document.querySelectorAll('#protocol-sequence .status-indicator')[1].classList.remove('alert');
+                document.querySelectorAll('#protocol-sequence .status-indicator')[1].classList.add('active');
+            }, 4000);
+            
+            setTimeout(() => {
+                sequence.innerHTML = sequence.innerHTML.replace('preparando...', '✓ 2 refugios listos');
+                document.querySelectorAll('#protocol-sequence .status-indicator')[2].classList.add('active');
+            }, 6000);
+            
+            // Iniciar secuencia de cifrado
+            iniciarProtocoloCifrado();
+        }
+        
+        function iniciarProtocoloCifrado() {
+            const chars = "0123456789ABCDEF";
+            let claveCifrado = "";
+            for(let i = 0; i < 64; i++) {
+                claveCifrado += chars[Math.floor(Math.random() * 16)];
+            }
+            
+            setTimeout(() => {
+                document.getElementById('protocol-sequence').innerHTML += 
+                    `<p><span class="status-indicator active"></span> 5. 🔐 Cifrado de sesión establecido: ${claveCifrado.substr(0, 8)}...</p>`;
+            }, 8000);
+            
+            // Reproducir sonido de alerta
+            const audio = new Audio('data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAA==');
+            audio.volume = 0.3;
+            audio.play();
+        }
+        
+        function cancelarEmergencia() {
+            const fecha = new Date();
+            const codigoDia = fecha.getDate();
+            const codigoMes = fecha.getMonth() + 1;
+            const codigoCorrecto = `COL${codigoDia}${codigoMes}SOBERANA`;
+            
+            const codigo = prompt("Ingrese código de seguridad para cancelar protocolo TIERRA ROJA:");
+            if(codigo === codigoCorrecto) {
+                document.getElementById('emergency-panel').style.display = 'none';
+                alert("Protocolo cancelado. ¡Viva Colombia Soberana!");
+            } else {
+                alert("Código inválido. El protocolo continúa.");
+            }
+        }
+        
+        // Sembrar semilla nativa
+        function sembrarSemilla() {
+            const semillasNativas = ['🌴', '🌿', '🌸', '🌱', '🪵', '🌽', '🍅', '🫘', '🥑', '🍌'];
+            const semilla = semillasNativas[Math.floor(Math.random() * semillasNativas.length)];
+            
+            const semillaDiv = document.createElement('div');
+            semillaDiv.textContent = semilla;
+            semillaDiv.style.position = 'fixed';
+            semillaDiv.style.left = `${20 + Math.random() * 50}px`;
+            semillaDiv.style.bottom = '100px';
+            semillaDiv.style.fontSize = '30px';
+            semillaDiv.style.zIndex = '1000';
+            semillaDiv.style.transition = 'all 3s';
+            
+            document.body.appendChild(semillaDiv);
+            
+            setTimeout(() => {
+                semillaDiv.style.bottom = `${20 + Math.random() * 50}px`;
+                semillaDiv.style.opacity = '0.7';
+            }, 10);
+            
+            setTimeout(() => {
+                semillaDiv.remove();
+                document.getElementById('semilla-dia').checked = true;
+            }, 3000);
+            
+            // Registrar en protocolo del alma
+            const registro = {
+                timestamp: new Date().toISOString(),
+                accion: 'semilla_sembrada',
+                tipo: semilla,
+                coordenadas: `${Math.random()*180-90}, ${Math.random()*360-180}`,
+                mensaje: '¡Fe sembrada en tierra colombiana!'
+            };
+            console.log('Protocolo del Alma:', registro);
+        }
+        
+        // Completar protocolo diario
+        function completarProtocoloDiario() {
+            const amanecer = document.getElementById('oracion-amanecer').checked;
+            const mediodia = document.getElementById('armamento-mental').checked;
+            const atardecer = document.getElementById('semilla-dia').checked;
+            
+            if(amanecer && mediodia && atardecer) {
+                alert("✅ Protocolo Diario de Resiliencia del Alma Completado\n\nFrecuencia: Alineada\nMente: Fortificada\nFe: Sembrada en tierra colombiana");
+                
+                // Actualizar estado del nexus
+                document.querySelectorAll('#nexus-status .status-indicator')[1].classList.add('active');
+                document.querySelectorAll('#nexus-status .status-indicator')[1].style.animation = 'pulsoNodo 2s infinite';
+                
+                // Reproducir sonido de éxito
+                const audio = new Audio('data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAA==');
+                audio.volume = 0.2;
+                audio.play();
+            } else {
+                alert("Complete las tres prácticas para fortificar el espíritu colombiano.");
+            }
+        }
+        
+        // Unirse como mayor/sabio
+        function unirseComoMayor() {
+            const sabiduria = prompt("Ingrese su saber ancestral (agricultura, construcción, medicina, oración):");
+            if(sabiduria) {
+                document.getElementById('saberes-red').innerHTML += 
+                    `<div style="background:rgba(0,122,51,0.3); padding:8px; margin:5px; border-radius:5px; border-left:4px solid var(--tierra);">
+                    <strong>Mayor:</strong> ${sabiduria} ✅<br>
+                    <small>Sabiduría ancestral colombiana</small>
+                    </div>`;
+            }
+        }
+        
+        function unirseComoJoven() {
+            const nombre = prompt("Ingrese su nombre de camino:");
+            if(nombre) {
+                document.getElementById('saberes-red').innerHTML += 
+                    `<div style="background:rgba(0,56,147,0.3); padding:8px; margin:5px; border-radius:5px; border-left:4px solid var(--amarillo);">
+                    <strong>${nombre}:</strong> Buscando el camino de la montaña 🌄<br>
+                    <small>Futuro guardián de Colombia</small>
+                    </div>`;
+            }
+        }
+        
+        // Tocar himno colombiano (simulación)
+        function tocarHimno() {
+            alert("🎶 ¡Oh gloria inmarcesible!\n🎶 ¡Oh júbilo inmortal!\n\n¡Viva Colombia Soberana!\n\nLa tierra que protegemos, la patria que honramos.");
+            
+            // Animación especial
+            document.querySelectorAll('.flora-icon').forEach(icon => {
+                icon.style.animation = 'brillar 0.5s 3';
+            });
+            
+            setTimeout(() => {
+                document.querySelectorAll('.flora-icon').forEach(icon => {
+                    icon.style.animation = '';
+                });
+            }, 2000);
+        }
+        
+        // Funciones adicionales de protocolo
+        function grabarDeclaracion() {
+            if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+                    .then(stream => {
+                        alert("🎥 Declaración Sagrada Lista para Grabar\n\nHable su pacto a la montaña colombiana.");
+                        // En producción: implementar grabación real
+                    })
+                    .catch(err => {
+                        alert("Se requiere acceso a cámara/micrófono para la declaración sagrada.");
+                    });
+            }
+        }
+        
+        function generarDeclaracionHumanitaria() {
+            alert("📜 'Declaración de Dedicación a Fines Humanitarios' generada.\n\nLista para radicar en notaría colombiana.");
+        }
+        
+        function despacharObservadores() {
+            alert("👁️ Observadores de La Forja del Guerrero despachados.\n\nEquipo de observación legal en transmisión en vivo.");
+        }
+        
+        function imprimirDocumento() {
+            window.print();
+        }
+        
+        function cifrarYAlmacenar() {
+            alert("🔐 Documento cifrado con PGP y almacenado en nodos Nexus.\n\nHash IPFS guardado en blockchain colombiano.");
+        }
+        
+        function registrarEnRUNAP() {
+            alert("📋 Registrando en RUNAP (Registro Único Nacional de Áreas Protegidas)\n\n✅ Área protegida registrada oficialmente");
+        }
+        
+        // Inicializar aplicación
+        window.onload = function() {
+            initNetwork();
+            setInterval(updateCountdown, 1000);
+            updateCountdown();
+            
+            // Actualizar currículo automáticamente
+            setInterval(() => {
+                const sesiones = [
+                    "Amanecer - Agricultura Regenerativa Andina",
+                    "Mañana - Medicina Natural Amazónica",
+                    "Mediodía - Tecnología Soberana",
+                    "Tarde - El Corazón (Oración en lenguas ancestrales)",
+                    "Atardecer - Construcción Natural"
+                ];
+                const sesionAleatoria = sesiones[Math.floor(Math.random() * sesiones.length)];
+                document.getElementById('curriculum-timer').textContent = 
+                    `Sesión Actual: ${sesionAleatoria}`;
+            }, 30000);
+            
+            // Inicializar puntos en el mapa
+            setTimeout(() => {
+                agregarPuntoMapa('ANT', 'Medellín');
+                agregarPuntoMapa('CUN', 'Bogotá');
+                agregarPuntoMapa('BOY', 'Tunja');
+                agregarPuntoMapa('VAL', 'Cali');
+                agregarPuntoMapa('CAL', 'Manizales');
+            }, 1000);
+        };
+    </script>
+</body>
+</html>
