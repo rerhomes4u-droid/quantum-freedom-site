@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OPERACIÓN SALVACIÓN COLOMBIA - Plan Maestro 2025</title>
+    <style>
+        :root {
+            --amarillo: #FCD116;
+            --azul: #003893;
+            --rojo: #CE1126;
+            --verde: #007A33;
+            --dorado: #FFD700;
+            --esmeralda: #50C878;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Georgia', 'Times New Roman', serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0c2461 0%, #1e3799 100%);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .war-room {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(0, 0, 0, 0.85);
+            border-radius: 30px;
+            border: 5px solid var(--amarillo);
+            box-shadow: 0 0 50px rgba(252, 209, 22, 0.3);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .war-room::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(252, 209, 22, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(206, 17, 38, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+        
+        .command-center {
+            background: linear-gradient(135deg, var(--azul), #002244);
+            padding: 40px;
+            text-align: center;
+            border-bottom: 5px solid var(--rojo);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .command-center::after {
+            content: '⚔️';
+            position: absolute;
+            font-size: 300px;
+            opacity: 0.05;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: girarEscudo 60s linear infinite;
+        }
+        
+        @keyframes girarEscudo {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        
+        .operation-title {
+            font-size: 3.5em;
+            color: var(--amarillo);
+            text-shadow: 3px 3px 10px rgba(0,0,0,0.5);
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .operation-subtitle {
+            font-size: 1.4em;
+            opacity: 0.9;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .phase-container {
+            padding: 40px;
+            display: none;
+        }
+        
+        .phase-container.active {
+            display: block;
+            animation: aparecerFase 0.8s ease;
+        }
+        
+        @keyframes aparecerFase {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .phase-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 40px;
+            background: linear-gradient(90deg, rgba(252, 209, 22, 0.1), transparent);
+            padding: 25px;
+            border-radius: 15px;
+            border-left: 8px solid var(--amarillo);
+        }
+        
+        .phase-number {
+            background: var(--rojo);
+            color: white;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            font-weight: bold;
+            margin-right: 30px;
+            flex-shrink: 0;
+            box-shadow: 0 10px 30px rgba(206, 17, 38, 0.4);
+            border: 3px solid var(--amarillo);
+        }
+        
+        .phase-title {
+            font-size: 36px;
+            color: var(--amarillo);
+            flex: 1;
+        }
+        
+        .battle-plan {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin: 40px 0;
+        }
+        
+        .mission-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            border: 2px solid transparent;
+            transition: all 0.4s;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .mission-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--amarillo), var(--verde));
+        }
+        
+        .mission-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--amarillo);
+            box-shadow: 0 20px 50px rgba(252, 209, 22, 0.2);
+        }
+        
+        .mission-icon {
+            font-size: 50px;
+            margin-bottom: 20px;
+            color: var(--amarillo);
+        }
+        
+        .mission-title {
+            font-size: 24px;
+            color: var(--amarillo);
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        
+        .mission-steps {
+            margin-top: 20px;
+        }
+        
+        .mission-step {
+            display: flex;
+            align-items: flex-start;
+            margin: 12px 0;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            border-left: 4px solid var(--verde);
+        }
+        
+        .mission-step.completed {
+            border-left-color: var(--amarillo);
+            background: rgba(252, 209, 22, 0.1);
+        }
+        
+        .step-number {
+            background: var(--azul);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            flex-shrink: 0;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        .step-content {
+            flex: 1;
+            line-height: 1.6;
+        }
+        
+        .resources-box {
+            background: linear-gradient(135deg, rgba(252, 209, 22, 0.1), rgba(0, 122, 51, 0.1));
+            border: 3px solid var(--verde);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 30px 0;
+        }
+        
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 50px;
+            padding-top: 30px;
+            border-top: 3px solid rgba(255,255,255,0.1);
+        }
+        
+        .war-button {
+            padding: 20px 40px;
+            border: none;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.4s;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .btn-advance {
+            background: linear-gradient(135deg, var(--verde), #2E7D32);
+            color: white;
+        }
+        
+        .btn-advance:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(46, 125, 50, 0.4);
+        }
+        
+        .btn-retreat {
+            background: linear-gradient(135deg, #6c757d, #495057);
+            color: white;
+        }
+        
+        .btn-retreat:hover {
+            transform: translateY(-3px);
+        }
+        
+        .btn-launch {
+            background: linear-gradient(135deg, var(--rojo), #b30000);
+            color: white;
+            font-size: 20px;
+            padding: 22px 50px;
+        }
+        
+        .victory-screen {
+            display: none;
+            text-align: center;
+            padding: 80px 40px;
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            min-height: 800px;
+        }
+        
+        .victory-screen.active {
+            display: block;
+            animation: victoria 1.5s ease;
+        }
+        
+        @keyframes victoria {
+            0% { opacity: 0; transform: scale(0.8); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        
+        .victory-celebration {
+            font-size: 120px;
+            margin: 40px 0;
+            animation: saltarVictoria 2s infinite;
+        }
+        
+        @keyframes saltarVictoria {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-40px) rotate(-10deg); }
+            75% { transform: translateY(-40px) rotate(10deg); }
+        }
+        
+        .colombia-map {
+            width: 100%;
+            height: 300px;
+            background: linear-gradient(135deg, var(--verde), var(--azul));
+            border-radius: 15px;
+            margin: 40px 0;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .resistance-point {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: var(--amarillo);
+            border-radius: 50%;
+            animation: latidoResistencia 2s infinite;
+        }
+        
+        @keyframes latidoResistencia {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 10px var(--amarillo); }
+            50% { transform: scale(1.3); box-shadow: 0 0 30px var(--amarillo); }
+        }
+        
+        .progress-war {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--rojo);
+            color: white;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 22px;
+            box-shadow: 0 15px 40px rgba(206, 17, 38, 0.6);
+            z-index: 1000;
+            border: 4px solid var(--amarillo);
+            animation: latido 2s infinite;
+        }
+        
+        @keyframes latido {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .quote-box {
+            background: rgba(252, 209, 22, 0.1);
+            border: 3px solid var(--amarillo);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 25px 0;
+            font-style: italic;
+            text-align: center;
+            font-size: 18px;
+        }
+        
+        .allies-network {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .ally-card {
+            background: rgba(255,255,255,0.05);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        
+        .ally-card:hover {
+            border-color: var(--verde);
+            transform: translateY(-5px);
+        }
+        
+        .timeline {
+            position: relative;
+            margin: 40px 0;
+            padding-left: 40px;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 20px;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(to bottom, var(--amarillo), var(--verde));
+        }
+        
+        .timeline-event {
+            position: relative;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            border-left: 5px solid var(--azul);
+        }
+        
+        .timeline-event::before {
+            content: '';
+            position: absolute;
+            left: -33px;
+            top: 25px;
+            width: 20px;
+            height: 20px;
+            background: var(--rojo);
+            border-radius: 50%;
+            border: 3px solid var(--amarillo);
+        }
+        
+        @media (max-width: 768px) {
+            .phase-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .phase-number {
+                margin-right: 0;
+                margin-bottom: 20px;
+            }
+            
+            .battle-plan {
+                grid-template-columns: 1fr;
+            }
+            
+            .war-button {
+                padding: 15px 25px;
+                font-size: 16px;
+            }
+            
+            .operation-title {
+                font-size: 2.5em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="war-room">
+        <div class="command-center">
+            <h1 class="operation-title">⚔️ OPERACIÓN SALVACIÓN COLOMBIA ⚔️</h1>
+            <p class="operation-subtitle">
+                Plan Maestro 2025 - De la resistencia a la reconstrucción. 
+                <strong>Fase por fase, pueblo por pueblo, corazón por corazón.</strong>
+            </p>
+            
+            <div style="margin-top: 30px;">
+                <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap;">
+                    <div style="background: var(--amarillo); color: var(--azul); padding: 10px 20px; border-radius: 25px; font-weight: bold;">
+                        🇨🇴 RESISTENCIA ACTIVA
+                    </div>
+                    <div style="background: var(--verde); color: white; padding: 10px 20px; border-radius: 25px; font-weight: bold;">
+                        🛡️ PROTECCIÓN COMUNITARIA
+                    </div>
+                    <div style="background: var(--rojo); color: white; padding: 10px 20px; border-radius: 25px; font-weight: bold;">
+                        💪 SOBERANÍA ECONÓMICA
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- FASE 1: RESISTENCIA -->
+        <div class="phase-container active" id="phase-1">
+            <div class="phase-header">
+                <div class="phase-number">1</div>
+                <div class="phase-title">FASE ALFA: LA RESISTENCIA SILENCIOSA</div>
+            </div>
+            
+            <div class="quote-box">
+                "Primero, sobrevivir. Luego, organizar. Finalmente, florecer."
+            </div>
+            
+            <div class="battle-plan">
+                <div class="mission-card">
+                    <div class="mission-icon">🛡️</div>
+                    <div class="mission-title">PROTECCIÓN DE LA FAMILIA</div>
+                    <p>Mientras el sistema colapsa, tu familia es tu fortaleza.</p>
+                    
+                    <div class="mission-steps">
+                        <div class="mission-step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <strong>Fideicomiso familiar inmediato</strong>
+                                <br>Protege tus bienes de confiscaciones
+                            </div>
+                        </div>
+                        <div class="mission-step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <strong>Red de trueque local</strong>
+                                <br>Comida por servicios, sin dinero
+                            </div>
+                        </div>
+                        <div class="mission-step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <strong>Huertas de supervivencia</strong>
+                                <br>Alimentos básicos en cada patio
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mission-card">
+                    <div class="mission-icon">📡</div>
+                    <div class="mission-title">COMUNICACIÓN SEGURA</div>
+                    <p>Sin comunicación, no hay resistencia organizada.</p>
+                    
+                    <div class="mission-steps">
+                        <div class="mission-step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <strong>Red mesh con radios Baofeng</strong>
+                                <br>Comunicación sin internet
+                            </div>
+                        </div>
+                        <div class="mission-step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <strong>Señales de seguridad</strong>
+                                <br>Códigos visuales entre vecinos
+                            </div>
+                        </div>
+                        <div class="mission-step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <strong>Correo humano</strong>
+                                <br>Mensajeros de confianza entre comunidades
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mission-card">
+                    <div class="mission-icon">💊</div>
+                    <div class="mission-title">SALUD AUTOSUFICIENTE</div>
+                    <p>Cuando los hospitales fallen, la medicina ancestral salva.</p>
+                    
+                    <div class="mission-steps">
+                        <div class="mission-step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <strong>Jardín medicinal básico</strong>
+                                <br>Menta, manzanilla, albahaca, jengibre
+                            </div>
+                        </div>
+                        <div class="mission-step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <strong>Botiquín de emergencia</strong>
+                                <br>Analgésicos naturales, vendas, antisépticos
+                            </div>
+                        </div>
+                        <div class="mission-step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <strong>Saberes ancestrales</strong>
+                                <br>Recuperar conocimientos de abuelos
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="colombia-map" id="resistance-map">
+                <!-- Puntos de resistencia aparecerán aquí -->
+            </div>
+            
+            <div class="button-group">
+                <button class="btn-retreat" onclick="takeStrategicPause()">
+                    ⏸️ Pausa Estratégica
+                </button>
+                <button class="btn-advance" onclick="nextPhase()">
+                    🚀 Avanzar a Fase 2 →
+                </button>
+            </div>
+        </div>
+        
+        <!-- FASE 2: ORGANIZACIÓN -->
+        <div class="phase-container" id="phase-2">
+            <div class="phase-header">
+                <div class="phase-number">2</div>
+                <div class="phase-title">FASE BRAVO: LA ORGANIZACIÓN COMUNITARIA</div>
+            </div>
+            
+            <div class="quote-box">
+                "Ninguna cadena puede resistir cuando todos tiran juntos."
+            </div>
+            
+            <div class="battle-plan">
+                <div class="mission-card">
+                    <div class="mission-icon">👥</div>
+                    <div class="mission-title">CONSEJOS DE BARRIO</div>
+                    <p>La democracia real empieza en tu cuadra.</p>
+                    
+                    <div class="mission-steps">
+                        <div class="mission-step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <strong>Asamblea vecinal semanal</strong>
+                                <br>En la cancha, en la esquina, en una casa
+                            </div>
+                        </div>
+                        <div class="mission-step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <strong>Ronda de vigilancia comunitaria</strong>
+                                <br>Vecinos protegiendo vecinos
+                            </div>
+                        </div>
+                        <div class="mission-step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <strong>Banco de herramientas compartidas</strong>
+                                <br>Lo que uno no tiene, otro presta
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mission-card">
+                    <div class="mission-icon">🌱</div>
+                    <div class="mission-title">SOBERANÍA ALIMENTARIA</div>
+                    <p>Quien controla tu comida, controla tu libertad.</p>
+                    
+                    <div class="mission-steps">
+                        <div class="mission-step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <strong>Huertas comunitarias</strong>
+                                <br>Lotes baldíos convertidos en alimento
+                            </div>
+                        </div>
+                        <div class="mission-step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <strong>Banco de semillas criollas</strong>
+                                <br>Semillas que no dependen de multinacionales
+                            </div>
+                        </div>
+                        <div class="mission-step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <strong>Trueque organizado</strong>
+                                <br>Mercados locales sin dinero oficial
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mission-card">
+                    <div class="mission-icon">🏫</div>
+                    <div class="mission-title">EDUCACIÓN PARALELA</div>
+                    <p>Educar para la libertad, no para la obediencia.</p>
+                    
+                    <div class="mission-steps">
+                        <div class="mission-step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <strong>Escuelas de oficios</strong>
+                                <br>Carpintería, costura, agricultura, mecánica
+                            </div>
+                        </div>
+                        <div class="mission-step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <strong>Bibliotecas populares</strong>
+                                <br>Libros prohibidos, conocimientos liberadores
+                            </div>
+                        </div>
+                        <div class="mission-step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <strong>Historia no contada</strong>
+                                <br>La verdad sobre nuestro país, sin censura
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="allies-network">
+                <div class="ally-card">
+                    <div style="font-size: 40px;">👵</div>
+                    <h4>Los Sabios</h4>
+                    <p>Abuelos con conocimientos ancestrales</p>
+                </div>
+                <div class="ally-card">
+                    <div style="font-size: 40px;">👨‍🔧</div>
+                    <h4>Los Artesanos</h4>
+                    <p>Maestros de oficios prácticos</p>
+                </div>
+                <div class="ally-card">
+                    <div style="font-size: 40px;">👩‍🌾</div>
+                    <h4>Los Agricultores</h4>
+                    <p>Guardianes de la tierra</p>
+                </div>
+                <div class="ally-card">
+                    <div style="font-size: 40px;">👨‍🏫</div>
+                    <h4>Los Educadores</h4>
+                    <p>Maestros de verdad</p>
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <button class="btn-retreat" onclick="prevPhase()">
+                    ← Volver a Fase 1
+                </button>
+                <button class="btn-advance" onclick="nextPhase()">
+                    ⚡ Avanzar a Fase 3 →
+                </button>
+            </div>
+        </div>
+        
+        <!-- FASE 3: RECONSTRUCCIÓN -->
+        <div class="phase-container" id="phase-3">
+            <div class="phase-header">
+                <div class="phase-number">3</div>
+                <div class="phase-title">FASE CHARLIE: LA RECONSTRUCCIÓN NACIONAL</div>
+            </div>
+            
+            <div class="quote-box">
+                "No reconstruimos lo que había. Construimos lo que siempre debió ser."
+            </div>
+            
+            <div class="timeline">
+                <div class="timeline-event">
+                    <h4>AÑO 1: CIMIENTOS (2025)</h4>
+                    <p>• 100 consejos comunales funcionando</p>
+                    <p>• Red de trueque nacional establecida</p>
+                    <p>• Sistema educativo paralelo en 50 municipios</p>
+                </div>
+                
+                <div class="timeline-event">
+                    <h4>AÑO 2: ESTRUCTURA (2026)</h4>
+                    <p>• Moneda comunitaria estable (no controlada por bancos)</p>
+                    <p>• Sistema de salud natural reconocido</p>
+                    <p>• Tribunal popular de justicia restaurativa</p>
+                </div>
+                
+                <div class="timeline-event">
+                    <h4>AÑO 3: FLORECIMIENTO (2027)</h4>
+                    <p>• Primera asamblea constituyente popular</p>
+                    <p>• Sistema económico basado en reciprocidad</p>
+                    <p>• Colombia soberana reconocida internacionalmente</p>
+                </div>
+            </div>
+            
+            <div class="battle-plan">
+                <div class="mission-card">
+                    <div class="mission-icon">🏛️</div>
+                    <div class="mission-title">GOBIERNO POPULAR</div>
+                    <p>Democracia real, no cada 4 años, sino cada día.</p>
+                    
+                    <div class="mission-steps">
+                        <div class="mission-step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <strong>Asambleas locales soberanas</strong>
+                                <br>Decisiones tomadas por quienes las viven
+                            </div>
+                        </div>
+                        <div class="mission-step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <strong>Delegados revocables</strong>
+                                <br>Representantes que obedecen, no mandan
+                            </div>
+                        </div>
+                        <div class="mission-step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <strong>Justicia restaurativa</strong>
+                                <br>Reparar daños, no solo castigar
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mission-card">
+                    <div class="mission-icon">💱</div>
+                    <div class="mission-title">ECONOMÍA DE RECIPROCIDAD</div>
+                    <p>Dinero que sirve a la gente, no gente que sirve al dinero.</p>
+                    
+                    <div class="mission-steps">
+                        <div class="mission-step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <strong>Moneda comunitaria</strong>
+                                <br>Basada en trabajo real, no deuda
+                            </div>
+                        </div>
+                        <div class="mission-step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <strong>Bancos de tiempo</strong>
+                                <br>1 hora de tu trabajo = 1 hora de cualquier otro
+                            </div>
+                        </div>
+                        <div class="mission-step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <strong>Propiedad comunitaria</strong>
+                                <br>Tierra y recursos como herencia colectiva
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mission-card">
+                    <div class="mission-icon">🌍</div>
+                    <div class="mission-title">RELACIONES INTERNACIONALES SOBERANAS</div>
+                    <p>Amigos, no amos. Cooperación, no sumisión.</p>
+                    
+                    <div class="mission-steps">
+                        <div class="mission-step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <strong>Pactos con pueblos, no con gobiernos</strong>
+                                <br>Con comunidades indígenas, campesinas, afro
+                            </div>
+                        </div>
+                        <div class="mission-step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <strong>Trueque internacional</strong>
+                                <br>Café por tecnología, sin dólares de por medio
+                            </div>
+                        </div>
+                        <div class="mission-step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <strong>Defensa diplomática popular</strong>
+                                <br>Embajadores del pueblo, no del estado
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="resources-box">
+                <h3 style="color: var(--amarillo); margin-bottom: 20px;">🎯 HERRAMIENTAS TÁCTICAS PARA EMPEZAR HOY:</h3>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 25px 0;">
+                    <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 12px;">
+                        <h4>🛠️ Kit de Supervivencia Urbana</h4>
+                        <p>• Radio Baofeng UV-5R</p>
+                        <p>• Filtro de agua portátil</p>
+                        <p>• Botiquín de hierbas</p>
+                        <p>• Manual de primeros auxilios</p>
+                    </div>
+                    
+                    <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 12px;">
+                        <h4>📚 Biblioteca de Resistencia</h4>
+                        <p>• "Cómo organizar una asamblea"</p>
+                        <p>• "Medicina natural colombiana"</p>
+                        <p>• "Agricultura urbana"</p>
+                        <p>• "Derecho consuetudinario"</p>
+                    </div>
+                    
+                    <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 12px;">
+                        <h4>💼 Fideicomiso Comunitario</h4>
+                        <p>• Modelo de estatutos</p>
+                        <p>• Lista de abogados solidarios</p>
+                        <p>• Guía paso a paso</p>
+                        <p>• Plantillas legales</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="button-group">
+                <button class="btn-retreat" onclick="prevPhase()">
+                    ← Volver a Fase 2
+                </button>
+                <button class="btn-launch" onclick="launchOperation()">
+                    🚀 ¡INICIAR OPERACIÓN!
+                </button>
+            </div>
+        </div>
+        
+        <!-- PANTALLA DE VICTORIA -->
+        <div class="victory-screen" id="victory-screen">
+            <div class="victory-celebration">🎉🇨🇴✨🏆🕊️</div>
+            
+            <h1 style="font-size: 4em; color: var(--amarillo); margin: 20px 0; text-shadow: 3px 3px 10px rgba(0,0,0,0.5);">
+                ¡COLOMBIA DESPIERTA!
+            </h1>
+            
+            <div style="max-width: 800px; margin: 50px auto;">
+                <div style="background: rgba(252, 209, 22, 0.1); padding: 30px; border-radius: 20px; border: 3px solid var(--amarillo);">
+                    <h2 style="color: var(--verde); margin-bottom: 25px;">🏆 MISIÓN ACEPTADA</h2>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 30px 0;">
+                        <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 12px; text-align: center;">
+                            <div style="font-size: 40px;">👥</div>
+                            <h4>Tu Primer Movimiento</h4>
+                            <p>Reúne a 3 vecinos esta semana</p>
+                        </div>
+                        
+                        <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 12px; text-align: center;">
+                            <div style="font-size: 40px;">🌱</div>
+                            <h4>Tu Primera Acción</h4>
+                            <p>Planta 5 semillas de comida hoy</p>
+                        </div>
+                        
+                        <div style="background: rgba(255,255,255,0.05); padding: 20px; border-radius: 12px; text-align: center;">
+                            <div style="font-size: 40px;">📚</div>
+                            <h4>Tu Primer Conocimiento</h4>
+                            <p>Aprende 1 planta medicinal esta semana</p>
+                        </div>
+                    </div>
+                    
+                    <div style="margin: 40px 0; padding: 25px; background: rgba(0, 56, 147, 0.2); border-radius: 15px;">
+                        <h3 style="color: var(--amarillo);">🎯 TU HOJA DE RUTA PERSONAL:</h3>
+                        <p style="margin: 15px 0; line-height: 1.8;">
+                            1. <strong>Esta semana:</strong> Habla con 1 vecino sobre seguridad comunitaria<br>
+                            2. <strong>Este mes:</strong> Organiza 1 reunión de 5 familias<br>
+                            3. <strong>En 3 meses:</strong> Ten 1 huerta familiar funcionando<br>
+                            4. <strong>En 6 meses:</strong> Participa en 1 asamblea barrial<br>
+                            5. <strong>En 1 año:</strong> Sé parte de 1 consejo comunal
+                        </p>
+                    </div>
+                </div>
+                
+                <div style="margin: 40px 0; text-align: center;">
+                    <h3 style="color: var(--verde);">🤝 CONECTA CON LA RESISTENCIA</h3>
+                    <p style="margin: 20px 0; font-size: 18px;">
+                        No estás solo. Miles ya comenzaron. 
+                        <strong>TripsToColombia.com</strong> es solo el primer nodo.
+                    </p>
+                    
+                    <div style="display: inline-flex; gap: 20px; margin: 30px 0; flex-wrap: wrap; justify-content: center;">
+                        <button style="background: var(--azul); color: white; padding: 15px 30px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer;">
+                            📡 Red Mesh Local
+                        </button>
+                        <button style="background: var(--verde); color: white; padding: 15px 30px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer;">
+                            👥 Consejos Comunales
+                        </button>
+                        <button style="background: var(--rojo); color: white; padding: 15px 30px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer;">
+                            🌱 Huertas Comunitarias
+                        </button>
+                    </div>
+                </div>
+                
+                <div style="background: linear-gradient(135deg, rgba(206, 17, 38, 0.1), rgba(252, 209, 22, 0.1)); padding: 30px; border-radius: 20px; margin: 40px 0;">
+                    <h3 style="color: var(--amarillo); text-align: center;">📞 TU PRIMERA ORDEN, SOLDADO DE LA PATRIA:</h3>
+                    <p style="text-align: center; margin-top: 20px; font-size: 20px; font-weight: bold;">
+                        "Esta semana, siembra una semilla, habla con un vecino, 
+                        aprende algo que el sistema no te enseñó. 
+                        <span style="color: var(--amarillo);">Pequeñas acciones, grandes revoluciones.</span>"
+                    </p>
+                </div>
+            </div>
+            
+            <button class="btn-launch" onclick="restartWarRoom()" style="margin-top: 30px;">
+                🔄 Iniciar Nueva Operación
+            </button>
+        </div>
+        
+        <div class="progress-war" id="progress-war">10%</div>
+    </div>
+
+    <script>
+        let currentPhase = 1;
+        const totalPhases = 3;
+        
+        // Inicializar mapa de resistencia
+        function initResistanceMap() {
+            const map = document.getElementById('resistance-map');
+            const regions = [
+                {x: 30, y: 40, name: 'Bogotá'},
+                {x: 25, y: 30, name: 'Medellín'},
+                {x: 20, y: 50, name: 'Cali'},
+                {x: 40, y: 60, name: 'Barranquilla'},
+                {x: 45, y: 70, name: 'Cartagena'},
+                {x: 35, y: 20, name: 'Santa Marta'},
+                {x: 50, y: 50, name: 'Pereira'},
+                {x: 55, y: 45, name: 'Manizales'},
+                {x: 60, y: 40, name: 'Bucaramanga'},
+                {x: 15, y: 35, name: 'Pasto'}
+            ];
+            
+            regions.forEach(region => {
+                const point = document.createElement('div');
+                point.className = 'resistance-point';
+                point.style.left = `${region.x}%`;
+                point.style.top = `${region.y}%`;
+                point.title = `Punto de resistencia: ${region.name}`;
+                map.appendChild(point);
+            });
+        }
+        
+        // Mostrar fase
+        function showPhase(phaseNumber) {
+            // Ocultar pantalla de victoria
+            document.getElementById('victory-screen').classList.remove('active');
+            
+            // Ocultar todas las fases
+            document.querySelectorAll('.phase-container').forEach(phase => {
+                phase.classList.remove('active');
+            });
+            
+            // Mostrar fase actual
+            const phaseElement = document.getElementById(`phase-${phaseNumber}`);
+            if(phaseElement) {
+                phaseElement.classList.add('active');
+            }
+            
+            // Actualizar progreso
+            updateWarProgress();
+        }
+        
+        function nextPhase() {
+            if(currentPhase < totalPhases) {
+                currentPhase++;
+                showPhase(currentPhase);
+            } else {
+                launchOperation();
+            }
+        }
+        
+        function prevPhase() {
+            if(currentPhase > 1) {
+                currentPhase--;
+                showPhase(currentPhase);
+            }
+        }
+        
+        function updateWarProgress() {
+            const percentage = Math.round((currentPhase / totalPhases) * 100);
+            document.getElementById('progress-war').textContent = `${percentage}%`;
+            document.getElementById('progress-war').style.background = 
+                percentage < 34 ? 'var(--rojo)' : 
+                percentage < 67 ? 'var(--amarillo)' : 
+                'var(--verde)';
+        }
+        
+        function takeStrategicPause() {
+            const messages = [
+                "⏳ Pausa táctica aprobada. Revisa suministros y moral.",
+                "☕ Tómate un tinto, revisa el plan, luego continúa.",
+                "🧠 Los grandes generales saben cuándo pausar para ganar.",
+                "🌙 Duerme una noche sobre esto. Mañana con más fuerza.",
+                "🎯 Mejor lento y seguro que rápido y arrepentido."
+            ];
+            
+            const message = messages[Math.floor(Math.random() * messages.length)];
+            showWarNotification(message);
+        }
+        
+        function launchOperation() {
+            document.querySelector('.command-center').style.display = 'none';
+            document.querySelectorAll('.phase-container').forEach(p => p.style.display = 'none');
+            document.getElementById('victory-screen').classList.add('active');
+            document.getElementById('progress-war').style.display = 'none';
+            
+            // Guardar inicio de operación
+            const operationData = {
+                startTime: new Date().toISOString(),
+                phase: 'LAUNCHED',
+                commitment: 'FULL'
+            };
+            
+            localStorage.setItem('colombia-operation', JSON.stringify(operationData));
+            
+            // Mostrar mensaje épico
+            setTimeout(() => {
+                showWarNotification('¡OPERACIÓN INICIADA! La resistencia comienza contigo. 🇨🇴');
+            }, 1000);
+            
+            // Iniciar simulación de red
+            simulateResistanceNetwork();
+        }
+        
+        function restartWarRoom() {
+            currentPhase = 1;
+            
+            document.getElementById('victory-screen').classList.remove('active');
+            document.querySelector('.command-center').style.display = 'block';
+            document.querySelectorAll('.phase-container').forEach(p => p.style.display = 'block');
+            document.getElementById('progress-war').style.display = 'flex';
+            
+            showPhase(1);
+            updateWarProgress();
+            
+            showWarNotification('¡Nueva operación cargada! Esta vez vamos por todo. ⚔️');
+        }
+        
+        function showWarNotification(message) {
+            const notification = document.createElement('div');
+            notification.textContent = message;
+            notification.style.cssText = `
+                position: fixed;
+                top: 30px;
+                left: 50%;
+                transform: translateX(-50%);
+                background: linear-gradient(135deg, var(--rojo), var(--azul));
+                color: white;
+                padding: 20px 35px;
+                border-radius: 15px;
+                z-index: 10000;
+                font-weight: bold;
+                font-size: 18px;
+                text-align: center;
+                box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+                border: 3px solid var(--amarillo);
+                animation: slideDown 0.5s forwards, fadeUp 0.5s 3.5s forwards;
+                max-width: 500px;
+                width: 90%;
+            `;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                if(notification.parentNode) {
+                    notification.remove();
+                }
+            }, 4000);
+        }
+        
+        function simulateResistanceNetwork() {
+            // Simular crecimiento de la red de resistencia
+            let nodes = 1;
+            const interval = setInterval(() => {
+                nodes *= 1.5;
+                
+                if(nodes > 10000) {
+                    clearInterval(interval);
+                    showWarNotification('¡RED DE RESISTENCIA NACIONAL ESTABLECIDA!');
+                } else if(nodes > 1000) {
+                    document.querySelector('.victory-celebration').innerHTML = '⚡🇨🇴💥🏛️✨';
+                    showWarNotification(`¡${Math.floor(nodes)} nodos de resistencia activos!`);
+                }
+            }, 5000);
+        }
+        
+        // Inicializar al cargar
+        window.onload = function() {
+            initResistanceMap();
+            showPhase(currentPhase);
+            updateWarProgress();
+            
+            // Agregar estilos de animación
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideDown {
+                    0% { transform: translateX(-50%) translateY(-100px); opacity: 0; }
+                    100% { transform: translateX(-50%) translateY(0); opacity: 1; }
+                }
+                
+                @keyframes fadeUp {
+                    0% { opacity: 1; transform: translateX(-50%) translateY(0); }
+                    100% { opacity: 0; transform: translateX(-50%) translateY(-50px); }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // Mostrar mensaje inicial
+            setTimeout(() => {
+                showWarNotification('¡Bienvenido al Cuarto de Guerra de la Salvación de Colombia! ⚔️');
+            }, 2000);
+        };
+        
+        // Configurar eventos de misión
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.mission-step').forEach(step => {
+                step.addEventListener('click', function() {
+                    this.classList.toggle('completed');
+                    
+                    // Sonido táctico (opcional)
+                    const audio = new Audio('data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAA==');
+                    audio.volume = 0.1;
+                    audio.play().catch(e => console.log('Audio no disponible'));
+                    
+                    // Mostrar progreso
+                    const completedSteps = document.querySelectorAll('.mission-step.completed').length;
+                    const totalSteps = document.querySelectorAll('.mission-step').length;
+                    const progress = Math.round((completedSteps / totalSteps) * 100);
+                    
+                    if(progress % 25 === 0) {
+                        showWarNotification(`Progreso de misión: ${progress}% completado`);
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
