@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OPERATION PAVEMENT | Guerrilla Repair Network</title>
+    <style>
+        :root {
+            --color-night: #0A0A2A;
+            --color-asphalt: #333333;
+            --color-safety: #FFD700;
+            --color-quickfix: #00CED1;
+            --color-success: #32CD32;
+            --color-warning: #FF8C00;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: linear-gradient(135deg, #0A0A2A 0%, #1A1A2E 100%);
+            color: white;
+            font-family: 'Courier New', monospace;
+            min-height: 100vh;
+        }
+        /* NIGHT MODE VISUAL */
+        .night-sky {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(255, 215, 0, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(0, 206, 209, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite alternate;
+        }
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 1; }
+        }
+        /* MAIN CONTAINER */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        /* HEADER */
+        .guerilla-header {
+            text-align: center;
+            padding: 3rem 0;
+            border-bottom: 3px solid var(--color-safety);
+            margin-bottom: 3rem;
+        }
+        h1 {
+            font-size: 4rem;
+            color: var(--color-safety);
+            text-shadow: 0 0 20px currentColor;
+            margin-bottom: 1rem;
+            letter-spacing: 3px;
+        }
+        .tagline {
+            font-size: 1.5rem;
+            color: var(--color-quickfix);
+            margin-bottom: 2rem;
+        }
+        /* PHASES */
+        .operation-phases {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 4rem 0;
+        }
+        .phase-card {
+            background: rgba(51, 51, 51, 0.8);
+            border: 3px solid;
+            border-radius: 15px;
+            padding: 2.5rem;
+            position: relative;
+            transition: all 0.3s;
+        }
+        .phase-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(255, 215, 0, 0.2);
+        }
+        .phase-1 { border-color: #FFD700; }
+        .phase-2 { border-color: #00CED1; }
+        .phase-3 { border-color: #32CD32; }
+        .phase-4 { border-color: #FF8C00; }
+        
+        .phase-number {
+            position: absolute;
+            top: -20px;
+            left: 20px;
+            background: inherit;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.5rem;
+            border: 3px solid;
+        }
+        /* MATERIALS GRID */
+        .materials-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+        .material-card {
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid var(--color-quickfix);
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        .material-card:hover {
+            border-color: var(--color-safety);
+            transform: scale(1.05);
+        }
+        .material-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+        /* CHEMICAL FORMULAS */
+        .chemical-formulas {
+            background: rgba(0, 0, 0, 0.9);
+            border: 3px solid var(--color-quickfix);
+            border-radius: 20px;
+            padding: 3rem;
+            margin: 4rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+        .chemical-formulas::before {
+            content: "⚠️";
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 2rem;
+            opacity: 0.5;
+        }
+        .formula-title {
+            color: var(--color-quickfix);
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        .formula {
+            background: rgba(0, 206, 209, 0.1);
+            border: 2px solid var(--color-quickfix);
+            border-radius: 10px;
+            padding: 2rem;
+            margin: 2rem 0;
+            font-family: monospace;
+            font-size: 1.2rem;
+        }
+        /* DISTRACTION SYSTEM */
+        .distraction-system {
+            background: linear-gradient(135deg, 
+                rgba(255, 140, 0, 0.2), 
+                rgba(255, 215, 0, 0.2));
+            border: 3px solid var(--color-warning);
+            border-radius: 20px;
+            padding: 3rem;
+            margin: 4rem 0;
+        }
+        .distraction-title {
+            color: var(--color-warning);
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        /* TRAINING SIMULATOR */
+        .training-simulator {
+            background: rgba(0, 0, 0, 0.9);
+            border: 3px solid var(--color-success);
+            border-radius: 20px;
+            padding: 3rem;
+            margin: 4rem 0;
+            text-align: center;
+        }
+        .simulator-title {
+            color: var(--color-success);
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+        }
+        .simulator-controls {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin: 3rem 0;
+        }
+        .simulator-btn {
+            background: var(--color-asphalt);
+            color: white;
+            border: 2px solid var(--color-safety);
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.3s;
+        }
+        .simulator-btn:hover {
+            background: var(--color-safety);
+            color: black;
+            transform: scale(1.1);
+        }
+        /* MAP INTERFACE */
+        .map-interface {
+            background: rgba(0, 0, 0, 0.8);
+            border: 3px solid var(--color-safety);
+            border-radius: 20px;
+            padding: 2rem;
+            margin: 3rem 0;
+            height: 500px;
+            position: relative;
+            overflow: hidden;
+        }
+        .map-grid {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            grid-template-rows: repeat(10, 1fr);
+            gap: 2px;
+            width: 100%;
+            height: 100%;
+        }
+        .map-cell {
+            background: #222;
+            border: 1px solid #444;
+            position: relative;
+            cursor: pointer;
+        }
+        .map-cell.pothole::after {
+            content: "🕳️";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.5rem;
+            color: var(--color-warning);
+        }
+        .map-cell.repaired::after {
+            content: "✅";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.2rem;
+            color: var(--color-success);
+        }
+        /* FOOTER */
+        .guerilla-footer {
+            text-align: center;
+            padding: 3rem;
+            border-top: 3px solid var(--color-asphalt);
+            margin-top: 3rem;
+            color: #666;
+        }
+        .safety-first {
+            color: var(--color-safety);
+            font-size: 1.5rem;
+            margin: 2rem 0;
+        }
+    </style>
+</head>
+<body>
+    <!-- NIGHT SKY -->
+    <div class="night-sky" id="nightSky"></div>
+
+    <div class="container">
+        <!-- HEADER -->
+        <header class="guerilla-header">
+            <h1>OPERATION PAVEMENT</h1>
+            <div class="tagline">Guerrilla Pothole Repair Network | Fix While They Sleep</div>
+            <p style="max-width: 800px; margin: 0 auto; font-size: 1.2rem; color: #aaa;">
+                This is not civil disobedience. This is <strong>civil reconstruction</strong>. 
+                While the system sleeps, we repair. While they ignore, we act.
+            </p>
+        </header>
+
+        <!-- OPERATION PHASES -->
+        <section>
+            <h2 style="text-align: center; color: var(--color-safety); font-size: 3rem; margin: 3rem 0;">
+                FOUR-PHASE DEPLOYMENT
+            </h2>
+            
+            <div class="operation-phases">
+                <!-- PHASE 1 -->
+                <div class="phase-card phase-1">
+                    <div class="phase-number">1</div>
+                    <h3 style="color: #FFD700; margin-bottom: 1.5rem; font-size: 1.8rem;">
+                        🗺️ RECONNAISSANCE & MAPPING
+                    </h3>
+                    <ul style="padding-left: 1.5rem; line-height: 1.8;">
+                        <li>Night walk with reflective gear</li>
+                        <li>GPS pin every pothole (use offline maps)</li>
+                        <li>Measure depth & diameter</li>
+                        <li>Photograph with timestamp</li>
+                        <li>Categorize: Critical / Urgent / Routine</li>
+                        <li>Note traffic patterns & camera locations</li>
+                    </ul>
+                </div>
+
+                <!-- PHASE 2 -->
+                <div class="phase-card phase-2">
+                    <div class="phase-number">2</div>
+                    <h3 style="color: #00CED1; margin-bottom: 1.5rem; font-size: 1.8rem;">
+                        📦 MATERIALS & LOGISTICS
+                    </h3>
+                    <ul style="padding-left: 1.5rem; line-height: 1.8;">
+                        <li>Mobile repair kits in backpacks</li>
+                        <li>Bicycle trailers for bulk materials</li>
+                        <li>Decentralized cache locations</li>
+                        <li>Silent tools only (no power tools)</li>
+                        <li>Waste collection system</li>
+                        <li>Emergency extraction plan</li>
+                    </ul>
+                </div>
+
+                <!-- PHASE 3 -->
+                <div class="phase-card phase-3">
+                    <div class="phase-number">3</div>
+                    <h3 style="color: #32CD32; margin-bottom: 1.5rem; font-size: 1.8rel;">
+                        🛠️ EXECUTION & REPAIR
+                    </h3>
+                    <ul style="padding-left: 1.5rem; line-height: 1.8;">
+                        <li>Team of 3 minimum: Fixer, Lookout, Distraction</li>
+                        <li>2300-0400 operations window</li>
+                        <li>15-minute maximum per repair</li>
+                        <li>Chemical formulas for quick cure</li>
+                        <li>Quality control stamp</li>
+                        <li>Before/after documentation</li>
+                    </ul>
+                </div>
+
+                <!-- PHASE 4 -->
+                <div class="phase-card phase-4">
+                    <div class="phase-number">4</div>
+                    <h3 style="color: #FF8C00; margin-bottom: 1.5rem; font-size: 1.8rem;">
+                        🎭 DISTRACTION & EXTRACTION
+                    </h3>
+                    <ul style="padding-left: 1.5rem; line-height: 1.8;">
+                        <li>Coordinated distractions 2 blocks away</li>
+                        <li>Legitimate-looking activities only</li>
+                        <li>Pre-arranged "emergencies"</li>
+                        <li>Clean extraction with zero trace</li>
+                        <li>Post-op debrief & map update</li>
+                        <li>Celebration at safe location</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- MATERIALS GRID -->
+        <section>
+            <h2 style="text-align: center; color: var(--color-quickfix); font-size: 2.5rem; margin: 3rem 0;">
+                MOBILE REPAIR KIT
+            </h2>
+            
+            <div class="materials-grid">
+                <div class="material-card">
+                    <div class="material-icon">🧪</div>
+                    <h3>Chemical Core</h3>
+                    <p>Baking soda + Super glue = Instant rock</p>
+                    <p style="font-size: 0.9rem; color: #aaa; margin-top: 1rem;">
+                        Ratio: 1:1 by volume<br>
+                        Cure time: 30 seconds<br>
+                        Strength: 3000 PSI
+                    </p>
+                </div>
+
+                <div class="material-card">
+                    <div class="material-icon">🔧</div>
+                    <h3>Tools</h3>
+                    <p>Wire brush, putty knife, measuring cup, mixing stick, tamping tool</p>
+                    <p style="font-size: 0.9rem; color: #aaa; margin-top: 1rem;">
+                        All tools blacked out<br>
+                        No reflective surfaces<br>
+                        Silent operation only
+                    </p>
+                </div>
+
+                <div class="material-card">
+                    <div class="material-icon">🎒</div>
+                    <h3>Carry System</h3>
+                    <p>Backpack with quick-access compartments, bicycle trailer for bulk</p>
+                    <p style="font-size: 0.9rem; color: #aaa; margin-top: 1rem;">
+                        Weight: 8kg max<br>
+                        Access time: 10 seconds<br>
+                        Weatherproof
+                    </p>
+                </div>
+
+                <div class="material-card">
+                    <div class="material-icon">📱</div>
+                    <h3>Tech Gear</h3>
+                    <p>Red lens flashlight, offline maps, encrypted comms, dash cam (for evidence)</p>
+                    <p style="font-size: 0.9rem; color: #aaa; margin-top: 1rem;">
+                        Phone in airplane mode<br>
+                        No cell tower pings<br>
+                        Encrypted everything
+                    </p>
+                </div>
+
+                <div class="material-card">
+                    <div class="material-icon">🚧</div>
+                    <h3>Safety Gear</h3>
+                    <p>Reflective vest (removable), gloves, mask, knee pads, emergency whistle</p>
+                    <p style="font-size: 0.9rem; color: #aaa; margin-top: 1rem;">
+                        Look like city workers<br>
+                        Act with authority<br>
+                        Safety first always
+                    </p>
+                </div>
+
+                <div class="material-card">
+                    <div class="material-icon">🧹</div>
+                    <h3>Cleanup Kit</h3>
+                    <p>Broom, dustpan, wet wipes, trash bags, leave-no-trace protocol</p>
+                    <p style="font-size: 0.9rem; color: #aaa; margin-top: 1rem;">
+                        Site cleaner than found<br>
+                        Zero evidence<br>
+                        Professional finish
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- CHEMICAL FORMULAS -->
+        <section class="chemical-formulas">
+            <h2 class="formula-title">EXPERIMENTAL FORMULAS</h2>
+            <p style="text-align: center; margin-bottom: 2rem; font-size: 1.2rem;">
+                These formulas create instant, durable repairs using common materials.
+            </p>
+
+            <div class="formula">
+                <h3 style="color: var(--color-quickfix); margin-bottom: 1rem;">⚡ FORMULA ALPHA: INSTANT ROCK</h3>
+                <p><strong>Ingredients:</strong></p>
+                <ul style="margin: 1rem 0; padding-left: 2rem;">
+                    <li>Baking soda (sodium bicarbonate) - 1 cup</li>
+                    <li>Cyanoacrylate (super glue) - 100ml</li>
+                    <li>Sand (optional, for texture match) - 2 cups</li>
+                    <li>Water (for pre-wetting) - 50ml</li>
+                </ul>
+                <p><strong>Procedure:</strong></p>
+                <ol style="margin: 1rem 0; padding-left: 2rem;">
+                    <li>Clean pothole thoroughly (wire brush)</li>
+                    <li>Wet surface with water spray</li>
+                    <li>Fill 3/4 with baking soda/sand mix</li>
+                    <li>Pour super glue evenly over surface</li>
+                    <li>Wait 30 seconds - chemical reaction creates instant solid</li>
+                    <li>Add second layer if needed</li>
+                    <li>Texture with asphalt dust for camouflage</li>
+                </ol>
+                <p style="color: var(--color-success); margin-top: 1rem;">
+                    ⏱️ Cure time: 30 seconds | 💪 Strength: 3000 PSI | 🌧️ Waterproof: Yes
+                </p>
+            </div>
+
+            <div class="formula">
+                <h3 style="color: var(--color-quickfix); margin-bottom: 1rem;">🔥 FORMULA BETA: COLD PATCH PLUS</h3>
+                <p><strong>Enhanced commercial cold patch formula:</strong></p>
+                <ul style="margin: 1rem 0; padding-left: 2rem;">
+                    <li>Store-bought cold patch asphalt - 1 bag</li>
+                    <li>Portland cement - 10% by weight</li>
+                    <li>Epoxy resin (two-part) - 5% by weight</li>
+                    <li>Crushed glass (for reflectivity) - handful</li>
+                </ul>
+                <p><strong>Enhancement makes permanent instead of temporary:</strong></p>
+                <ol style="margin: 1rem 0; padding-left: 2rem;">
+                    <li>Mix dry ingredients first</li>
+                    <li>Add epoxy resin and hardener</li>
+                    <li>Knead until uniform color</li>
+                    <li>Apply like normal cold patch</li>
+                    <li>Sets in 15 minutes, cures to concrete strength in 24h</li>
+                </ol>
+            </div>
+
+            <div class="formula">
+                <h3 style="color: var(--color-quickfix); margin-bottom: 1rem;">🌀 FORMULA GAMMA: RECYCLED RUBBER</h3>
+                <p><strong>Using recycled materials for eco-repair:</strong></p>
+                <ul style="margin: 1rem 0; padding-left: 2rem;">
+                    <li>Shredded tire rubber - 2 cups</li>
+                    <li>Asphalt emulsion - 1 cup</li>
+                    <li>Bentonite clay (waterproofing) - 1/2 cup</li>
+                    <li>Liquid nails adhesive - 1/4 cup</li>
+                </ul>
+                <p><strong>Flexible, waterproof, eco-friendly:</strong></p>
+                <ol style="margin: 1rem 0; padding-left: 2rem;">
+                    <li>Mix rubber and clay first</li>
+                    <li>Add asphalt emulsion slowly</li>
+                    <li>Mix in adhesive last</li>
+                    <li>Pack into hole firmly</li>
+                    <li>Creates flexible, waterproof patch</li>
+                </ol>
+            </div>
+        </section>
+
+        <!-- DISTRACTION SYSTEM -->
+        <section class="distraction-system">
+            <h2 class="distraction-title">COORDINATED DISTRACTION PROTOCOLS</h2>
+            <p style="text-align: center; margin-bottom: 2rem; font-size: 1.2rem;">
+                Keep repair teams safe by creating legitimate-looking distractions 2 blocks away.
+            </p>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem;">
+                <div style="background: rgba(0,0,0,0.5); padding: 1.5rem; border-radius: 10px;">
+                    <h3 style="color: var(--color-warning); margin-bottom: 1rem;">🎭 THEATER DISTRACTIONS</h3>
+                    <ul>
+                        <li>Fake car trouble (changing tire)</li>
+                        <li>Loud argument (couple fighting)</li>
+                        <li>Street performance (guitar, magic)</li>
+                        <li>Lost tourist with giant map</li>
+                        <li>Food truck "breakdown"</li>
+                    </ul>
+                </div>
+
+                <div style="background: rgba(0,0,0,0.5); padding: 1.5rem; border-radius: 10px;">
+                    <h3 style="color: var(--color-warning); margin-bottom: 1rem;">📡 TECH DISTRACTIONS</h3>
+                    <ul>
+                        <li>WiFi hotspot with funny name</li>
+                        <li>Bluetooth speaker "party"</li>
+                        <li>Drone flight (legal altitude)</li>
+                        <li>LED light show on building</li>
+                        <li>Projector movie on wall</li>
+                    </ul>
+                </div>
+
+                <div style="background: rgba(0,0,0,0.5); padding: 1.5rem; border-radius: 10px;">
+                    <h3 style="color: var(--color-warning); margin-bottom: 1rem;">🏢 CIVIC DISTRACTIONS</h3>
+                    <ul>
+                        <li>Fake utility work (cones, vests)</li>
+                        <li>Neighborhood watch walk</li>
+                        <li>Community cleanup (legit)</li>
+                        <li>Fire department "inspection"</li>
+                        <li>City survey team (clipboards)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div style="margin-top: 3rem; padding: 2rem; background: rgba(0,0,0,0.7); border-radius: 15px;">
+                <h3 style="color: var(--color-safety); text-align: center; margin-bottom: 1rem;">
+                    DISTRACTION TIMING PROTOCOL
+                </h3>
+                <ol style="max-width: 600px; margin: 0 auto; line-height: 1.8;">
+                    <li>Distraction team arrives 10 minutes before repair team</li>
+                    <li>Establish distraction 2 blocks away (upwind/up-traffic)</li>
+                    <li>Repair team gets "green light" via encrypted text: "STAGE CLEAR"</li>
+                    <li>If police approach distraction: "RAIN" signal</li>
+                    <li>If police approach repair: "THUNDER" signal (abort)</li>
+                    <li>All clear: "SUNRISE" signal (extract)</li>
+                </ol>
+            </div>
+        </section>
+
+        <!-- TRAINING SIMULATOR -->
+        <section class="training-simulator">
+            <h2 class="simulator-title">VIRTUAL TRAINING SIMULATOR</h2>
+            <p style="margin-bottom: 2rem; font-size: 1.2rem;">
+                Practice the repair sequence before going live. Timer starts when you click BEGIN.
+            </p>
+
+            <div style="margin: 3rem 0;">
+                <div style="background: var(--color-asphalt); border-radius: 10px; padding: 2rem; margin-bottom: 2rem;">
+                    <div id="simulatorStatus" style="color: var(--color-safety); font-size: 1.5rem; margin-bottom: 1rem;">
+                        READY FOR TRAINING
+                    </div>
+                    <div id="simulatorTimer" style="font-size: 3rem; font-family: monospace; margin-bottom: 1rem;">
+                        15:00
+                    </div>
+                    <div id="simulatorProgress" style="height: 10px; background: #222; border-radius: 5px; overflow: hidden;">
+                        <div id="progressBar" style="height: 100%; background: var(--color-success); width: 0%; transition: width 1s;"></div>
+                    </div>
+                </div>
+
+                <div class="simulator-controls">
+                    <button class="simulator-btn" id="beginTraining">🚀 BEGIN TRAINING</button>
+                    <button class="simulator-btn" id="pauseTraining">⏸️ PAUSE</button>
+                    <button class="simulator-btn" id="resetTraining">🔄 RESET</button>
+                </div>
+
+                <div id="trainingSteps" style="margin-top: 3rem; text-align: left; max-width: 600px; margin-left: auto; margin-right: auto;">
+                    <div class="training-step" data-step="1">
+                        <h4 style="color: var(--color-quickfix); margin-bottom: 0.5rem;">STEP 1: Site Assessment</h4>
+                        <p>Check for traffic, cameras, witnesses. Place safety cones.</p>
+                    </div>
+                    <div class="training-step" data-step="2">
+                        <h4 style="color: var(--color-quickfix); margin-bottom: 0.5rem;">STEP 2: Clean Hole</h4>
+                        <p>Remove debris, wire brush edges, wet surface.</p>
+                    </div>
+                    <div class="training-step" data-step="3">
+                        <h4 style="color: var(--color-quickfix); margin-bottom: 0.5rem;">STEP 3: Mix Formula</h4>
+                        <p>Combine baking soda and sand, prepare super glue.</p>
+                    </div>
+                    <div class="training-step" data-step="4">
+                        <h4 style="color: var(--color-quickfix); margin-bottom: 0.5rem;">STEP 4: Fill & Cure</h4>
+                        <p>Pack material, pour glue, wait 30 seconds.</p>
+                    </div>
+                    <div class="training-step" data-step="5">
+                        <h4 style="color: var(--color-quickfix); margin-bottom: 0.5rem;">STEP 5: Finish & Clean</h4>
+                        <p>Texture surface, clean area, remove cones.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- MAP INTERFACE -->
+        <section>
+            <h2 style="text-align: center; color: var(--color-safety); font-size: 2.5rem; margin: 3rem 0;">
+                COMMUNITY POTHOLE MAP
+            </h2>
+            
+            <div class="map-interface">
+                <div class="map-grid" id="potholeMap">
+                    <!-- Map cells will be generated by JavaScript -->
+                </div>
+                <div style="position: absolute; top: 20px; left: 20px; background: rgba(0,0,0,0.8); padding: 1rem; border-radius: 10px;">
+                    <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <div style="width: 20px; height: 20px; background: #222; border: 1px solid #444;"></div>
+                            <span>Clear</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <div style="width: 20px; height: 20px; background: #222; border: 1px solid #444; position: relative;">
+                                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: var(--color-warning);">🕳️</div>
+                            </div>
+                            <span>Pothole</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <div style="width: 20px; height: 20px; background: #222; border: 1px solid #444; position: relative;">
+                                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: var(--color-success);">✅</div>
+                            </div>
+                            <span>Repaired</span>
+                        </div>
+                    </div>
+                    <div>
+                        <strong>Potholes found:</strong> <span id="potholeCount">0</span> |
+                        <strong>Repaired:</strong> <span id="repairedCount">0</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer class="guerilla-footer">
+            <div class="safety-first">
+                SAFETY FIRST • LEAVE NO TRACE • COMMUNITY FIRST
+            </div>
+            <p style="margin: 2rem 0; font-size: 1.1rem;">
+                This system repairs roads while building community. Each fixed pothole is a vote for 
+                a world where we take care of each other.
+            </p>
+            <p style="color: #666; font-size: 0.9rem;">
+                Operation Pavement | Guerrilla Repair Network v1.0<br>
+                Open source community defense system<br>
+                Not destruction - reconstruction. Not protest - solution.
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        // ====================
+        // OPERATION PAVEMENT CORE
+        // ====================
+        class OperationPavement {
+            constructor() {
+                this.trainingActive = false;
+                this.trainingTime = 900; // 15 minutes in seconds
+                this.currentTime = this.trainingTime;
+                this.currentStep = 0;
+                this.potholes = [];
+                this.repaired = [];
+                this.initialize();
+            }
+            
+            initialize() {
+                // Create night sky stars
+                this.createStars();
+                
+                // Setup training simulator
+                this.setupTraining();
+                
+                // Generate pothole map
+                this.generateMap();
+                
+                // Setup map interactions
+                this.setupMap();
+                
+                // Console welcome
+                this.displayWelcome();
+            }
+            
+            createStars() {
+                const sky = document.getElementById('nightSky');
+                for (let i = 0; i < 100; i++) {
+                    const star = document.createElement('div');
+                    star.className = 'star';
+                    star.style.width = `${Math.random() * 3 + 1}px`;
+                    star.style.height = star.style.width;
+                    star.style.left = `${Math.random() * 100}%`;
+                    star.style.top = `${Math.random() * 100}%`;
+                    star.style.animationDelay = `${Math.random() * 3}s`;
+                    star.style.animationDuration = `${2 + Math.random() * 3}s`;
+                    sky.appendChild(star);
+                }
+            }
+            
+            setupTraining() {
+                const beginBtn = document.getElementById('beginTraining');
+                const pauseBtn = document.getElementById('pauseTraining');
+                const resetBtn = document.getElementById('resetTraining');
+                const status = document.getElementById('simulatorStatus');
+                const timer = document.getElementById('simulatorTimer');
+                const progressBar = document.getElementById('progressBar');
+                
+                let trainingInterval;
+                
+                beginBtn.addEventListener('click', () => {
+                    if (!this.trainingActive) {
+                        this.trainingActive = true;
+                        status.textContent = 'TRAINING IN PROGRESS';
+                        status.style.color = 'var(--color-success)';
+                        
+                        trainingInterval = setInterval(() => {
+                            this.currentTime--;
+                            
+                            // Update timer display
+                            const minutes = Math.floor(this.currentTime / 60);
+                            const seconds = this.currentTime % 60;
+                            timer.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                            
+                            // Update progress bar
+                            const progress = ((this.trainingTime - this.currentTime) / this.trainingTime) * 100;
+                            progressBar.style.width = `${progress}%`;
+                            
+                            // Update step highlighting
+                            this.updateTrainingSteps();
+                            
+                            // Time's up
+                            if (this.currentTime <= 0) {
+                                clearInterval(trainingInterval);
+                                this.trainingActive = false;
+                                status.textContent = 'TRAINING COMPLETE';
+                                timer.textContent = '00:00';
+                                progressBar.style.width = '100%';
+                                this.showTrainingComplete();
+                            }
+                        }, 1000);
+                    }
+                });
+                
+                pauseBtn.addEventListener('click', () => {
+                    if (this.trainingActive) {
+                        clearInterval(trainingInterval);
+                        this.trainingActive = false;
+                        status.textContent = 'TRAINING PAUSED';
+                        status.style.color = 'var(--color-warning)';
+                    }
+                });
+                
+                resetBtn.addEventListener('click', () => {
+                    clearInterval(trainingInterval);
+                    this.trainingActive = false;
+                    this.currentTime = this.trainingTime;
+                    this.currentStep = 0;
+                    status.textContent = 'READY FOR TRAINING';
+                    status.style.color = 'var(--color-safety)';
+                    timer.textContent = '15:00';
+                    progressBar.style.width = '0%';
+                    
+                    // Reset step highlighting
+                    document.querySelectorAll('.training-step').forEach(step => {
+                        step.style.opacity = '0.5';
+                    });
+                });
+            }
+            
+            updateTrainingSteps() {
+                // Each step gets 3 minutes (180 seconds)
+                const stepTime = 180;
+                const elapsed = this.trainingTime - this.currentTime;
+                const newStep = Math.min(5, Math.floor(elapsed / stepTime) + 1);
+                
+                if (newStep !== this.currentStep) {
+                    this.currentStep = newStep;
+                    
+                    // Update step highlighting
+                    document.querySelectorAll('.training-step').forEach(step => {
+                        const stepNum = parseInt(step.dataset.step);
+                        if (stepNum <= this.currentStep) {
+                            step.style.opacity = '1';
+                            step.style.color = 'white';
+                        } else {
+                            step.style.opacity = '0.5';
+                            step.style.color = '#666';
+                        }
+                    });
+                }
+            }
+            
+            showTrainingComplete() {
+                // Create celebration effect
+                for (let i = 0; i < 10; i++) {
+                    setTimeout(() => {
+                        const star = document.createElement('div');
+                        star.textContent = '✨';
+                        star.style.position = 'fixed';
+                        star.style.top = `${Math.random() * 100}%`;
+                        star.style.left = `${Math.random() * 100}%`;
+                        star.style.fontSize = '2rem';
+                        star.style.zIndex = '10000';
+                        star.style.animation = 'float-up 2s forwards';
+                        
+                        const style = document.createElement('style');
+                        style.textContent = `
+                            @keyframes float-up {
+                                0% { transform: translateY(0) scale(1); opacity: 1; }
+                                100% { transform: translateY(-100px) scale(0); opacity: 0; }
+                            }
+                        `;
+                        document.head.appendChild(style);
+                        
+                        document.body.appendChild(star);
+                        
+                        setTimeout(() => {
+                            if (star.parentNode) {
+                                star.parentNode.removeChild(star);
+                            }
+                        }, 2000);
+                    }, i * 200);
+                }
+                
+                // Console message
+                console.log('%c🎉 TRAINING COMPLETE: Ready for field deployment', 
+                    'color: var(--color-success); font-size: 16px;');
+            }
+            
+            generateMap() {
+                const map = document.getElementById('potholeMap');
+                map.innerHTML = '';
+                
+                // Generate 10x10 grid
+                for (let row = 0; row < 10; row++) {
+                    for (let col = 0; col < 10; col++) {
+                        const cell = document.createElement('div');
+                        cell.className = 'map-cell';
+                        cell.dataset.row = row;
+                        cell.dataset.col = col;
+                        
+                        // 30% chance of pothole
+                        if (Math.random() < 0.3) {
+                            cell.classList.add('pothole');
+                            this.potholes.push({row, col});
+                        }
+                        
+                        map.appendChild(cell);
+                    }
+                }
+                
+                this.updateMapCounts();
+            }
+            
+            setupMap() {
+                const map = document.getElementById('potholeMap');
+                
+                map.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('map-cell')) {
+                        const cell = e.target;
+                        const row = parseInt(cell.dataset.row);
+                        const col = parseInt(cell.dataset.col);
+                        
+                        if (cell.classList.contains('pothole')) {
+                            // Repair the pothole
+                            cell.classList.remove('pothole');
+                            cell.classList.add('repaired');
+                            
+                            // Update arrays
+                            const index = this.potholes.findIndex(p => p.row === row && p.col === col);
+                            if (index > -1) {
+                                this.potholes.splice(index, 1);
+                                this.repaired.push({row, col});
+                            }
+                            
+                            this.updateMapCounts();
+                            
+                            // Visual feedback
+                            this.showRepairEffect(cell);
+                        }
+                    }
+                });
+            }
+            
+            updateMapCounts() {
+                document.getElementById('potholeCount').textContent = this.potholes.length;
+                document.getElementById('repairedCount').textContent = this.repaired.length;
+            }
+            
+            showRepairEffect(cell) {
+                // Create repair animation
+                const rect = cell.getBoundingClientRect();
+                const effect = document.createElement('div');
+                effect.style.cssText = `
+                    position: fixed;
+                    top: ${rect.top + rect.height/2}px;
+                    left: ${rect.left + rect.width/2}px;
+                    width: 50px;
+                    height: 50px;
+                    background: radial-gradient(circle, var(--color-success), transparent);
+                    border-radius: 50%;
+                    pointer-events: none;
+                    z-index: 10000;
+                    animation: repair-pulse 1s forwards;
+                `;
+                
+                const style = document.createElement('style');
+                style.textContent = `
+                    @keyframes repair-pulse {
+                        0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+                        100% { transform: translate(-50%, -50%) scale(3); opacity: 0; }
+                    }
+                `;
+                document.head.appendChild(style);
+                
+                document.body.appendChild(effect);
+                
+                setTimeout(() => {
+                    if (effect.parentNode) {
+                        effect.parentNode.removeChild(effect);
+                    }
+                }, 1000);
+                
+                // Play repair sound (simulated)
+                this.playRepairSound();
+            }
+            
+            playRepairSound() {
+                // Simulate sound with Web Audio API
+                try {
+                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    oscillator.frequency.value = 440;
+                    oscillator.type = 'sine';
+                    
+                    gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+                    gainNode.gain.linearRampToValueAtTime(0.1, audioContext.currentTime + 0.1);
+                    gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.3);
+                    
+                    oscillator.start();
+                    oscillator.stop(audioContext.currentTime + 0.3);
+                } catch (e) {
+                    // Audio not supported
+                }
+            }
+            
+            displayWelcome() {
+                setTimeout(() => {
+                    console.log('%c🛣️ OPERATION PAVEMENT ACTIVATED', 
+                        'color: var(--color-safety); font-size: 24px; font-weight: bold;');
+                    console.log('%cGuerrilla pothole repair network online', 
+                        'color: var(--color-quickfix);');
+                    console.log('%cSafety first • Community first • Results first', 
+                        'color: var(--color-success);');
+                    console.log('');
+                    console.log('%cTraining simulator: Click BEGIN to practice', 
+                        'color: var(--color-safety);');
+                    console.log('%cMap: Click potholes to repair them', 
+                        'color: var(--color-success);');
+                }, 1000);
+            }
+            
+            // Public method to simulate repair
+            simulateRepair() {
+                if (this.potholes.length > 0) {
+                    const randomIndex = Math.floor(Math.random() * this.potholes.length);
+                    const pothole = this.potholes[randomIndex];
+                    
+                    const cell = document.querySelector(`.map-cell[data-row="${pothole.row}"][data-col="${pothole.col}"]`);
+                    if (cell) {
+                        cell.click();
+                    }
+                }
+            }
+        }
+
+        // ====================
+        // INITIALIZE OPERATION
+        // ====================
+        const operation = new OperationPavement();
+
+        // ====================
+        // KEYBOARD SHORTCUTS
+        // ====================
+        document.addEventListener('keydown', (e) => {
+            // Ctrl+P for Operation Pavement menu
+            if (e.ctrlKey && e.key === 'p') {
+                e.preventDefault();
+                const command = prompt('Operation Pavement Commands:\n"train" - Start training\n"repair" - Simulate repair\n"map" - Generate new map');
+                
+                if (command === 'train') {
+                    document.getElementById('beginTraining').click();
+                } else if (command === 'repair') {
+                    operation.simulateRepair();
+                } else if (command === 'map') {
+                    operation.generateMap();
+                }
+            }
+            
+            // Spacebar to pause/resume training
+            if (e.key === ' ') {
+                e.preventDefault();
+                if (operation.trainingActive) {
+                    document.getElementById('pauseTraining').click();
+                } else {
+                    document.getElementById('beginTraining').click();
+                }
+            }
+        });
+
+        // ====================
+        // FORMULA CALCULATOR
+        // ====================
+        // Add formula calculator to chemical section
+        setTimeout(() => {
+            const formulas = document.querySelector('.chemical-formulas');
+            const calculator = document.createElement('div');
+            calculator.innerHTML = `
+                <div style="margin-top: 3rem; padding: 2rem; background: rgba(0,0,0,0.5); border-radius: 10px;">
+                    <h3 style="color: var(--color-quickfix); margin-bottom: 1rem;">🧮 FORMULA CALCULATOR</h3>
+                    <p>Enter pothole dimensions to calculate materials needed:</p>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.5rem 0;">
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem;">Diameter (inches):</label>
+                            <input type="number" id="diameter" value="12" style="width: 100%; padding: 0.5rem; background: #222; border: 1px solid #444; color: white; border-radius: 5px;">
+                        </div>
+                        <div>
+                            <label style="display: block; margin-bottom: 0.5rem;">Depth (inches):</label>
+                            <input type="number" id="depth" value="3" style="width: 100%; padding: 0.5rem; background: #222; border: 1px solid #444; color: white; border-radius: 5px;">
+                        </div>
+                    </div>
+                    
+                    <button id="calculateBtn" style="background: var(--color-quickfix); color: black; border: none; padding: 1rem 2rem; border-radius: 5px; cursor: pointer; font-weight: bold;">
+                        CALCULATE MATERIALS
+                    </button>
+                    
+                    <div id="calculationResult" style="margin-top: 1.5rem; padding: 1rem; background: rgba(0,206,209,0.1); border-radius: 5px; display: none;">
+                        <!-- Results will appear here -->
+                    </div>
+                </div>
+            `;
+            
+            formulas.appendChild(calculator);
+            
+            // Add calculator functionality
+            document.getElementById('calculateBtn').addEventListener('click', () => {
+                const diameter = parseFloat(document.getElementById('diameter').value);
+                const depth = parseFloat(document.getElementById('depth').value);
+                
+                if (diameter && depth) {
+                    // Calculate volume in cubic inches
+                    const radius = diameter / 2;
+                    const area = Math.PI * radius * radius;
+                    const volumeCubicInches = area * depth;
+                    
+                    // Convert to cups (1 cup = 14.4375 cubic inches)
+                    const volumeCups = volumeCubicInches / 14.4375;
+                    
+                    // Calculate materials for Formula Alpha
+                    const bakingSoda = volumeCups * 0.8; // 80% baking soda
+                    const superGlueML = volumeCups * 100; // 100ml per cup
+                    const sand = volumeCups * 1.5; // 50% extra for compaction
+                    
+                    const resultDiv = document.getElementById('calculationResult');
+                    resultDiv.innerHTML = `
+                        <h4 style="color: var(--color-quickfix); margin-bottom: 1rem;">MATERIALS NEEDED:</h4>
+                        <ul style="line-height: 1.8;">
+                            <li>Baking soda: <strong>${bakingSoda.toFixed(1)} cups</strong></li>
+                            <li>Super glue: <strong>${superGlueML.toFixed(0)} ml</strong></li>
+                            <li>Sand (optional): <strong>${sand.toFixed(1)} cups</strong></li>
+                            <li>Water: <strong>${(volumeCups * 0.5).toFixed(1)} oz</strong></li>
+                        </ul>
+                        <p style="margin-top: 1rem; color: #aaa;">
+                            Pothole volume: ${volumeCubicInches.toFixed(0)} cubic inches<br>
+                            Repair time: ${(volumeCups * 0.5).toFixed(0)} minutes
+                        </p>
+                    `;
+                    resultDiv.style.display = 'block';
+                }
+            });
+        }, 1000);
+
+        // ====================
+        // AUTO-SIMULATION
+        // ====================
+        // Simulate community progress over time
+        setInterval(() => {
+            if (Math.random() > 0.7 && operation.potholes.length > 0) {
+                operation.simulateRepair();
+                console.log(`%c🛠️ Community repaired a pothole! ${operation.repaired.length} total repaired`, 
+                    'color: var(--color-success);');
+            }
+        }, 10000);
+
+    </script>
+</body>
+</html>
