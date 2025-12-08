@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Structural Integrity Analysis - Roofing Project</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 40px 20px;
+            background: rgba(255, 0, 0, 0.1);
+            border-left: 5px solid #ff0000;
+            margin-bottom: 40px;
+            border-radius: 8px;
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #ff0000, #ff6b6b);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 0, 0, 0.3);
+        }
+        
+        .card-title {
+            font-size: 1.5rem;
+            color: #ff6b6b;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .defect-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .defect-item {
+            background: rgba(255, 0, 0, 0.08);
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #ff0000;
+        }
+        
+        .defect-item.critical {
+            background: rgba(255, 0, 0, 0.15);
+            border-left: 4px solid #ff4757;
+        }
+        
+        .evidence {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+        
+        .evidence-tag {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+        
+        .options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 50px 0;
+        }
+        
+        .option-card {
+            padding: 40px 30px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        
+        .option-a {
+            background: linear-gradient(135deg, #00b894, #00a085);
+            border: 3px solid #00ffcc;
+        }
+        
+        .option-b {
+            background: linear-gradient(135deg, #ff4757, #ff3838);
+            border: 3px solid #ff7675;
+        }
+        
+        .option-title {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        
+        .option-list {
+            text-align: left;
+            margin: 20px 0;
+            padding-left: 20px;
+        }
+        
+        .option-list li {
+            margin: 10px 0;
+            padding-left: 10px;
+        }
+        
+        .consequences {
+            background: rgba(255, 0, 0, 0.1);
+            padding: 40px;
+            border-radius: 12px;
+            margin: 40px 0;
+            border: 2px solid rgba(255, 0, 0, 0.3);
+        }
+        
+        .timer {
+            text-align: center;
+            padding: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            margin: 40px 0;
+            border: 2px dashed rgba(255, 0, 0, 0.5);
+        }
+        
+        #countdown {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #ff0000;
+            margin: 20px 0;
+            font-family: monospace;
+        }
+        
+        .contact-box {
+            text-align: center;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            margin-top: 40px;
+        }
+        
+        .contact-info {
+            font-size: 1.3rem;
+            margin: 20px 0;
+            color: #00ffcc;
+        }
+        
+        .final-warning {
+            color: #ff0000;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 20px;
+            padding: 15px;
+            border: 2px solid #ff0000;
+            border-radius: 8px;
+            display: inline-block;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .defect-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .options {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Structural Integrity Analysis</h1>
+            <div class="subtitle">Roofing Project • Complete Failure Assessment</div>
+            <div class="subtitle">Last Updated: <span id="currentDate"></span></div>
+        </div>
+        
+        <div class="card">
+            <div class="card-title">⚠️ Executive Summary</div>
+            <p>The roofing project executed by your team represents a systematic failure of professional standards, technical competence, and basic construction integrity. What was delivered is not merely substandard—it is dangerous, non-compliant, and fundamentally defective.</p>
+            <p>Every claim of professional capability made prior to engagement has been contradicted by the physical evidence of your workmanship.</p>
+        </div>
+        
+        <div class="card">
+            <div class="card-title">📋 Documented Deficiencies</div>
+            <div class="defect-grid">
+                <div class="defect-item critical">
+                    <strong>20 Missing Structural Braces</strong>
+                    <p>Complete omission of critical structural components</p>
+                    <div class="evidence">
+                        <span class="evidence-tag">Photos</span>
+                        <span class="evidence-tag">Video</span>
+                        <span class="evidence-tag">Engineering Analysis</span>
+                    </div>
+                </div>
+                
+                <div class="defect-item critical">
+                    <strong>Improper Welding</strong>
+                    <p>Puntos de soldadura where continuous welds are required</p>
+                    <div class="evidence">
+                        <span class="evidence-tag">Macro Photos</span>
+                        <span class="evidence-tag">Thermal Imaging</span>
+                        <span class="evidence-tag">Code Violation Report</span>
+                    </div>
+                </div>
+                
+                <div class="defect-item">
+                    <strong>Damaged Tejas</strong>
+                    <p>Multiple units compromised, creating water infiltration points</p>
+                    <div class="evidence">
+                        <span class="evidence-tag">Water Test</span>
+                        <span class="evidence-tag">Material Analysis</span>
+                    </div>
+                </div>
+                
+                <div class="defect-item">
+                    <strong>Improper Fastening</strong>
+                    <p>Incorrect installation methodology throughout</p>
+                    <div class="evidence">
+                        <span class="evidence-tag">Installation Photos</span>
+                        <span class="evidence-tag">Manufacturer Specs</span>
+                    </div>
+                </div>
+                
+                <div class="defect-item critical">
+                    <strong>Safety Compromises</strong>
+                    <p>Structural integrity below minimum safety standards</p>
+                    <div class="evidence">
+                        <span class="evidence-tag">Structural Analysis</span>
+                        <span class="evidence-tag">Safety Audit</span>
+                    </div>
+                </div>
+                
+                <div class="defect-item">
+                    <strong>Material Defects</strong>
+                    <p>Use of inappropriate or damaged materials</p>
+                    <div class="evidence">
+                        <span class="evidence-tag">Material Logs</span>
+                        <span class="evidence-tag">Supplier Records</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="consequences">
+            <div class="card-title">⚖️ Legal & Professional Implications</div>
+            <p>This documentation package is prepared for multiple audiences:</p>
+            <div class="defect-grid" style="margin-top: 20px;">
+                <div class="defect-item">
+                    <strong>Colombian Contractor Associations</strong>
+                    <p>Professional standards review committees</p>
+                </div>
+                <div class="defect-item">
+                    <strong>Municipal Building Authorities</strong>
+                    <p>Code compliance and safety violations</p>
+                </div>
+                <div class="defect-item">
+                    <strong>Public Review Platforms</strong>
+                    <p>Complete case study with visual evidence</p>
+                </div>
+                <div class="defect-item">
+                    <strong>International Contractor Networks</strong>
+                    <p>Cross-border professional conduct alert</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="timer">
+            <div class="card-title">⏳ Decision Timeline</div>
+            <p>You have until the following date and time to provide written commitment to complete remediation:</p>
+            <div id="countdown">48:00:00</div>
+            <p>After this deadline, the documentation is automatically distributed to all relevant parties.</p>
+        </div>
+        
+        <div class="options">
+            <div class="option-card option-a">
+                <div class="option-title">OPTION A: Professional Resolution</div>
+                <p>Immediate written commitment to:</p>
+                <ul class="option-list">
+                    <li>Complete roof replacement at your expense</li>
+                    <li>Proper materials and workmanship</li>
+                    <li>Continuous professional welding (no puntos)</li>
+                    <li>Installation of all missing structural components</li>
+                    <li>Third-party quality verification</li>
+                </ul>
+                <p><strong>Outcome:</strong> Matter resolved privately. Positive testimonial provided regarding your professional integrity in remediation.</p>
+            </div>
+            
+            <div class="option-card option-b">
+                <div class="option-title">OPTION B: Public Resolution</div>
+                <p>Failure to commit results in:</p>
+                <ul class="option-list">
+                    <li>Full documentation package published</li>
+                    <li>Professional community notification</li>
+                    <li>Regulatory authority reports filed</li>
+                    <li>Public review platform postings</li>
+                    <li>Permanent digital record of failure</li>
+                </ul>
+                <p><strong>Outcome:</strong> Irreversible damage to professional reputation. Public record of this catastrophic failure.</p>
+            </div>
+        </div>
+        
+        <div class="contact-box">
+            <div class="card-title">📞 Immediate Response Required</div>
+            <p>Send written commitment via email including:</p>
+            <div class="contact-info">
+                1. Agreement to complete replacement at your expense<br>
+                2. Detailed timeline for remediation<br>
+                3. Methodology for proper installation<br>
+                4. Quality verification plan
+            </div>
+            <p>Email response must be received before the countdown expires.</p>
+            <div class="final-warning">
+                This is not a negotiation. This is your final opportunity.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Set current date
+        const now = new Date();
+        document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+        
+        // Countdown timer (48 hours from now)
+        const countdownElement = document.getElementById('countdown');
+        const deadline = new Date(now.getTime() + 48 * 60 * 60 * 1000);
+        
+        function updateCountdown() {
+            const now = new Date();
+            const diff = deadline - now;
+            
+            if (diff <= 0) {
+                countdownElement.textContent = "EXPIRED";
+                countdownElement.style.color = "#ff0000";
+                return;
+            }
+            
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+            
+            countdownElement.textContent = 
+                `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            // Change color as time runs out
+            if (hours < 6) {
+                countdownElement.style.color = "#ff4757";
+            } else if (hours < 24) {
+                countdownElement.style.color = "#ffa502";
+            }
+        }
+        
+        // Update countdown every second
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+        
+        // Add some visual effects
+        document.querySelectorAll('.defect-item').forEach(item => {
+            item.addEventListener('click', function() {
+                this.style.transform = 'scale(1.02)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 200);
+            });
+        });
+        
+        // Auto-update time every minute
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            }) + ' ' + now.toLocaleTimeString();
+        }, 60000);
+    </script>
+</body>
+</html>
