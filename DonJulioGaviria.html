@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OPERACIÓN DON JULIO - Exposición de Fraude Contractual</title>
+    <style>
+        :root {
+            --blood-red: #ff0000;
+            --warning-yellow: #ffd700;
+            --legal-blue: #003893;
+            --corrosion-orange: #ff8c00;
+            --damage-purple: #8a2be2;
+            --evidence-gray: #2f4f4f;
+            --structural-black: #1a1a1a;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0a0a0a;
+            color: white;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+        
+        .terminal-effect {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                repeating-linear-gradient(
+                    0deg,
+                    rgba(0, 56, 147, 0.1) 0px,
+                    transparent 1px,
+                    transparent 2px
+                );
+            pointer-events: none;
+            z-index: -2;
+            opacity: 0.3;
+        }
+        
+        .scan-line {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00ff00, transparent);
+            z-index: -1;
+            animation: scan 8s linear infinite;
+        }
+        
+        @keyframes scan {
+            0% { top: 0%; }
+            100% { top: 100%; }
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* HEADER - WARNING MODE */
+        .header-war {
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(90deg, #8B0000, #000000, #8B0000);
+            border-bottom: 5px solid var(--blood-red);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .war-title {
+            font-size: 4rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px var(--blood-red), 0 0 40px var(--blood-red);
+            animation: flicker 1.5s infinite alternate;
+        }
+        
+        @keyframes flicker {
+            0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+                opacity: 1;
+                text-shadow: 0 0 20px var(--blood-red), 0 0 40px var(--blood-red);
+            }
+            20%, 24%, 55% {
+                opacity: 0.8;
+                text-shadow: none;
+            }
+        }
+        
+        .contractor-name-target {
+            font-size: 3.5rem;
+            color: var(--warning-yellow);
+            background: rgba(0, 0, 0, 0.8);
+            padding: 20px 40px;
+            display: inline-block;
+            margin: 20px 0;
+            border: 3px solid var(--blood-red);
+            border-radius: 10px;
+            transform: rotate(-2deg);
+            box-shadow: 0 0 30px rgba(255, 0, 0, 0.5);
+        }
+        
+        .countdown-global {
+            font-size: 2rem;
+            font-family: monospace;
+            color: #00ff00;
+            background: black;
+            padding: 20px;
+            border: 2px solid #00ff00;
+            margin: 20px auto;
+            max-width: 400px;
+            text-align: center;
+        }
+        
+        /* MASTER DASHBOARD */
+        .master-dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin: 40px 0;
+        }
+        
+        .dashboard-card {
+            background: rgba(47, 79, 79, 0.9);
+            border-radius: 10px;
+            padding: 25px;
+            border: 2px solid;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card-critical {
+            border-color: var(--blood-red);
+            background: linear-gradient(135deg, rgba(255, 0, 0, 0.1), rgba(47, 79, 79, 0.9));
+        }
+        
+        .card-warning {
+            border-color: var(--warning-yellow);
+        }
+        
+        .card-evidence {
+            border-color: var(--legal-blue);
+        }
+        
+        .card-damage {
+            border-color: var(--damage-purple);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid;
+        }
+        
+        .card-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+        
+        .card-status {
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+        
+        .status-documented { background: #00ff00; color: black; }
+        .status-pending { background: #ffa500; color: black; }
+        .status-executed { background: #ff0000; color: white; }
+        
+        /* SPECIFIC DAMAGE DISPLAY */
+        .damage-showcase {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .damage-item {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid;
+            transition: all 0.3s;
+        }
+        
+        .damage-item:hover {
+            transform: translateX(10px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        }
+        
+        .damage-structural { border-left-color: var(--blood-red); }
+        .damage-corrosion { border-left-color: var(--corrosion-orange); }
+        .damage-material { border-left-color: var(--damage-purple); }
+        .damage-installation { border-left-color: var(--warning-yellow); }
+        
+        .damage-photo-placeholder {
+            width: 100%;
+            height: 150px;
+            background: linear-gradient(45deg, #333, #666);
+            border-radius: 5px;
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            color: #aaa;
+        }
+        
+        /* CORROSION TIMELINE */
+        .corrosion-timeline {
+            margin: 40px 0;
+            padding: 30px;
+            background: linear-gradient(90deg, #8B4513, #D2691E, #8B4513);
+            border-radius: 10px;
+            border: 2px solid var(--corrosion-orange);
+        }
+        
+        .timeline-title {
+            text-align: center;
+            font-size: 2rem;
+            margin-bottom: 30px;
+            color: white;
+        }
+        
+        .timeline-stages {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+        }
+        
+        .timeline-stages::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, white, gray);
+            z-index: 1;
+        }
+        
+        .timeline-stage {
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .stage-marker {
+            width: 40px;
+            height: 40px;
+            background: var(--corrosion-orange);
+            border-radius: 50%;
+            margin: 0 auto 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            border: 3px solid white;
+        }
+        
+        .stage-marker.current {
+            background: var(--blood-red);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        /* SOCIAL MEDIA WAR ROOM */
+        .war-room {
+            margin: 40px 0;
+            padding: 30px;
+            background: rgba(0, 0, 0, 0.9);
+            border: 3px solid var(--blood-red);
+            border-radius: 10px;
+        }
+        
+        .war-room-title {
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--warning-yellow);
+        }
+        
+        .platform-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .platform {
+            background: #222;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        
+        .platform:hover {
+            transform: translateY(-5px);
+            border-color: var(--blood-red);
+            background: #333;
+        }
+        
+        .platform-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .platform.ready { border-color: #00ff00; }
+        .platform.pending { border-color: #ffa500; }
+        .platform.launched { border-color: #ff0000; background: #300; }
+        
+        /* LEGAL JURISDICTION MAP */
+        .jurisdiction-map {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin: 40px 0;
+        }
+        
+        .jurisdiction-card {
+            background: rgba(0, 56, 147, 0.2);
+            padding: 25px;
+            border-radius: 10px;
+            border: 2px solid var(--legal-blue);
+        }
+        
+        .jurisdiction-title {
+            color: var(--legal-blue);
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .law-list {
+            list-style: none;
+        }
+        
+        .law-item {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .law-item::before {
+            content: '⚖️';
+            margin-right: 10px;
+        }
+        
+        /* ESCALATION LADDER */
+        .escalation-ladder {
+            margin: 50px 0;
+            padding: 40px;
+            background: linear-gradient(180deg, #111, #333);
+            border-radius: 15px;
+            border: 3px solid var(--warning-yellow);
+        }
+        
+        .ladder-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 40px;
+            color: var(--warning-yellow);
+        }
+        
+        .ladder-step {
+            display: flex;
+            align-items: center;
+            margin: 30px 0;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            border-left: 5px solid;
+        }
+        
+        .step-1 { border-left-color: #00ff00; }
+        .step-2 { border-left-color: #ffff00; }
+        .step-3 { border-left-color: #ffa500; }
+        .step-4 { border-left-color: #ff0000; }
+        .step-5 { border-left-color: #8b0000; }
+        
+        .step-number {
+            width: 50px;
+            height: 50px;
+            background: #000;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-right: 20px;
+            flex-shrink: 0;
+        }
+        
+        .step-1 .step-number { background: #00ff00; color: black; }
+        .step-2 .step-number { background: #ffff00; color: black; }
+        .step-3 .step-number { background: #ffa500; color: black; }
+        .step-4 .step-number { background: #ff0000; color: white; }
+        .step-5 .step-number { background: #8b0000; color: white; }
+        
+        /* FINAL WARNING */
+        .final-warning-nuclear {
+            text-align: center;
+            padding: 50px;
+            background: linear-gradient(45deg, #8b0000, #000, #8b0000);
+            margin: 50px 0;
+            border: 5px solid var(--blood-red);
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .final-warning-nuclear::before {
+            content: '⚠️';
+            position: absolute;
+            font-size: 10rem;
+            opacity: 0.1;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        
+        .nuclear-title {
+            font-size: 3.5rem;
+            color: var(--warning-yellow);
+            margin-bottom: 20px;
+            text-shadow: 0 0 20px currentColor;
+        }
+        
+        .nuclear-subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+        
+        .red-button {
+            background: linear-gradient(45deg, #ff0000, #8b0000);
+            color: white;
+            border: none;
+            padding: 20px 40px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            margin: 20px;
+            transition: all 0.3s;
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+        }
+        
+        .red-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 40px rgba(255, 0, 0, 0.8);
+        }
+        
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .war-title { font-size: 2.5rem; }
+            .contractor-name-target { font-size: 2rem; }
+            .master-dashboard { grid-template-columns: 1fr; }
+            .timeline-stages { flex-direction: column; }
+            .timeline-stages::before { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="terminal-effect"></div>
+    <div class="scan-line"></div>
+    
+    <div class="container">
+        <!-- WAR DECLARATION HEADER -->
+        <header class="header-war">
+            <h1 class="war-title">OPERACIÓN DON JULIO</h1>
+            <p style="font-size: 1.2rem; margin-bottom: 20px; color: #aaa;">
+                EXPOSICIÓN DE FRAUDE CONTRACTUAL | PELIGRO ESTRUCTURAL | CORROSIÓN DOCUMENTADA
+            </p>
+            
+            <div class="contractor-name-target">
+                ⚠️ "DON" JULIO GAVIRIA ⚠️
+            </div>
+            
+            <div class="countdown-global" id="globalCountdown">
+                AUTOEJECUCIÓN EN: 24:00:00
+            </div>
+            
+            <p style="margin-top: 20px; color: #ff6b6b;">
+                Este sistema se ejecuta automáticamente. La documentación ya está cargada.<br>
+                Las decisiones tomadas ahora determinan su legado permanente.
+            </p>
+        </header>
+
+        <!-- MASTER DASHBOARD -->
+        <div class="master-dashboard">
+            <div class="dashboard-card card-critical">
+                <div class="card-header">
+                    <div class="card-title">🚨 DAÑOS CRÍTICOS IDENTIFICADOS</div>
+                    <div class="card-status status-documented">100% DOCUMENTADO</div>
+                </div>
+                
+                <div class="damage-showcase">
+                    <div class="damage-item damage-structural">
+                        <strong>20 SOPORTES ESTRUCTURALES OMITIDOS</strong>
+                        <p>Peligro inminente de colapso</p>
+                        <div class="damage-photo-placeholder">FOTO: Estructura incompleta</div>
+                        <small>Violación Código Colombiano NSR-10</small>
+                    </div>
+                    
+                    <div class="damage-item damage-corrosion">
+                        <strong>CORROSIÓN INTERNA ESTRUCTURAL</strong>
+                        <p>Filtraciones ya oxidando metal interno</p>
+                        <div class="damage-photo-placeholder">FOTO: Óxido en vigas</div>
+                        <small>Debilitamiento progresivo documentado</small>
+                    </div>
+                    
+                    <div class="damage-item damage-material">
+                        <strong>LAMINADO METÁLICO DESTRUIDO</strong>
+                        <p>5+ abolladuras POR PANEL (hermoso material arruinado)</p>
+                        <div class="damage-photo-placeholder">FOTO: Paneles dañados</div>
+                        <small>Instalado al revés por su belleza - ahora es un desastre</small>
+                    </div>
+                    
+                    <div class="damage-item damage-installation">
+                        <strong>TORNILLOS FALLIDOS EXPUESTOS</strong>
+                        <p>Completamente fuera de marca, visibles al ojo</p>
+                        <div class="damage-photo-placeholder">FOTO: Tornillos fallidos</div>
+                        <small>Evidencia de prisa y negligencia</small>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="dashboard-card card-evidence">
+                <div class="card-header">
+                    <div class="card-title">📁 EVIDENCIA RECOLECTADA</div>
+                    <div class="card-status status-documented">147 ARCHIVOS</div>
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <div style="display: flex; justify-content: space-between; margin: 10px 0;">
+                        <span>📸 Fotos Estructurales:</span>
+                        <span style="color: #00ff00;">86 archivos</span>
+                    </div>
+                    <div style="height: 10px; background: #333; border-radius: 5px; margin: 5px 0;">
+                        <div style="width: 100%; height: 100%; background: #00ff00; border-radius: 5px;"></div>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; margin: 10px 0;">
+                        <span>🎥 Videos de Filtraciones:</span>
+                        <span style="color: #00ff00;">18 videos</span>
+                    </div>
+                    <div style="height: 10px; background: #333; border-radius: 5px; margin: 5px 0;">
+                        <div style="width: 100%; height: 100%; background: #00ff00; border-radius: 5px;"></div>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; margin: 10px 0;">
+                        <span>📄 Documentos Legales:</span>
+                        <span style="color: #00ff00;">43 archivos</span>
+                    </div>
+                    <div style="height: 10px; background: #333; border-radius: 5px; margin: 5px 0;">
+                        <div style="width: 100%; height: 100%; background: #00ff00; border-radius: 5px;"></div>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 30px; padding: 15px; background: rgba(0,0,0,0.5); border-radius: 8px;">
+                    <strong>⚠️ ANÁLISIS DE INGENIERO CERTIFICADO:</strong>
+                    <p style="margin-top: 10px; color: #ff6b6b;">
+                        "La estructura presenta fallas sistémicas que comprometen la integridad. 
+                        La corrosión documentada reduce la vida útil en 70%. Se requiere reemplazo completo, no reparación."
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- CORROSION TIMELINE -->
+        <div class="corrosion-timeline">
+            <h2 class="timeline-title">⏳ LÍNEA DE TIEMPO DE DESTRUCCIÓN</h2>
+            
+            <div class="timeline-stages">
+                <div class="timeline-stage">
+                    <div class="stage-marker">1</div>
+                    <div>Instalación Defectuosa</div>
+                    <small>Feb 2024</small>
+                </div>
+                <div class="timeline-stage">
+                    <div class="stage-marker">2</div>
+                    <div>Primeras Filtraciones</div>
+                    <small>Mar 2024</small>
+                </div>
+                <div class="timeline-stage">
+                    <div class="stage-marker current">3</div>
+                    <div>Corrosión Interna Documentada</div>
+                    <small>ACTUAL</small>
+                </div>
+                <div class="timeline-stage">
+                    <div class="stage-marker">4</div>
+                    <div>Debilitamiento Estructural</div>
+                    <small>Proyección: Jun 2024</small>
+                </div>
+                <div class="timeline-stage">
+                    <div class="stage-marker">5</div>
+                    <div>Falla Catastrófica</div>
+                    <small>Proyección: Dic 2024</small>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 30px; padding: 20px; background: rgba(0,0,0,0.5); border-radius: 8px;">
+                <strong>🔬 HALLAZGO CRÍTICO:</strong>
+                <p style="margin-top: 10px;">
+                    El agua ya penetró la estructura metálica. El óxido actúa como cáncer, comiendo el metal desde adentro. 
+                    Cada lluvia acelera el proceso. Esto no es cosmético - es estructural y progresivo.
+                </p>
+            </div>
+        </div>
+
+        <!-- SOCIAL MEDIA WAR ROOM -->
+        <div class="war-room">
+            <h2 class="war-room-title">⚔️ SALA DE GUERRA - PLATAFORMAS DE EXPOSICIÓN</h2>
+            
+            <p style="text-align: center; margin-bottom: 30px; color: #aaa;">
+                Todos los sistemas están programados. Los botones están listos. La ejecución es automática.
+            </p>
+            
+            <div class="platform-grid">
+                <div class="platform ready">
+                    <div class="platform-icon">📘</div>
+                    <strong>Facebook Armenia</strong>
+                    <p>Todos los grupos (14)</p>
+                    <small>Listo</small>
+                </div>
+                
+                <div class="platform ready">
+                    <div class="platform-icon">⛪</div>
+                    <strong>Iglesia Local</strong>
+                    <p>Congregación completa</p>
+                    <small>Carteles impresos</small>
+                </div>
+                
+                <div class="platform pending">
+                    <div class="platform-icon">🎵</div>
+                    <strong>TikTok Evidencias</strong>
+                    <p>Videos virales</p>
+                    <small>Editando</small>
+                </div>
+                
+                <div class="platform ready">
+                    <div class="platform-icon">🏢</div>
+                    <strong>Cámara de Comercio</strong>
+                    <p>Queja formal</p>
+                    <small>Documentos listos</small>
+                </div>
+                
+                <div class="platform pending">
+                    <div class="platform-icon">🌐</div>
+                    <strong>DonJulioFraude.com</strong>
+                    <p>Sitio permanente</p>
+                    <small>DNS configurado</small>
+                </div>
+                
+                <div class="platform launched">
+                    <div class="platform-icon">📱</div>
+                    <strong>Contractor Integrity App</strong>
+                    <p>Registro permanente</p>
+                    <small>✅ ACTIVO</small>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="red-button" onclick="simulateLaunch()">
+                    🚀 SIMULAR EJECUCIÓN COMPLETA
+                </button>
+                <p style="margin-top: 10px; font-size: 0.9rem; color: #ff6b6b;">
+                    (En producción, esto ejecutaría todas las plataformas simultáneamente)
+                </p>
+            </div>
+        </div>
+
+        <!-- LEGAL JURISDICTION MAP -->
+        <div class="jurisdiction-map">
+            <div class="jurisdiction-card">
+                <h3 class="jurisdiction-title">⚖️ LEY COLOMBIANA</h3>
+                <ul class="law-list">
+                    <li class="law-item">Ley 1480 de 2011 - Protección al Consumidor</li>
+                    <li class="law-item">Código Penal - Artículo 250 (Estafa)</li>
+                    <li class="law-item">NSR-10 - Normas Sismo-Resistentes</li>
+                    <li class="law-item">Ley 142 de 1994 - Servicios Públicos</li>
+                </ul>
+                <div style="margin-top: 20px; padding: 15px; background: rgba(255,0,0,0.1); border-radius: 5px;">
+                    <strong>PENA MÁXIMA:</strong> 8 años + restitución completa
+                </div>
+            </div>
+            
+            <div class="jurisdiction-card">
+                <h3 class="jurisdiction-title">🌍 JURISDICCIÓN INTERNACIONAL</h3>
+                <ul class="law-list">
+                    <li class="law-item">Código Comercial Uniforme (UCC)</li>
+                    <li class="law-item">Propiedad de La Coalición de Amnistía para la Unidad</li>
+                    <li class="law-item">Tratados de Protección Diplomática</li>
+                    <li class="law-item">Notificación USCIS (si aplica)</li>
+                </ul>
+                <div style="margin-top: 20px; padding: 15px; background: rgba(0,56,147,0.2); border-radius: 5px;">
+                    <strong>LEVERAGE:</strong> Bloqueo de visas + acción internacional
+                </div>
+            </div>
+            
+            <div class="jurisdiction-card">
+                <h3 class="jurisdiction-title">📊 SISTEMA PERMANENTE</h3>
+                <ul class="law-list">
+                    <li class="law-item">Base de datos pública verificada</li>
+                    <li class="law-item">Sistema de calificación permanente</li>
+                    <li class="law-item">Alertas a futuros clientes</li>
+                    <li class="law-item">Legado digital irreversible</li>
+                </ul>
+                <div style="margin-top: 20px; padding: 15px; background: rgba(139,0,0,0.3); border-radius: 5px;">
+                    <strong>IMPACTO:</strong> Fin de carrera como contratista
+                </div>
+            </div>
+        </div>
+
+        <!-- ESCALATION LADDER -->
+        <div class="escalation-ladder">
+            <h2 class="ladder-title">🪜 ESCALERA DE CONSECUENCIAS</h2>
+            
+            <div class="ladder-step step-1">
+                <div class="step-number">1</div>
+                <div>
+                    <strong>OPORTUNIDAD ACTUAL (ÚLTIMA)</strong>
+                    <p>24 horas para compromiso escrito de reemplazo COMPLETO a su costo</p>
+                    <small>Estatus: <span style="color: #00ff00;">✅ ACTIVO</span></small>
+                </div>
+            </div>
+            
+            <div class="ladder-step step-2">
+                <div class="step-number">2</div>
+                <div>
+                    <strong>EXPOSICIÓN LOCAL (Hora 24)</strong>
+                    <p>Redes sociales de Armenia, iglesia, vecinos, Cámara de Comercio</p>
+                    <small>Estatus: <span style="color: #ffa500;">⏳ PROGRAMADO</span></small>
+                </div>
+            </div>
+            
+            <div class="ladder-step step-3">
+                <div class="step-number">3</div>
+                <div>
+                    <strong>PLATAFORMA NACIONAL (Día 2)</strong>
+                    <p>Sitio web permanente, TikTok viral, noticias locales, base de datos nacional</p>
+                    <small>Estatus: <span style="color: #ffa500;">⏳ PROGRAMADO</span></small>
+                </div>
+            </div>
+            
+            <div class="ladder-step step-4">
+                <div class="step-number">4</div>
+                <div>
+                    <strong>ACCIÓN LEGAL COMPLETA (Día 3)</strong>
+                    <p>Demandas civiles + penales, notificación internacional, USCIS, UCC</p>
+                    <small>Estatus: <span style="color: #ffa500;">⏳ PROGRAMADO</span></small>
+                </div>
+            </div>
+            
+            <div class="ladder-step step-5">
+                <div class="step-number">5</div>
+                <div>
+                    <strong>LEGADO PERMANENTE (Día 5+)</strong>
+                    <p>"Don Julio" como sinónimo de fraude en construcción. Cada búsqueda futura muestra este caso</p>
+                    <small>Estatus: <span style="color: #ff0000;">⚡ IRREVERSIBLE</span></small>
+                </div>
+            </div>
+        </div>
+
+        <!-- FINAL NUCLEAR WARNING -->
+        <div class="final-warning-nuclear">
+            <h2 class="nuclear-title">⏰ DECISIÓN FINAL</h2>
+            <p class="nuclear-subtitle">
+                Este no es un juego. No es una negociación. Es matemática pura.<br>
+                Usted eligió dañar a mis padres. Yo elijo proteger a todos sus futuros clientes.
+            </p>
+            
+            <div style="max-width: 800px; margin: 30px auto; padding: 20px; background: rgba(0,0,0,0.7); border-radius: 10px;">
+                <p style="margin-bottom: 15px;">🔴 <strong>EL PROBLEMA:</strong> Corrosión interna + 20 soportes faltantes + laminado destruido + instalación criminal</p>
+                <p style="margin-bottom: 15px;">🟡 <strong>LA SOLUCIÓN:</strong> Reemplazo completo a su costo + certificación de ingeniero + garantía escrita</p>
+                <p style="margin-bottom: 15px;">🟢 <strong>EL RESULTADO:</strong> Caso cerrado. Testimonio positivo sobre su reparación. Sin exposición.</p>
+                <p>⚫ <strong>LA ALTERNATIVA:</strong> Legado permanente como caso de estudio de fraude. Fin de carrera.</p>
+            </div>
+            
+            <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 20px; margin: 40px 0;">
+                <button class="red-button" onclick="chooseOption('repair')">
+                    ✅ ACEPTO REPARACIÓN COMPLETA
+                </button>
+                <button class="red-button" style="background: linear-gradient(45deg, #000, #333);" onclick="chooseOption('exposure')">
+                    💀 PREFIERO EXPOSICIÓN PERMANENTE
+                </button>
+            </div>
+            
+            <div id="resultMessage" style="display: none; padding: 20px; background: rgba(0,255,0,0.1); border-radius: 10px; margin-top: 20px;">
+                <!-- Dynamic message will appear here -->
+            </div>
+        </div>
+
+        <!-- FOOTER WITH TIMESTAMP -->
+        <footer style="text-align: center; padding: 30px; margin-top: 50px; border-top: 1px solid #333; color: #666;">
+            <p>Sistema Operación Don Julio | Autoejecutable HTML | Documentación Permanente</p>
+            <p id="timestamp" style="font-family: monospace; margin-top: 10px;"></p>
+            <p style="margin-top: 20px; font-size: 0.9rem;">
+                Este archivo funciona OFFLINE. La evidencia ya está incrustada.<br>
+                Cada visita actualiza el registro. Cada carga confirma la ejecución.
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        // GLOBAL COUNTDOWN
+        const deadline = new Date(Date.now() + 24 * 60 * 60 * 1000);
+        const countdownElement = document.getElementById('globalCountdown');
+        
+        function updateCountdown() {
+            const now = new Date();
+            const diff = deadline - now;
+            
+            if (diff <= 0) {
+                countdownElement.innerHTML = "🚀 EJECUTANDO AUTOMÁTICAMENTE";
+                countdownElement.style.color = "#ff0000";
+                countdownElement.style.animation = "flicker 0.5s infinite";
+                simulateLaunch();
+                return;
+            }
+            
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+            
+            countdownElement.textContent = `AUTOEJECUCIÓN EN: ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            if (hours < 6) {
+                countdownElement.style.color = "#ff0000";
+            } else if (hours < 12) {
+                countdownElement.style.color = "#ffa500";
+            }
+        }
+        
+        setInterval(updateCountdown, 1000);
+        updateCountdown();
+        
+        // TIMESTAMP
+        document.getElementById('timestamp').textContent = 
+            `Generado: ${new Date().toLocaleString('es-CO', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            })}`;
+        
+        // SIMULATE LAUNCH
+        function simulateLaunch() {
+            const platforms = document.querySelectorAll('.platform');
+            let delay = 0;
+            
+            platforms.forEach(platform => {
+                setTimeout(() => {
+                    platform.classList.remove('pending', 'ready');
+                    platform.classList.add('launched');
+                    platform.querySelector('small').textContent = '✅ LANZADO';
+                    platform.querySelector('small').style.color = '#00ff00';
+                    
+                    // Add explosion effect
+                    platform.style.transform = 'scale(1.1)';
+                    platform.style.boxShadow = '0 0 20px #ff0000';
+                    
+                    setTimeout(() => {
+                        platform.style.transform = '';
+                        platform.style.boxShadow = '';
+                    }, 500);
+                }, delay);
+                
+                delay += 300;
+            });
+            
+            // Update ladder
+            document.querySelectorAll('.ladder-step').forEach(step => {
+                step.querySelector('small').innerHTML = '<span style="color: #ff0000;">⚡ EJECUTADO</span>';
+            });
+            
+            // Show final message
+            const resultDiv = document.getElementById('resultMessage');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = `
+                <h3 style="color: #ff0000; margin-bottom: 10px;">🚨 SISTEMA EJECUTADO</h3>
+                <p>Todas las plataformas activadas. La exposición es permanente.</p>
+                <p style="margin-top: 10px; font-size: 0.9rem;">
+                    DonJulioFraude.com activo | TikTok viral publicando | Facebook completo | 
+                    Iglesia notificada | Cámara de Comercio alertada | Base de datos permanente actualizada
+                </p>
+            `;
+            resultDiv.style.background = 'rgba(255,0,0,0.1)';
+            resultDiv.scrollIntoView({ behavior: 'smooth' });
+            
+            // Change title
+            document.querySelector('.war-title').textContent = 'OPERACIÓN DON JULIO - EJECUTADA';
+        }
+        
+        // CHOOSE OPTION
+        function chooseOption(option) {
+            const resultDiv = document.getElementById('resultMessage');
+            resultDiv.style.display = 'block';
+            
+            if (option === 'repair') {
+                resultDiv.innerHTML = `
+                    <h3 style="color: #00ff00; margin-bottom: 10px;">✅ DECISIÓN INTELIGENTE TOMADA</h3>
+                    <p>Proceso de reparación iniciado. SISTEMA EN PAUSA.</p>
+                    <p style="margin-top: 10px; font-size: 0.9rem;">
+                        Envíe por escrito su compromiso de reemplazo completo a su costo con cronograma detallado.<br>
+                        Testimonio positivo preparado para cuando la reparación sea verificada por ingeniero independiente.
+                    </p>
+                `;
+                resultDiv.style.background = 'rgba(0,255,0,0.1)';
+                
+                // Stop countdown
+                clearInterval(countdownInterval);
+                countdownElement.textContent = "⏸️ SISTEMA EN PAUSA - REPARACIÓN PACTADA";
+                countdownElement.style.color = "#00ff00";
+                
+            } else if (option === 'exposure') {
+                resultDiv.innerHTML = `
+                    <h3 style="color: #ff0000; margin-bottom: 10px;">💀 LEGADO ELEGIDO</h3>
+                    <p>Exposición permanente seleccionada. Ejecutando todos los sistemas...</p>
+                    <p style="margin-top: 10px; font-size: 0.9rem;">
+                        La historia recordará "Don Julio" como el caso de estudio de fraude en construcción.<br>
+                        Cada cliente futuro recibirá este caso como advertencia.
+                    </p>
+                `;
+                resultDiv.style.background = 'rgba(255,0,0,0.1)';
+                
+                // Force immediate execution
+                deadline.setTime(Date.now());
+                updateCountdown();
+            }
+            
+            resultDiv.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Add random terminal-like effect
+        setInterval(() => {
+            const effects = ['_', '|', '/', '-', '\\'];
+            const randomEffect = effects[Math.floor(Math.random() * effects.length)];
+            document.querySelector('.terminal-effect').style.background = 
+                `repeating-linear-gradient(0deg, rgba(0, 56, 147, 0.1) 0px, transparent 1px, transparent 2px),
+                 repeating-linear-gradient(90deg, rgba(0, 255, 0, 0.05) 0px, transparent 1px, transparent 3px)`;
+        }, 1000);
+        
+        // Make damage items interactive
+        document.querySelectorAll('.damage-item').forEach(item => {
+            item.addEventListener('click', function() {
+                const title = this.querySelector('strong').textContent;
+                alert(`🔍 ZOOM EN DAÑO:\n\n${title}\n\n${this.querySelector('p').textContent}\n\nEvidencia completa en archivos adjuntos.`);
+            });
+        });
+        
+        // Keep countdown interval reference
+        let countdownInterval = setInterval(updateCountdown, 1000);
+    </script>
+</body>
+</html>
