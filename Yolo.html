@@ -432,9 +432,8 @@
 
     <script>
         // ============================================
-        // GOOGLE SHEETS CONFIGURATION
+        // GOOGLE SHEETS CONFIGURATION - YOUR ACTUAL URL
         // ============================================
-        const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/10PUp3NK_iyiryuIMdZy97kT4pIsoJXwGBg3H4H3jOSI/edit#gid=0';
         const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzIPT9RnAVJ9x7mQPSZnw8JwCQ_Q1zSvPiQ6Uz2SVvxvopbHZQegwwCz-rEYNzQ5Mfb/exec';
         
         // ============================================
@@ -482,22 +481,32 @@
         }
         
         // ============================================
-        // GOOGLE SHEETS FUNCTIONS
+        // GOOGLE SHEETS FUNCTIONS - FIXED VERSION
         // ============================================
         async function saveToGoogleSheets(formData) {
             try {
+                // Add timestamp for sorting
+                const dataToSend = {
+                    ...formData,
+                    timestamp: new Date().toISOString(),
+                    hearts: 0
+                };
+                
+                // Send to Google Sheets
                 const response = await fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST',
-                    mode: 'no-cors',
                     headers: {
-                        'Content-Type': 'application/json',
+                        'Content-Type': 'text/plain;charset=utf-8',
                     },
-                    body: JSON.stringify(formData)
+                    body: JSON.stringify(dataToSend)
                 });
                 
-                // Since we use no-cors, we can't read the response
-                // But we assume it worked
-                return true;
+                // Check if it worked
+                if (response.ok || response.status === 0) {
+                    console.log('Successfully saved to Google Sheets');
+                    return true;
+                }
+                return false;
             } catch (error) {
                 console.error('Error saving to Google Sheets:', error);
                 return false;
@@ -506,58 +515,74 @@
         
         async function loadFromGoogleSheets() {
             try {
-                // Since we can't use doGet directly from frontend,
-                // We'll use a workaround - store initial data
-                // You can manually add messages to the sheet and they'll appear
-                // when you refresh the page
-                return [
-                    {
-                        name: "Natalia",
-                        emoji: "❤️",
-                        status: "Yes",
-                        message: "Muchas gracias, confirmamos",
-                        time: "2 days ago"
-                    },
-                    {
-                        name: "Mario",
-                        emoji: "🙏",
-                        status: "Yes",
-                        message: "Dios les pague por tenernos en cuenta",
-                        time: "2 days ago"
-                    },
-                    {
-                        name: "Julian",
-                        emoji: "🥳",
-                        status: "Maybe",
-                        message: "Trataré de estar 🥳🥳🥳",
-                        time: "1 day ago"
-                    },
-                    {
-                        name: "Alvaro",
-                        emoji: "✨",
-                        status: "Yes",
-                        message: "Qué maravilla de encuentro...",
-                        time: "1 day ago"
-                    },
-                    {
-                        name: "Jesus Antonio",
-                        emoji: "🎉",
-                        status: "Yes",
-                        message: "Muchas gracias por la invitación",
-                        time: "1 day ago"
-                    },
-                    {
-                        name: "Gustavo",
-                        emoji: "😊",
-                        status: "Yes",
-                        message: "Allí estaremos",
-                        time: "1 day ago"
+                // Load from Google Sheets
+                const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=get`);
+                
+                if (response.ok) {
+                    const messages = await response.json();
+                    
+                    // If we get messages from the sheet, use them
+                    if (messages && messages.length > 0) {
+                        return messages;
                     }
-                ];
+                }
+                
+                // If no messages from sheet, return the default ones
+                return getDefaultMessages();
+                
             } catch (error) {
                 console.error('Error loading from Google Sheets:', error);
-                return [];
+                // Return default messages if error
+                return getDefaultMessages();
             }
+        }
+        
+        function getDefaultMessages() {
+            // These are your existing messages - they'll show if Google Sheets is empty
+            return [
+                {
+                    name: "Natalia",
+                    emoji: "❤️",
+                    status: "Yes",
+                    message: "Muchas gracias, confirmamos",
+                    time: "2 days ago"
+                },
+                {
+                    name: "Mario",
+                    emoji: "🙏",
+                    status: "Yes",
+                    message: "Dios les pague por tenernos en cuenta",
+                    time: "2 days ago"
+                },
+                {
+                    name: "Julian",
+                    emoji: "🥳",
+                    status: "Maybe",
+                    message: "Trataré de estar 🥳🥳🥳",
+                    time: "1 day ago"
+                },
+                {
+                    name: "Alvaro",
+                    emoji: "✨",
+                    status: "Yes",
+                    message: "Qué maravilla de encuentro...",
+                    time: "1 day ago"
+                },
+                {
+                    name: "Jesus Antonio",
+                    emoji: "🎉",
+                    status: "Yes",
+                    message: "Muchas gracias por la invitación",
+                    time: "1 day ago"
+                },
+                {
+                    name: "Gustavo",
+                    emoji: "😊",
+                    status: "Yes",
+                    message: "Allí estaremos",
+                    time: "1 day ago"
+                }
+            ];
         }
         
         // ============================================
@@ -577,6 +602,10 @@
                 return;
             }
             
+            // Update stats
+            updateStats(messages);
+            
+            // Display messages
             let html = '';
             messages.forEach(msg => {
                 const statusText = msg.status === 'Yes' ? (currentLanguage === 'en' ? 'COMING! 🎉' : '¡VIENE! 🎉') :
@@ -587,7 +616,7 @@
                     <div class="message-item">
                         <div style="display: flex; justify-content: space-between; align-items: center;">
                             <div>
-                                <span style="font-size: 1.5rem;">${msg.emoji}</span>
+                                <span style="font-size: 1.5rem;">${msg.emoji || '❤️'}</span>
                                 <span class="message-name">${msg.name}</span>
                             </div>
                             <div style="background: ${msg.status === 'Yes' ? '#06D6A0' : msg.status === 'Maybe' ? '#FFD166' : '#FF6B6B'}; 
@@ -596,12 +625,24 @@
                             </div>
                         </div>
                         <div class="message-text">${msg.message}</div>
-                        <div style="color: #888; font-size: 0.8rem;">${msg.time}</div>
+                        <div style="color: #888; font-size: 0.8rem;">${msg.time || 'Recently'}</div>
                     </div>
                 `;
             });
             
             container.innerHTML = html;
+        }
+        
+        function updateStats(messages) {
+            const total = messages.length;
+            const yes = messages.filter(m => m.status === 'Yes').length;
+            const maybe = messages.filter(m => m.status === 'Maybe').length;
+            const hearts = messages.reduce((sum, m) => sum + (m.hearts || 0), 0);
+            
+            document.getElementById('totalCount').textContent = total;
+            document.getElementById('yesCount').textContent = yes;
+            document.getElementById('maybeCount').textContent = maybe;
+            document.getElementById('loveCount').textContent = hearts;
         }
         
         function loadMessages() {
@@ -637,9 +678,8 @@
                 name: name,
                 emoji: selectedEmoji,
                 status: status,
-                guests: 0, // Simplified version
-                message: message,
-                timestamp: new Date().toISOString()
+                guests: 0,
+                message: message
             };
             
             const submitBtn = document.getElementById('submitBtn');
@@ -690,14 +730,21 @@
         document.addEventListener('DOMContentLoaded', function() {
             // Set default selections
             selectStatus(document.querySelector('.status-btn.yes'), 'Yes');
-            document.querySelector('.emoji-btn[data-emoji="❤️"]').style.background = '#FF6B6B';
-            document.querySelector('.emoji-btn[data-emoji="❤️"]').style.color = 'white';
+            const heartEmojiBtn = document.querySelector('.emoji-btn[data-emoji="❤️"]');
+            if (heartEmojiBtn) {
+                heartEmojiBtn.style.background = '#FF6B6B';
+                heartEmojiBtn.style.color = 'white';
+            }
             
             // Load initial messages
             displayMessages();
+            
+            // Auto-refresh every 30 seconds
+            setInterval(loadMessages, 30000);
         });
         
         console.log('🎉 Yolo\'s Love Wall is ready! Connected to Google Sheets.');
+        console.log('Google Script URL:', GOOGLE_SCRIPT_URL);
     </script>
 </body>
 </html>
