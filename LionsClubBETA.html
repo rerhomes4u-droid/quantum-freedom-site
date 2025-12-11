@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LEONES 360 - Sistema Inteligente</title>
+    <style>
+        /* Reset and Base */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --lion-gold: #FFD700;
+            --lion-blue: #0056A4;
+            --lion-purple: #6A0DAD;
+            --success: #00C851;
+            --warning: #ffbb33;
+            --danger: #ff4444;
+            --dark: #2E2E2E;
+            --light: #f8f9fa;
+            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); min-height: 100vh; }
+        
+        /* Navigation */
+        .nav-3d {
+            background: var(--dark);
+            padding: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transform: perspective(1000px) rotateX(2deg);
+            transform-origin: top;
+        }
+        .nav-grid {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+        .nav-menu {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+        }
+        .nav-item {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .nav-item:hover {
+            background: var(--lion-gold);
+            color: var(--dark);
+            transform: translateY(-2px);
+        }
+        .nav-item.active {
+            background: var(--lion-blue);
+            box-shadow: 0 0 20px rgba(0,86,164,0.5);
+        }
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--danger);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Main Container */
+        .container-3d {
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            perspective: 1000px;
+        }
+        
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        /* Card Styles */
+        .card-3d {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .card-3d:hover {
+            transform: translateY(-10px) rotateX(2deg);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        .card-3d:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: var(--gradient);
+        }
+        
+        /* Live Celebration Wall */
+        .celebration-wall {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 20px;
+            margin-bottom: 2rem;
+        }
+        .celebration-items {
+            display: flex;
+            gap: 2rem;
+            overflow-x: auto;
+            padding: 1rem 0;
+        }
+        .celebration-card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            padding: 1.5rem;
+            border-radius: 15px;
+            min-width: 250px;
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        /* Interactive Elements */
+        .live-update {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+            padding: 1rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .live-update:hover {
+            transform: scale(1.02);
+        }
+        
+        /* Progress Rings */
+        .progress-ring {
+            width: 100px;
+            height: 100px;
+            margin: 1rem auto;
+        }
+        .ring-bg {
+            fill: none;
+            stroke: #eee;
+            stroke-width: 10;
+        }
+        .ring-progress {
+            fill: none;
+            stroke: var(--success);
+            stroke-width: 10;
+            stroke-linecap: round;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+            transition: stroke-dashoffset 0.5s;
+        }
+        
+        /* Real-time Chat */
+        .live-chat {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 350px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            z-index: 1000;
+            display: none;
+        }
+        .chat-header {
+            background: var(--gradient);
+            color: white;
+            padding: 1rem;
+            border-radius: 15px 15px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .chat-body {
+            height: 300px;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+        .chat-input {
+            display: flex;
+            padding: 1rem;
+            border-top: 1px solid #eee;
+        }
+        .chat-input input {
+            flex: 1;
+            padding: 0.5rem;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+        }
+        
+        /* Voice Message Button */
+        .voice-msg {
+            background: var(--lion-blue);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-left: 0.5rem;
+            cursor: pointer;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0,86,164,0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(0,86,164,0); }
+            100% { box-shadow: 0 0 0 0 rgba(0,86,164,0); }
+        }
+        
+        /* 3D Member Visualizer */
+        .member-visualizer {
+            width: 100%;
+            height: 300px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 15px;
+            position: relative;
+            overflow: hidden;
+        }
+        .member-node {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        .member-node:hover {
+            transform: scale(1.2);
+            z-index: 10;
+        }
+        
+        /* Quick Action Buttons */
+        .quick-actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .action-btn {
+            background: var(--gradient);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .action-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+        
+        /* AR/VR View Button */
+        .ar-view {
+            background: linear-gradient(135deg, #12c2e9 0%, #c471ed 50%, #f64f59 100%);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            animation: rainbow 3s infinite;
+        }
+        @keyframes rainbow {
+            0% { filter: hue-rotate(0deg); }
+            100% { filter: hue-rotate(360deg); }
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-menu { display: none; }
+            .dashboard-grid { grid-template-columns: 1fr; }
+            .live-chat { width: calc(100% - 40px); }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav-3d">
+        <div class="nav-grid">
+            <div class="logo">
+                <span class="lion-logo">🦁</span>
+                LEONES 360°
+                <span class="lion-logo">🦁</span>
+            </div>
+            <div class="nav-menu">
+                <a href="#dashboard" class="nav-item active"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+                <a href="#members" class="nav-item"><i class="fas fa-users"></i> Miembros <span class="notification-badge">3</span></a>
+                <a href="#finances" class="nav-item"><i class="fas fa-money-bill-wave"></i> Finanzas <span class="notification-badge">5</span></a>
+                <a href="#events" class="nav-item"><i class="fas fa-calendar-star"></i> Eventos</a>
+                <a href="#projects" class="nav-item"><i class="fas fa-hands-helping"></i> Proyectos</a>
+                <a href="#recognition" class="nav-item"><i class="fas fa-trophy"></i> Reconocimientos</a>
+                <a href="#ar" class="nav-item ar-view"><i class="fas fa-vr-cardboard"></i> Vista AR</a>
+            </div>
+            <div class="user-profile">
+                <div class="member-node" style="top: 0; left: 0; background: var(--lion-gold);" onclick="toggleChat()">
+                    <i class="fas fa-comment-medical"></i>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container-3d">
+        <!-- Celebration Wall -->
+        <div class="celebration-wall">
+            <h2><i class="fas fa-birthday-cake"></i> MURO DE CELEBRACIONES EN VIVO</h2>
+            <div class="celebration-items">
+                <div class="celebration-card">
+                    <h3>🎂 Clariza</h3>
+                    <p>¡Feliz Cumpleaños! Que Dios te bendiga</p>
+                    <div class="messages">
+                        <p><strong>Luz Dary:</strong> ¡Feliz cumple querida!</p>
+                        <p><strong>María Isabel:</strong> Bendiciones</p>
+                        <button class="add-wish" onclick="addBirthdayWish('Clariza')">+ Agregar Deseo</button>
+                    </div>
+                </div>
+                <div class="celebration-card">
+                    <h3>🦁 Héctor Ángel</h3>
+                    <p>25 años de servicio Leonístico</p>
+                    <div class="progress-ring">
+                        <canvas id="serviceProgress"></canvas>
+                    </div>
+                    <button class="action-btn" onclick="sendRecognition()">👏 Aplaudir</button>
+                </div>
+                <div class="celebration-card">
+                    <h3>🎄 Cena Navideña</h3>
+                    <p>12 Dic - 6:30 PM</p>
+                    <div class="quick-actions-grid">
+                        <button class="action-btn" onclick="confirmAttendance()">✅ Confirmar</button>
+                        <button class="action-btn" onclick="viewGiftList()">🎁 Lista Regalos</button>
+                        <button class="action-btn" onclick="addDish()">🍲 Contribuir Plato</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard Grid -->
+        <div class="dashboard-grid">
+            <!-- Financial Overview -->
+            <div class="card-3d">
+                <h3><i class="fas fa-chart-line"></i> FINANZAS EN TIEMPO REAL</h3>
+                <div class="live-update" onclick="openFinances()">
+                    <p><strong>⚠️ PENDIENTE:</strong> 5 miembros con cuotas atrasadas</p>
+                    <p><strong>✅ RECAUDADO:</strong> $2.5M en rifa del carro</p>
+                    <div class="progress-ring">
+                        <svg width="100" height="100">
+                            <circle class="ring-bg" cx="50" cy="50" r="40"></circle>
+                            <circle class="ring-progress" cx="50" cy="50" r="40" 
+                                    stroke-dasharray="251.2" stroke-dashoffset="100"></circle>
+                        </svg>
+                    </div>
+                    <p>75% meta rifa alcanzada</p>
+                </div>
+                <button class="action-btn" onclick="makePayment()">
+                    <i class="fas fa-money-check-alt"></i> Pagar en Línea
+                </button>
+            </div>
+
+            <!-- Children's Gifts Tracker -->
+            <div class="card-3d">
+                <h3><i class="fas fa-gifts"></i> REGALOS PARA NIÑOS</h3>
+                <div id="giftList">
+                    <!-- Dynamic list will be loaded here -->
+                </div>
+                <button class="action-btn" onclick="claimGift()">
+                    <i class="fas fa-hand-holding-heart"></i> Adoptar Niño
+                </button>
+                <button class="action-btn" onclick="markGiftDelivered()">
+                    <i class="fas fa-check-circle"></i> Marcar Entregado
+                </button>
+            </div>
+
+            <!-- Live Service Map -->
+            <div class="card-3d">
+                <h3><i class="fas fa-map-marked-alt"></i> MAPA DE SERVICIO EN VIVO</h3>
+                <div class="member-visualizer" id="serviceMap">
+                    <!-- 3D member nodes will be added here -->
+                </div>
+                <p>Miembros activos ahora: <span id="activeMembers">12</span></p>
+                <button class="ar-view" onclick="openARView()">
+                    <i class="fas fa-vr-cardboard"></i> Ver en Realidad Aumentada
+                </button>
+            </div>
+
+            <!-- Condolences & Support -->
+            <div class="card-3d">
+                <h3><i class="fas fa-hands"></i> APOYO Y SOLIDARIDAD</h3>
+                <div class="live-update" onclick="sendCondolence()">
+                    <p><strong>❤️ NECESITA APOYO:</strong> Familia Ramirez</p>
+                    <p>Pérdida familiar - Necesitan comidas</p>
+                    <div class="quick-actions-grid">
+                        <button class="action-btn"><i class="fas fa-utensils"></i> Cocinar</button>
+                        <button class="action-btn"><i class="fas fa-car"></i> Visitar</button>
+                        <button class="action-btn"><i class="fas fa-pray"></i> Orar</button>
+                    </div>
+                </div>
+                <textarea id="supportMessage" placeholder="Escribe mensaje de apoyo..." rows="2"></textarea>
+                <button class="action-btn" onclick="sendSupportMessage()">
+                    <i class="fas fa-paper-plane"></i> Enviar Solidaridad
+                </button>
+            </div>
+
+            <!-- Skills Bank -->
+            <div class="card-3d">
+                <h3><i class="fas fa-tools"></i> BANCO DE HABILIDADES</h3>
+                <div id="skillsList">
+                    <p>👨‍⚕️ Dr. Fabio - Disponible para consultas</p>
+                    <p>🔨 Hugo - Ayuda con reparaciones</p>
+                    <p>🎨 Liliana - Diseño gráfico</p>
+                </div>
+                <button class="action-btn" onclick="offerSkill()">
+                    <i class="fas fa-plus-circle"></i> Ofrecer Habilidad
+                </button>
+                <button class="action-btn" onclick="requestHelp()">
+                    <i class="fas fa-hands-helping"></i> Solicitar Ayuda
+                </button>
+            </div>
+
+            <!-- Decision Tracker -->
+            <div class="card-3d">
+                <h3><i class="fas fa-vote-yea"></i> DECISIONES PENDIENTES</h3>
+                <div class="live-update" onclick="voteNow()">
+                    <p><strong>📋 VOTACIÓN ABIERTA:</strong> Nuevo proyecto comunidad</p>
+                    <p>Vence: 15 Dic - 3:00 PM</p>
+                    <div class="quick-actions-grid">
+                        <button class="action-btn" onclick="castVote('for')">✅ A Favor</button>
+                        <button class="action-btn" onclick="castVote('against')">❌ En Contra</button>
+                        <button class="action-btn" onclick="castVote('abstain')">🤐 Abstención</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Legacy Builder -->
+            <div class="card-3d">
+                <h3><i class="fas fa-history"></i> CONSTRUCTOR DE LEGADO</h3>
+                <p>Total horas servicio: <strong>2,540 horas</strong></p>
+                <p>Vidas impactadas: <strong>1,250 personas</strong></p>
+                <button class="action-btn" onclick="shareStory()">
+                    <i class="fas fa-book-open"></i> Compartir Historia
+                </button>
+                <button class="action-btn" onclick="viewTimeline()">
+                    <i class="fas fa-timeline"></i> Línea de Tiempo
+                </button>
+            </div>
+
+            <!-- AI Assistant -->
+            <div class="card-3d">
+                <h3><i class="fas fa-robot"></i> ASISTENTE LEONÍSTICO AI</h3>
+                <p>¿En qué puedo ayudarte hoy?</p>
+                <input type="text" id="aiQuery" placeholder="Pregunta al asistente..." style="width: 100%; padding: 0.5rem; margin: 0.5rem 0;">
+                <button class="action-btn" onclick="askAssistant()">
+                    <i class="fas fa-comment-dots"></i> Consultar
+                </button>
+                <div id="aiResponse" style="margin-top: 1rem; padding: 0.5rem; background: #f0f8ff; border-radius: 5px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Live Chat -->
+    <div class="live-chat" id="liveChat">
+        <div class="chat-header">
+            <span><i class="fas fa-comments"></i> Chat en Vivo</span>
+            <button onclick="toggleChat()" style="background: none; border: none; color: white; cursor: pointer;">✕</button>
+        </div>
+        <div class="chat-body" id="chatBody">
+            <!-- Messages will appear here -->
+        </div>
+        <div class="chat-input">
+            <input type="text" id="chatInput" placeholder="Escribe tu mensaje...">
+            <button class="voice-msg" onclick="startVoiceMessage()">
+                <i class="fas fa-microphone"></i>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // 🔥 REVOLUTIONARY FEATURES NO ONE ELSE HAS
+
+        // 1. REAL-TIME CELEBRATION WALL
+        const celebrationWall = {
+            addWish: function(member) {
+                const wish = prompt(`Escribe tu deseo para ${member}:`);
+                if (wish) {
+                    // Update Google Sheets via API
+                    fetch('https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            action: 'addBirthdayWish',
+                            member: member,
+                            wish: wish,
+                            timestamp: new Date().toISOString()
+                        })
+                    });
+                    
+                    // Update UI immediately
+                    showNotification(`¡Deseo enviado a ${member}! 🎉`);
+                }
+            }
+        };
+
+        // 2. 3D MEMBER VISUALIZATION
+        function render3DNetwork() {
+            const members = [
+                {name: "Fabio", x: 50, y: 50, status: "active"},
+                {name: "Luz Dary", x: 30, y: 30, status: "active"},
+                {name: "María Isabel", x: 70, y: 30, status: "busy"},
+                {name: "Héctor", x: 50, y: 70, status: "inactive"}
+            ];
+            
+            const map = document.getElementById('serviceMap');
+            map.innerHTML = '';
+            
+            members.forEach(member => {
+                const node = document.createElement('div');
+                node.className = 'member-node';
+                node.style.left = `${member.x}%`;
+                node.style.top = `${member.y}%`;
+                node.style.background = member.status === 'active' ? 'var(--success)' : 
+                                      member.status === 'busy' ? 'var(--warning)' : '#ccc';
+                node.innerHTML = `<strong>${member.name.charAt(0)}</strong>`;
+                node.onclick = () => showMemberDetails(member.name);
+                map.appendChild(node);
+            });
+        }
+
+        // 3. CONDOLENCE SUPPORT SYSTEM
+        const supportSystem = {
+            sendCondolence: function(family) {
+                const message = document.getElementById('supportMessage').value;
+                if (message) {
+                    // Log to Google Sheets
+                    logToSheet('Condolences', {
+                        family: family,
+                        message: message,
+                        sender: 'Current User',
+                        timestamp: new Date().toISOString()
+                    });
+                    
+                    // Send to WhatsApp group automatically
+                    sendToWhatsApp(`❤️ MENSAJE DE APOYO: ${message}`);
+                    
+                    showNotification('Mensaje de apoyo enviado 💝');
+                }
+            },
+            
+            scheduleMeal: function(family, date, mealType) {
+                // Creates a meal train schedule
+                return {
+                    family: family,
+                    date: date,
+                    mealType: mealType,
+                    volunteer: 'Current User',
+                    confirmed: false
+                };
+            }
+        };
+
+        // 4. INTERACTIVE GIFT TRACKER
+        const giftTracker = {
+            children: [
+                {name: "Juan Pérez", age: 8, assigned: "Fabio", delivered: false},
+                {name: "María Gómez", age: 5, assigned: null, delivered: false}
+            ],
+            
+            claimGift: function(childIndex) {
+                if (this.children[childIndex].assigned === null) {
+                    this.children[childIndex].assigned = 'Current User';
+                    updateGiftList();
+                    showNotification(`¡Adoptaste a ${this.children[childIndex].name}! 🎁`);
+                }
+            },
+            
+            updateGiftList: function() {
+                const list = document.getElementById('giftList');
+                list.innerHTML = this.children.map((child, index) => `
+                    <div style="padding: 0.5rem; border-bottom: 1px solid #eee;">
+                        <strong>${child.name} (${child.age} años)</strong>
+                        <br>
+                        ${child.assigned ? `👤 ${child.assigned}` : '❌ Sin asignar'}
+                        ${child.delivered ? '✅ Entregado' : ''}
+                        ${!child.assigned ? 
+                            `<button onclick="giftTracker.claimGift(${index})" style="margin-left: 1rem;">Adoptar</button>` : 
+                            ''}
+                    </div>
+                `).join('');
+            }
+        };
+
+        // 5. LIVE VOTING SYSTEM
+        const votingSystem = {
+            activeVotes: [
+                {id: 1, topic: "Nuevo proyecto comunidad", deadline: "2024-12-15T15:00", votes: {for: 5, against: 2, abstain: 1}}
+            ],
+            
+            castVote: function(voteId, vote) {
+                // Update Google Sheets
+                fetch('https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec', {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        action: 'castVote',
+                        voteId: voteId,
+                        vote: vote,
+                        member: 'Current User'
+                    })
+                });
+                
+                showNotification(`¡Voto registrado como ${vote}! 🗳️`);
+            }
+        };
+
+        // 6. AI ASSISTANT
+        const lionAI = {
+            respond: function(query) {
+                const responses = {
+                    "cuotas": "5 miembros tienen cuotas pendientes. Total adeudado: $350,000",
+                    "rifa": "Rifa del carro: 75% vendido. Falta: 125 boletas",
+                    "eventos": "Próximos eventos: Cena Navideña (12 Dic), Fiesta niños (15 Dic)",
+                    "regalos": "Faltan 8 regalos para niños. 12 ya asignados",
+                    "apoyo": "Familia Ramirez necesita apoyo por pérdida familiar"
+                };
+                
+                return responses[query.toLowerCase()] || 
+                       "Puedo ayudarte con: cuotas, rifa, eventos, regalos, apoyo. ¿Qué necesitas?";
+            }
+        };
+
+        // 7. VOICE MESSAGES
+        let voiceRecognition;
+        function startVoiceMessage() {
+            if (!('webkitSpeechRecognition' in window)) {
+                alert("Tu navegador no soporta mensajes de voz");
+                return;
+            }
+            
+            voiceRecognition = new webkitSpeechRecognition();
+            voiceRecognition.lang = 'es-ES';
+            voiceRecognition.onresult = function(event) {
+                const transcript = event.results[0][0].transcript;
+                sendChatMessage(transcript, true);
+            };
+            voiceRecognition.start();
+        }
+
+        // 8. AR VIEW FOR PROJECTS
+        function openARView() {
+            // This would integrate with WebXR for AR project visualization
+            alert("🔮 Vista AR: Visualizando proyectos en realidad aumentada...");
+            // In production: window.location.href = '/ar-viewer.html';
+        }
+
+        // 9. LEGACY TIMELINE BUILDER
+        const legacyBuilder = {
+            addStory: function(title, story, photos) {
+                // Creates timeline entries with multimedia
+                const entry = {
+                    date: new Date().toISOString(),
+                    title: title,
+                    story: story,
+                    photos: photos,
+                    author: 'Current User'
+                };
+                
+                // Save to Google Sheets
+                logToSheet('LegacyStories', entry);
+                showNotification("Historia añadida al legado del club 📖");
+            }
+        };
+
+        // 10. AUTOMATIC WHATSAPP INTEGRATION
+        function sendToWhatsApp(message) {
+            // Uses WhatsApp API to send messages to group
+            const phoneNumbers = ["+573001234567", "+573008765432"]; // Club leaders
+            phoneNumbers.forEach(phone => {
+                // In production: fetch to WhatsApp Business API
+                console.log(`Sending to ${phone}: ${message}`);
+            });
+        }
+
+        // UTILITY FUNCTIONS
+        function showNotification(message) {
+            // Create notification
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: var(--success);
+                color: white;
+                padding: 1rem;
+                border-radius: 10px;
+                z-index: 10000;
+                animation: slideIn 0.3s ease;
+            `;
+            notification.innerHTML = `🦁 ${message}`;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => notification.remove(), 3000);
+        }
+
+        function logToSheet(sheetName, data) {
+            // Logs to Google Sheets
+            console.log(`Logging to ${sheetName}:`, data);
+            // Actual implementation would use Google Sheets API
+        }
+
+        // INITIALIZATION
+        document.addEventListener('DOMContentLoaded', function() {
+            render3DNetwork();
+            giftTracker.updateGiftList();
+            
+            // Update active members count every 30 seconds
+            setInterval(() => {
+                document.getElementById('activeMembers').textContent = 
+                    Math.floor(Math.random() * 5) + 10;
+            }, 30000);
+            
+            // Simulate live updates
+            setInterval(() => {
+                const updates = [
+                    "Nuevo mensaje en Muro de Celebraciones",
+                    "Actualización en finanzas de rifa",
+                    "Miembro acaba de confirmar asistencia",
+                    "Regalo marcado como entregado"
+                ];
+                const randomUpdate = updates[Math.floor(Math.random() * updates.length)];
+                showNotification(randomUpdate);
+            }, 60000);
+        });
+
+        // CHAT FUNCTIONS
+        function toggleChat() {
+            const chat = document.getElementById('liveChat');
+            chat.style.display = chat.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function sendChatMessage(message, isVoice = false) {
+            const chatBody = document.getElementById('chatBody');
+            const msgDiv = document.createElement('div');
+            msgDiv.innerHTML = `
+                <div style="background: #f0f8ff; padding: 0.5rem; border-radius: 10px; margin: 0.5rem 0;">
+                    <strong>Tú ${isVoice ? '🎤' : ''}:</strong> ${message}
+                    <br>
+                    <small>${new Date().toLocaleTimeString()}</small>
+                </div>
+            `;
+            chatBody.appendChild(msgDiv);
+            chatBody.scrollTop = chatBody.scrollHeight;
+        }
+
+        // MAKE FUNCTIONS GLOBAL
+        window.addBirthdayWish = celebrationWall.addWish;
+        window.sendCondolence = () => supportSystem.sendCondolence('Familia Ramirez');
+        window.sendSupportMessage = () => {
+            const message = document.getElementById('supportMessage').value;
+            if (message) {
+                sendChatMessage(`❤️ APOYO: ${message}`);
+                document.getElementById('supportMessage').value = '';
+            }
+        };
+        window.claimGift = () => giftTracker.claimGift(1); // Example
+        window.castVote = (vote) => votingSystem.castVote(1, vote);
+        window.askAssistant = () => {
+            const query = document.getElementById('aiQuery').value;
+            const response = lionAI.respond(query);
+            document.getElementById('aiResponse').innerHTML = `🤖 ${response}`;
+        };
+        window.confirmAttendance = () => showNotification("✅ Asistencia confirmada para Cena Navideña!");
+        window.openARView = openARView;
+        window.startVoiceMessage = startVoiceMessage;
+    </script>
+</body>
+</html>
