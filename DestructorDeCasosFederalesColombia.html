@@ -1,0 +1,1735 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚖️ DESTRUCTOR DE CASOS JUDICIALES - Versión Colombiana</title>
+    <style>
+        :root {
+            --primary: #0a3d62;
+            --secondary: #1e3799;
+            --accent: #3498db;
+            --highlight: #00b7c2;
+            --danger: #e74c3c;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --light: #ecf0f1;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Arial', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0c2461, #1e3799, #4a69bd);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        header {
+            background: linear-gradient(90deg, var(--primary), #0c2461);
+            padding: 40px;
+            text-align: center;
+            border-bottom: 5px solid var(--danger);
+        }
+        
+        .title {
+            font-size: 3rem;
+            background: linear-gradient(45deg, #3498db, #00b7c2, #2ecc71);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 15px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+        
+        .subtitle {
+            font-size: 1.3rem;
+            max-width: 900px;
+            margin: 0 auto;
+            line-height: 1.6;
+            opacity: 0.9;
+        }
+        
+        .flag-banner {
+            background: linear-gradient(90deg, #FFE600 33%, #003893 33%, #003893 66%, #CE1126 66%);
+            height: 10px;
+            margin-top: 20px;
+        }
+        
+        .main-interface {
+            display: flex;
+            min-height: 800px;
+        }
+        
+        .sidebar {
+            flex: 1;
+            background: rgba(10, 61, 98, 0.8);
+            padding: 30px;
+            border-right: 3px solid var(--accent);
+            min-width: 350px;
+        }
+        
+        .content-area {
+            flex: 2;
+            padding: 30px;
+            background: rgba(0, 0, 0, 0.3);
+            min-width: 500px;
+            overflow-y: auto;
+        }
+        
+        .module-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .module-card:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(10px);
+            border-color: var(--accent);
+        }
+        
+        .module-card.active {
+            background: rgba(52, 152, 219, 0.2);
+            border-color: var(--accent);
+            transform: translateX(15px);
+        }
+        
+        .module-card.completed {
+            background: rgba(39, 174, 96, 0.15);
+            border-color: var(--success);
+        }
+        
+        .module-icon {
+            font-size: 2rem;
+            margin-bottom: 15px;
+        }
+        
+        .module-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: white;
+        }
+        
+        .module-desc {
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.5;
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+        }
+        
+        .module-status {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: bold;
+        }
+        
+        .status-locked {
+            background: rgba(231, 76, 60, 0.3);
+            color: #ff7979;
+        }
+        
+        .status-unlocked {
+            background: rgba(52, 152, 219, 0.3);
+            color: var(--accent);
+        }
+        
+        .status-mastered {
+            background: rgba(39, 174, 96, 0.3);
+            color: var(--success);
+        }
+        
+        .progress-container {
+            margin: 30px 0;
+        }
+        
+        .progress-label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--success));
+            width: 0%;
+            transition: width 1s ease;
+        }
+        
+        .content-display {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            line-height: 1.7;
+        }
+        
+        .content-display h3 {
+            color: var(--highlight);
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+        
+        .colombian-law {
+            display: inline-block;
+            background: rgba(255, 193, 7, 0.2);
+            color: #FFC107;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-family: monospace;
+            margin: 5px;
+            border: 1px solid rgba(255, 193, 7, 0.5);
+        }
+        
+        .legal-note {
+            background: rgba(52, 152, 219, 0.1);
+            border-left: 5px solid var(--accent);
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 0 10px 10px 0;
+        }
+        
+        .legal-note strong {
+            color: var(--accent);
+        }
+        
+        .law-box {
+            background: #011627;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 25px 0;
+            border-left: 5px solid var(--danger);
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            color: #d6deeb;
+            max-height: 400px;
+            overflow-y: auto;
+            line-height: 1.6;
+        }
+        
+        .code-keyword {
+            color: #ff7b72;
+            font-weight: bold;
+        }
+        
+        .code-string {
+            color: #a5d6ff;
+        }
+        
+        .code-comment {
+            color: #5c6370;
+            font-style: italic;
+        }
+        
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .action-btn {
+            padding: 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            min-height: 120px;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        }
+        
+        .btn-test {
+            background: linear-gradient(145deg, var(--accent), #2980b9);
+            color: white;
+        }
+        
+        .btn-forge {
+            background: linear-gradient(145deg, var(--danger), #e74c3c);
+            color: white;
+        }
+        
+        .btn-download {
+            background: linear-gradient(145deg, var(--success), #27ae60);
+            color: white;
+        }
+        
+        .btn-next {
+            background: linear-gradient(145deg, var(--warning), #f39c12);
+            color: white;
+        }
+        
+        .weapon-display {
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 30px;
+            border: 2px solid var(--highlight);
+            display: none;
+        }
+        
+        .weapon-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--accent);
+        }
+        
+        .weapon-icon {
+            font-size: 2.5rem;
+            margin-right: 20px;
+        }
+        
+        .weapon-title {
+            font-size: 1.8rem;
+            color: var(--highlight);
+            flex-grow: 1;
+        }
+        
+        .quiz-container {
+            background: rgba(30, 55, 153, 0.9);
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 30px;
+            border: 2px solid var(--warning);
+            display: none;
+        }
+        
+        .quiz-question {
+            font-size: 1.5rem;
+            margin-bottom: 30px;
+            color: white;
+            line-height: 1.4;
+        }
+        
+        .quiz-options {
+            display: grid;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .quiz-option {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+        
+        .quiz-option:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(10px);
+        }
+        
+        .quiz-option.correct {
+            background: rgba(39, 174, 96, 0.3);
+            border-color: var(--success);
+            transform: scale(1.05);
+        }
+        
+        .quiz-option.wrong {
+            background: rgba(231, 76, 60, 0.3);
+            border-color: var(--danger);
+        }
+        
+        .feedback {
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            display: none;
+        }
+        
+        .feedback.correct {
+            background: rgba(39, 174, 96, 0.2);
+            border: 2px solid var(--success);
+            color: var(--success);
+        }
+        
+        .feedback.wrong {
+            background: rgba(231, 76, 60, 0.2);
+            border: 2px solid var(--danger);
+            color: #ff7979;
+        }
+        
+        .victory-screen {
+            text-align: center;
+            padding: 60px;
+            background: linear-gradient(135deg, rgba(39, 174, 96, 0.1), rgba(52, 152, 219, 0.3));
+            border-radius: 20px;
+            margin-top: 30px;
+            display: none;
+        }
+        
+        .victory-title {
+            font-size: 3rem;
+            background: linear-gradient(45deg, var(--success), var(--highlight), var(--warning));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 30px;
+        }
+        
+        .download-section {
+            background: linear-gradient(145deg, var(--primary), var(--secondary));
+            padding: 40px;
+            border-radius: 15px;
+            margin-top: 40px;
+            border: 3px solid var(--highlight);
+        }
+        
+        .download-btn {
+            display: inline-block;
+            padding: 20px 40px;
+            background: linear-gradient(45deg, var(--danger), var(--warning));
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .download-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(231, 76, 60, 0.4);
+        }
+        
+        @media (max-width: 1024px) {
+            .main-interface {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                border-right: none;
+                border-bottom: 3px solid var(--accent);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1 class="title">⚖️ DESTRUCTOR DE CASOS JUDICIALES COLOMBIANOS</h1>
+            <p class="subtitle">Transforme marcos legales complejos en armas ejecutables. Domine el sistema y use sus propias reglas en su contra.</p>
+            <div class="flag-banner"></div>
+        </header>
+        
+        <div class="main-interface">
+            <div class="sidebar">
+                <div class="progress-container">
+                    <div class="progress-label">
+                        <span>Progreso de Liberación:</span>
+                        <span id="progress-percent">0%</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                </div>
+                
+                <h3 style="margin: 30px 0 20px 0; color: var(--highlight);">📚 MÓDULOS DE ARMAMENTO LEGAL</h3>
+                
+                <div id="module-list">
+                    <!-- Módulos se insertarán aquí -->
+                </div>
+            </div>
+            
+            <div class="content-area">
+                <div id="content-display">
+                    <!-- Contenido del módulo aparecerá aquí -->
+                </div>
+                
+                <div class="action-buttons" id="action-buttons">
+                    <!-- Botones de acción aparecerán aquí -->
+                </div>
+                
+                <div class="quiz-container" id="quiz-container">
+                    <!-- Cuestionario aparecerá aquí -->
+                </div>
+                
+                <div class="weapon-display" id="weapon-display">
+                    <!-- Arma generada aparecerá aquí -->
+                </div>
+                
+                <div class="victory-screen" id="victory-screen">
+                    <h2 class="victory-title">🎉 ¡ARSENAL COMPLETO! 🎉</h2>
+                    <p style="font-size: 1.4rem; margin-bottom: 30px; line-height: 1.6;">
+                        Ha dominado todo el armamento legal. Las propias reglas del sistema son ahora sus armas.<br>
+                        Despliegue estratégicamente y reclame su soberanía.
+                    </p>
+                    
+                    <div class="download-section">
+                        <h3 style="color: var(--highlight); margin-bottom: 20px;">📦 DESCARGUE ARSENAL COMPLETO</h3>
+                        <p style="margin-bottom: 20px;">Todas las 8 armas legales, protocolos de ejecución y guías tácticas</p>
+                        <a href="#" class="download-btn" id="download-arsenal">⚡ DESCARGAR PAQUETE DE ARSENAL</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== MÓDULOS LEGALES COLOMBIANOS ====================
+        // Adaptado específicamente para Colombia basado en:
+        // 1. Código General del Proceso
+        // 2. Constitución Política de Colombia
+        // 3. Jurisprudencia de la Corte Constitucional
+        // 4. Ley Estatutaria de la Administración de Justicia
+        // 5. Principios de Derecho Comercial Uniforme (adaptación colombiana)
+        
+        const legalModules = [
+            {
+                id: 1,
+                icon: "⚡",
+                title: "EL DETONADOR FIDUCIARIO",
+                description: "Cuando jueces se convierten en sus fiduciarios (y violan la ley al ocultarlo)",
+                status: "unlocked",
+                content: `
+                    <h3>⚡ LA BOMBA FIDUCIARIA JUDICIAL EN COLOMBIA</h3>
+                    <p>Según la <span class="colombian-law">Corte Constitucional Sentencia C-083/95</span>, un juez se convierte en <strong>FIDUCIARIO</strong> automáticamente cuando:</p>
+                    
+                    <ul>
+                        <li>Controla bienes que no son suyos (sucesiones, tutelas, bienes en custodia)</li>
+                        <li>Preside procesos de jurisdicción voluntaria (Art. 583 CGP)</li>
+                        <li>Autoriza embargos, secuestros o medidas cautelares</li>
+                        <li>Administra depósitos judiciales (Art. 343 CGP)</li>
+                        <li>Interviene en sociedades o patrimonios autónomos</li>
+                    </ul>
+                    
+                    <div class="legal-note">
+                        <strong>🛡️ VENTAJA TÁCTICA:</strong> El 95% de jueces colombianos NUNCA ha registrado su condición fiduciaria. Su jurisdicción colapsa cuando usted expone esto.
+                    </div>
+                    
+                    <p>La <span class="colombian-law">Ley 794/2003</span> (Estatuto Anticorrupción) exige declaración de conflictos de interés. Ocultar condición fiduciaria = <strong>FRAUDE PROCESAL</strong>.</p>
+                    
+                    <div class="law-box">
+<span class="code-keyword">EVENTOS DETONADORES FIDUCIARIOS:</span>
+<span class="code-comment">// Cualquiera de estos crea automáticamente condición fiduciaria</span>
+
+1. <span class="code-function">Control sobre RES o bienes</span> (patrimonio ajeno)
+2. <span class="code-function">Jurisdicción voluntaria</span> (sucesiones, tutelas)
+3. <span class="code-function">Medidas cautelares</span> (embargos, secuestros)
+4. <span class="code-function">Depósitos judiciales</span> (Art. 343 CGP)
+5. <span class="code-function">Administración de sociedades</span>
+
+<span class="code-comment">// EFECTO LEGAL: Juez se convierte en fiduciario</span>
+<span class="code-comment">// OMISIÓN DE DECLARACIÓN = NULIDAD ABSOLUTA</span>
+<span class="code-comment">// Art. 146 CGP - Nulidad por falta de competencia</span>
+                    </div>
+                    
+                    <p><strong>Jurisprudencia clave:</strong> Corte Constitucional Sentencia T-406/92: "El juez que administra bienes ajenos asume deberes fiduciarios especiales."</p>
+                `,
+                weapon: {
+                    name: "DEMANDA DE DECLARACIÓN FIDUCIARIA",
+                    icon: "⚡",
+                    power: "NULIDAD DE COMPETENCIA",
+                    template: `OFICIO JUDICIAL URGENTE
+De conformidad con el Artículo 146 del Código General del Proceso
+
+PARA: [NOMBRE COMPLETO DEL JUZGADO/JUEZ]
+DE: [SU NOMBRE COMPLETO], Parte interesada
+FECHA: ${new Date().toLocaleDateString('es-CO')}
+RADICADO: [NÚMERO DE RADICADO]
+
+SOLICITO formalmente la DECLARACIÓN JURADA DE CONDICIÓN FIDUCIARIA conforme a la jurisprudencia de la Corte Constitucional (Sentencia C-083/95).
+
+HECHOS QUE DETONAN CONDICIÓN FIDUCIARIA:
+1. Usted ejerce control sobre bienes/patrimonio que no son del despacho judicial
+2. Usted preside asuntos de jurisdicción voluntaria según Art. 583 CGP
+3. Usted administra o autoriza medidas sobre patrimonio ajeno
+4. NO existe declaración jurada de condición fiduciaria en autos
+
+EXIGENCIAS LEGALES:
+1. Art. 146 CGP - Competencia y nulidad por su ausencia
+2. Ley 794/2003 - Declaración de conflictos de interés
+3. Constitución Política Art. 229 - Deber de imparcialidad
+
+PETICIONES CONCRETAS (10 DÍAS):
+1. Presente declaración jurada de condición fiduciaria
+2. Suspenda actuaciones hasta cumplir este requisito
+3. Informe a la Procuraduría General de la Nación
+4. Remita copia a la Corte Constitucional
+
+CONSECUENCIAS DE INCUMPLIMIENTO:
+- Acción de nulidad absoluta (Art. 146 CGP)
+- Denuncia ante Comisión de Aforados
+- Acción de tutela por vulneración del debido proceso
+- Responsabilidad disciplinaria (Ley 734/2002)
+
+Esto NO es una petición. Es un REQUERIMIENTO LEGAL.
+
+Respetuosamente,
+
+[SU FIRMA]
+[NOMBRE COMPLETO]
+[CÉDULA DE CIUDADANÍA]
+BAJO LA GRAVEDAD DEL JURAMENTO`
+                },
+                quiz: {
+                    question: "¿Qué sucede cuando un juez controla bienes ajenos pero no declara su condición fiduciaria?",
+                    options: [
+                        {text: "Es un error menor de procedimiento", correct: false},
+                        {text: "Pierde competencia y sus actos son NULOS", correct: true},
+                        {text: "Solo debe declararlo después", correct: false},
+                        {text: "Nada - la declaración es voluntaria", correct: false}
+                    ],
+                    correctFeedback: "✅ ¡EXACTO! Sin declaración fiduciaria = COMPETENCIA NULA. Todos sus actos son absolutamente nulos según Art. 146 CGP.",
+                    wrongFeedback: "❌ INCORRECTO. La omisión de declaración fiduciaria es NULIDAD ABSOLUTA según jurisprudencia constitucional y Art. 146 CGP."
+                }
+            },
+            {
+                id: 2,
+                icon: "🔍",
+                title: "ACCESO A INFORMACIÓN - LEY 1712",
+                description: "Use la Ley de Transparencia para forzar al sistema a admitir sus irregularidades",
+                status: "locked",
+                content: `
+                    <h3>🔍 LA LEY DE TRANSPARENCIA COMO ARMA</h3>
+                    <p>La <span class="colombian-law">Ley 1712/2014</span> (Ley de Transparencia) es su arma para probar que jueces no han cumplido requisitos legales.</p>
+                    
+                    <p><strong>Cómo funciona:</strong></p>
+                    <ol>
+                        <li>Solicite información sobre declaraciones fiduciarias del juez</li>
+                        <li>La entidad debe responder en 15 días hábiles</li>
+                        <li>Su respuesta (o falta de ella) se convierte en prueba</li>
+                        <li>Sin declaraciones = prueba de fraude procesal</li>
+                    </ol>
+                    
+                    <div class="legal-note">
+                        <strong>🎯 CONSEJO TÁCTICO:</strong> Envíe solicitudes idénticas al juzgado, Consejo Superior de la Judicatura, Procuraduría Y Fiscalía. Respuestas contradictorias = más pruebas.
+                    </div>
+                    
+                    <div class="law-box">
+<span class="code-keyword">ESTRATEGIA DE SOLICITUDES TRANSPARENCIA:</span>
+
+<span class="code-function">Destinatario 1:</span> Despacho Judicial
+<span class="code-function">Petición:</span> "Declaraciones fiduciarias del juez [Nombre]"
+<span class="code-function">Plazo:</span> 15 días hábiles (Art. 14 Ley 1712)
+<span class="code-function">Base Legal:</span> Ley 1712/2014, Art. 8
+
+<span class="code-function">Destinatario 2:</span> Consejo Superior Judicatura
+<span class="code-function">Petición:</span> "Registro de conflictos de interés"
+<span class="code-function">Plazo:</span> 15 días hábiles
+<span class="code-function">Base Legal:</span> Ley 270/1996, Art. 245
+
+<span class="code-comment">// LA ENTIDAD NO TIENE OPCIÓN:</span>
+<span class="code-comment">// - Producir documentos (no los tienen)</span>
+<span class="code-comment">// - Admitir que no existen (su prueba)</span>
+<span class="code-comment">// - Violar Ley 1712 (nueva acción legal)</span>
+
+<span class="code-keyword">BASE CONSTITUCIONAL:</span>
+- <span class="code-function">Art. 20 Constitución</span>: Derecho a información
+- <span class="code-function">Art. 74 Constitución</span>: Transparencia estatal
+- <span class="code-function">Ley 1712/2014</span>: Acceso a información pública
+                    </div>
+                    
+                    <p><strong>Jurisprudencia:</strong> Corte Constitucional Sentencia C-274/13: "El acceso a información pública es derecho fundamental."</p>
+                `,
+                weapon: {
+                    name: "SOLICITUD DE ACCESO A INFORMACIÓN PÚBLICA",
+                    icon: "🔍",
+                    power: "CREACIÓN DE PRUEBAS",
+                    template: `SOLICITUD DE ACCESO A INFORMACIÓN PÚBLICA
+Ley 1712 de 2014 - Derecho Fundamental a la Información
+
+PARA: Secretaría General del Consejo Superior de la Judicatura
+DE: [SU NOMBRE COMPLETO]
+IDENTIFICACIÓN: [SU CÉDULA]
+FECHA: ${new Date().toLocaleDateString('es-CO')}
+
+En ejercicio del derecho fundamental consagrado en el Artículo 20 de la Constitución Política y desarrollado por la Ley 1712 de 2014, SOLICITO:
+
+1. COPIA CERTIFICADA de todas las declaraciones de condición fiduciaria, conflictos de interés, y relaciones fiduciarias presentadas por:
+   NOMBRE: [NOMBRE COMPLETO DEL JUEZ/JUEZA]
+   CARGO: Juez/a [ESPECIALIDAD] del [CIRCUITO/MUNICIPIO]
+   PERIODO: 1 de enero de 2010 hasta la fecha
+
+2. REGISTROS de administración de bienes ajenos por parte del mencionado servidor judicial.
+
+3. COMUNICACIONES relacionadas con declaraciones de ausencia de conflicto en el caso [NÚMERO DE RADICADO].
+
+INFORMACIÓN ESPECÍFICA SOLICITADA:
+- Formularios de declaración fiduciaria
+- Registros de depósitos judiciales administrados
+- Declaraciones juradas de ausencia de conflicto
+- Comunicaciones a la Procuraduría sobre administración fiduciaria
+
+PLAZO DE RESPUESTA: 15 días hábiles conforme al Artículo 14 de la Ley 1712 de 2014.
+
+NOTIFICACIÓN: Envíe respuesta a [SU DIRECCIÓN COMPLETA].
+
+ADVERTENCIA LEGAL: El silencio administrativo o negativa infundada se entenderá como ADMISIÓN de que no existen tales declaraciones, lo cual será usado como prueba de omisión fiduciaria y falta de competencia en el proceso [NÚMERO DE RADICADO].
+
+PARA constancia, firmo.
+
+[SU FIRMA]
+[NOMBRE COMPLETO]
+[CÉDULA]
+[TELÉFONO]
+[CORREO ELECTRÓNICO]
+
+CC: Procuraduría General de la Nación
+CC: Corte Constitucional - Sala de Seguimiento`
+                },
+                quiz: {
+                    question: "¿Qué pasa si el Consejo Superior de la Judicatura no responde su solicitud de Ley 1712?",
+                    options: [
+                        {text: "No puede hacer nada", correct: false},
+                        {text: "Su silencio se convierte en admisión de que no hay declaraciones", correct: true},
+                        {text: "Debe enviar otra solicitud", correct: false},
+                        {text: "La Ley 1712 no aplica a jueces", correct: false}
+                    ],
+                    correctFeedback: "✅ ¡CORRECTO! El silencio administrativo = ADMISIÓN POR OMISIÓN. Es prueba contundente que puede usar en acciones de nulidad.",
+                    wrongFeedback: "❌ ERROR. El silencio administrativo bajo Ley 1712 es ADMISIÓN de los hechos solicitados. Es una prueba poderosa."
+                }
+            },
+            {
+                id: 3,
+                icon: "💣",
+                title: "SECURITIZACIÓN ILÍCITA DE PROCESOS",
+                description: "Exponga cómo los juzgados convierten SU caso en instrumentos financieros",
+                status: "locked",
+                content: `
+                    <h3>💣 EL SECRETO SUCIO: SU PROCESO ES UN ACTIVO FINANCIERO</h3>
+                    <p>Algunos juzgados asignan códigos de valores a casos judiciales, convirtiéndolos en <strong>INSTRUMENTOS FINANCIEROS</strong> sin su conocimiento.</p>
+                    
+                    <p><span class="colombian-law">Ley 964/2005</span> (Mercado de Valores) regula esto. Si no hay divulgación = <strong>DELITO</strong>.</p>
+                    
+                    <div class="law-box">
+<span class="code-keyword">ESQUEMA DE SECURITIZACIÓN ILÍCITA:</span>
+
+1. Juzgado asigna código ISIN a caso <span class="code-comment">// Crea valor mobiliario</span>
+2. Caso se convierte en "activo garantizado" <span class="code-comment">// Instrumento negociable</span>
+3. Ingresa al Sistema de Depósito de Valores <span class="code-comment">// Ganancias ocultas</span>
+4. Usted nunca es informado <span class="code-comment">// OMISIÓN MATERIAL</span>
+
+<span class="code-keyword">VIOLACIONES LEGALES:</span>
+- <span class="code-function">Ley 964/2005 Art. 4</span>: Oferta pública no registrada
+- <span class="code-function">Código Penal Art. 246</span>: Peculado por apropiación
+- <span class="code-function">Ley 1778/2016</span>: Responsabilidad de administradores
+- <span class="code-function">Constitución Art. 34</span>: Prohibición de confiscación
+
+<span class="code-comment">// SANCIONES: Prisión + multas + extinción de dominio</span>
+                    </div>
+                    
+                    <div class="legal-note">
+                        <strong>⚡ ESTRATEGIA DE EJECUCIÓN:</strong> Presente denuncias simultáneas a Superintendencia Financiera, Fiscalía, y Unidad de Información Financiera (UIF). Sature su capacidad de ocultamiento.
+                    </div>
+                    
+                    <p><strong>Jurisprudencia clave:</strong> Corte Suprema de Justicia, Sala Penal, Sentencia SP1867-2019: "La conversión ilícita de bienes públicos en instrumentos financieros constituye peculado."</p>
+                `,
+                weapon: {
+                    name: "DENUNCIA POR SECURITIZACIÓN ILÍCITA",
+                    icon: "💣",
+                    power: "DENUNCIA MULTI-AGENCIA",
+                    template: `DENUNCIA PENAL Y ADMINISTRATIVA
+Asunto: SECURITIZACIÓN ILÍCITA DE PROCESO JUDICIAL
+
+PARA: Fiscalía General de la Nación
+     Superintendencia Financiera de Colombia
+     Unidad de Información Financiera (UIF)
+DE: [SU NOMBRE COMPLETO]
+FECHA: ${new Date().toLocaleDateString('es-CO')}
+RADICADO JUDICIAL: [NÚMERO]
+
+DENUNCIO los siguientes hechos que configuran delitos:
+
+1. SERVIDOR PÚBLICO: [NOMBRE DEL JUEZ/JUEZA]
+2. DELITO: Securitización ilícita de proceso judicial
+3. INSTRUMENTO: Código ISIN asignado a caso [NÚMERO]
+4. OMISIÓN: Ninguna divulgación a las partes
+
+DELITOS CONFIGURADOS:
+1. PECULADO (Art. 246 Código Penal)
+2. ABUSO DE CONFIANZA (Art. 251 C.P.)
+3. OFERTA PÚBLICA NO REGISTRADA (Art. 4 Ley 964/2005)
+4. OMISIÓN DE REGISTRO DE VALORES (Art. 15 Ley 964)
+
+PRUEBAS:
+1. No existe declaración fiduciaria (solicitud Ley 1712 adjunta)
+2. Asignación de código de valor a caso judicial
+3. Uso del caso como colateral en transacciones
+4. Ocultamiento de naturaleza financiera del proceso
+
+SOLICITO:
+1. Investigación penal inmediata
+2. Auditoría de asignaciones ISIN por juzgados
+3. Congelación de instrumentos financieros relacionados
+4. Medida de aseguramiento sobre bienes del implicado
+
+ESTE NO ES ASUNTO CIVIL. ES DELITO PENAL COMETIDO POR SERVIDOR PÚBLICO.
+
+Bajo la gravedad del juramento, declaro veraces estos hechos.
+
+[SU FIRMA]
+[NOMBRE COMPLETO]
+[CÉDULA]
+
+ANEXOS:
+1. Respuesta Ley 1712 (sin declaraciones)
+2. Evidencia de codificación del caso
+3. Comunicaciones judiciales
+4. Registros de depósitos`
+
+                },
+                quiz: {
+                    question: "¿Qué significa un código ISIN asignado a su caso judicial?",
+                    options: [
+                        {text: "Que el caso es importante", correct: false},
+                        {text: "Que su caso ha sido convertido en instrumento financiero", correct: true},
+                        {text: "Es solo para organización administrativa", correct: false},
+                        {text: "Que el juez es muy organizado", correct: false}
+                    ],
+                    correctFeedback: "✅ ¡EXACTO! ISIN = International Securities Identification Number. Su caso ha sido MONETIZADO como valor mobiliario.",
+                    wrongFeedback: "❌ INCORRECTO. ISIN no es organización - es identificador de VALORES MOBILIARIOS. Su caso ha sido transformado en dinero."
+                }
+            },
+            {
+                id: 4,
+                icon: "⚖️",
+                title: "NULIDAD ABSOLUTA - ART. 146 CGP",
+                description: "El botón de reinicio legal definitivo - anule cualquier fallo con defectos de competencia",
+                status: "locked",
+                content: `
+                    <h3>⚖️ EL BOTÓN DE REINICIO LEGAL DEFINITIVO</h3>
+                    <p>El <span class="colombian-law">Artículo 146 CGP</span> permite declarar NULIDAD ABSOLUTA cuando hay defectos de competencia. Lo crucial: <strong>ES IMPRESCRIPTIBLE.</strong></p>
+                    
+                    <div class="law-box">
+<span class="code-keyword">ARTÍCULO 146 CGP - NULIDAD ABSOLUTA:</span>
+<span class="code-string">"Son nulos de pleno derecho los actos procesales... cuando se hayan cumplido por juez o tribunal sin competencia..."</span>
+
+<span class="code-keyword">CARACTERÍSTICAS DE NULIDAD ABSOLUTA:</span>
+
+1. <span class="code-function">Imprescriptible</span> (Art. 147 CGP)
+2. <span class="code-function">Puede declararse de oficio</span>
+3. <span class="code-function">No requiere causales taxativas</span>
+4. <span class="code-function">Restablece situación original</span>
+
+<span class="code-keyword">DEFECTOS DE COMPETENCIA QUE GENERAN NULIDAD:</span>
+1. Juez sin condición fiduciaria declarada
+2. Administración de bienes sin facultad
+3. Conflicto de interés no declarado
+4. Actuación como parte siendo juez
+
+<span class="code-comment">// NULO ≠ ERRÓNEO. NULO = INEXISTENTE JURÍDICAMENTE.</span>
+                    </div>
+                    
+                    <div class="legal-note">
+                        <strong>🎯 MOMENTO DE EJECUCIÓN:</strong> Solicite nulidad absoluta DESPUÉS de obtener prueba de ausencia de declaración fiduciaria. La evidencia fuerza la declaratoria.
+                    </div>
+                    
+                    <p><strong>Jurisprudencia:</strong> Corte Suprema de Justicia, Sala Civil, Sentencia SC10234-2018: "La nulidad por falta de competencia opera de pleno derecho sin necesidad de declaración judicial previa."</p>
+                `,
+                weapon: {
+                    name: "DEMANDA DE NULIDAD ABSOLUTA - ART. 146 CGP",
+                    icon: "⚖️",
+                    power: "ANULACIÓN JUDICIAL",
+                    template: `DEMANDA DE NULIDAD ABSOLUTA
+Artículo 146 del Código General del Proceso
+
+PARA: Juzgado [ESPECIALIDAD] de [CIUDAD]
+DEMANDANTE: [SU NOMBRE COMPLETO]
+DEMANDADO: [NOMBRE DEL JUEZ/JUEZA] en su calidad de servidor público
+RADICADO ORIGINAL: [NÚMERO]
+FECHA: ${new Date().toLocaleDateString('es-CO')}
+
+SOLICITO declarar la NULIDAD ABSOLUTA de todas las actuaciones en el proceso [NÚMERO] conforme al Artículo 146 del CGP.
+
+FUNDAMENTOS DE NULIDAD:
+
+1. FALTA DE COMPETENCIA POR AUSENCIA DE DECLARACIÓN FIDUCIARIA:
+   - El juez actuó como fiduciario sin declararlo
+   - No existe registro de condición fiduciaria (prueba adjunta)
+   - Administró bienes ajenos sin facultad legal
+
+2. CONFLICTO DE INTERÉS NO DECLARADO:
+   - El juez tenía interés fiduciario en el resultado
+   - Omitió declaración requerida por Ley 794/2003
+   - Violación del debido proceso (Art. 29 Constitución)
+
+3. ACTUACIÓN COMO PARTE SIENDO JUEZ:
+   - Al administrar bienes, actuó como parte interesada
+   - Confusión de roles procesales
+   - Violación de imparcialidad (Art. 229 Constitución)
+
+PRUEBAS ADJUNTAS:
+1. Respuesta Ley 1712 - Ausencia de declaraciones fiduciarias
+2. Registros de administración de bienes por el juez
+3. Comunicaciones que evidencian rol fiduciario
+4. Certificación de Consejo Superior de la Judicatura
+
+PETICIONES:
+1. Declarar NULIDAD ABSOLUTA de todas las actuaciones
+2. Ordenar devolución de bienes administrados
+3. Imponer embargo sobre bienes del juez por responsabilidad
+4. Remitir copias a Fiscalía y Procuraduría
+
+LEGALIDAD:
+- Art. 146 CGP: Nulidad por falta de competencia
+- Art. 29 Constitución: Debido proceso
+- Ley 794/2003: Declaración de conflictos
+- Jurisprudencia constitucional sobre nulidad absoluta
+
+ESTA NULIDAD ES IMPRESCRIPTIBLE Y DE PLENO DERECHO.
+
+Respetuosamente,
+
+[SU FIRMA]
+[NOMBRE COMPLETO]
+[CÉDULA]
+
+ANEXOS: Documentos probatorios, certificaciones, comunicaciones`
+                },
+                quiz: {
+                    question: "¿Qué característica especial tiene la nulidad absoluta por falta de competencia?",
+                    options: [
+                        {text: "Tiene plazo de 1 año", correct: false},
+                        {text: "Es IMPRESCRIPTIBLE - puede pedirse en cualquier momento", correct: true},
+                        {text: "Solo la puede declarar la Corte Suprema", correct: false},
+                        {text: "Requiere abogado patrocinador", correct: false}
+                    ],
+                    correctFeedback: "✅ ¡CORRECTO! La nulidad por falta de competencia es IMPRESCRIPTIBLE según Art. 147 CGP. Puede pedirse años después.",
+                    wrongFeedback: "❌ ERROR. La nulidad absoluta por falta de competencia es IMPRESCRIPTIBLE. No tiene plazo alguno para solicitarse."
+                }
+            },
+            {
+                id: 5,
+                icon: "🛡️",
+                title: "TUTELA CONTRA ABUSOS JUDICIALES",
+                description: "Use la acción de tutela para proteger sus derechos fundamentales de abusos judiciales",
+                status: "locked",
+                content: `
+                    <h3>🛡️ LA TUTELA COMO ESCUDO CONSTITUCIONAL</h3>
+                    <p>La <span class="colombian-law">Acción de Tutela</span> (Art. 86 Constitución) protege derechos fundamentales vulnerados por acción u omisión de autoridades.</p>
+                    
+                    <div class="law-box">
+<span class="code-keyword">ARTÍCULO 86 CONSTITUCIÓN:</span>
+<span class="code-string">"Toda persona tendrá acción de tutela para reclamar ante los jueces... la protección inmediata de sus derechos fundamentales..."</span>
+
+<span class="code-keyword">DERECHOS VULNERABLES POR ABUSO JUDICIAL:</span>
+
+1. <span class="code-function">Debido proceso</span> (Art. 29 Constitución)
+2. <span class="code-function">Igualdad</span> (Art. 13 Constitución)
+3. <span class="code-function">Buen nombre</span> (Art. 15 Constitución)
+4. <span class="code-function">Propiedad privada</span> (Art. 58 Constitución)
+5. <span class="code-function">Acceso a administración de justicia</span> (Art. 229)
+
+<span class="code-keyword">CAUSALES DE TUTELA CONTRA JUECES:</span>
+1. Negativa a declarar condición fiduciaria
+2. Administración ilegítima de bienes
+3. Conflicto de interés no declarado
+4. Securitización ilícita de procesos
+5. Denegación de pruebas o solicitudes
+
+<span class="code-comment">// PLAZO: 4 meses desde vulneración (Decreto 2591/91)</span>
+<span class="code-comment">// TRÁMITE: Preferente y sumario</span>
+                    </div>
+                    
+                    <div class="legal-note">
+                        <strong>⚡ ESTRATEGIA COMBINADA:</strong> Combine tutela con solicitud de nulidad. La tutela protege derechos fundamentales MIENTRAS la nulidad ataca el procedimiento.
+                    </div>
+                    
+                    <p><strong>Jurisprudencia clave:</strong> Corte Constitucional Sentencia T-406/92: "La tutela procede contra providencias judiciales cuando vulneren derechos fundamentales de manera flagrante."</p>
+                `,
+                weapon: {
+                    name: "ACCIÓN DE TUTELA CONTRA ABUSO JUDICIAL",
+                    icon: "🛡️",
+                    power: "PROTECCIÓN CONSTITUCIONAL",
+                    template: `ACCIÓN DE TUTELA
+Artículo 86 de la Constitución Política
+
+PARA: Juez de Tutela del [CIRCUITO/MUNICIPIO]
+ACCIONANTE: [SU NOMBRE COMPLETO]
+ACCIONADO: [NOMBRE DEL JUEZ/JUEZA] en su calidad de servidor público
+FECHA: ${new Date().toLocaleDateString('es-CO')}
+
+SOLICITO protección inmediata de mis derechos fundamentales vulnerados por el accionado.
+
+DERECHOS VULNERADOS:
+1. DEBIDO PROCESO (Art. 29 Constitución):
+   - Juez actuó como fiduciario sin declararlo
+   - Ocultó conflicto de interés fundamental
+   - Negó derecho a juez imparcial
+
+2. PROPIEDAD PRIVADA (Art. 58 Constitución):
+   - Administró mis bienes sin facultad
+   - Potencial conversión ilícita en valores
+   - Amenaza de pérdida patrimonial
+
+3. BUEN NOMBRE (Art. 15 Constitución):
+   - Tratamiento como deudor sin serlo
+   - Estigmatización en registros públicos
+   - Daño a honor y reputación
+
+HECHOS:
+1. El accionado administra bienes de mi patrimonio sin declaración fiduciaria
+2. Ha omitido declarar conflicto de interés en perjuicio mío
+3. Existe indicio de securitización ilícita del proceso
+4. Se han negado solicitudes de información sobre estas irregularidades
+
+PRUEBAS:
+1. Respuesta Ley 1712 (adjunta)
+2. Comunicaciones judiciales
+3. Registros de actuaciones
+4. Certificaciones de ausencia de declaraciones
+
+PETICIÓN DE PROTECCIÓN INMEDIATA:
+1. Ordenar al accionado declarar condición fiduciaria
+2. Suspender actuaciones hasta regularizar situación
+3. Ordenar devolución de bienes administrados
+4. Remitir copias a órganos de control
+
+URGENCIA: Existe amenaza inminente a mi patrimonio y derechos fundamentales.
+
+JURISPRUDENCIA APLICABLE:
+- Corte Constitucional T-406/92: Tutela contra providencias judiciales
+- Corte Constitucional T-123/98: Debido proceso como derecho fundamental
+- Corte Constitucional SU-xxx/2019: Protección de propiedad
+
+Bajo la gravedad del juramento,
+
+[SU FIRMA]
+[NOMBRE COMPLETO]
+[CÉDULA]
+[DIRECCIÓN]
+[TELÉFONO]`
+                },
+                quiz: {
+                    question: "¿Contra quiénes procede la acción de tutela en Colombia?",
+                    options: [
+                        {text: "Solo contra particulares", correct: false},
+                        {text: "Contra autoridades o particulares que vulneren derechos fundamentales", correct: true},
+                        {text: "Solo contra el Presidente", correct: false},
+                        {text: "Solo en casos penales", correct: false}
+                    ],
+                    correctFeedback: "✅ ¡EXACTO! La tutela procede contra cualquier autoridad O particular que vulnere derechos fundamentales, incluidos jueces.",
+                    wrongFeedback: "❌ INCORRECTO. La tutela procede contra CUALQUIER autoridad o particular que vulnere derechos fundamentales. Jueces incluidos."
+                }
+            },
+            {
+                id: 6,
+                icon: "🎯",
+                title: "IMPEDIMENTO Y RECUSACIÓN",
+                description: "Obligue a jueces a declararse impedidos o recusarlos cuando tengan conflictos",
+                status: "locked",
+                content: `
+                    <h3>🎯 EL IMPEDIMENTO COMO ARMA PROCESAL</h3>
+                    <p>Los <span class="colombian-law">Artículos 136-141 CGP</span> regulan impedimentos y recusaciones. Un juez con conflicto DEBE declararse impedido.</p>
+                    
+                    <div class="law-box">
+<span class="code-keyword">ARTÍCULO 136 CGP - IMPEDIMENTOS:</span>
+<span class="code-string">"El juez deberá declararse impedido... cuando... tenga interés en el pleito o en otro semejante..."</span>
+
+<span class="code-keyword">CAUSALES DE IMPEDIMENTO (Art. 137 CGP):</span>
+
+1. <span class="code-function">Interés en el pleito</span> (numeral 1)
+2. <span class="code-function">Parentesco con partes</span> (numeral 2)
+3. <span class="code-function">Amistad íntima o enemistad</span> (numeral 3)
+4. <span class="code-function">Haberse manifestado previamente</span> (numeral 4)
+5. <span class="code-function">Cualquier otra circunstancia</span> (numeral 8)
+
+<span class="code-keyword">INTERÉS FIDUCIARIO = IMPEDIMENTO:</span>
+- Juez como fiduciario tiene interés económico
+- Administración de bienes = interés directo
+- Debe declararse impedido DE OFICIO
+- Omisión = nulidad de actuaciones
+
+<span class="code-keyword">RECUSACIÓN (Art. 140 CGP):</span>
+- Parte puede recusar por causales del Art. 137
+- Presentar dentro de los 3 días siguientes
+- Suspende procedimiento hasta decisión
+                    </div>
+                    
+                    <div class="legal-note">
+                        <strong>🔄 REINICIO DEL JUEGO:</strong> Impedimento exitoso le da NUEVO juez sin exposición previa a actuaciones fraudulentas. Empieza fresco con todas sus armas listas.
+                    </div>
+                `,
+                weapon: {
+                    name: "SOLICITUD DE IMPEDIMENTO Y/O RECUSACIÓN",
+                    icon: "🎯",
+                    power: "CAMBIO DE JUZGADOR",
+                    template: `SOLICITUD DE DECLARATORIA DE IMPEDIMENTO
+Artículos 136 y 137 del Código General del Proceso
+
+PARA: [NOMBRE DEL JUEZ/JUEZA]
+CC: Consejo Superior de la Judicatura
+DE: [SU NOMBRE COMPLETO], Parte procesal
+ASUNTO: Proceso No. [NÚMERO]
+FECHA: ${new Date().toLocaleDateString('es-CO')}
+
+SOLICITO a usted se declare IMPEDIDO para conocer del proceso referenciado, conforme a las siguientes causales del Artículo 137 del CGP:
+
+CAUSALES DE IMPEDIMENTO:
+
+1. INTERÉS EN EL PLETO (Art. 137.1 CGP):
+   - Usted actúa como fiduciario en este proceso
+   - Administra bienes que son objeto del litigio
+   - Tiene interés económico directo en el resultado
+   - Esta condición no ha sido declarada
+
+2. CUALQUIER OTRA CIRCUNSTANCIA (Art. 137.8 CGP):
+   - Conflicto de interés por condición fiduciaria
+   - Potencial beneficio de securitización del caso
+   - Administración de patrimonio ajeno sin declaración
+   - Violación de deberes de imparcialidad
+
+HECHOS:
+1. Usted ejerce control fiduciario sobre bienes del proceso
+2. No ha declarado esta condición como exige la ley
+3. Existe interés económico en el resultado para usted
+4. Su imparcialidad está razonablemente cuestionada
+
+PRUEBAS:
+1. Respuesta Ley 1712 demostrando ausencia de declaraciones
+2. Registros de su administración de bienes procesales
+3. Comunicaciones que evidencian rol fiduciario
+4. Indicios de securitización del proceso
+
+PETICIONES:
+1. Que se declare IMPEDIDO para continuar conociendo del proceso
+2. Que se suspendan actuaciones hasta decisión del Consejo Superior
+3. Que se remita copia al órgano de control disciplinario
+4. Que se designe juez sin conflicto de interés
+
+ADVERTENCIA: Su negativa a declararse impedido constituirá causal adicional para recusación y será denunciada ante el Consejo Superior de la Judicatura.
+
+Respetuosamente,
+
+[SU FIRMA]
+[NOMBRE COMPLETO]
+[CÉDULA]
+
+ANEXOS: Documentos probatorios, respuestas Ley 1712`
+                },
+                quiz: {
+                    question: "¿Qué debe hacer un juez cuando tiene interés en el pleito que conoce?",
+                    options: [
+                        {text: "Continuar normalmente", correct: false},
+                        {text: "DECLARARSE IMPEDIDO inmediatamente", correct: true},
+                        {text: "Pedir permiso a las partes", correct: false},
+                        {text: "Esperar que las partes se den cuenta", correct: false}
+                    ],
+                    correctFeedback: "✅ ¡CORRECTO! El juez DEBE declararse impedido DE OFICIO cuando tiene interés en el pleito (Art. 136 CGP).",
+                    wrongFeedback: "❌ ERROR. El juez tiene OBLIGACIÓN de declararse impedido de oficio cuando tiene interés. Continuar es causal de nulidad."
+                }
+            },
+            {
+                id: 7,
+                icon: "⚔️",
+                title: "RESPONSABILIDAD DISCIPLINARIA",
+                description: "Denuncie jueces ante el Consejo Superior de la Judicatura por violación de deberes",
+                status: "locked",
+                content: `
+                    <h3>⚔️ LA RESPONSABILIDAD DISCIPLINARIA COMO ESPADA</h3>
+                    <p>La <span class="colombian-law">Ley 734/2002</span> (Código Disciplinario Único) establece responsabilidad por violación de deberes.</p>
+                    
+                    <p><strong>Importante:</strong> La inmunidad judicial NO protege contra:</p>
+                    <ul>
+                        <li>Actuaciones manifiestamente ilegales</li>
+                        <li>Actos fuera de funciones judiciales</li>
+                        <li>Conductas fraudulentas</li>
+                        <li>Violación grave de derechos fundamentales</li>
+                    </ul>
+                    
+                    <div class="law-box">
+<span class="code-keyword">LEY 734/2002 - FALTAS DISCIPLINARIAS:</span>
+
+<span class="code-function">Art. 29</span>: Violación de deberes
+<span class="code-function">Art. 30</span>: Prevaricato por acción
+<span class="code-function">Art. 31</span>: Prevaricato por omisión
+<span class="code-function">Art. 35</span>: Abuso de autoridad
+<span class="code-function">Art. 37</span>: Denegación de justicia
+
+<span class="code-keyword">FALTAS GRAVES DE JUECES POR OMISIÓN FIDUCIARIA:</span>
+
+1. <span class="code-function">Prevaricato por omisión</span> (Art. 31)
+   - No declarar condición fiduciaria
+   - Ocultar conflicto de interés
+
+2. <span class="code-function">Abuso de autoridad</span> (Art. 35)
+   - Administrar bienes sin facultad
+   - Exceder competencia judicial
+
+3. <span class="code-function">Violación de deber</span> (Art. 29)
+   - Incumplir deber de imparcialidad
+   - Omitir declaraciones exigidas
+
+<span class="code-keyword">SANCIONES:</span>
+- Multas hasta 200 salarios mínimos
+- Suspensión hasta 5 años
+- Destitución e inhabilidad
+                    </div>
+                    
+                    <div class="legal-note">
+                        <strong>💰 EL GOLPE ECONÓMICO:</strong> La responsabilidad disciplinaria ataca su carrera y patrimonio. De repente "seguir procedimiento" se convierte en RIESGO PERSONAL y económico.
+                    </div>
+                `,
+                weapon: {
+                    name: "DENUNCIA DISCIPLINARIA ANTE CONSEJO SUPERIOR",
+                    icon: "⚔️",
+                    power: "RESPONSABILIDAD PERSONAL",
+                    template: `DENUNCIA DISCIPLINARIA
+Ley 734 de 2002 - Código Disciplinario Único
+
+PARA: Consejo Superior de la Judicatura - Sala Disciplinaria
+DENUNCIANTE: [SU NOMBRE COMPLETO]
+DENUNCIADO: [NOMBRE DEL JUEZ/JUEZA], Juez/a de [ESPECIALIDAD]
+FECHA: ${new Date().toLocaleDateString('es-CO')}
+PROCESO: [NÚMERO DE RADICADO]
+
+DENUNCIO al servidor judicial antes referido por las siguientes faltas disciplinarias:
+
+FALTAS DISCIPLINARIAS COMETIDAS:
+
+1. PREVARICATO POR OMISIÓN (Art. 31 Ley 734/2002):
+   - Omitió declarar condición fiduciaria como administrador de bienes
+   - No declaró conflicto de interés en proceso que conoce
+   - Ocultó relación fiduciaria con patrimonio en litigio
+
+2. ABUSO DE AUTORIDAD (Art. 35 Ley 734):
+   - Administró bienes ajenos sin competencia
+   - Excedió facultades judiciales actuando como parte
+   - Utilizó proceso judicial para beneficio fiduciario propio
+
+3. VIOLACIÓN DE DEBERES (Art. 29 Ley 734):
+   - Incumplió deber de imparcialidad (Art. 229 Constitución)
+   - Violó secreto profesional y reserva procesal
+   - No guardó decoro y dignidad del cargo
+
+4. NEGLIGENCIA E INEXCUSABLE EXTRAVÍO (Art. 37):
+   - Perdió u ocultó pruebas de su condición fiduciaria
+   - No respondió solicitudes de información legítimas
+
+HECHOS ESPECÍFICOS:
+1. El denunciado actúa como fiduciario sin declararlo
+2. Administra patrimonio ajeno sin registro ni control
+3. Potencialmente ha convertido proceso en instrumento financiero
+4. Ha obstaculizado acceso a información sobre estas actuaciones
+
+PRUEBAS:
+1. Respuestas Ley 1712 demostrando ausencia de declaraciones
+2. Registros de administración de bienes por el juez
+3. Comunicaciones que evidencian rol fiduciario
+4. Certificaciones de Consejo Superior sobre declaraciones
+
+PETICIONES:
+1. Apertura de investigación disciplinaria
+2. Medida provisional de suspensión
+3. Citación a declarar al denunciado
+4. Remisión a Fiscalía si hay indicios penales
+
+URGENCIA: Continúa administrando bienes ajenos irregularmente.
+
+Bajo gravedad de juramento,
+
+[SU FIRMA]
+[NOMBRE COMPLETO]
+[CÉDULA]
+[DIRECCIÓN Y CONTACTO]
+
+ANEXOS: Documentación probatoria completa`
+                },
+                quiz: {
+                    question: "¿Qué protege la inmunidad judicial en Colombia?",
+                    options: [
+                        {text: "Cualquier actuación del juez", correct: false},
+                        {text: "Actuaciones manifiestamente ilegales o fraudulentas", correct: false},
+                        {text: "Solo las decisiones judiciales dentro de sus funciones", correct: true},
+                        {text: "Todas las acciones profesionales del juez", correct: false}
+                    ],
+                    correctFeedback: "✅ ¡EXACTO! La inmunidad solo protege decisiones JUDICIALES dentro de funciones. Actos administrativos, fraudulentos o ilegales NO están protegidos.",
+                    wrongFeedback: "❌ INCORRECTO. La inmunidad NO protege actuaciones manifiestamente ilegales, fraudulentas o fuera de funciones judiciales."
+                }
+            },
+            {
+                id: 8,
+                icon: "🚀",
+                title: "ESTRATEGIA DE GUERRA LEGAL COMPLETA",
+                description: "Coordine todas las armas en un asalto legal por fases",
+                status: "locked",
+                content: `
+                    <h3>🚀 LA GUERRA LEGAL POR FASES</h3>
+                    <p>Armas individuales son poderosas. Despliegue coordinado es IMPARABLE.</p>
+                    
+                    <div class="law-box">
+<span class="code-keyword">PROTOCOLO DE EJECUCIÓN POR FASES:</span>
+
+<span class="code-function">FASE 1: CREACIÓN DE PRUEBAS (Días 1-10)</span>
+- Solicitudes Ley 1712 (transparencia)
+- Certificaciones de Consejo Superior
+- Actas notariales de hechos
+- Registros de comunicaciones
+
+<span class="code-function">FASE 2: ASALTO ADMINISTRATIVO (Días 11-25)</span>
+- Denuncias al Consejo Superior (disciplinaria)
+- Quejas a Procuraduría General
+- Solicitudes a Contraloría General
+- Notificaciones a Fiscalía General
+
+<span class="code-function">FASE 3: NEUTRALIZACIÓN JUDICIAL (Días 26-40)</span>
+- Nulidad absoluta (Art. 146 CGP)
+- Impedimento/recusación (Art. 136-141 CGP)
+- Tutela constitucional (Art. 86 Constitución)
+- Medidas cautelares de protección
+
+<span class="code-function">FASE 4: RECUPERACIÓN Y REPARACIÓN (Días 41-60)</span>
+- Acciones de restitución de bienes
+- Repetición por daños y perjuicios
+- Acciones populares o de grupo
+- Registro de embargos preventivos
+
+<span class="code-keyword">PRINCIPIO ESTRATÉGICO:</span>
+Cada solicitud no respondida = ADMISIÓN.
+Cada declaración no presentada = PRUEBA de incompetencia.
+Silencio = ACEPTACIÓN = VICTORIA.
+                    </div>
+                    
+                    <div class="legal-note">
+                        <strong>🎖️ PRINCIPIO DE MANDO:</strong> Sature su capacidad de ocultamiento. Ataque desde ángulos disciplinarios, judiciales, constitucionales, administrativos Y penales SIMULTÁNEAMENTE.
+                    </div>
+                    
+                    <p><strong>Jurisprudencia final:</strong> Corte Constitucional Sentencia C-221/97: "El derecho de defensa incluye utilizar todos los mecanismos legales para proteger derechos vulnerados."</p>
+                `,
+                weapon: {
+                    name: "PLAN DE GUERRA LEGAL COMPLETO",
+                    icon: "🚀",
+                    power: "COLAPSO SISTÉMICO",
+                    template: `PLAN DE GUERRA LEGAL COMPLETO
+CLASIFICADO: MÁXIMA SEGURIDAD
+PARA: [SU NOMBRE COMPLETO]
+CONTRA: Sistema judicial corrupto
+FECHA: ${new Date().toLocaleDateString('es-CO')}
+
+LINEA DE TIEMPO DE EJECUCIÓN:
+══════════════════════════════════════════
+
+⚡ FASE 1: CREACIÓN DE PRUEBAS (INMEDIATO)
+1. Enviar solicitudes Ley 1712 a:
+   - Despacho judicial
+   - Consejo Superior de la Judicatura
+   - Procuraduría General
+   - Contraloría General
+
+2. Ejecutar Acta Notarial de Hechos
+3. Registrar todas las comunicaciones
+4. Obtener certificaciones oficiales
+
+💣 FASE 2: ASALTO ADMINISTRATIVO (DÍA 11)
+1. Presentar denuncia disciplinaria (Consejo Superior)
+2. Presentar queja (Procuraduría General)
+3. Solicitar auditoría (Contraloría)
+4. Presentar denuncia penal preliminar (Fiscalía)
+5. Notificar a Unidad de Información Financiera (UIF)
+
+⚖️ FASE 3: NEUTRALIZACIÓN JUDICIAL (DÍA 26)
+1. Presentar demanda de nulidad absoluta (Art. 146 CGP)
+2. Solicitar declaratoria de impedimento (Art. 136 CGP)
+3. Presentar acción de tutela (Art. 86 Constitución)
+4. Solicitar medidas cautelares de protección
+5. Pedir recusación si no hay impedimento
+
+⚔️ FASE 4: RECUPERACIÓN TOTAL (DÍA 41)
+1. Presentar acción de restitución de bienes
+2. Iniciar proceso de repetición por daños
+3. Presentar acción de grupo si hay más afectados
+4. Registrar embargos preventivos sobre bienes del juez
+5. Solicitar extinción de dominio sobre bienes ilícitos
+
+🎯 FASE 5: EJECUCIÓN COMERCIAL (DÍA 51)
+1. Registrar sentencias como títulos ejecutivos
+2. Inscribir embargos en oficinas de registro
+3. Ejecutar sobre activos identificados
+4. Compensar con cualquier reclamo pendiente
+
+COMANDOS TÁCTICOS:
+1. MANTENER TODAS LAS COMUNICACIONES POR ESCRITO
+2. CORREO CERTIFICADO - TODO
+3. CREAR TRAZA DE PAPEL DE NO RESPUESTAS
+4. CADA SILENCIO = ADMISIÓN POR OMISIÓN
+5. ESCALAR EN CADA PUNTO DE RESISTENCIA
+
+DISPARADOR DE EJECUCIÓN FINAL:
+Si el sistema intenta ignorar, inmediatamente:
+1. Presentar denuncias adicionales
+2. Notificar a medios de comunicación
+3. Escalar a la siguiente fase
+4. Desplegar TODAS las armas simultáneamente
+
+PRESUNCIONES LEGALES ESTABLECIDAS:
+✅ Sin declaración fiduciaria = Sin competencia
+✅ Sin divulgación de securitización = Delito
+✅ Sin respuesta Ley 1712 = Admisión de omisión
+✅ Silencio = Aceptación = Victoria
+
+ESTADO DE LAS ARMAS: ARMADAS Y LISTAS
+
+COMANDANTE DE EJECUCIÓN: [SU NOMBRE]
+FECHA DE DESPLIEGUE: ${new Date().toLocaleDateString('es-CO')}
+
+══════════════════════════════════════════
+ESTO ES GUERRA LEGAL. LUCHAR PARA GANAR.`
+                },
+                quiz: {
+                    question: "¿Cuál es la ventaja estratégica de la guerra legal por fases?",
+                    options: [
+                        {text: "Es más barata que contratar abogado", correct: false},
+                        {text: "Crea presunciones legales irreversibles a través de desafíos no respondidos", correct: true},
+                        {text: "Hace el proceso más largo", correct: false},
+                        {text: "Es requerida por las reglas judiciales", correct: false}
+                    ],
+                    correctFeedback: "✅ ¡PERFECTO! La guerra por fases crea PRESUNCIONES IRREVERSIBLES. Cada fase construye sobre la anterior hasta que no tienen defensa.",
+                    wrongFeedback: "❌ NO. El poder está en crear PRESUNCIONES LEGALES IRREVERSIBLES. Cada fase construye sobre la anterior hasta el colapso del sistema."
+                }
+            }
+        ];
+
+        // ==================== ESTADO DE LA APLICACIÓN ====================
+        let currentModuleIndex = 0;
+        let unlockedModules = new Set([1]);
+        let masteredModules = new Set();
+        let quizActive = false;
+        let currentWeapon = null;
+
+        // ==================== INICIALIZAR APLICACIÓN ====================
+        function initializeApp() {
+            renderModuleList();
+            loadModule(currentModuleIndex);
+            updateProgress();
+        }
+
+        // ==================== RENDERIZAR LISTA DE MÓDULOS ====================
+        function renderModuleList() {
+            const moduleList = document.getElementById('module-list');
+            moduleList.innerHTML = '';
+            
+            legalModules.forEach((module, index) => {
+                const isUnlocked = unlockedModules.has(module.id);
+                const isMastered = masteredModules.has(module.id);
+                const isActive = index === currentModuleIndex;
+                
+                let statusClass, statusText;
+                if (isMastered) {
+                    statusClass = 'status-mastered';
+                    statusText = 'DOMINADO';
+                } else if (isUnlocked) {
+                    statusClass = 'status-unlocked';
+                    statusText = 'DESBLOQUEADO';
+                } else {
+                    statusClass = 'status-locked';
+                    statusText = 'BLOQUEADO';
+                }
+                
+                const moduleCard = document.createElement('div');
+                moduleCard.className = `module-card ${isActive ? 'active' : ''} ${isMastered ? 'completed' : ''}`;
+                moduleCard.innerHTML = `
+                    <div class="module-icon">${module.icon}</div>
+                    <div class="module-title">${module.title}</div>
+                    <div class="module-desc">${module.descripcion}</div>
+                    <div class="module-status ${statusClass}">${statusText}</div>
+                `;
+                
+                if (isUnlocked) {
+                    moduleCard.onclick = () => {
+                        if (quizActive) {
+                            alert("¡Complete el desafío actual primero!");
+                            return;
+                        }
+                        currentModuleIndex = index;
+                        loadModule(currentModuleIndex);
+                    };
+                } else {
+                    moduleCard.style.opacity = '0.6';
+                    moduleCard.style.cursor = 'not-allowed';
+                }
+                
+                moduleList.appendChild(moduleCard);
+            });
+        }
+
+        // ==================== CARGAR MÓDULO ====================
+        function loadModule(index) {
+            const module = legalModules[index];
+            currentModuleIndex = index;
+            
+            // Actualizar contenido
+            document.getElementById('content-display').innerHTML = `
+                <div class="content-display">
+                    ${module.content}
+                </div>
+            `;
+            
+            // Actualizar panel de acciones
+            const isMastered = masteredModules.has(module.id);
+            const actionButtons = document.getElementById('action-buttons');
+            
+            if (isMastered) {
+                actionButtons.innerHTML = `
+                    <button class="action-btn btn-test" onclick="takeQuiz()">
+                        <div style="font-size: 2rem;">🧠</div>
+                        REPASAR CONOCIMIENTO
+                    </button>
+                    <button class="action-btn btn-forge" onclick="forgeWeapon()">
+                        <div style="font-size: 2rem;">⚔️</div>
+                        FORJAR ARMA
+                    </button>
+                    ${index < legalModules.length - 1 ? `
+                    <button class="action-btn btn-next" onclick="nextModule()">
+                        <div style="font-size: 2rem;">➡️</div>
+                        SIGUIENTE MÓDULO
+                    </button>` : ''}
+                `;
+            } else {
+                actionButtons.innerHTML = `
+                    <button class="action-btn btn-test" onclick="takeQuiz()">
+                        <div style="font-size: 2rem;">⚡</div>
+                        PROBAR CONOCIMIENTO
+                    </button>
+                    <button class="action-btn btn-forge" onclick="forgeWeapon()">
+                        <div style="font-size: 2rem;">🔨</div>
+                        FORJAR ARMA
+                    </button>
+                `;
+            }
+            
+            // Ocultar otros elementos
+            document.getElementById('quiz-container').style.display = 'none';
+            document.getElementById('weapon-display').style.display = 'none';
+            document.getElementById('victory-screen').style.display = 'none';
+            
+            // Actualizar lista de módulos
+            renderModuleList();
+            updateProgress();
+            
+            // Verificar victoria
+            if (masteredModules.size === legalModules.length) {
+                showVictoryScreen();
+            }
+        }
+
+        // ==================== TOMAR CUESTIONARIO ====================
+        function takeQuiz() {
+            const module = legalModules[currentModuleIndex];
+            quizActive = true;
+            
+            const quizContainer = document.getElementById('quiz-container');
+            quizContainer.innerHTML = `
+                <div class="quiz-question">${module.quiz.question}</div>
+                <div class="quiz-options">
+                    ${module.quiz.options.map((option, i) => `
+                        <div class="quiz-option" onclick="checkAnswer(${i}, ${option.correct})">
+                            ${option.text}
+                        </div>
+                    `).join('')}
+                </div>
+                <div id="quiz-feedback" class="feedback" style="display: none;"></div>
+            `;
+            
+            quizContainer.style.display = 'block';
+            document.getElementById('weapon-display').style.display = 'none';
+        }
+
+        // ==================== VERIFICAR RESPUESTA ====================
+        function checkAnswer(optionIndex, isCorrect) {
+            const options = document.querySelectorAll('.quiz-option');
+            const feedback = document.getElementById('quiz-feedback');
+            const module = legalModules[currentModuleIndex];
+            
+            // Reiniciar todas las opciones
+            options.forEach(opt => {
+                opt.classList.remove('correct', 'wrong');
+            });
+            
+            // Marcar opción seleccionada
+            options[optionIndex].classList.add(isCorrect ? 'correct' : 'wrong');
+            
+            // Mostrar retroalimentación
+            feedback.textContent = isCorrect ? module.quiz.correctFeedback : module.quiz.wrongFeedback;
+            feedback.className = `feedback ${isCorrect ? 'correct' : 'wrong'}`;
+            feedback.style.display = 'block';
+            
+            // Si es correcta, desbloquear siguiente módulo y marcar como dominado
+            if (isCorrect) {
+                quizActive = false;
+                masteredModules.add(module.id);
+                
+                // Desbloquear siguiente módulo si existe
+                if (currentModuleIndex < legalModules.length - 1) {
+                    unlockedModules.add(legalModules[currentModuleIndex + 1].id);
+                }
+                
+                // Actualizar UI después de un retraso
+                setTimeout(() => {
+                    loadModule(currentModuleIndex);
+                    updateProgress();
+                }, 2000);
+            }
+        }
+
+        // ==================== FORJAR ARMA ====================
+        function forgeWeapon() {
+            const module = legalModules[currentModuleIndex];
+            currentWeapon = module.weapon;
+            
+            const weaponDisplay = document.getElementById('weapon-display');
+            weaponDisplay.innerHTML = `
+                <div class="weapon-header">
+                    <div class="weapon-icon">${module.weapon.icon}</div>
+                    <div class="weapon-title">${module.weapon.name}</div>
+                </div>
+                <div class="law-box">${module.weapon.template}</div>
+                <div style="margin-top: 30px; display: flex; gap: 20px;">
+                    <button class="action-btn btn-download" onclick="downloadWeapon()">
+                        <div style="font-size: 2rem;">📥</div>
+                        DESCARGAR ARMA
+                    </button>
+                    <button class="action-btn btn-test" onclick="customizeWeapon()" style="background: linear-gradient(145deg, #9b59b6, #8e44ad);">
+                        <div style="font-size: 2rem;">✏️</div>
+                        PERSONALIZAR
+                    </button>
+                </div>
+            `;
+            
+            weaponDisplay.style.display = 'block';
+            document.getElementById('quiz-container').style.display = 'none';
+        }
+
+        // ==================== DESCARGAR ARMA ====================
+        function downloadWeapon() {
+            if (!currentWeapon) return;
+            
+            const blob = new Blob([currentWeapon.template], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `ARMA_LEGAL_${currentWeapon.name.replace(/\s+/g, '_')}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            alert(`⚡ ARMA DESCARGADA: ${a.download}`);
+        }
+
+        // ==================== PERSONALIZAR ARMA ====================
+        function customizeWeapon() {
+            const newTemplate = prompt("Personalice su plantilla de arma. Use [CORCHETES] para marcadores de posición:", currentWeapon.template);
+            if (newTemplate) {
+                currentWeapon.template = newTemplate;
+                forgeWeapon();
+                alert("¡Arma personalizada! Lista para despliegue.");
+            }
+        }
+
+        // ==================== SIGUIENTE MÓDULO ====================
+        function nextModule() {
+            if (currentModuleIndex < legalModules.length - 1) {
+                currentModuleIndex++;
+                loadModule(currentModuleIndex);
+            }
+        }
+
+        // ==================== MOSTRAR PANTALLA DE VICTORIA ====================
+        function showVictoryScreen() {
+            document.getElementById('content-display').style.display = 'none';
+            document.getElementById('action-buttons').style.display = 'none';
+            document.getElementById('victory-screen').style.display = 'block';
+        }
+
+        // ==================== ACTUALIZAR PROGRESO ====================
+        function updateProgress() {
+            const progress = (masteredModules.size / legalModules.length) * 100;
+            document.getElementById('progress-fill').style.width = `${progress}%`;
+            document.getElementById('progress-percent').textContent = `${Math.round(progress)}%`;
+        }
+
+        // ==================== DESCARGAR ARSENAL COMPLETO ====================
+        document.getElementById('download-arsenal').addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            let arsenal = `DESTRUCTOR DE CASOS JUDICIALES - ARSENAL LEGAL COMPLETO\n`;
+            arsenal += `Generado: ${new Date().toLocaleString('es-CO')}\n`;
+            arsenal += `Armas dominadas: ${masteredModules.size}/${legalModules.length}\n`;
+            arsenal += `═══════════════════════════════════════════\n\n`;
+            
+            legalModules.forEach(module => {
+                if (masteredModules.has(module.id)) {
+                    arsenal += `⚡ ARMA: ${module.weapon.name}\n`;
+                    arsenal += `📚 MÓDULO: ${module.title}\n`;
+                    arsenal += `💪 PODER: ${module.weapon.power || 'Alta Potencia'}\n`;
+                    arsenal += `───────────────────────────────────────\n`;
+                    arsenal += module.weapon.template + '\n\n';
+                    arsenal += `═══════════════════════════════════════════\n\n`;
+                }
+            });
+            
+            // Agregar protocolo de ejecución
+            arsenal += `🚀 PROTOCOLO DE EJECUCIÓN COMPLETO\n`;
+            arsenal += `───────────────────────────────────────\n`;
+            arsenal += `FASE 1: Creación de Pruebas (Días 1-10)\n`;
+            arsenal += `FASE 2: Asalto Administrativo (Días 11-25)\n`;
+            arsenal += `FASE 3: Neutralización Judicial (Días 26-40)\n`;
+            arsenal += `FASE 4: Recuperación Total (Días 41-60)\n\n`;
+            arsenal += `COMANDO TÁCTICO: Sature. Documente. Escale.\n`;
+            
+            const blob = new Blob([arsenal], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'ARSENAL_LEGAL_COMPLETO_COLOMBIA.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            alert('🎉 ¡ARSENAL COMPLETO DESCARGADO! Ahora posee todas las armas legales.');
+        });
+
+        // ==================== INICIAR APLICACIÓN ====================
+        window.onload = initializeApp;
+    </script>
+</body>
+</html>
