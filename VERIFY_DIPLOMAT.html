@@ -941,22 +941,65 @@
             }
         }
 
-        // Enviar datos a Google Sheets
-        async function enviarGoogleSheets(datos) {
-            // URL de tu Google Apps Script Web App
-            const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwT6Uv_e4bu092ajtEkbqcpdgywX23KLiU-W8wGSrKFy86b4Xktk0uK3ClXQWovoLz3/exec';
-            
-            const respuesta = await fetch(SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors', // Importante para evitar problemas CORS
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(datos)
-            });
-            
-            return respuesta;
+        // Enviar datos a Google Sheets - FIXED VERSION
+async function enviarGoogleSheets(datos) {
+    console.log('📤 Sending data to Google Sheets:', datos);
+    
+    try {
+        // Send as JSON instead of FormData
+        const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(datos),
+            // Remove mode: 'no-cors' - we need to see the response
+        });
+        
+        console.log('📥 Response received:', response);
+        
+        // Try to read the response if we can
+        if (response.ok) {
+            const responseData = await response.text();
+            console.log('✅ Response data:', responseData);
+            return JSON.parse(responseData);
+        } else {
+            console.error('❌ Response not OK:', response.status);
+            return { success: false, error: 'HTTP ' + response.status };
         }
+        
+    } catch (error) {
+        console.error('❌ Fetch error:', error);
+        // Fallback: try with a different approach
+        return await enviarGoogleSheetsFallback(datos);
+    }
+}
+
+// Fallback method using form submission
+async function enviarGoogleSheetsFallback(datos) {
+    console.log('🔄 Trying fallback method');
+    
+    // Create a hidden form
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = GOOGLE_APPS_SCRIPT_URL;
+    form.style.display = 'none';
+    
+    // Add all data as hidden inputs
+    Object.keys(datos).forEach(key => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = key;
+        input.value = datos[key];
+        form.appendChild(input);
+    });
+    
+    // Add the form to the page and submit it
+    document.body.appendChild(form);
+    form.submit();
+    
+    return { success: true, message: 'Form submitted' };
+}
 
         // Efecto de escritura en tiempo real
         function efectoEscritura() {
