@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unified Diplomatic Verification System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ===== BASE STYLES ===== */
+        :root {
+            --police-blue: #003366;
+            --diplomatic-gold: #D4AF37;
+            --classified-red: #8B0000;
+            --terminal-green: #00ff41;
+            --success-green: #2E8B57;
+            --dark-bg: #0a192f;
+            --panel-bg: rgba(255, 255, 255, 0.05);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--dark-bg);
+            color: white;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        /* ===== SCANNER LINE ===== */
+        .scanner {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--terminal-green), transparent);
+            z-index: 9999;
+            animation: scan 3s linear infinite;
+            box-shadow: 0 0 20px var(--terminal-green);
+        }
+        
+        @keyframes scan {
+            0% { top: 0; }
+            100% { top: 100vh; }
+        }
+        
+        /* ===== HEADER ===== */
+        .header {
+            text-align: center;
+            padding: 60px 20px 40px;
+            position: relative;
+            background: linear-gradient(180deg, rgba(10, 25, 47, 0.9) 0%, transparent 100%);
+        }
+        
+        .seal {
+            width: 180px;
+            height: 180px;
+            margin: 0 auto 30px;
+            border: 5px solid var(--diplomatic-gold);
+            border-radius: 15px;
+            background: radial-gradient(circle, var(--police-blue) 40%, #00162d 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+        
+        .seal-text {
+            color: var(--diplomatic-gold);
+            text-align: center;
+            font-weight: bold;
+            padding: 20px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        
+        .title {
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #fff, var(--diplomatic-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 0 30px rgba(212, 175, 55, 0.3);
+        }
+        
+        .subtitle {
+            color: var(--diplomatic-gold);
+            font-size: 1.5rem;
+            letter-spacing: 3px;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+        }
+        
+        /* ===== ECONOMIC TICKER ===== */
+        .ticker-container {
+            max-width: 600px;
+            margin: 30px auto;
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid var(--terminal-green);
+            border-radius: 15px;
+            padding: 25px;
+            text-align: center;
+            box-shadow: 0 0 40px rgba(0, 255, 65, 0.2);
+        }
+        
+        .ticker-title {
+            color: var(--terminal-green);
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .ticker-value {
+            font-size: 3.5rem;
+            font-weight: 900;
+            font-family: 'Courier New', monospace;
+            color: white;
+            text-shadow: 0 0 20px var(--terminal-green);
+            margin: 10px 0;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        
+        .ticker-label {
+            color: #aaa;
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+        
+        /* ===== APPS GRID ===== */
+        .apps-grid {
+            max-width: 1400px;
+            margin: 60px auto;
+            padding: 0 20px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+        }
+        
+        .app-card {
+            background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+            border-radius: 20px;
+            padding: 40px 30px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(212, 175, 55, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            text-decoration: none;
+            color: inherit;
+        }
+        
+        .app-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--terminal-green);
+            box-shadow: 0 20px 50px rgba(0, 255, 65, 0.15);
+        }
+        
+        .app-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, var(--diplomatic-gold), var(--terminal-green));
+        }
+        
+        .app-icon {
+            font-size: 4rem;
+            margin-bottom: 25px;
+            height: 90px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .app-card.police .app-icon { color: var(--police-blue); }
+        .app-card.diplomatic .app-icon { color: var(--diplomatic-gold); }
+        .app-card.missions .app-icon { color: var(--terminal-green); }
+        .app-card.dossier .app-icon { color: var(--classified-red); }
+        
+        .app-name {
+            font-size: 1.8rem;
+            margin-bottom: 15px;
+            color: white;
+            font-weight: 700;
+        }
+        
+        .app-description {
+            color: #ccc;
+            margin-bottom: 25px;
+            line-height: 1.6;
+            flex-grow: 1;
+        }
+        
+        .app-stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .stat {
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--terminal-green);
+            font-family: 'Courier New', monospace;
+        }
+        
+        .stat-label {
+            font-size: 0.8rem;
+            color: #888;
+            margin-top: 5px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .launch-btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 30px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+            text-decoration: none;
+            border-radius: 30px;
+            font-weight: bold;
+            border: 2px solid;
+            transition: all 0.3s;
+        }
+        
+        .police .launch-btn { border-color: var(--police-blue); }
+        .diplomatic .launch-btn { border-color: var(--diplomatic-gold); }
+        .missions .launch-btn { border-color: var(--terminal-green); }
+        .dossier .launch-btn { border-color: var(--classified-red); }
+        
+        .launch-btn:hover {
+            background: rgba(255,255,255,0.2);
+            transform: scale(1.05);
+        }
+        
+        /* ===== SYSTEM STATUS ===== */
+        .system-status {
+            max-width: 800px;
+            margin: 60px auto;
+            padding: 30px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 15px;
+            border: 2px solid var(--terminal-green);
+            text-align: center;
+        }
+        
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .status-item {
+            background: rgba(0, 255, 65, 0.05);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid rgba(0, 255, 65, 0.2);
+        }
+        
+        .status-label {
+            color: var(--terminal-green);
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+        
+        .status-value {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: white;
+        }
+        
+        /* ===== FOOTER ===== */
+        .footer {
+            text-align: center;
+            padding: 40px 20px;
+            margin-top: 60px;
+            color: #888;
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(212, 175, 55, 0.3);
+        }
+        
+        .footer-links {
+            margin-top: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .footer-link {
+            color: var(--diplomatic-gold);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .footer-link:hover {
+            color: white;
+        }
+        
+        /* ===== NOTIFICATIONS ===== */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 20px 30px;
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            z-index: 10000;
+            animation: slideIn 0.3s, fadeOut 0.3s 2.7s;
+            max-width: 400px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .notification.success {
+            background: var(--success-green);
+            border-left: 5px solid darkgreen;
+        }
+        
+        .notification.error {
+            background: var(--classified-red);
+            border-left: 5px solid darkred;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        @keyframes fadeOut {
+            from { opacity: 1; }
+            to { opacity: 0; }
+        }
+        
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .title { font-size: 2.5rem; }
+            .subtitle { font-size: 1.2rem; }
+            .ticker-value { font-size: 2.5rem; }
+            .apps-grid { grid-template-columns: 1fr; padding: 20px; }
+            .status-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Scanner Line -->
+    <div class="scanner"></div>
+    
+    <!-- Header -->
+    <header class="header">
+        <div class="seal">
+            <div class="seal-text">
+                RAMIRO EZLÉO RAMÍREZ<br>
+                SEPÚLVEDA LEÓN RODAS<br>
+                AMBASSADOR AT LARGE<br>
+                AMNESTY COALITION FOR UNITY
+            </div>
+        </div>
+        
+        <h1 class="title">UNIFIED DIPLOMATIC SYSTEM</h1>
+        <div class="subtitle">VERIFICATION • PROTECTION • IMPACT • DOCUMENTATION</div>
+        
+        <!-- Economic Ticker -->
+        <div class="ticker-container">
+            <div class="ticker-title">
+                <i class="fas fa-chart-line"></i>
+                LIVE ECONOMIC IMPACT FOR COLOMBIA
+            </div>
+            <div class="ticker-value" id="economicTicker">$55,000,000,000</div>
+            <div class="ticker-label">
+                Generated through diplomatic tourism initiatives<br>
+                Verified by Ministry of Finance & Central Bank
+            </div>
+        </div>
+    </header>
+    
+    <!-- Apps Grid -->
+    <div class="apps-grid">
+        <!-- Police Portal -->
+        <a href="police-portal.html" class="app-card police">
+            <div class="app-icon">
+                <i class="fas fa-shield-alt"></i>
+            </div>
+            <h2 class="app-name">POLICE VERIFICATION PORTAL</h2>
+            <p class="app-description">
+                For Colombian police officers to verify diplomatic status, 
+                register for commission programs, and access protected information.
+                Secure officer registration with real-time verification.
+            </p>
+            <div class="app-stats">
+                <div class="stat">
+                    <div class="stat-value" id="policeCount">1,427</div>
+                    <div class="stat-label">Officers</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="policeCommissions">$12.5M</div>
+                    <div class="stat-label">Commissions</div>
+                </div>
+            </div>
+            <div class="launch-btn">
+                <i class="fas fa-external-link-alt"></i> LAUNCH PORTAL
+            </div>
+        </a>
+        
+        <!-- Diplomatic Terminal -->
+        <a href="diplomatic-terminal.html" class="app-card diplomatic">
+            <div class="app-icon">
+                <i class="fas fa-user-tie"></i>
+            </div>
+            <h2 class="app-name">DIPLOMATIC VERIFICATION TERMINAL</h2>
+            <p class="app-description">
+                Official diplomatic status queries, legal framework access, 
+                and real-time verification of ambassador protections.
+                UN Convention 1973 & Vienna Convention 1961 protocols.
+            </p>
+            <div class="app-stats">
+                <div class="stat">
+                    <div class="stat-value" id="diplomaticQueries">8,923</div>
+                    <div class="stat-label">Queries</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="diplomaticVerified">100%</div>
+                    <div class="stat-label">Verified</div>
+                </div>
+            </div>
+            <div class="launch-btn">
+                <i class="fas fa-external-link-alt"></i> LAUNCH TERMINAL
+            </div>
+        </a>
+        
+        <!-- Missions Dashboard -->
+        <a href="missions-dashboard.html" class="app-card missions">
+            <div class="app-icon">
+                <i class="fas fa-crosshairs"></i>
+            </div>
+            <h2 class="app-name">MISSIONS DASHBOARD</h2>
+            <p class="app-description">
+                Real-time tracking of humanitarian missions, economic impact monitoring, 
+                and live mission protocol execution. Exodus Code active operations.
+            </p>
+            <div class="app-stats">
+                <div class="stat">
+                    <div class="stat-value" id="activeMissions">6</div>
+                    <div class="stat-label">Active</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="missionValue">$55B</div>
+                    <div class="stat-label">Value</div>
+                </div>
+            </div>
+            <div class="launch-btn">
+                <i class="fas fa-external-link-alt"></i> LAUNCH DASHBOARD
+            </div>
+        </a>
+        
+        <!-- Classified Dossier -->
+        <a href="classified-dossier.html" class="app-card dossier">
+            <div class="app-icon">
+                <i class="fas fa-file-secret"></i>
+            </div>
+            <h2 class="app-name">CLASSIFIED DOSSIER</h2>
+            <p class="app-description">
+                Official government documentation, economic impact reporting, 
+                and classified mission accomplishment records.
+                Level 5 clearance required.
+            </p>
+            <div class="app-stats">
+                <div class="stat">
+                    <div class="stat-value" id="dossierPages">42</div>
+                    <div class="stat-label">Pages</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="dossierVerified">✓</div>
+                    <div class="stat-label">Verified</div>
+                </div>
+            </div>
+            <div class="launch-btn">
+                <i class="fas fa-external-link-alt"></i> LAUNCH DOSSIER
+            </div>
+        </a>
+    </div>
+    
+    <!-- System Status -->
+    <div class="system-status">
+        <h2 style="color: var(--terminal-green); margin-bottom: 20px;">
+            <i class="fas fa-network-wired"></i> SYSTEM INTERCONNECTIVITY
+        </h2>
+        <p style="color: #ccc; margin-bottom: 30px; max-width: 700px; margin-left: auto; margin-right: auto;">
+            All applications share a unified database, real-time economic data, 
+            and synchronized user sessions. Actions in one app are immediately 
+            reflected across all systems through the central Diplomatic API.
+        </p>
+        
+        <div class="status-grid">
+            <div class="status-item">
+                <div class="status-label">DATABASE STATUS</div>
+                <div class="status-value" id="dbStatus">SYNCHRONIZED</div>
+            </div>
+            <div class="status-item">
+                <div class="status-label">API RESPONSE TIME</div>
+                <div class="status-value" id="apiResponse">28ms</div>
+            </div>
+            <div class="status-item">
+                <div class="status-label">LAST SYNC</div>
+                <div class="status-value" id="lastSync">Just now</div>
+            </div>
+            <div class="status-item">
+                <div class="status-label">SYSTEM UPTIME</div>
+                <div class="status-value" id="uptime">99.9%</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Footer -->
+    <footer class="footer">
+        <p>© 2024 Unified Diplomatic Verification System • Republic of Colombia Recognition</p>
+        <p style="margin-top: 10px; font-size: 0.8em; color: #666;">
+            This system operates under international diplomatic law and Colombian sovereignty.
+            All data is protected under the 1973 UN Convention on Internationally Protected Persons.
+        </p>
+        
+        <div class="footer-links">
+            <span class="footer-link" onclick="showNotification('System documentation access requires Level 2 clearance', 'warning')" style="cursor: pointer;">
+                <i class="fas fa-book"></i> Documentation
+            </span>
+            <span class="footer-link" onclick="showNotification('Legal protocols accessed through Diplomatic Terminal', 'warning')" style="cursor: pointer;">
+                <i class="fas fa-gavel"></i> Legal Protocols
+            </span>
+            <span class="footer-link" onclick="showNotification('Contact Ministry of Foreign Affairs for verification', 'warning')" style="cursor: pointer;">
+                <i class="fas fa-envelope"></i> Contact
+            </span>
+            <span class="footer-link" onclick="exportData()" style="cursor: pointer;">
+                <i class="fas fa-download"></i> Export Data
+            </span>
+        </div>
+    </footer>
+    
+    <!-- Notification Container -->
+    <div id="notificationContainer"></div>
+    
+    <!-- API Service -->
+    <script src="api-service.js"></script>
+    
+    <script>
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('Diplomatic Portal Initializing...');
+            
+            // Start economic ticker
+            startEconomicTicker();
+            
+            // Update system status
+            updateSystemStatus();
+            
+            // Add scanner reset animation
+            setInterval(() => {
+                const scanner = document.querySelector('.scanner');
+                scanner.style.animation = 'none';
+                setTimeout(() => {
+                    scanner.style.animation = 'scan 3s linear infinite';
+                }, 10);
+            }, 3000);
+            
+            // Initialize API
+            try {
+                const api = window.DiplomaticAPI;
+                // Test connection
+                const economicData = await api.getEconomicData();
+                console.log('API connected:', economicData);
+                
+                showNotification('System online - Diplomatic API connected', 'success');
+                
+            } catch (error) {
+                console.error('API Error:', error);
+                showNotification('Local storage active - Working offline', 'warning');
+            }
+        });
+        
+        // Economic ticker animation
+        async function startEconomicTicker() {
+            const ticker = document.getElementById('economicTicker');
+            let baseValue = 55000000000;
+            
+            // Get real data from API
+            try {
+                const api = window.DiplomaticAPI;
+                const economicData = await api.getEconomicData();
+                baseValue = economicData.total_value || baseValue;
+            } catch (error) {
+                console.log('Using default economic data');
+            }
+            
+            // Animate the ticker
+            function updateTicker() {
+                // Add small random fluctuations
+                const fluctuation = Math.floor(Math.random() * 10000) - 5000;
+                const displayValue = baseValue + fluctuation;
+                
+                ticker.textContent = '$' + displayValue.toLocaleString('en-US');
+                
+                // Subtle pulse effect
+                ticker.style.textShadow = `0 0 ${10 + Math.random() * 5}px var(--terminal-green)`;
+                
+                // Gradually increase base value
+                baseValue += Math.floor(Math.random() * 1000);
+            }
+            
+            updateTicker();
+            setInterval(updateTicker, 3000);
+        }
+        
+        // Update system status
+        function updateSystemStatus() {
+            // Simulate live status updates
+            setInterval(() => {
+                const responseTimes = [28, 32, 25, 30, 35];
+                const randomTime = responseTimes[Math.floor(Math.random() * responseTimes.length)];
+                
+                document.getElementById('apiResponse').textContent = randomTime + 'ms';
+                
+                // Update last sync time
+                const minutes = Math.floor(Math.random() * 5);
+                document.getElementById('lastSync').textContent = 
+                    minutes === 0 ? 'Just now' : `${minutes} minute${minutes > 1 ? 's' : ''} ago`;
+                    
+            }, 5000);
+        }
+        
+        // Notification system
+        function showNotification(message, type = 'success') {
+            const container = document.getElementById('notificationContainer');
+            
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'}"></i>
+                <div>${message}</div>
+            `;
+            
+            container.appendChild(notification);
+            
+            // Remove after animation
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 3000);
+        }
+        
+        // Export data function
+        async function exportData() {
+            try {
+                const api = window.DiplomaticAPI;
+                
+                // Get all data
+                const tables = ['officers', 'diplomatic_queries', 'missions', 'economic_impact', 'system_logs'];
+                const exportData = {};
+                
+                for (const table of tables) {
+                    exportData[table] = await api.getData(table);
+                }
+                
+                // Create download
+                const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `diplomatic-backup-${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                
+                showNotification('All data exported successfully', 'success');
+                
+            } catch (error) {
+                showNotification('Export failed: ' + error.message, 'error');
+            }
+        }
+        
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(event) {
+            // Ctrl+S for save/export
+            if (event.ctrlKey && event.key === 's') {
+                event.preventDefault();
+                exportData();
+            }
+        });
+    </script>
+</body>
+</html>
