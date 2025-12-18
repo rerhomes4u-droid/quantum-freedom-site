@@ -21,282 +21,7 @@
             box-sizing: border-box;
             font-family: 'Georgia', serif;
         }
-        <script>
-// Configuration
-const CONFIG = {
-    API_URL: 'YOUR_GOOGLE_APPS_SCRIPT_WEBAPP_URL', // Replace after deployment
-    STORE_CODE: 'AYNI_SALENTO',
-    TRIPS_ECOSYSTEM_URL: 'https://tripstocolombia.com/api/stores/'
-};
-
-// Load Products Dynamically
-async function loadProducts() {
-    try {
-        const response = await fetch(`${CONFIG.API_URL}?action=getProducts`);
-        const data = await response.json();
         
-        if (data.products && data.products.length > 0) {
-            renderProducts(data.products);
-            updateWhatsAppNumbers(data.whatsapp);
-        }
-    } catch (error) {
-        console.log('Using static products as fallback');
-        // Fallback to static products
-    }
-}
-
-// Render Products from Sheet Data
-function renderProducts(products) {
-    const grid = document.querySelector('.products-grid');
-    if (!grid) return;
-    
-    grid.innerHTML = products.map(product => `
-        <div class="product-card" data-id="${product.ID}">
-            <div class="product-image" style="background: linear-gradient(135deg, #DEB887, #2E8B57);">
-                <img src="${product.Image_URL || 'https://via.placeholder.com/350x250?text=Medicina+de+la+Tierra'}" 
-                     alt="${product.Name}" 
-                     style="width: 100%; height: 100%; object-fit: cover;">
-                <div class="product-badge">${product.Category || 'SABIDURÍA ANCESTRAL'}</div>
-            </div>
-            <div class="product-content">
-                <div class="product-header">
-                    <div class="product-icon">${getProductIcon(product.Category)}</div>
-                    <div class="product-info">
-                        <h3>${product.Name}</h3>
-                        <div class="product-origin">${product.Origin || 'Corazón de Colombia'}</div>
-                    </div>
-                </div>
-                <div class="product-description">${product.Description}</div>
-                
-                ${product.Benefits ? `
-                <div class="product-benefits">
-                    <div class="benefits-title">Beneficios Ancestrales:</div>
-                    <div class="benefits-list">${formatBenefits(product.Benefits)}</div>
-                </div>` : ''}
-                
-                <div class="product-actions">
-                    <div>
-                        <div class="product-price">${formatPrice(product.Price_COP)}</div>
-                        <div class="price-note">
-                            ${product.Unit || 'Unidad'} • 
-                            ${product.Stock > 0 ? `Stock: ${product.Stock}` : 'Stock limitado'}
-                            ${product.Community_Impact ? `<br><small style="color: var(--forest);">${product.Community_Impact}</small>` : ''}
-                        </div>
-                    </div>
-                    <button class="purchase-btn" onclick="addToCart('${product.ID}', '${product.Name}', ${product.Price_COP})">
-                        Agregar al Ritual
-                    </button>
-                </div>
-            </div>
-        </div>
-    `).join('');
-}
-
-// Shopping Cart Functionality
-let cart = [];
-
-function addToCart(id, name, price) {
-    const existing = cart.find(item => item.id === id);
-    
-    if (existing) {
-        existing.quantity++;
-    } else {
-        cart.push({
-            id: id,
-            name: name,
-            price: price,
-            quantity: 1
-        });
-    }
-    
-    updateCartUI();
-    showNotification(`${name} agregado al ritual`);
-}
-
-function updateCartUI() {
-    const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
-    const cartTotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    
-    // Update cart indicator (you can add this element to your HTML)
-    const cartIndicator = document.getElementById('cart-indicator') || createCartIndicator();
-    cartIndicator.innerHTML = `🛒 Ritual (${cartCount}) - ${formatPrice(cartTotal)}`;
-}
-
-function createCartIndicator() {
-    const indicator = document.createElement('div');
-    indicator.id = 'cart-indicator';
-    indicator.style.cssText = `
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        background: var(--forest);
-        color: white;
-        padding: 15px 25px;
-        border-radius: 50px;
-        cursor: pointer;
-        z-index: 1000;
-        box-shadow: 0 5px 20px rgba(0,0,0,0.3);
-        font-weight: bold;
-    `;
-    indicator.onclick = showCartModal;
-    document.body.appendChild(indicator);
-    return indicator;
-}
-
-function showCartModal() {
-    const modal = document.createElement('div');
-    modal.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.8);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 2000;
-    `;
-    
-    modal.innerHTML = `
-        <div style="background: white; border-radius: 20px; padding: 30px; max-width: 500px; width: 90%;">
-            <h3 style="color: var(--earth); margin-bottom: 20px;">Tu Ritual de Sanación</h3>
-            ${cart.length === 0 ? 
-                '<p>Tu ritual está vacío. Agrega medicina de la tierra.</p>' : 
-                cart.map(item => `
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #eee;">
-                        <span>${item.name} × ${item.quantity}</span>
-                        <span>${formatPrice(item.price * item.quantity)}</span>
-                    </div>
-                `).join('')
-            }
-            ${cart.length > 0 ? `
-                <div style="font-weight: bold; margin-top: 20px; padding-top: 20px; border-top: 2px solid var(--earth);">
-                    Total: ${formatPrice(cart.reduce((sum, item) => sum + (item.price * item.quantity), 0))}
-                </div>
-                <div style="display: flex; gap: 10px; margin-top: 30px;">
-                    <button onclick="closeCart()" style="flex:1; padding: 12px; background: #ccc; border: none; border-radius: 10px;">Seguir Explorando</button>
-                    <button onclick="checkout()" style="flex:1; padding: 12px; background: var(--forest); color: white; border: none; border-radius: 10px;">Completar Ritual</button>
-                </div>
-            ` : ''}
-            <button onclick="closeCart()" style="position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 20px; cursor: pointer;">×</button>
-        </div>
-    `;
-    
-    document.body.appendChild(modal);
-}
-
-function closeCart() {
-    document.querySelector('div[style*="position: fixed; top: 0"]')?.remove();
-}
-
-function checkout() {
-    const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    const productList = cart.map(item => `${item.name} (${item.quantity}x)`).join(', ');
-    
-    const whatsappMessage = `Hola AYNI SANTUARIO! Quiero hacer este pedido:%0A%0A${productList}%0A%0ATotal: ${formatPrice(total)}%0A%0AMi nombre: [TU NOMBRE]%0ADirección: [TU DIRECCIÓN]`;
-    const whatsappURL = `https://wa.me/573226921775?text=${whatsappMessage}`;
-    
-    window.open(whatsappURL, '_blank');
-    closeCart();
-    cart = [];
-    updateCartUI();
-}
-
-// Utility Functions
-function formatPrice(price) {
-    return '$' + parseInt(price).toLocaleString('es-CO') + ' COP';
-}
-
-function formatBenefits(benefits) {
-    if (!benefits) return '';
-    return benefits.split(',').map(b => `• ${b.trim()}`).join('<br>');
-}
-
-function getProductIcon(category) {
-    const icons = {
-        'aceite': '⚫',
-        'hongos': '🍄',
-        'aromaterapia': '🌿',
-        'miel': '🐝',
-        'pomada': '🔥',
-        'default': '🌱'
-    };
-    return icons[category?.toLowerCase()] || icons.default;
-}
-
-function showNotification(message) {
-    const notification = document.createElement('div');
-    notification.textContent = message;
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: var(--forest);
-        color: white;
-        padding: 15px 25px;
-        border-radius: 10px;
-        z-index: 3000;
-        animation: slideIn 0.3s ease;
-    `;
-    
-    document.body.appendChild(notification);
-    
-    setTimeout(() => {
-        notification.style.animation = 'slideOut 0.3s ease';
-        setTimeout(() => notification.remove(), 300);
-    }, 3000);
-}
-
-// Add animation styles
-const style = document.createElement('style');
-style.textContent = `
-    @keyframes slideIn {
-        from { transform: translateX(100%); opacity: 0; }
-        to { transform: translateX(0); opacity: 1; }
-    }
-    @keyframes slideOut {
-        from { transform: translateX(0); opacity: 1; }
-        to { transform: translateX(100%); opacity: 0; }
-    }
-`;
-document.head.appendChild(style);
-
-// Initialize when page loads
-document.addEventListener('DOMContentLoaded', () => {
-    loadProducts();
-    
-    // Add store code to all external links
-    document.querySelectorAll('a[href*="tripstocolombia.com"]').forEach(link => {
-        const url = new URL(link.href);
-        url.searchParams.set('store', CONFIG.STORE_CODE);
-        link.href = url.toString();
-    });
-});
-
-// Multi-store integration
-async function connectToEcosystem() {
-    try {
-        const response = await fetch(`${CONFIG.TRIPS_ECOSYSTEM_URL}${CONFIG.STORE_CODE}`);
-        const ecosystem = await response.json();
-        
-        // Update stats with live data
-        if (ecosystem.stats) {
-            document.querySelectorAll('.sanctuary-stat').forEach((stat, index) => {
-                const labels = ['Productos', 'Comunidades', 'Orgánico', 'Impacto'];
-                if (stat.querySelector('.stat-label').textContent.includes(labels[index])) {
-                    const value = Object.values(ecosystem.stats)[index];
-                    if (value) {
-                        stat.querySelector('.stat-number').textContent = value;
-                    }
-                }
-            });
-        }
-    } catch (error) {
-        console.log('Ecosystem connection optional');
-    }
-}
-</script>
         body {
             background: linear-gradient(135deg, var(--earth), var(--forest));
             color: #333;
@@ -467,9 +192,19 @@ async function connectToEcosystem() {
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 4rem;
-            color: white;
             position: relative;
+            overflow: hidden;
+        }
+        
+        .product-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        
+        .product-card:hover .product-image img {
+            transform: scale(1.05);
         }
         
         .product-badge {
@@ -482,6 +217,7 @@ async function connectToEcosystem() {
             border-radius: 15px;
             font-size: 0.8rem;
             font-weight: bold;
+            z-index: 2;
         }
         
         .product-content {
@@ -577,6 +313,56 @@ async function connectToEcosystem() {
         .purchase-btn:hover {
             background: var(--earth);
             transform: translateY(-2px);
+        }
+        
+        .whatsapp-section {
+            background: linear-gradient(135deg, #25D366, #128C7E);
+            border-radius: 20px;
+            padding: 40px;
+            margin: 40px 0;
+            text-align: center;
+            color: white;
+        }
+        
+        .whatsapp-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        
+        .whatsapp-btn {
+            padding: 20px 30px;
+            border-radius: 15px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: all 0.3s ease;
+            min-width: 250px;
+        }
+        
+        .orders-btn {
+            background: white;
+            color: #25D366;
+        }
+        
+        .alliances-btn {
+            background: var(--sun);
+            color: var(--earth);
+        }
+        
+        .whatsapp-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+        
+        .whatsapp-btn small {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin-top: 5px;
         }
         
         .impact-section {
@@ -842,6 +628,21 @@ async function connectToEcosystem() {
             text-decoration: underline;
         }
         
+        #cart-indicator {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--forest);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 50px;
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            font-weight: bold;
+            display: none;
+        }
+        
         @media (max-width: 768px) {
             .products-grid {
                 grid-template-columns: 1fr;
@@ -860,6 +661,10 @@ async function connectToEcosystem() {
             .main-title {
                 font-size: 2.2rem;
             }
+            
+            .whatsapp-buttons {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
@@ -872,7 +677,7 @@ async function connectToEcosystem() {
             
             <div class="sanctuary-stats">
                 <div class="sanctuary-stat">
-                    <div class="stat-number">15+</div>
+                    <div class="stat-number">9</div>
                     <div class="stat-label">Productos de la Tierra</div>
                 </div>
                 <div class="sanctuary-stat">
@@ -909,137 +714,183 @@ async function connectToEcosystem() {
             <h2 class="section-title" id="products">Medicina de la Tierra</h2>
             
             <div class="products-grid">
+                <!-- Product 1: Fitoyara Spray & Macadamia Oil -->
                 <div class="product-card">
                     <div class="product-image">
-                        <div>🪔</div>
-                        <div class="product-badge">BOTIQUÍN COMPLETO</div>
+                        <img src="https://drive.google.com/thumbnail?id=1BE3SOOeqjkUZ5zoph4RTyxI0_AsF5-r9&sz=w800" 
+                             alt="Fitoyara Spray & Aceite de Macadamia">
+                        <div class="product-badge">FRESCURA & HIDRATACIÓN</div>
                     </div>
                     <div class="product-content">
                         <div class="product-header">
-                            <div class="product-icon">⚫</div>
+                            <div class="product-icon">💨</div>
                             <div class="product-info">
-                                <h3>Aceite de Comino Negro</h3>
-                                <div class="product-origin">"El Aceite de Cleopatra"</div>
+                                <h3>Fitoyara + Aceite de Macadamia</h3>
+                                <div class="product-origin">"Frescura & Hidratación Divina"</div>
                             </div>
                         </div>
                         <div class="product-description">
-                            Aceite sagrado usado desde la antigüedad para regeneración celular, sistema inmune y sanación profunda. 100% puro, prensado en frío.
+                            Kit completo: Fitoyara para limpiar y refrescar, Aceite de Macadamia para hidratar y regenerar. Combinación perfecta para ritual diario de cuidado.
                         </div>
                         <div class="product-benefits">
-                            <div class="benefits-title">Beneficios Ancestrales:</div>
+                            <div class="benefits-title">Beneficios Completos:</div>
                             <div class="benefits-list">
-                                • Relajación muscular y sistema nervioso<br>
-                                • Fortalece sistema inmune<br>
+                                • Frescura inmediata con Fitoyara<br>
+                                • Hidratación profunda con Macadamia<br>
+                                • Alivia rinitis y congestión<br>
                                 • Regenera piel y cabello<br>
-                                • Ayuda a dormir profundamente<br>
-                                • Antiinflamatorio natural
+                                • Equilibrio natural completo
                             </div>
                         </div>
                         <div class="product-actions">
                             <div>
-                                <div class="product-price">$45.000 COP</div>
-                                <div class="price-note">30ml • Dura 2-3 meses</div>
+                                <div class="product-price">$92.000 COP</div>
+                                <div class="price-note">Kit completo • 2 productos</div>
                             </div>
-                            <button class="purchase-btn">Agregar al Ritual</button>
+                            <button class="purchase-btn" data-product="fitoyara-macadamia">Agregar al Ritual</button>
                         </div>
                     </div>
                 </div>
                 
+                <!-- Product 2: Lion's Mane & Droppers -->
                 <div class="product-card">
                     <div class="product-image">
-                        <div>🍄</div>
+                        <img src="https://drive.google.com/thumbnail?id=10TC2TBWKuq13P0SRkp_7LsBjtnkFgITe&sz=w800" 
+                             alt="Melena de León & Aceites Esenciales">
                         <div class="product-badge">SABIDURÍA ANCESTRAL</div>
                     </div>
                     <div class="product-content">
                         <div class="product-header">
                             <div class="product-icon">🦁</div>
                             <div class="product-info">
-                                <h3>Melena de León</h3>
-                                <div class="product-origin">Hongos Medicinales</div>
+                                <h3>Melena de León + Aceites Esenciales</h3>
+                                <div class="product-origin">Hongos Medicinales & Plantas Sagradas</div>
                             </div>
                         </div>
                         <div class="product-description">
-                            Hongo sagrado que fortalece conexiones neuronales, mejora concentración, memoria y salud digestiva. Cultivado con amor en bosques nativos.
+                            Hongo sagrado para la mente, combinado con aceites esenciales puros para el espíritu. Conexión completa mente-cuerpo-espíritu.
                         </div>
                         <div class="product-benefits">
-                            <div class="benefits-title">Beneficios Cognitivos:</div>
+                            <div class="benefits-title">Beneficios Cognitivos & Espirituales:</div>
                             <div class="benefits-list">
                                 • Mejora concentración y memoria<br>
-                                • Fortalece sistema digestivo<br>
-                                • Neuroregeneración natural<br>
-                                • Reduce inflamación cerebral<br>
-                                • Equilibrio sistema nervioso
+                                • Fortalece conexiones neuronales<br>
+                                • Equilibrio emocional<br>
+                                • Claridad mental<br>
+                                • Conexión espiritual profunda
                             </div>
                         </div>
                         <div class="product-actions">
                             <div>
-                                <div class="product-price">$38.000 COP</div>
-                                <div class="price-note">60 cápsulas • 1 mes</div>
+                                <div class="product-price">$88.000 COP</div>
+                                <div class="price-note">Kit cerebral • 3 productos</div>
                             </div>
-                            <button class="purchase-btn">Agregar al Ritual</button>
+                            <button class="purchase-btn" data-product="lions-mane-droppers">Agregar al Ritual</button>
                         </div>
                     </div>
                 </div>
                 
+                <!-- Product 3: Coca-canabis -->
                 <div class="product-card">
                     <div class="product-image">
-                        <div>🌿</div>
-                        <div class="product-badge">FRESCURA INMEDIATA</div>
+                        <img src="https://drive.google.com/thumbnail?id=1LBwDD4lby_vovaX2X8zZISL6_cAtRPN0&sz=w800" 
+                             alt="Pomada Coca-Canabis">
+                        <div class="product-badge">SANACIÓN ANCESTRAL</div>
                     </div>
                     <div class="product-content">
                         <div class="product-header">
-                            <div class="product-icon">💨</div>
+                            <div class="product-icon">🌱</div>
                             <div class="product-info">
-                                <h3>Fitoyara Aromaterapia</h3>
-                                <div class="product-origin">Pereira, Colombia</div>
+                                <h3>Pomada Coca-Canabis Ancestral</h3>
+                                <div class="product-origin">Putumayo, Medicina China & Indígena</div>
                             </div>
                         </div>
                         <div class="product-description">
-                            Líquido suave con alcohol que se evapora llevando frescura y sanación. Inhalas profundo y sientes toda esa frescura penetrar cuerpo y espíritu.
+                            Pomada sagrada creada por médica china y mujeres cabeza de hogar. Fusión de sabiduría ancestral china e indígena para sanación profunda.
                         </div>
                         <div class="product-benefits">
-                            <div class="benefits-title">Para el Bienestar:</div>
+                            <div class="benefits-title">Sanación Profunda:</div>
                             <div class="benefits-list">
-                                • Alivia cólicos y rinitis<br>
-                                • Refresca en menopausia<br>
-                                • Anti-insectos natural<br>
-                                • Libera tensiones musculares<br>
-                                • Conexión con el presente
+                                • Antiinflamatorio natural poderoso<br>
+                                • Alivia artritis y dolores musculares<br>
+                                • Calma migrañas y tensiones<br>
+                                • Regenera tejidos dañados<br>
+                                • Sabiduría china-indígena unida
                             </div>
                         </div>
                         <div class="product-actions">
                             <div>
-                                <div class="product-price">$50.000 COP</div>
-                                <div class="price-note">Frasco ritual • Dura 3 meses</div>
+                                <div class="product-price">$28.000 COP</div>
+                                <div class="price-note">60gr • Botiquín natural</div>
                             </div>
-                            <button class="purchase-btn">Agregar al Ritual</button>
+                            <button class="purchase-btn" data-product="coca-canabis">Agregar al Ritual</button>
                         </div>
                     </div>
                 </div>
                 
+                <!-- Product 4: Coca-canabis 2 -->
                 <div class="product-card">
                     <div class="product-image">
-                        <div>🐝</div>
-                        <div class="product-badge">PULMÓN DEL PLANETA</div>
+                        <img src="https://drive.google.com/thumbnail?id=1F9BNLj_mr5GRVh2qqIY7LvHaGy7M-hSL&sz=w800" 
+                             alt="Pomada Coca-Canabis Fuerte">
+                        <div class="product-badge">POTENCIA ANCESTRAL</div>
                     </div>
                     <div class="product-content">
                         <div class="product-header">
-                            <div class="product-icon">🌳</div>
+                            <div class="product-icon">🔥</div>
                             <div class="product-info">
-                                <h3>Miel del Macizo Colombiano</h3>
-                                <div class="product-origin">Indígenas Protectores</div>
+                                <h3>Pomada Coca-Canabis Fuerza Máxima</h3>
+                                <div class="product-origin">Concentrado de Sabiduría Andina</div>
                             </div>
                         </div>
                         <div class="product-description">
-                            Miel pura de abejas que polinizan el pulmón de Colombia. Cada compra sostiene a comunidades indígenas que protegen este santuario natural.
+                            Versión concentrada de nuestra pomada sagrada. Para dolores profundos, inflamaciones crónicas y sanación acelerada.
                         </div>
                         <div class="product-benefits">
-                            <div class="benefits-title">Dulce Protección:</div>
+                            <div class="benefits-title">Potencia Máxima:</div>
+                            <div class="benefits-list">
+                                • Concentración máxima de principios activos<br>
+                                • Acción rápida y profunda<br>
+                                • Para condiciones crónicas<br>
+                                • Regeneración celular acelerada<br>
+                                • Fórmula ancestral mejorada
+                            </div>
+                        </div>
+                        <div class="product-actions">
+                            <div>
+                                <div class="product-price">$35.000 COP</div>
+                                <div class="price-note">45gr • Concentrado ancestral</div>
+                            </div>
+                            <button class="purchase-btn" data-product="coca-canabis-fuerte">Agregar al Ritual</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Product 5: Natural Honey -->
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="https://drive.google.com/thumbnail?id=1nYKrX56N98JYSirXDvCp0SsvCY0Jy85x&sz=w800" 
+                             alt="Miel Natural del Macizo Colombiano">
+                        <div class="product-badge">DULZURA PURA</div>
+                    </div>
+                    <div class="product-content">
+                        <div class="product-header">
+                            <div class="product-icon">🐝</div>
+                            <div class="product-info">
+                                <h3>Miel Pura del Macizo Colombiano</h3>
+                                <div class="product-origin">Abejas Nativas, Indígenas Protectores</div>
+                            </div>
+                        </div>
+                        <div class="product-description">
+                            Miel pura de abejas que polinizan el pulmón de Colombia. Sin procesar, sin pasteurizar, con todo el poder medicinal de las flores nativas.
+                        </div>
+                        <div class="product-benefits">
+                            <div class="benefits-title">Dulce Medicina:</div>
                             <div class="benefits-list">
                                 • Endulzante natural medicinal<br>
                                 • Antioxidante poderoso<br>
                                 • Fortalece sistema inmune<br>
-                                • Protege bosque nativo<br>
+                                • Alivia garganta y tos<br>
                                 • Sostiene culturas ancestrales
                             </div>
                         </div>
@@ -1048,81 +899,141 @@ async function connectToEcosystem() {
                                 <div class="product-price">$32.000 COP</div>
                                 <div class="price-note">500gr • Pura sin procesar</div>
                             </div>
-                            <button class="purchase-btn">Agregar al Ritual</button>
+                            <button class="purchase-btn" data-product="miel-natural">Agregar al Ritual</button>
                         </div>
                     </div>
                 </div>
                 
+                <!-- Product 6: Black Olive Oil Small -->
                 <div class="product-card">
                     <div class="product-image">
-                        <div>🌰</div>
-                        <div class="product-badge">HIDRATACIÓN PROFUNDA</div>
+                        <img src="https://drive.google.com/thumbnail?id=1qBd4w__MnyBOvgq0oYdmMV9iAbuHBnJl&sz=w800" 
+                             alt="Aceite de Comino Negro Pequeño">
+                        <div class="product-badge">BOTIQUÍN PERSONAL</div>
                     </div>
                     <div class="product-content">
                         <div class="product-header">
-                            <div class="product-icon">💧</div>
+                            <div class="product-icon">⚫</div>
                             <div class="product-info">
-                                <h3>Aceite de Macadamia 100% Puro</h3>
-                                <div class="product-origin">Montenegro, Quindío</div>
+                                <h3>Aceite de Comino Negro (Pequeño)</h3>
+                                <div class="product-origin">"El Aceite de Cleopatra" - Botiquín Personal</div>
                             </div>
                         </div>
                         <div class="product-description">
-                            Hidratante divino para cuerpo y alma. Restaura cabello, rejuvenece piel y equilibra colesterol y azúcar cuando se consume internamente.
+                            Aceite sagrado para llevar siempre contigo. Versión pequeña para uso diario, viajes, o para probar esta medicina ancestral.
                         </div>
                         <div class="product-benefits">
-                            <div class="benefits-title">Regeneración Celular:</div>
+                            <div class="benefits-title">Beneficios Portátiles:</div>
                             <div class="benefits-list">
-                                • Hidratación profunda piel/cabello<br>
-                                • Regula colesterol y azúcar<br>
-                                • Antioxidante natural<br>
-                                • Post-tratamientos de piel<br>
-                                • Retrasa envejecimiento
+                                • Ideal para viajes y uso diario<br>
+                                • Perfecto para probar primera vez<br>
+                                • Botiquín personal completo<br>
+                                • Regeneración celular<br>
+                                • Sistema inmune fortalecido
                             </div>
                         </div>
                         <div class="product-actions">
                             <div>
-                                <div class="product-price">$42.000 COP</div>
-                                <div class="price-note">120ml • Multi-usos</div>
+                                <div class="product-price">$25.000 COP</div>
+                                <div class="price-note">15ml • Perfecto para viajar</div>
                             </div>
-                            <button class="purchase-btn">Agregar al Ritual</button>
+                            <button class="purchase-btn" data-product="comino-pequeno">Agregar al Ritual</button>
                         </div>
                     </div>
                 </div>
                 
+                <!-- Product 7: Black Olive Oil Medium -->
                 <div class="product-card">
                     <div class="product-image">
-                        <div>🔥</div>
-                        <div class="product-badge">SABIDURÍA ANCESTRAL</div>
+                        <img src="https://drive.google.com/thumbnail?id=1hGKfC04akQWIbJ7pdrIyVAgMR9NZEajS&sz=w800" 
+                             alt="Aceite de Comino Negro Mediano">
+                        <div class="product-badge">BOTIQUÍN FAMILIAR</div>
                     </div>
                     <div class="product-content">
                         <div class="product-header">
-                            <div class="product-icon">🌱</div>
+                            <div class="product-icon">⚫</div>
                             <div class="product-info">
-                                <h3>Pomada Cocainabis</h3>
-                                <div class="product-origin">Putumayo, Medicina China</div>
+                                <h3>Aceite de Comino Negro (Mediano)</h3>
+                                <div class="product-origin">"El Aceite de Cleopatra" - Para Familia</div>
                             </div>
                         </div>
                         <div class="product-description">
-                            Pomada sagrada creada por médica china y mujeres cabeza de hogar. Antiinflamatorio poderoso para dolores musculares, artritis y más.
+                            Tamaño perfecto para toda la familia. Para bebés con cólicos, adultos con estrés, ancianos con dolores, deportistas con lesiones.
                         </div>
                         <div class="product-benefits">
-                            <div class="benefits-title">Sanación Ancestral:</div>
+                            <div class="benefits-title">Beneficios Familiares:</div>
                             <div class="benefits-list">
+                                • Tamaño familiar (2-3 meses)<br>
+                                • Para todas las edades<br>
+                                • Uso interno y externo<br>
                                 • Antiinflamatorio natural<br>
-                                • Alivia artritis y dolores<br>
-                                • Calma migrañas y tensiones<br>
-                                • Regenera tejidos<br>
-                                • Sabiduría china-indígena
+                                • Botiquín familiar completo
                             </div>
                         </div>
                         <div class="product-actions">
                             <div>
-                                <div class="product-price">$28.000 COP</div>
-                                <div class="price-note">60gr • Botiquín natural</div>
+                                <div class="product-price">$45.000 COP</div>
+                                <div class="price-note">30ml • Para toda la familia</div>
                             </div>
-                            <button class="purchase-btn">Agregar al Ritual</button>
+                            <button class="purchase-btn" data-product="comino-mediano">Agregar al Ritual</button>
                         </div>
                     </div>
+                </div>
+                
+                <!-- Product 8: Natural Soap (using same image as Lion's Mane for now) -->
+                <div class="product-card">
+                    <div class="product-image">
+                        <img src="https://drive.google.com/thumbnail?id=10TC2TBWKuq13P0SRkp_7LsBjtnkFgITe&sz=w800" 
+                             alt="Jabón Natural Artesanal">
+                        <div class="product-badge">HIGIENE CONSCIENTE</div>
+                    </div>
+                    <div class="product-content">
+                        <div class="product-header">
+                            <div class="product-icon">🧼</div>
+                            <div class="product-info">
+                                <h3>Jabón Natural Artesanal</h3>
+                                <div class="product-origin">Plantas Medicinales & Aceites Esenciales</div>
+                            </div>
+                        </div>
+                        <div class="product-description">
+                            Jabón hecho a mano con plantas medicinales colombianas. Limpia sin dañar, nutre sin químicos, honra el agua y la tierra.
+                        </div>
+                        <div class="product-benefits">
+                            <div class="benefits-title">Limpieza Consciente:</div>
+                            <div class="benefits-list">
+                                • 100% ingredientes naturales<br>
+                                • Biodegradable, no contamina agua<br>
+                                • Nutre la piel con plantas<br>
+                                • Aromaterapia en cada baño<br>
+                                • Hecho a mano con amor
+                            </div>
+                        </div>
+                        <div class="product-actions">
+                            <div>
+                                <div class="product-price">$18.000 COP</div>
+                                <div class="price-note">150gr • 1-2 meses de uso</div>
+                            </div>
+                            <button class="purchase-btn" data-product="jabon-natural">Agregar al Ritual</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- WhatsApp Section -->
+            <div class="whatsapp-section">
+                <h3 class="section-title" style="color: white;">Conéctate con la Tierra</h3>
+                <div class="whatsapp-buttons">
+                    <a href="https://wa.me/573226921775?text=Hola%20AYNI%20SANCTUARY,%20quiero%20hacer%20un%20pedido%20de%20medicina%20de%20la%20tierra" 
+                       class="whatsapp-btn orders-btn" target="_blank">
+                       <span>📦 PEDIDOS & ENVÍOS</span>
+                       <small>+57 322 692 1775</small>
+                    </a>
+                    
+                    <a href="https://wa.me/573223319416?text=Hola%20AYNI%20SANCTUARY,%20quiero%20conversar%20sobre%20alianzas%20estratégicas%20y%20comunidad" 
+                       class="whatsapp-btn alliances-btn" target="_blank">
+                       <span>🤝 ALIANZAS ANCESTRALES</span>
+                       <small>+57 322 331 9416</small>
+                    </a>
                 </div>
             </div>
             
@@ -1149,21 +1060,22 @@ async function connectToEcosystem() {
                     </div>
                 </div>
             </div>
-    <div class="experience-section">
-    <h2 class="section-title" id="story">La Historia que nos Une</h2>
-    
-    <div class="video-container">
-        <iframe 
-            width="100%" 
-            height="100%" 
-            src="https://www.youtube-nocookie.com/embed/Z7xEWMKZJqI?playlist=Z7xEWMKZJqI&autoplay=1&iv_load_policy=3&loop=1&start=&controls=1&modestbranding=1&rel=0" 
-            frameborder="0" 
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-            allowfullscreen
-            style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 20px;">
-        </iframe>
-    </div>
+
+            <div class="experience-section">
+                <h2 class="section-title" id="story">La Historia que nos Une</h2>
                 
+                <div class="video-container">
+                    <iframe 
+                        width="100%" 
+                        height="100%" 
+                        src="https://www.youtube-nocookie.com/embed/Z7xEWMKZJqI?playlist=Z7xEWMKZJqI&autoplay=1&iv_load_policy=3&loop=1&start=&controls=1&modestbranding=1&rel=0" 
+                        frameborder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen
+                        style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 20px;">
+                    </iframe>
+                </div>
+                    
                 <div class="story-section">
                     <h3 class="story-title">No Somos una Tienda - Somos un Santuario</h3>
                     <div class="story-content">
@@ -1204,7 +1116,7 @@ async function connectToEcosystem() {
                         <div class="step-number">3</div>
                         <div class="step-content">
                             <h4>El Baño de Bosque en Casa</h4>
-                            <p>Con el champú orgánico, puedes bañarte en el río sin contaminar. Pero también puedes llevar el río a tu ducha. Cada espuma que cae por tu cuerpo es una oración por el agua limpia. Cada aroma a plantas nativas es un recuerdo de que tu cuerpo también es naturaleza.</p>
+                            <p>Con el jabón natural, puedes bañarte en el río sin contaminar. Pero también puedes llevar el río a tu ducha. Cada espuma que cae por tu cuerpo es una oración por el agua limpia. Cada aroma a plantas nativas es un recuerdo de que tu cuerpo también es naturaleza.</p>
                         </div>
                     </div>
                 </div>
@@ -1246,7 +1158,7 @@ async function connectToEcosystem() {
                 <p class="community-description">
                     Esto no termina con una compra. Comienza con una conexión. Únete a nuestra comunidad de guardianes terrestres: recibe enseñanzas de indígenas, participa en ceremonias virtuales, visita el santuario en Salento, y sé parte del movimiento que está redefiniendo lo que significa consumir.
                 </p>
-                <a href="https://tripstocolombia.com" class="community-btn">Entrar al Santuario</a>
+                <a href="https://tripstocolombia.com" class="community-btn" target="_blank">Entrar al Santuario</a>
             </div>
         </div>
         
@@ -1255,26 +1167,221 @@ async function connectToEcosystem() {
             <p>Salento, Quindío • Colombia<br>Parte del ecosistema TripsToColombia.com</p>
             
             <div class="footer-links">
-                <a href="https://tripstocolombia.com" class="footer-link">Visítanos en Salento</a>
-                <a href="https://tripstocolombia.com" class="footer-link">Comunidad de Guardianes</a>
-                <a href="https://tripstocolombia.com" class="footer-link">Nuestro Impacto</a>
+                <a href="https://tripstocolombia.com" class="footer-link" target="_blank">Visítanos en Salento</a>
+                <a href="https://tripstocolombia.com" class="footer-link" target="_blank">Comunidad de Guardianes</a>
+                <a href="https://tripstocolombia.com" class="footer-link" target="_blank">Nuestro Impacto</a>
             </div>
             
             <p style="margin-top: 30px; opacity: 0.8; font-size: 0.9rem;">
                 "No vendemos productos. Compartimos medicina. Protegemos territorio. Construimos comunidad.<br>Esta es nuestra guerra silenciosa por un mundo donde todo lo que consuma dé vida en lugar de quitarla."
             </p>
         </footer>
+        
+        <!-- Cart Indicator -->
+        <div id="cart-indicator" onclick="showCart()">🛒 Ritual (0)</div>
     </div>
 
     <script>
-        // Navigation smooth scroll
-        const navLinks = document.querySelectorAll('.nav-item');
-        navLinks.forEach(link => {
+        // Simple shopping cart
+        let cart = [];
+        
+        // Add to cart functionality
+        document.querySelectorAll('.purchase-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const productCard = this.closest('.product-card');
+                const productName = productCard.querySelector('h3').textContent;
+                const productPrice = productCard.querySelector('.product-price').textContent;
+                const productId = this.getAttribute('data-product');
+                
+                // Add to cart
+                cart.push({
+                    id: productId,
+                    name: productName,
+                    price: productPrice
+                });
+                
+                // Update cart indicator
+                updateCartIndicator();
+                
+                // Show notification
+                showNotification(`${productName} agregado al ritual`);
+            });
+        });
+        
+        // Update cart indicator
+        function updateCartIndicator() {
+            const indicator = document.getElementById('cart-indicator');
+            indicator.textContent = `🛒 Ritual (${cart.length})`;
+            indicator.style.display = 'block';
+        }
+        
+        // Show notification
+        function showNotification(message) {
+            // Remove existing notification
+            const existingNotification = document.querySelector('.notification');
+            if (existingNotification) {
+                existingNotification.remove();
+            }
+            
+            // Create new notification
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.innerHTML = `
+                <div style="
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background: var(--forest);
+                    color: white;
+                    padding: 15px 25px;
+                    border-radius: 10px;
+                    z-index: 3000;
+                    animation: slideIn 0.3s ease;
+                    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+                ">
+                    ${message}
+                </div>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+        
+        // Show cart modal
+        function showCart() {
+            if (cart.length === 0) {
+                showNotification('Tu ritual está vacío. Agrega medicina de la tierra.');
+                return;
+            }
+            
+            // Create modal
+            const modal = document.createElement('div');
+            modal.innerHTML = `
+                <div style="
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0,0,0,0.8);
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    z-index: 2000;
+                    animation: fadeIn 0.3s ease;
+                ">
+                    <div style="
+                        background: white;
+                        border-radius: 20px;
+                        padding: 30px;
+                        max-width: 500px;
+                        width: 90%;
+                        max-height: 80vh;
+                        overflow-y: auto;
+                    ">
+                        <h3 style="color: var(--earth); margin-bottom: 20px; text-align: center;">Tu Ritual de Sanación</h3>
+                        
+                        <div style="margin-bottom: 20px;">
+                            ${cart.map((item, index) => `
+                                <div style="
+                                    display: flex;
+                                    justify-content: space-between;
+                                    align-items: center;
+                                    margin-bottom: 10px;
+                                    padding-bottom: 10px;
+                                    border-bottom: 1px solid #eee;
+                                ">
+                                    <span>${item.name}</span>
+                                    <span>${item.price}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                        
+                        <div style="
+                            font-weight: bold;
+                            margin-top: 20px;
+                            padding-top: 20px;
+                            border-top: 2px solid var(--earth);
+                            text-align: center;
+                        ">
+                            Total: ${cart.length} producto${cart.length !== 1 ? 's' : ''}
+                        </div>
+                        
+                        <div style="display: flex; gap: 10px; margin-top: 30px;">
+                            <button onclick="closeCart()" style="
+                                flex:1;
+                                padding: 12px;
+                                background: #ccc;
+                                border: none;
+                                border-radius: 10px;
+                                cursor: pointer;
+                                font-weight: bold;
+                            ">Seguir Explorando</button>
+                            <button onclick="checkout()" style="
+                                flex:1;
+                                padding: 12px;
+                                background: var(--forest);
+                                color: white;
+                                border: none;
+                                border-radius: 10px;
+                                cursor: pointer;
+                                font-weight: bold;
+                            ">Completar Ritual</button>
+                        </div>
+                        
+                        <button onclick="closeCart()" style="
+                            position: absolute;
+                            top: 10px;
+                            right: 10px;
+                            background: none;
+                            border: none;
+                            font-size: 24px;
+                            cursor: pointer;
+                            color: var(--earth);
+                        ">×</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        }
+        
+        // Close cart
+        function closeCart() {
+            const modal = document.querySelector('div[style*="position: fixed; top: 0"]');
+            if (modal) {
+                modal.remove();
+            }
+        }
+        
+        // Checkout function
+        function checkout() {
+            const productList = cart.map(item => `${item.name} - ${item.price}`).join('%0A• ');
+            const totalItems = cart.length;
+            
+            const message = `Hola AYNI SANTUARIO! 🌿%0A%0AQuiero hacer este pedido:%0A%0A• ${productList}%0A%0ATotal: ${totalItems} producto${totalItems !== 1 ? 's' : ''}%0A%0AMi nombre: ________________%0AMi dirección: ________________%0A%0A¡Gracias!`;
+            
+            const whatsappURL = `https://wa.me/573226921775?text=${encodeURIComponent(message)}`;
+            
+            window.open(whatsappURL, '_blank');
+            cart = [];
+            updateCartIndicator();
+            closeCart();
+            showNotification('¡Ritual enviado por WhatsApp!');
+        }
+        
+        // Navigation
+        document.querySelectorAll('.nav-item').forEach(link => {
             link.addEventListener('click', function(e) {
                 e.preventDefault();
                 
                 // Update active nav item
-                navLinks.forEach(nav => nav.classList.remove('active'));
+                document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
                 this.classList.add('active');
                 
                 // Scroll to section
@@ -1289,121 +1396,23 @@ async function connectToEcosystem() {
             });
         });
         
-        // Purchase buttons
-        const purchaseButtons = document.querySelectorAll('.purchase-btn');
-        purchaseButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                const productName = this.closest('.product-card').querySelector('h3').textContent;
-                const productPrice = this.closest('.product-card').querySelector('.product-price').textContent;
-                
-                alert(`✨ ${productName} agregado a tu Ritual de Sanación ✨\n\nPrecio: ${productPrice}\n\nEn una aplicación real, esto abriría un carrito de compras y conectaría con el sistema de pago del ecosistema TripsToColombia.com.`);
-            });
-        });
-        
-        // Community button
-        document.querySelector('.community-btn').addEventListener('click', function(e) {
-            e.preventDefault();
-            alert('Redirigiendo al portal comunitario de TripsToColombia.com...');
-            window.location.href = this.href;
-        });
-        
-        // Update product prices based on impact
-        function updateImpactPrices() {
-            const prices = document.querySelectorAll('.product-price');
-            prices.forEach(price => {
-                const current = price.textContent;
-                const amount = parseInt(current.replace(/\D/g, ''));
-                // In a real app, this would fetch live data
-                // For demo, we'll show a small variation
-                const impactBonus = Math.floor(Math.random() * 5) * 1000;
-                const newAmount = amount + impactBonus;
-                price.textContent = '$' + newAmount.toLocaleString() + ' COP';
-                
-                // Add a note about impact
-                const priceNote = price.nextElementSibling;
-                if (priceNote && priceNote.classList.contains('price-note')) {
-                    priceNote.innerHTML += `<br><small style="color: var(--forest);">+${impactBonus.toLocaleString()} COP para protección territorial</small>`;
-                }
-            });
-        }
-        
-        // Simulate live impact updates
-        setInterval(updateImpactPrices, 30000);
+        // Add CSS animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+        `;
+        document.head.appendChild(style);
     </script>
-    <!-- Add to your HTML before </body> -->
-<div class="whatsapp-section">
-    <h3 class="section-title">Conéctate con la Tierra</h3>
-    <div class="whatsapp-buttons">
-        <a href="https://wa.me/573226921775?text=Hola%20AYNI%20SANCTUARY,%20quiero%20hacer%20un%20pedido%20de%20medicina%20de%20la%20tierra" 
-           class="whatsapp-btn orders-btn" target="_blank">
-           <span>📦 PEDIDOS & ENVÍOS</span>
-           <small>+57 322 692 1775</small>
-        </a>
-        
-        <a href="https://wa.me/573223319416?text=Hola%20AYNI%20SANCTUARY,%20quiero%20conversar%20sobre%20alianzas%20estratégicas%20y%20comunidad" 
-           class="whatsapp-btn alliances-btn" target="_blank">
-           <span>🤝 ALIANZAS ANCESTRALES</span>
-           <small>+57 322 331 9416</small>
-        </a>
-    </div>
-</div>
-
-<style>
-.whatsapp-section {
-    background: linear-gradient(135deg, #25D366, #128C7E);
-    border-radius: 20px;
-    padding: 40px;
-    margin: 40px 0;
-    text-align: center;
-    color: white;
-}
-
-.whatsapp-buttons {
-    display: flex;
-    gap: 20px;
-    justify-content: center;
-    margin-top: 30px;
-}
-
-.whatsapp-btn {
-    padding: 20px 30px;
-    border-radius: 15px;
-    text-decoration: none;
-    font-weight: bold;
-    font-size: 1.1rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    transition: all 0.3s ease;
-    min-width: 250px;
-}
-
-.orders-btn {
-    background: white;
-    color: #25D366;
-}
-
-.alliances-btn {
-    background: var(--sun);
-    color: var(--earth);
-}
-
-.whatsapp-btn:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-}
-
-.whatsapp-btn small {
-    font-size: 0.9rem;
-    opacity: 0.9;
-    margin-top: 5px;
-}
-
-@media (max-width: 768px) {
-    .whatsapp-buttons {
-        flex-direction: column;
-    }
-}
-</style>
 </body>
 </html>
