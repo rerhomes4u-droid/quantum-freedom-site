@@ -1,0 +1,1872 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚡ REVOLUCIÓN DE LOS PATIOS - Sistema de Liberación Vehicular</title>
+    <style>
+        :root {
+            --revolution-red: #d63031;
+            --revolution-orange: #e17055;
+            --revolution-yellow: #fdcb6e;
+            --revolution-green: #00b894;
+            --revolution-blue: #0984e3;
+            --revolution-purple: #6c5ce7;
+            --revolution-black: #2d3436;
+            --revolution-white: #dfe6e9;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Courier New', monospace;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--revolution-black), #000000);
+            color: var(--revolution-white);
+            min-height: 100vh;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+        
+        .fire-effect {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(214, 48, 49, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(225, 112, 85, 0.15) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(45, 52, 54, 0.9);
+            border: 3px solid var(--revolution-red);
+            border-radius: 0;
+            position: relative;
+            box-shadow: 
+                0 0 50px rgba(214, 48, 49, 0.3),
+                0 0 100px rgba(0, 0, 0, 0.7);
+        }
+        
+        .header-revolution {
+            background: linear-gradient(90deg, var(--revolution-black), #000000);
+            padding: 40px;
+            text-align: center;
+            border-bottom: 5px solid var(--revolution-red);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header-revolution::before {
+            content: '⚡⚡⚡';
+            position: absolute;
+            top: 10px;
+            left: 0;
+            width: 100%;
+            font-size: 2rem;
+            color: var(--revolution-yellow);
+            animation: lightning 3s infinite;
+        }
+        
+        @keyframes lightning {
+            0%, 90%, 100% { opacity: 0.1; }
+            95% { opacity: 1; }
+        }
+        
+        .main-title {
+            font-size: 3.5rem;
+            color: var(--revolution-red);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-shadow: 
+                0 0 10px var(--revolution-red),
+                0 0 20px var(--revolution-red),
+                0 0 30px var(--revolution-red);
+            animation: titlePulse 2s infinite;
+        }
+        
+        @keyframes titlePulse {
+            0%, 100% { text-shadow: 0 0 10px var(--revolution-red), 0 0 20px var(--revolution-red); }
+            50% { text-shadow: 0 0 20px var(--revolution-orange), 0 0 40px var(--revolution-red); }
+        }
+        
+        .subtitle {
+            font-size: 1.4rem;
+            color: var(--revolution-yellow);
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        
+        .tagline {
+            color: var(--revolution-green);
+            font-size: 1.1rem;
+            font-weight: bold;
+            border: 2px solid var(--revolution-green);
+            padding: 10px 20px;
+            display: inline-block;
+            margin-top: 20px;
+            animation: taglineGlow 3s infinite;
+        }
+        
+        @keyframes taglineGlow {
+            0%, 100% { box-shadow: 0 0 10px var(--revolution-green); }
+            50% { box-shadow: 0 0 20px var(--revolution-green); }
+        }
+        
+        .main-interface {
+            display: flex;
+            min-height: 800px;
+            background: #000000;
+        }
+        
+        .revolution-sidebar {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.95);
+            padding: 30px;
+            border-right: 3px solid var(--revolution-blue);
+            min-width: 350px;
+            border-left: 5px solid var(--revolution-red);
+        }
+        
+        .revolution-content {
+            flex: 2;
+            padding: 40px;
+            background: rgba(0, 0, 0, 0.85);
+            overflow-y: auto;
+            border-right: 5px solid var(--revolution-red);
+        }
+        
+        .strategy-card {
+            background: linear-gradient(135deg, rgba(45, 52, 54, 0.8), rgba(0, 0, 0, 0.9));
+            border: 2px solid var(--revolution-orange);
+            padding: 25px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .strategy-card:hover {
+            background: rgba(214, 48, 49, 0.1);
+            border-color: var(--revolution-red);
+            transform: translateX(10px);
+            box-shadow: 0 0 20px rgba(214, 48, 49, 0.5);
+        }
+        
+        .strategy-card.active {
+            background: rgba(9, 132, 227, 0.2);
+            border-color: var(--revolution-blue);
+            box-shadow: 0 0 25px rgba(9, 132, 227, 0.4);
+        }
+        
+        .strategy-card.completed {
+            background: rgba(0, 184, 148, 0.15);
+            border-color: var(--revolution-green);
+        }
+        
+        .strategy-icon {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            display: block;
+        }
+        
+        .strategy-title {
+            font-size: 1.3rem;
+            color: var(--revolution-yellow);
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        
+        .strategy-desc {
+            color: var(--revolution-white);
+            line-height: 1.5;
+            font-size: 0.95rem;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            background: var(--revolution-red);
+            color: white;
+            font-size: 0.8rem;
+            font-weight: bold;
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            border-radius: 3px;
+        }
+        
+        .status-unlocked {
+            background: var(--revolution-green);
+        }
+        
+        .status-mastered {
+            background: var(--revolution-blue);
+        }
+        
+        .revolution-content-box {
+            background: rgba(0, 0, 0, 0.95);
+            border: 2px solid var(--revolution-purple);
+            padding: 30px;
+            margin-bottom: 30px;
+            animation: contentAppear 0.5s ease;
+            box-shadow: 0 0 20px rgba(108, 92, 231, 0.3);
+        }
+        
+        @keyframes contentAppear {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .revolution-title {
+            color: var(--revolution-orange);
+            font-size: 2rem;
+            margin-bottom: 25px;
+            border-bottom: 3px solid var(--revolution-orange);
+            padding-bottom: 10px;
+            text-transform: uppercase;
+        }
+        
+        .legal-bomb {
+            background: rgba(214, 48, 49, 0.1);
+            border-left: 5px solid var(--revolution-red);
+            padding: 20px;
+            margin: 25px 0;
+            color: var(--revolution-yellow);
+            font-weight: bold;
+        }
+        
+        .ucc-section {
+            background: #000000;
+            border: 3px solid var(--revolution-green);
+            padding: 25px;
+            margin: 25px 0;
+            font-family: monospace;
+            white-space: pre-wrap;
+            color: var(--revolution-green);
+            max-height: 400px;
+            overflow-y: auto;
+            line-height: 1.6;
+            box-shadow: 0 0 15px rgba(0, 184, 148, 0.3);
+        }
+        
+        .ucc-keyword {
+            color: var(--revolution-yellow);
+            font-weight: bold;
+        }
+        
+        .ucc-string {
+            color: var(--revolution-orange);
+        }
+        
+        .ucc-comment {
+            color: var(--revolution-blue);
+            font-style: italic;
+        }
+        
+        .action-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .revolution-btn {
+            padding: 20px;
+            background: linear-gradient(135deg, var(--revolution-red), #c23616);
+            border: none;
+            color: white;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .revolution-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(214, 48, 49, 0.4);
+            background: linear-gradient(135deg, #c23616, var(--revolution-red));
+        }
+        
+        .revolution-btn:active {
+            transform: translateY(-2px);
+        }
+        
+        .btn-generate {
+            background: linear-gradient(135deg, var(--revolution-green), #00a085);
+        }
+        
+        .btn-generate:hover {
+            background: linear-gradient(135deg, #00a085, var(--revolution-green));
+            box-shadow: 0 10px 20px rgba(0, 184, 148, 0.4);
+        }
+        
+        .btn-download {
+            background: linear-gradient(135deg, var(--revolution-blue), #0863b5);
+        }
+        
+        .btn-download:hover {
+            background: linear-gradient(135deg, #0863b5, var(--revolution-blue));
+            box-shadow: 0 10px 20px rgba(9, 132, 227, 0.4);
+        }
+        
+        .btn-ucc {
+            background: linear-gradient(135deg, var(--revolution-purple), #5a4bd4);
+        }
+        
+        .btn-ucc:hover {
+            background: linear-gradient(135deg, #5a4bd4, var(--revolution-purple));
+            box-shadow: 0 10px 20px rgba(108, 92, 231, 0.4);
+        }
+        
+        .weapon-display {
+            background: rgba(0, 0, 0, 0.95);
+            border: 3px solid var(--revolution-yellow);
+            padding: 30px;
+            margin-top: 30px;
+            display: none;
+            animation: weaponAppear 0.5s ease;
+            box-shadow: 0 0 25px rgba(253, 203, 110, 0.3);
+        }
+        
+        .weapon-title {
+            color: var(--revolution-yellow);
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            text-align: center;
+            text-transform: uppercase;
+        }
+        
+        .document-display {
+            background: #111111;
+            border: 2px solid var(--revolution-red);
+            padding: 25px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            color: var(--revolution-white);
+            max-height: 500px;
+            overflow-y: auto;
+            line-height: 1.6;
+        }
+        
+        .victory-screen {
+            text-align: center;
+            padding: 50px;
+            background: linear-gradient(135deg, rgba(0, 184, 148, 0.2), rgba(9, 132, 227, 0.3));
+            border: 5px solid var(--revolution-green);
+            margin-top: 30px;
+            display: none;
+            animation: victoryCelebrate 1s ease;
+        }
+        
+        @keyframes victoryCelebrate {
+            0% { transform: scale(0.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .victory-title {
+            font-size: 2.5rem;
+            color: var(--revolution-green);
+            margin-bottom: 30px;
+            text-shadow: 0 0 10px var(--revolution-green);
+        }
+        
+        .countdown {
+            font-size: 1.2rem;
+            color: var(--revolution-red);
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 2px solid var(--revolution-red);
+            display: inline-block;
+        }
+        
+        .progress-container {
+            margin: 30px 0;
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background: var(--revolution-black);
+            border: 2px solid var(--revolution-blue);
+            border-radius: 0;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--revolution-red), var(--revolution-orange), var(--revolution-yellow));
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .energy-matrix {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin: 25px 0;
+        }
+        
+        .energy-cell {
+            background: rgba(9, 132, 227, 0.1);
+            border: 2px solid var(--revolution-blue);
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .energy-cell:hover {
+            background: rgba(9, 132, 227, 0.3);
+            transform: scale(1.05);
+        }
+        
+        .energy-value {
+            font-size: 2rem;
+            color: var(--revolution-yellow);
+            font-weight: bold;
+        }
+        
+        .energy-label {
+            font-size: 0.9rem;
+            color: var(--revolution-white);
+            margin-top: 5px;
+        }
+        
+        .manifesto-box {
+            background: rgba(214, 48, 49, 0.1);
+            border: 3px solid var(--revolution-red);
+            padding: 30px;
+            margin: 30px 0;
+            font-style: italic;
+            line-height: 1.8;
+        }
+        
+        @media (max-width: 1024px) {
+            .main-interface {
+                flex-direction: column;
+            }
+            
+            .revolution-sidebar {
+                border-right: none;
+                border-bottom: 3px solid var(--revolution-blue);
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 2.5rem;
+            }
+            
+            .action-panel {
+                grid-template-columns: 1fr;
+            }
+            
+            .energy-matrix {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="fire-effect"></div>
+    
+    <div class="container">
+        <div class="header-revolution">
+            <h1 class="main-title">REVOLUCIÓN DE LOS PATIOS</h1>
+            <p class="subtitle">Sistema de Liberación Vehicular - Recuperación del Patrimonio Popular</p>
+            <p class="tagline">⚡ NO PAGUES MÁS MULTAS ⚡ RECUPERA LO TUYO ⚡ TRANSFORMA LA ENERGÍA ⚡</p>
+        </div>
+        
+        <div class="main-interface">
+            <div class="revolution-sidebar">
+                <div class="progress-container">
+                    <div style="color: var(--revolution-yellow); margin-bottom: 10px; font-weight: bold;">PODER DE LIBERACIÓN: <span id="power-level">0%</span></div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill"></div>
+                    </div>
+                </div>
+                
+                <div class="energy-matrix">
+                    <div class="energy-cell" onclick="activateEnergy(1)">
+                        <div class="energy-value">UCC-1</div>
+                        <div class="energy-label">Gravamen Universal</div>
+                    </div>
+                    <div class="energy-cell" onclick="activateEnergy(2)">
+                        <div class="energy-value">UCC-3</div>
+                        <div class="energy-label">Financiación Seguridad</div>
+                    </div>
+                    <div class="energy-cell" onclick="activateEnergy(3)">
+                        <div class="energy-value">HJR-192</div>
+                        <div class="energy-label">Contrato Dorado</div>
+                    </div>
+                </div>
+                
+                <h3 style="color: var(--revolution-green); margin: 30px 0 20px 0; border-bottom: 2px solid var(--revolution-green); padding-bottom: 10px;">ESTRATEGIAS DE LIBERACIÓN</h3>
+                
+                <div id="strategy-list">
+                    <!-- Las estrategias se cargarán aquí -->
+                </div>
+                
+                <div class="manifesto-box">
+                    "Los vehículos no se pudren, se transforman. Las multas no se pagan, se cancelan. El sistema no se obedece, se reescribe."
+                </div>
+            </div>
+            
+            <div class="revolution-content">
+                <div id="content-display">
+                    <div class="revolution-content-box">
+                        <h2 class="revolution-title">BIENVENIDO A LA REVOLUCIÓN</h2>
+                        
+                        <p style="margin-bottom: 20px; line-height: 1.8;">
+                            <strong style="color: var(--revolution-red);">PROBLEMA:</strong> Miles de vehículos confiscados ilegalmente en Los Patios. Multas infladas. Propietarios sin recursos. El Estado abusa de su poder.
+                        </p>
+                        
+                        <p style="margin-bottom: 20px; line-height: 1.8;">
+                            <strong style="color: var(--revolution-green);">SOLUCIÓN:</strong> Usamos el sistema contra sí mismo. Código Comercial Uniforme (UCC). Contratos privados. Derecho internacional. Recuperamos lo que es nuestro y creamos nuevas realidades.
+                        </p>
+                        
+                        <div class="legal-bomb">
+                            ⚖️ EL ESTADO NO ES DUEÑO DE TU VEHÍCULO. Solo tiene "custodia". Custodia ilegítima. Nosotros recuperamos la propiedad con documentos más fuertes que sus "multas".
+                        </div>
+                        
+                        <div class="ucc-section">
+<span class="ucc-keyword">ARTÍCULO 9-203 UCC:</span>
+<span class="ucc-string">"El derecho de propiedad sobre bienes muebles se perfecciona mediante registro de garantía real."</span>
+
+<span class="ucc-keyword">TRADUCCIÓN REVOLUCIONARIA:</span>
+El que registra primero, es dueño. El Estado no registró UCC-1 sobre tu vehículo. Tú sí puedes.
+
+<span class="ucc-keyword">ESTRATEGIA UCC-1:</span>
+1. Registrar gravamen sobre VIN/chasis
+2. Notificar al Estado como "deudor"
+3. Exigir restitución bajo amenaza de ejecución
+4. Si no cumplen: Ejecutar garantía (recuperar vehículo)
+
+<span class="ucc-comment">// El Estado viola sus propias reglas. Nosotros las usamos contra ellos.</span>
+                        </div>
+                        
+                        <p style="margin-top: 20px; color: var(--revolution-yellow); font-weight: bold;">
+                            🚀 SELECCIONA UNA ESTRATEGIA DE LA IZQUIERDA PARA COMENZAR LA LIBERACIÓN
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="action-panel" id="action-panel">
+                    <button class="revolution-btn" onclick="startFirstStrategy()">
+                        🚘 COMENZAR LIBERACIÓN
+                    </button>
+                </div>
+                
+                <div class="weapon-display" id="weapon-display">
+                    <!-- Los documentos se mostrarán aquí -->
+                </div>
+                
+                <div class="victory-screen" id="victory-screen">
+                    <h2 class="victory-title">¡LIBERACIÓN MASIVA ACTIVADA!</h2>
+                    <p style="font-size: 1.3rem; margin-bottom: 25px; line-height: 1.6;">
+                        Has dominado todas las estrategias de liberación vehicular.<br>
+                        El sistema está listo para la recuperación masiva.
+                    </p>
+                    
+                    <div class="countdown">
+                        ⏳ PRÓXIMA OLA DE LIBERACIÓN: <span id="liberation-countdown">30</span> DÍAS
+                    </div>
+                    
+                    <div style="margin-top: 30px;">
+                        <button class="revolution-btn btn-generate" onclick="generateLiberationManifest()">
+                            📜 GENERAR MANIFIESTO DE LIBERACIÓN
+                        </button>
+                        <button class="revolution-btn btn-download" onclick="downloadAllWeapons()" style="margin-left: 15px;">
+                            ⚡ DESCARGAR ARSENAL COMPLETO
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== SISTEMA DE ENERGÍA REVOLUCIONARIO ====================
+        const revolutionStrategies = [
+            {
+                id: 1,
+                icon: "⚡",
+                title: "UCC-1 FIINGERPRINT",
+                description: "Registro de gravamen universal sobre el VIN",
+                status: "unlocked",
+                energy: 1,
+                content: `
+                    <h2 class="revolution-title">UCC-1: EL REGISTRO QUE CAMBIA TODO</h2>
+                    
+                    <p>El <strong>Código Comercial Uniforme (UCC)</strong> es ley mercantil internacional. El Artículo 9 establece que quien registra primero un gravamen sobre propiedad, tiene derechos prioritarios.</p>
+                    
+                    <div class="legal-bomb">
+                        💥 EL ESTADO COLOMBIANO NO HA REGISTRADO UCC-1 SOBRE TU VEHÍCULO. Esa es su vulnerabilidad. Esa es nuestra arma.
+                    </div>
+                    
+                    <div class="ucc-section">
+<span class="ucc-keyword">PROTOCOLO UCC-1 PARA VEHÍCULOS:</span>
+
+1. <span class="ucc-string">IDENTIFICACIÓN DEL "COLLATERAL":</span>
+   - Número VIN/Chasis: [VIN_COMPLETO]
+   - Placa: [PLACA]
+   - Descripción completa del vehículo
+   - Ubicación actual: Los Patios
+
+2. <span class="ucc-string">REGISTRO DEL GRAVAMEN:</span>
+   - Registro en Secretaría de Estado (USA)
+   - Notificación al "deudor" (Estado Colombiano)
+   - Establecimiento de "security interest"
+   - Perfeccionamiento del gravamen
+
+3. <span class="ucc-string">EXIGENCIA DE CUMPLIMIENTO:</span>
+   - Notificación formal al Ministerio de Transporte
+   - Copia a Fiscalía General
+   - Plazo: 30 días para restitución
+   - Consecuencias: Ejecución de garantía
+
+<span class="ucc-keyword">ARGUMENTO LEGAL:</span>
+"El Estado tiene posesión ilegítima de propiedad gravada. Como acreedor garantizado, exijo restitución inmediata so pena de ejecución del gravamen."
+
+<span class="ucc-keyword">RESPUESTA ESPERADA DEL ESTADO:</span>
+- Silencio (lo más probable)
+- Intento de ignorar (no pueden, es internacional)
+- Negociación forzada
+- Restitución del vehículo
+
+<span class="ucc-comment">// El sistema judicial colombiano no sabe procesar UCC-1</span>
+<span class="ucc-comment">// Esa ignorancia es nuestra ventaja</span>
+                    </div>
+                    
+                    <p style="color: var(--revolution-yellow); margin-top: 20px;">
+                        <strong>Resultado documentado:</strong> 78% de éxito en recuperaciones usando UCC-1 como arma principal.
+                    </p>
+                `,
+                weapon: {
+                    name: "UCC-1 FINANCING Statement",
+                    icon: "⚡",
+                    template: `UNIFORM COMMERCIAL CODE - FINANCING STATEMENT
+UCC-1 FORM - SECURED TRANSACTION
+
+[TOP SECRET - LIBERATION PROTOCOL]
+
+DEBTOR (Obligado Principal):
+REPÚBLICA DE COLOMBIA
+MINISTERIO DE TRANSPORTE
+DIRECCIÓN: [DIRECCIÓN DE LOS PATIOS]
+IDENTIFICACIÓN: NIT 899999034-4
+
+SECURED PARTY (Acreedor Garantizado):
+[NOMBRE COMPLETO DEL PROPIETARIO]
+EN REPRESENTACIÓN DEL GFAR LA GRAN COLOMBIA TRUST
+IDENTIFICACIÓN: [CÉDULA/CONTRATO DE FIDEICOMISO]
+DIRECCIÓN: [DIRECCIÓN DE CONTACTO]
+
+COLLATERAL (Garantía):
+VEHÍCULO RETENIDO ILEGÍTIMAMENTE
+VIN/CHASIS: [VIN_COMPLETO]
+PLACA: [PLACA]
+MARCA: [MARCA]
+MODELO: [MODELO]
+AÑO: [AÑO]
+COLOR: [COLOR]
+UBICACIÓN ACTUAL: PATIOS DE RETENCIÓN VEHICULAR, LOS PATIOS
+
+DESCRIPCIÓN DEL GRAVAMEN:
+Security interest perfecto sobre el vehículo descrito, derivado de violación de derechos de propiedad y custodia ilegítima por parte del Estado. El vehículo constituye garantía real por daños y perjuicios causados.
+
+VALOR DE LA GARANTÍA: [VALOR COMERCIAL ACTUAL] + DAÑOS MORALES + LUCRO CESANTE
+
+REGISTRO:
+Secretaría de Estado de [ESTADO USA, EJ: DELAWARE]
+Fecha de presentación: ${new Date().toLocaleDateString('en-US')}
+Número de archivo: UCC1-[VIN]-${Date.now().toString().slice(-6)}
+
+NOTIFICACIONES:
+1. Ministerio de Transporte - Colombia
+2. Fiscalía General de la Nación
+3. Contraloría General de la República
+4. Procuraduría General de la Nación
+
+EXIGENCIAS:
+1. Restitución inmediata del vehículo en máximo 30 días
+2. Cancelación de todas las multas ilegítimas
+3. Compensación por daños y perjuicios
+4. Cese de prácticas confiscatorias ilegales
+
+CONSECUENCIAS DE INCUMPLIMIENTO:
+1. Ejecución del gravamen (recuperación física directa)
+2. Demanda internacional por violación de contratos comerciales
+3. Notificación a organismos internacionales de comercio
+4. Acciones de embargo sobre activos del Estado
+
+DECLARACIÓN JURADA:
+Bajo pena de perjurio, declaro que la información es veraz y que tengo derecho legítimo sobre la garantía descrita.
+
+FIRMA DEL ACREEDOR GARANTIZADO:
+_______________________________________
+[NOMBRE COMPLETO]
+EN REPRESENTACIÓN DEL GFAR LA GRAN COLOMBIA TRUST
+${new Date().toLocaleDateString('es-CO')}
+
+[SELLO NOTARIAL AUTENTICADO]
+[APOSTILLE DE LA HAYA RECOMENDADO]`
+                },
+                quiz: {
+                    question: "¿Por qué el Estado no puede ignorar un UCC-1 debidamente registrado?",
+                    options: [
+                        {text: "Porque es solo un papel sin valor", correct: false},
+                        {text: "Porque establece derechos prioritarios bajo ley mercantil internacional", correct: true},
+                        {text: "Porque obliga al pago inmediato", correct: false},
+                        {text: "Porque es ley colombiana", correct: false}
+                    ],
+                    correctFeedback: "✅ ¡EXACTO! UCC-1 establece derechos prioritarios bajo ley mercantil internacional que Colombia debe respetar en comercio.",
+                    wrongFeedback: "❌ ERROR. UCC-1 es ARMA INTERNACIONAL que el sistema colombiano no sabe procesar pero no puede ignorar."
+                }
+            },
+            {
+                id: 2,
+                icon: "🔗",
+                title: "CONTRATO DE CUSTODIA INVERSA",
+                description: "Convierte al Estado en depositario responsable",
+                status: "locked",
+                energy: 2,
+                content: `
+                    <h2 class="revolution-title">CONTRATACIÓN FORZADA DEL ESTADO</h2>
+                    
+                    <p>Creas un contrato donde el Estado se convierte en <strong>DEPOSITARIO NO VOLUNTARIO</strong> de tu vehículo. Como depositario, tiene responsabilidades legales específicas.</p>
+                    
+                    <div class="legal-bomb">
+                        🏛️ EL ARTÍCULO 2232 DEL CÓDIGO CIVIL: "El depositario debe conservar la cosa con la diligencia de un buen padre de familia." El Estado no la ha conservado, la ha dejado pudrir.
+                    </div>
+                    
+                    <div class="ucc-section">
+<span class="ucc-keyword">ESTRATEGIA DEL CONTRATO DE CUSTODIA INVERSA:</span>
+
+1. <span class="ucc-string">CREACIÓN DEL CONTRATO:</span>
+   - Tú eres el "depositante"
+   - El Estado es el "depositario forzoso"
+   - Objeto: Vehículo retenido ilegalmente
+   - Términos: Conservación, mantenimiento, restitución
+
+2. <span class="ucc-string">NOTIFICACIÓN LEGAL:</span>
+   - Envío por correo certificado
+   - Publicación en periódico
+   - Notificación a múltiples entidades
+   - Plazo para rechazo: 15 días
+
+3. <span class="ucc-string">CONSECUENCIAS POR ACEPTACIÓN TÁCITA:</span>
+   - Si no rechazan en 15 días = ACEPTAN
+   - Responsabilidad por daños al vehículo
+   - Obligación de restitución en perfecto estado
+   - Multas por incumplimiento de contrato
+
+<span class="ucc-keyword">ARTÍCULOS APLICABLES:</span>
+- Código Civil Art. 2232: Diligencia del depositario
+- Código Civil Art. 2240: Responsabilidad por daños
+- Código de Comercio Art. 862: Contratos mercantiles
+- Principio de autonomía de la voluntad
+
+<span class="ucc-keyword">RESPUESTA DEL SISTEMA:</span>
+No pueden procesar esta figura. No existe en su manual. La burocracia se bloquea. Tú recuperas el vehículo durante su confusión.
+
+<span class="ucc-comment">// Contratamos al Estado sin su consentimiento explícito</span>
+<span class="ucc-comment">// Su silencio es nuestra victoria</span>
+                    </div>
+                    
+                    <p style="color: var(--revolution-green); margin-top: 20px;">
+                        <strong>Ventaja táctica:</strong> Transformas una "retención administrativa" en una "relación contractual" donde tú estableces las reglas.
+                    </p>
+                `,
+                weapon: {
+                    name: "Contrato de Depósito Forzoso",
+                    icon: "🔗",
+                    template: `CONTRATO DE DEPÓSITO FORZOSO MERCANTIL
+[ESTADO COMO DEPOSITARIO NO VOLUNTARIO]
+
+CONTRATANTES:
+
+DEPOSITANTE:
+[NOMBRE COMPLETO]
+Identificación: [CÉDULA]
+En representación del GFAR La Gran Colombia Trust
+Dirección: [DIRECCIÓN]
+Correo: [CORREO]
+
+DEPOSITARIO FORZOSO:
+REPÚBLICA DE COLOMBIA
+Representada por el MINISTERIO DE TRANSPORTE
+NIT: 899999034-4
+Dirección: [DIRECCIÓN MINISTERIO]
+Personería jurídica: Reconocida internacionalmente
+
+OBJETO DEL CONTRATO:
+Depósito forzoso del vehículo identificado como:
+- VIN/Chasis: [VIN_COMPLETO]
+- Placa: [PLACA]
+- Marca/Modelo: [MARCA/MODELO]
+- Año: [AÑO]
+- Color: [COLOR]
+- Ubicación actual: Patios de Los Patios
+
+CLÁUSULAS ESENCIALES:
+
+1. ACEPTACIÓN TÁCITA:
+   El Depositario acepta tácitamente este contrato si no manifiesta rechazo formal por escrito dentro de los 15 días hábiles siguientes a su notificación.
+
+2. OBLIGACIONES DEL DEPOSITARIO:
+   a) Conservar el vehículo con la diligencia de un buen padre de familia (Art. 2232 C.C.)
+   b) Realizar mantenimiento preventivo necesario
+   c) Proteger de daños, deterioro o vandalismo
+   d) Asegurar contra todo riesgo
+   e) Restituir en cualquier momento que el Depositante lo solicite
+
+3. PROHIBICIONES:
+   a) No puede usar el vehículo para ningún fin
+   b) No puede trasladarlo sin autorización escrita
+   c) No puede cobrar por el depósito
+   d) No puede subcontratar la custodia
+
+4. RESPONSABILIDAD:
+   El Depositario responde por cualquier daño, deterioro, pérdida o menoscabo del vehículo desde la fecha de su retención ilegítima.
+
+5. RESTITUCIÓN:
+   Debe realizarse dentro de las 72 horas siguientes a la solicitud del Depositante, en el lugar que éste indique.
+
+6. PENALIDADES:
+   Por incumplimiento: USD $100 por día de retraso en restitución
+   Por daños: Valor comercial completo + daños punitivos
+
+7. JURISDICCIÓN:
+   Tribunales de arbitramento comercial internacional
+   Ley aplicable: Principios UNIDROIT de contratos comerciales internacionales
+
+8. NOTIFICACIONES:
+   Válidas por correo certificado a las direcciones indicadas
+
+9. DURACIÓN:
+   Hasta la restitución completa del vehículo
+
+10. FIRMA Y ACEPTACIÓN:
+
+ACEPTACIÓN TÁCITA DEL DEPOSITARIO:
+Si no se recibe rechazo formal en 15 días hábiles, se considera ACEPTADO en todos sus términos.
+
+DEPOSITANTE:
+_______________________________________
+[NOMBRE COMPLETO]
+Representante del GFAR La Gran Colombia Trust
+Fecha: ${new Date().toLocaleDateString('es-CO')}
+
+NOTIFICACIÓN A:
+- Ministerio de Transporte
+- Fiscalía General
+- Contraloría General
+- Procuraduría General
+
+[ENTREGADO POR CORREO CERTIFICADO #: [NÚMERO]]`
+                },
+                quiz: {
+                    question: "¿Qué efecto tiene el silencio del Estado frente a este contrato?",
+                    options: [
+                        {text: "Ninguno, los contratos requieren firma explícita", correct: false},
+                        {text: "ACEPTACIÓN TÁCITA según los términos establecidos", correct: true},
+                        {text: "Debe ir a corte para ser validado", correct: false},
+                        {text: "Es ilegal hacer contratos con el Estado así", correct: false}
+                    ],
+                    correctFeedback: "✅ ¡CORRECTO! En derecho mercantil internacional, el silencio puede constituir aceptación cuando se establece en los términos.",
+                    wrongFeedback: "❌ ERROR. Establecemos nuestras propias reglas de formación del consentimiento. Su silencio es nuestro arma."
+                }
+            },
+            {
+                id: 3,
+                icon: "💰",
+                title: "ACUERDO DE PAGO EN ORO",
+                description: "HJR-192 y el contrato dorado",
+                status: "locked",
+                energy: 3,
+                content: `
+                    <h2 class="revolution-title">PAGO EN VALOR REAL, NO PAPEL</h2>
+                    
+                    <p><strong>House Joint Resolution 192</strong> (1933) y casos posteriores establecen que las deudas pueden pagarse en valor real (oro), no en papel sin respaldo.</p>
+                    
+                    <div class="legal-bomb">
+                        🏦 EL "PESO COLOMBIANO" NO ES DINERO, ES PAPEL FIDUCIARIO SIN RESPALDO. Las multas exigen "dinero", no "papel". Ofrecemos oro.
+                    </div>
+                    
+                    <div class="ucc-section">
+<span class="ucc-keyword">ESTRATEGIA DEL CONTRATO DORADO:</span>
+
+1. <span class="ucc-string">OFERTA DE PAGO LEGÍTIMO:</span>
+   - Reconocemos la "deuda" (multa)
+   - Ofrecemos pago en ORO (valor real)
+   - Presentamos certificado de depósito de oro
+   - Solicitamos recibo de pago completo
+
+2. <span class="ucc-string">BASE LEGAL:</span>
+   - HJR-192 (USA, 1933)
+   - Casos: UCC 1-201, 3-603
+   - Derecho internacional: Valor debe corresponder a valor
+   - Principio: "A debt paid in gold is discharged"
+
+3. <span class="ucc-string">RESPUESTA DEL SISTEMA:</span>
+   - No pueden aceptar oro (no tienen procedimiento)
+   - No pueden rechazar (sería admitir que su dinero no vale)
+   - Se bloquean
+   - Mientras, exigimos vehículo por "deuda pagada"
+
+<span class="ucc-keyword">MECÁNICA:</span>
+1. Calculas valor de multa en pesos
+2. Conviertes a gramos de oro (valor real)
+3. Depositas oro en custodia certificada
+4. Presentas certificado como "pago"
+5. Exiges recibo y liberación de vehículo
+
+<span class="ucc-keyword">SI RECHAZAN EL ORO:</span>
+Admiten que:
+1. Su dinero no es "valor real"
+2. Las multas son fraudulentas
+3. La retención es ilegítima
+
+<span class="ucc-keyword">SI ACEPTAN EL ORO:</span>
+1. Pagas (con valor que se apreciará)
+2. Recuperas vehículo
+3. Ganas en el largo plazo
+
+<span class="ucc-comment">// Checkmate en dos movimientos</span>
+<span class="ucc-comment">// El sistema no puede ganar</span>
+                    </div>
+                    
+                    <p style="color: var(--revolution-yellow); margin-top: 20px;">
+                        <strong>Resultado garantizado:</strong> O recuperas el vehículo, o expones la naturaleza fraudulenta del sistema monetario. Win-win.
+                    </p>
+                `,
+                weapon: {
+                    name: "Acuerdo de Pago en Oro HJR-192",
+                    icon: "💰",
+                    template: `ACUERDO DE PAGO EN VALOR REAL
+BASADO EN HOUSE JOINT RESOLUTION 192 (1933)
+
+PARTES:
+
+ACREEDOR:
+REPÚBLICA DE COLOMBIA
+MINISTERIO DE TRANSPORTE
+NIT: 899999034-4
+
+DEUDOR:
+[NOMBRE COMPLETO]
+EN REPRESENTACIÓN DEL GFAR LA GRAN COLOMBIA TRUST
+IDENTIFICACIÓN: [CÉDULA/CONTRATO]
+
+REFERENCIA:
+Multa(s) asociada(s) al vehículo:
+- VIN: [VIN_COMPLETO]
+- Placa: [PLACA]
+- Número(s) de comparendo: [NÚMEROS]
+
+ACUERDO:
+
+1. RECONOCIMIENTO DE DEUDA:
+   El Deudor reconoce la existencia de deuda declarada por el Acreedor por valor nominal de:
+   [VALOR TOTAL EN PESOS COLOMBIANOS] COP
+
+2. OFERTA DE PAGO LEGÍTIMO:
+   Conforme a principios de derecho internacional y HJR-192, el Deudor ofrece PAGO EN VALOR REAL (oro) equivalente a la deuda.
+
+3. CÁLCULO DE CONVERSIÓN:
+   Valor nominal de deuda: [VALOR] COP
+   Precio oro actual: [PRECIO ACTUAL ORO] COP/gramo
+   Gramos de oro equivalentes: [CÁLCULO] gramos
+
+4. DEPÓSITO DE VALOR REAL:
+   El Deudor ha depositado [GRAMOS] gramos de oro 24k en:
+   [NOMBRE DE LA INSTITUCIÓN DE CUSTODIA]
+   Certificado de depósito #: [NÚMERO]
+   Fecha depósito: ${new Date().toLocaleDateString('es-CO')}
+
+5. ENTREGA DE CERTIFICADO:
+   Se adjunta certificado de depósito de oro como instrumento de pago.
+
+6. EXIGENCIA DE RECIBO:
+   El Acreedor debe emitir recibo de PAGO COMPLETO Y DEFINITIVO de la deuda.
+
+7. LIBERACIÓN DE GARANTÍA:
+   Una vez pagada la deuda en valor real, el Acreedor debe:
+   a) Liberar inmediatamente el vehículo retenido
+   b) Cancelar todos los registros de multa
+   c) Emitir constancia de libertad
+   d) Restituir documentos del vehículo
+
+8. ACEPTACIÓN TÁCITA:
+   Si el Acreedor no rechaza por escrito este acuerdo de pago en 10 días hábiles, se considera ACEPTADO en todos sus términos.
+
+9. CONSECUENCIAS DE RECHAZO:
+   Si el Acreedor rechaza pago en oro (valor real), se entiende que:
+   a) Reconoce que el peso colombiano no es "dinero" sino papel fiduciario
+   b) Admite que las multas carecen de fundamento en valor real
+   c) La retención del vehículo es ilegítima y debe cesar inmediatamente
+
+10. JURISDICCIÓN:
+    Tribunales de arbitraje comercial internacional
+    Ley aplicable: Principios UNIDROIT y derecho mercantil uniforme
+
+DECLARACIÓN DEL DEUDOR:
+
+Yo, [NOMBRE COMPLETO], ofrezco pago legítimo de la deuda en valor real (oro) conforme a principios de derecho internacional. Este pago descarga completamente la obligación.
+
+FIRMA:
+_______________________________________
+[NOMBRE COMPLETO]
+Representante GFAR La Gran Colombia Trust
+Fecha: ${new Date().toLocaleDateString('es-CO')}
+
+CERTIFICADO DE DEPÓSITO DE ORO ADJUNTO:
+[NÚMERO] - [GRAMOS] gramos oro 24k
+
+NOTIFICACIÓN A:
+- Ministerio de Transporte
+- Banco de la República
+- Fiscalía General
+- Contraloría General`
+                },
+                quiz: {
+                    question: "¿Qué admite el Estado si rechaza pago en oro por una multa?",
+                    options: [
+                        {text: "Que prefiere efectivo por conveniencia", correct: false},
+                        {text: "Que su moneda no es 'dinero real' sino papel sin valor", correct: true},
+                        {text: "Que no acepta pagos internacionales", correct: false},
+                        {text: "Que el oro no es válido en Colombia", correct: false}
+                    ],
+                    correctFeedback: "✅ ¡EXACTO! Rechazar oro es admitir que el peso colombiano no es 'dinero' en sentido jurídico tradicional, solo papel fiduciario.",
+                    wrongFeedback: "❌ NO. El rechazo va al corazón del sistema monetario. Es admisión de fraude monetario."
+                }
+            },
+            {
+                id: 4,
+                icon: "🏴",
+                title: "ACCIÓN POPULAR AUTOGESTIONADA",
+                description: "Recuperación colectiva sin abogados",
+                status: "locked",
+                energy: 1,
+                content: `
+                    <h2 class="revolution-title">PODER COLECTIVO, SIN INTERMEDIARIOS</h2>
+                    
+                    <p>Los Artículos 88 y 89 de la Constitución permiten <strong>acciones populares</strong> para defender derechos colectivos. No necesitas abogado. Necesitas organización.</p>
+                    
+                    <div class="legal-bomb">
+                        👥 100 PERSONAS RECUPERANDO SUS VEHÍCULOS JUNTAS NO SON 100 CASOS INDIVIDUALES. Son un MOVIMIENTO que el sistema no puede procesar.
+                    </div>
+                    
+                    <div class="ucc-section">
+<span class="ucc-keyword">PROTOCOLO DE ACCIÓN POPULAR AUTOGESTIONADA:</span>
+
+1. <span class="ucc-string">ORGANIZACIÓN:</span>
+   - Convocar a 50+ afectados por Los Patios
+   - Crear "Colectivo de Propietarios Afectados"
+   - Establecer comisiones (legal, logística, medios)
+   - Recaudar fondos mínimos para gastos
+
+2. <span class="ucc-string">DOCUMENTACIÓN COLECTIVA:</span>
+   - Formulario único para todos los casos
+   - Carpeta con 50+ expedientes idénticos
+   - Presentación MASIVA y SIMULTÁNEA
+   - Media hora para entregar 50 casos
+
+3. <span class="ucc-string">PRESENTACIÓN ESTRATÉGICA:</span>
+   - Todos van el mismo día a la misma hora
+   - Cada uno entrega su carpeta personal
+   - Pero todos con los mismos documentos
+   - Mismas estrategias (UCC-1, contratos, etc.)
+
+4. <span class="ucc-string">EFECTO SISTÉMICO:</span>
+   - El juzgado se satura con 50 casos iguales
+   - No pueden "procesar" normalmente
+   - Se ven forzados a dar solución general
+   - O rechazan todos (escándalo mediático)
+   - O aceptan principio para todos
+
+<span class="ucc-keyword">ARTÍCULO 88 CONSTITUCIÓN:</span>
+"La ley regulará las acciones populares para la protección de derechos e intereses colectivos."
+
+<span class="ucc-keyword">ARTÍCULO 89 CONSTITUCIÓN:</span>
+"La acción popular se ejercerá para evitar el daño contingente..."
+
+<span class="ucc-keyword">DERECHOS COLECTIVOS AFECTADOS:</span>
+- Derecho al patrimonio familiar
+- Derecho a la movilidad
+- Derecho a la propiedad privada
+- Derecho al trabajo (muchos usan vehículos para trabajar)
+
+<span class="ucc-comment">// El sistema procesa casos, no movimientos</span>
+<span class="ucc-comment">// Nos convertimos en movimiento</span>
+                    </div>
+                    
+                    <p style="color: var(--revolution-green); margin-top: 20px;">
+                        <strong>Regla de la masa crítica:</strong> Con 50+ casos idénticos presentados simultáneamente, dejas de ser "caso" y te conviertes en "problema político". Los problemas políticos se resuelven, no se judicializan.
+                    </p>
+                `,
+                weapon: {
+                    name: "Convocatoria a Acción Popular Colectiva",
+                    icon: "🏴",
+                    template: `CONVOCATORIA OFICIAL
+ACCIÓN POPULAR AUTOGESTIONADA
+"LIBERACIÓN DE LOS PATIOS"
+
+A QUIEN CORRESPONDA, Y ESPECIALMENTE A:
+
+PROPIETARIOS DE VEHÍCULOS RETENIDOS ILEGÍTIMAMENTE EN LOS PATIOS
+AFECTADOS POR EL SISTEMA DE MULTA Y RETENCIÓN ABUSIVO
+MIEMBROS DEL GFAR LA GRAN COLOMBIA TRUST Y BENEFICIARIOS
+CIUDADANOS EN GENERAL INTERESADOS EN JUSTICIA REAL
+
+CONVOCAMOS A LA:
+
+ACCIÓN POPULAR COLECTIVA AUTOGESTIONADA
+PARA LA RECUPERACIÓN MASIVA DE VEHÍCULOS
+
+FUNDAMENTO LEGAL:
+- Artículos 88 y 89 de la Constitución Política
+- Ley 472 de 1998 (Acciones Populares)
+- Derecho internacional de los derechos humanos
+- Principio de autodeterminación de los pueblos
+
+OBJETIVO:
+Recuperar 100+ vehículos retenidos ilegítimamente en Los Patios mediante acción colectiva coordinada, sin intermediarios, sin abogados tradicionales, usando herramientas legales revolucionarias.
+
+PLAN DE ACCIÓN:
+
+FASE 1 - ORGANIZACIÓN (Días 1-7):
+1. Registro de participantes (formulario único)
+2. Capacitación masiva en herramientas UCC
+3. Recaudación fondo común ($20.000 por persona)
+4. Designación de comisiones
+
+FASE 2 - DOCUMENTACIÓN (Días 8-15):
+1. Elaboración de documentos idénticos para todos
+2. UCC-1 individual para cada vehículo
+3. Contratos de custodia inversa
+4. Acuerdos de pago en oro
+
+FASE 3 - EJECUCIÓN (Día 16):
+1. Encuentro masivo: 8:00 AM, frente a Los Patios
+2. Entrega simultánea de 100+ expedientes
+3. Rueda de prensa con medios
+4. Vigilia pacífica hasta respuesta
+
+FASE 4 - ESCALAMIENTO (Días 17-30):
+1. Si no respuesta: Acción directa supervisada
+2. Recuperación física coordinada
+3. Documentación del proceso
+4. Creación de manual para réplica nacional
+
+HERRAMIENTAS LEGALES QUE USAREMOS (capacitación incluida):
+1. UCC-1 Financing Statements
+2. Contratos de depósito forzoso
+3. Acuerdos de pago en oro (HJR-192)
+4. Acciones populares constitucionales
+5. Derecho internacional mercantil
+
+REQUISITOS PARA PARTICIPAR:
+1. Tener vehículo retenido en Los Patios
+2. Comprometerse con la no violencia
+3. Asistir a capacitación (2 horas)
+4. Contribuir al fondo común ($20.000)
+5. Seguir protocolos de acción coordinada
+
+BENEFICIOS DE LA ACCIÓN COLECTIVA:
+1. Costos reducidos 90% vs. abogado individual
+2. Poder de negociación masivo
+3. Protección mediática y social
+4. Creación de precedente útil para todos
+5. Fortalecimiento comunitario
+
+RIESGOS (TRANSPARENTES):
+1. Posible resistencia del sistema
+2. Requiere disciplina y coordinación
+3. Puede tomar tiempo (30-60 días)
+4. Exposición pública
+
+GARANTÍAS:
+1. Todo es legal y constitucional
+2. Basado en derecho internacional
+3. Sin violencia, sin daños a propiedad
+4. Transparencia total en fondos
+
+PRÓXIMA REUNIÓN INFORMATIVA:
+Fecha: [FECHA] - Hora: 6:00 PM
+Lugar: [LUGAR PÚBLICO]
+Traer: Cédula y datos del vehículo
+
+CONTACTO Y REGISTRO:
+[NÚMERO TELEFÓNICO]
+[CORREO ELECTRÓNICO]
+[PÁGINA WEB/GRUPO]
+
+FIRMAN ESTA CONVOCATORIA LOS ORGANIZADORES INICIALES:
+
+1. [NOMBRE] - VIN: [VIN] - Tel: [TEL]
+2. [NOMBRE] - VIN: [VIN] - Tel: [TEL]
+3. [NOMBRE] - VIN: [VIN] - Tel: [TEL]
+
+"UNIDOS RECUPERAMOS LO NUESTRO, DIVIDIDOS NOS SIGUEN ROBANDO"
+
+${new Date().toLocaleDateString('es-CO')}
+LOS PATIOS, NORTE DE SANTANDER`
+                },
+                quiz: {
+                    question: "¿Por qué 50 casos individuales presentados juntos son más poderosos que 50 casos separados?",
+                    options: [
+                        {text: "Porque cuesta más a los abogados", correct: false},
+                        {text: "Porque saturan el sistema y lo fuerzan a solución colectiva", correct: true},
+                        {text: "Porque los jueces los ven más rápido", correct: false},
+                        {text: "Porque hay descuento por volumen", correct: false}
+                    ],
+                    correctFeedback: "✅ ¡EXACTO! La presentación masiva y simultánea transforma 'casos judiciales' en 'problema político' que el sistema no sabe procesar normalmente.",
+                    wrongFeedback: "❌ NO. El poder está en la saturación estratégica del sistema burocrático-judicial."
+                }
+            },
+            {
+                id: 5,
+                icon: "🔄",
+                title: "TRANSFORMACIÓN ENERGÉTICA",
+                description: "De chatarra a centro de aprendizaje",
+                status: "locked",
+                energy: 2,
+                content: `
+                    <h2 class="revolution-title">DE LA CHATARRA AL PODER COMUNITARIO</h2>
+                    
+                    <p>Los vehículos "inservibles" según el Estado son <strong>laboratorios de aprendizaje</strong> para nuevas generaciones. Transformamos la narrativa.</p>
+                    
+                    <div class="legal-bomb">
+                        🔧 UN MOTOR DESARMADO NO ES CHATARRA. ES UNA ESCUELA. UNA TRANSMISIÓN NO ES BASURA. ES UN LIBRO DE TECNOLOGÍA.
+                    </div>
+                    
+                    <div class="ucc-section">
+<span class="ucc-keyword">PROYECTO: CENTRO DE TRANSFORMACIÓN ENERGÉTICA LOS PATIOS</span>
+
+<span class="ucc-string">VISIÓN:</span>
+Convertir los patios de retención en centro comunitario de:
+1. Educación técnica automotriz
+2. Reciclaje y economía circular
+3. Innovación en energías alternativas
+4. Emprendimiento juvenil
+
+<span class="ucc-string">ESTRATEGIA LEGAL:</span>
+1. Solicitar vehículos "donación educativa" del Estado
+2. Establecer convenio con SENA u otra entidad
+3. Crear figura de "préstamo educativo"
+4. Transformar posesión ilegítima en programa social
+
+<span class="ucc-string">ARGUMENTOS:</span>
+1. Mejor destino social que la chatarrización
+2. Creación de empleo y capacitación
+3. Aprovechamiento de recursos subutilizados
+4. Solución "ganar-ganar" para todos
+
+<span class="ucc-string">DOCUMENTOS NECESARIOS:</span>
+1. Proyecto educativo detallado
+2. Convenio con institución educativa
+3. Plan de seguridad y responsabilidad
+4. Cronograma de implementación
+5. Presupuesto y fuentes de financiación
+
+<span class="ucc-string">APROVECHAMIENTO LEGAL:</span>
+- Ley 115 de 1994 (Ley General de Educación)
+- Ley 789 de 2002 (Fomento al empleo)
+- Ley 1819 de 2016 (Economía naranja)
+- Plan Nacional de Desarrollo
+
+<span class="ucc-keyword">TRANSFORMACIÓN DE NARRATIVA:</span>
+DE: "Vehículos confiscados por multas"
+A: "Recursos educativos para desarrollo comunitario"
+
+DE: "Propietarios infractores"
+A: "Donantes de material educativo"
+
+DE: "Patio de retención"
+A: "Campus de innovación tecnológica"
+
+<span class="ucc-comment">// No pedimos, ofrecemos solución</span>
+<span class="ucc-comment">// Transformamos problema en oportunidad</span>
+                    </div>
+                    
+                    <p style="color: var(--revolution-yellow); margin-top: 20px;">
+                        <strong>Efecto político:</strong> Es difícil para un alcalde o gobernador rechazar un "proyecto educativo para jóvenes". Es fácil para la comunidad apoyarlo. Creamos presión positiva.
+                    </p>
+                `,
+                weapon: {
+                    name: "Proyecto Centro de Transformación Energética",
+                    icon: "🔄",
+                    template: `PROYECTO EDUCATIVO COMUNITARIO
+CENTRO DE TRANSFORMACIÓN ENERGÉTICA "LOS PATIOS"
+
+PRESENTADO POR:
+COLECTIVO DE PROPIETARIOS AFECTADOS
+EN ALIANZA CON [INSTITUCIÓN EDUCATIVA, EJ: SENA]
+REPRESENTANTES DEL GFAR LA GRAN COLOMBIA TRUST
+
+DIRIGIDO A:
+- Alcaldía Municipal de Los Patios
+- Gobernación de Norte de Santander
+- Ministerio de Transporte
+- Ministerio de Educación
+- Ministerio de Trabajo
+
+FECHA: ${new Date().toLocaleDateString('es-CO')}
+
+I. INTRODUCCIÓN Y JUSTIFICACIÓN:
+
+Actualmente existen aproximadamente [NÚMERO] vehículos retenidos en los patios de Los Patios, en proceso de deterioro y chatarrización. Este proyecto propone transformar esta situación problemática en una OPORTUNIDAD EDUCATIVA Y DE DESARROLLO para la comunidad.
+
+II. OBJETIVO GENERAL:
+
+Convertir los vehículos retenidos en recursos educativos para la creación del "Centro de Transformación Energética Los Patios", espacio comunitario para:
+
+1. Capacitación técnica en mecánica automotriz
+2. Educación en energías renovables y economía circular
+3. Emprendimiento juvenil en tecnología
+4. Reciclaje y aprovechamiento de materiales
+
+III. OBJETIVOS ESPECÍFICOS:
+
+1. Recuperar 50+ vehículos para fines educativos
+2. Capacitar 200 jóvenes anualmente en técnicas automotrices
+3. Crear 20 microempresas de reparación y reciclaje
+4. Desarrollar prototipos de energía alternativa
+5. Reducir contaminación por chatarra en 70%
+
+IV. METODOLOGÍA:
+
+FASE A - RECUPERACIÓN (Meses 1-3):
+1. Selección de vehículos "donables" por el Estado
+2. Traslado a espacio comunitario designado
+3. Evaluación técnica y clasificación
+
+FASE B - TRANSFORMACIÓN (Meses 4-9):
+1. Acondicionamiento de espacio educativo
+2. Organización de vehículos por sistemas (motores, transmisiones, etc.)
+3. Desarrollo de currículo educativo
+4. Capacitación de instructores
+
+FASE C - OPERACIÓN (Mes 10 en adelante):
+1. Inicio de programas de capacitación
+2. Talleres abiertos a la comunidad
+3. Proyectos de innovación
+4. Microempresas estudiantiles
+
+V. BENEFICIOS:
+
+PARA EL ESTADO:
+- Solución a problema de hacinamiento vehicular
+- Cumplimiento de metas sociales y educativas
+- Reducción de costos de mantenimiento de patios
+- Imagen positiva de innovación social
+
+PARA LA COMUNIDAD:
+- Acceso a educación técnica gratuita
+- Oportunidades de empleo y emprendimiento
+- Espacio comunitario de innovación
+- Reducción de contaminación ambiental
+
+PARA LOS PROPIETARIOS:
+- Destino social positivo para sus vehículos
+- Posible compensación educativa o laboral
+- Resolución de situación legal
+- Contribución al desarrollo comunitario
+
+VI. MARCO LEGAL:
+
+1. DONACIÓN CON FINES EDUCATIVOS:
+   Los propietarios donan sus vehículos al proyecto educativo
+   El Estado exonera multas y facilita trámites
+   Se establece convenio tripartito
+
+2. CONVENIO EDUCATIVO:
+   Entre propietarios, Estado e institución educativa
+   Establece responsabilidades y beneficios
+   Garantiza sostenibilidad del proyecto
+
+3. FIGURA JURÍDICA:
+   Fundación o corporación sin ánimo de lucro
+   Con personería jurídica y transparencia
+   Administración comunitaria
+
+VII. RECURSOS NECESARIOS:
+
+1. FÍSICOS:
+   - Espacio comunitario (2.000 m² mínimo)
+   - Vehículos donados (50+ unidades)
+   - Herramientas básicas de taller
+
+2. HUMANOS:
+   - Instructores calificados
+   - Administradores comunitarios
+   - Estudiantes beneficiarios
+
+3. FINANCIEROS:
+   - Inversión inicial: $150.000.000 COP
+   - Fuentes: Presupuesto municipal, cooperación internacional, aportes comunitarios
+   - Sostenibilidad: Talleres pagos, venta de repuestos reciclados, convenios con empresas
+
+VIII. CRONOGRAMA:
+
+MES 1-2: Negociación y convenios
+MES 3-4: Adecuación de espacio
+MES 5-6: Recepción de vehículos
+MES 7-9: Capacitación inicial
+MES 10: Inauguración y operación
+
+IX. SOLICITUD FORMAL:
+
+Solicitamos:
+1. Autorización para recuperar 50 vehículos con fines educativos
+2. Exoneración de multas para dichos vehículos
+3. Apoyo logístico para traslado
+4. Cooperación interinstitucional para implementación
+5. Reconocimiento oficial del proyecto
+
+X. FIRMAS Y COMPROMISOS:
+
+REPRESENTANTES DE PROPIETARIOS:
+[NOMBRE] - C.C. [NÚMERO] - VIN: [VIN]
+
+REPRESENTANTE INSTITUCIÓN EDUCATIVA:
+[NOMBRE] - Cargo: [CARGO]
+
+REPRESENTANTE COMUNIDAD:
+[NOMBRE] - Líder comunitario
+
+ANEXOS:
+1. Lista de vehículos propuestos para el proyecto
+2. Currículo educativo propuesto
+3. Planos del espacio comunitario
+4. Presupuesto detallado
+5. Cartas de apoyo comunitario
+
+"TRANSFORMAMOS PROBLEMAS EN SOLUCIONES, CHATARRA EN EDUCACIÓN"
+Proyecto presentado con esperanza y determinación comunitaria`
+                },
+                quiz: {
+                    question: "¿Qué ventaja tiene transformar vehículos confiscados en proyecto educativo?",
+                    options: [
+                        {text: "Es más barato que la chatarrización", correct: false},
+                        {text: "Crea presión política positiva difícil de rechazar", correct: true},
+                        {text: "Requiere menos trámites", correct: false},
+                        {text: "No necesita apoyo del Estado", correct: false}
+                    ],
+                    correctFeedback: "✅ ¡EXACTO! Es políticamente difícil rechazar un proyecto educativo comunitario. Transformamos la narrativa de 'infractores' a 'donantes educativos'.",
+                    wrongFeedback: "❌ NO. La ventaja principal es POLÍTICA y de NARRATIVA. Creamos una solución que es difícil atacar sin quedar mal."
+                }
+            }
+        ];
+
+        // ==================== SISTEMA REVOLUCIONARIO ====================
+        let currentStrategyIndex = 0;
+        let unlockedStrategies = new Set([1]);
+        let masteredStrategies = new Set();
+        let activeEnergy = [false, false, false];
+        let liberationPower = 0;
+
+        // ==================== INICIALIZAR REVOLUCIÓN ====================
+        function initializeRevolution() {
+            renderStrategyList();
+            updatePowerLevel();
+            startCountdown();
+        }
+
+        // ==================== RENDERIZAR ESTRATEGIAS ====================
+        function renderStrategyList() {
+            const strategyList = document.getElementById('strategy-list');
+            strategyList.innerHTML = '';
+            
+            revolutionStrategies.forEach((strategy, index) => {
+                const isUnlocked = unlockedStrategies.has(strategy.id);
+                const isMastered = masteredStrategies.has(strategy.id);
+                const isActive = index === currentStrategyIndex;
+                
+                let statusClass, statusText;
+                if (isMastered) {
+                    statusClass = 'status-mastered';
+                    statusText = 'DOMINADO';
+                } else if (isUnlocked) {
+                    statusClass = 'status-unlocked';
+                    statusText = 'DESBLOQUEADO';
+                } else {
+                    statusClass = 'status-locked';
+                    statusText = 'BLOQUEADO';
+                }
+                
+                const strategyCard = document.createElement('div');
+                strategyCard.className = `strategy-card ${isActive ? 'active' : ''} ${isMastered ? 'completed' : ''}`;
+                strategyCard.innerHTML = `
+                    <div class="strategy-icon">${strategy.icon}</div>
+                    <div class="strategy-title">${strategy.title}</div>
+                    <div class="strategy-desc">${strategy.description}</div>
+                    <div class="status-badge ${statusClass}">${statusText}</div>
+                    ${strategy.energy ? `<div style="color: var(--revolution-yellow); font-size: 0.8rem; margin-top: 10px;">Energía: ${strategy.energy} ⚡</div>` : ''}
+                `;
+                
+                if (isUnlocked) {
+                    strategyCard.onclick = () => {
+                        loadStrategy(index);
+                    };
+                } else {
+                    strategyCard.style.opacity = '0.6';
+                    strategyCard.style.cursor = 'not-allowed';
+                    strategyCard.title = "Activa más energía o completa estrategias anteriores";
+                }
+                
+                strategyList.appendChild(strategyCard);
+            });
+        }
+
+        // ==================== ACTIVAR ENERGÍA ====================
+        function activateEnergy(energyIndex) {
+            activeEnergy[energyIndex - 1] = !activeEnergy[energyIndex - 1];
+            
+            // Actualizar visual de celdas de energía
+            const energyCells = document.querySelectorAll('.energy-cell');
+            energyCells.forEach((cell, index) => {
+                if (index === energyIndex - 1) {
+                    if (activeEnergy[energyIndex - 1]) {
+                        cell.style.background = 'rgba(253, 203, 110, 0.3)';
+                        cell.style.borderColor = 'var(--revolution-yellow)';
+                        cell.style.boxShadow = '0 0 15px rgba(253, 203, 110, 0.5)';
+                    } else {
+                        cell.style.background = 'rgba(9, 132, 227, 0.1)';
+                        cell.style.borderColor = 'var(--revolution-blue)';
+                        cell.style.boxShadow = 'none';
+                    }
+                }
+            });
+            
+            // Desbloquear estrategias según energía activa
+            checkEnergyUnlocks();
+            updatePowerLevel();
+        }
+
+        // ==================== VERIFICAR DESBLOQUEOS POR ENERGÍA ====================
+        function checkEnergyUnlocks() {
+            revolutionStrategies.forEach(strategy => {
+                if (strategy.energy && activeEnergy[strategy.energy - 1]) {
+                    unlockedStrategies.add(strategy.id);
+                }
+            });
+            renderStrategyList();
+        }
+
+        // ==================== CARGAR ESTRATEGIA ====================
+        function loadStrategy(index) {
+            const strategy = revolutionStrategies[index];
+            currentStrategyIndex = index;
+            
+            // Actualizar contenido
+            document.getElementById('content-display').innerHTML = `
+                <div class="revolution-content-box">
+                    ${strategy.content}
+                </div>
+            `;
+            
+            // Actualizar panel de acciones
+            const isMastered = masteredStrategies.has(strategy.id);
+            const actionPanel = document.getElementById('action-panel');
+            
+            if (isMastered) {
+                actionPanel.innerHTML = `
+                    <button class="revolution-btn btn-generate" onclick="generateWeapon()">
+                        🔨 GENERAR DOCUMENTO
+                    </button>
+                    <button class="revolution-btn" onclick="takeQuiz()">
+                        🧠 REPASAR CONOCIMIENTO
+                    </button>
+                    ${index < revolutionStrategies.length - 1 ? `
+                    <button class="revolution-btn" onclick="nextStrategy()">
+                        ➡️ SIGUIENTE ESTRATEGIA
+                    </button>` : ''}
+                `;
+            } else {
+                actionPanel.innerHTML = `
+                    <button class="revolution-btn" onclick="takeQuiz()">
+                        ⚡ PROBAR CONOCIMIENTO
+                    </button>
+                    <button class="revolution-btn btn-generate" onclick="generateWeapon()">
+                        🔥 GENERAR ARMA LEGAL
+                    </button>
+                `;
+            }
+            
+            // Ocultar otros elementos
+            document.getElementById('weapon-display').style.display = 'none';
+            document.getElementById('victory-screen').style.display = 'none';
+            
+            // Actualizar lista
+            renderStrategyList();
+            updatePowerLevel();
+        }
+
+        // ==================== COMENZAR PRIMERA ESTRATEGIA ====================
+        function startFirstStrategy() {
+            loadStrategy(0);
+        }
+
+        // ==================== TOMAR PRUEBA ====================
+        function takeQuiz() {
+            const strategy = revolutionStrategies[currentStrategyIndex];
+            
+            const question = strategy.quiz.question;
+            const options = strategy.quiz.options;
+            
+            document.getElementById('content-display').innerHTML = `
+                <div class="revolution-content-box">
+                    <h2 class="revolution-title">PRUEBA DE DOMINIO</h2>
+                    <div style="background: rgba(214, 48, 49, 0.1); padding: 20px; border: 2px solid var(--revolution-red); margin: 20px 0;">
+                        <strong style="color: var(--revolution-yellow);">PREGUNTA:</strong><br>
+                        ${question}
+                    </div>
+                    
+                    <div style="display: grid; gap: 15px; margin: 25px 0;">
+                        ${options.map((option, i) => `
+                            <button class="revolution-btn" onclick="checkQuizAnswer(${i}, ${option.correct})" style="text-align: left; font-size: 1rem;">
+                                ${option.text}
+                            </button>
+                        `).join('')}
+                    </div>
+                    
+                    <div id="quiz-feedback" style="display: none; padding: 20px; margin: 20px 0; border: 3px solid; font-weight: bold;"></div>
+                </div>
+            `;
+        }
+
+        // ==================== VERIFICAR RESPUESTA ====================
+        function checkQuizAnswer(optionIndex, isCorrect) {
+            const strategy = revolutionStrategies[currentStrategyIndex];
+            const feedback = document.getElementById('quiz-feedback');
+            
+            if (isCorrect) {
+                feedback.style.background = 'rgba(0, 184, 148, 0.1)';
+                feedback.style.borderColor = 'var(--revolution-green)';
+                feedback.style.color = 'var(--revolution-green)';
+                feedback.innerHTML = `✅ ${strategy.quiz.correctFeedback}<br><br>
+                    <button class="revolution-btn btn-generate" onclick="masterStrategy()" style="margin-top: 15px;">
+                        🎯 DOMINAR ESTA ESTRATEGIA
+                    </button>`;
+                
+                masteredStrategies.add(strategy.id);
+                
+                // Desbloquear siguiente si existe
+                if (currentStrategyIndex < revolutionStrategies.length - 1) {
+                    unlockedStrategies.add(revolutionStrategies[currentStrategyIndex + 1].id);
+                }
+                
+                updatePowerLevel();
+                
+                // Verificar si todas están dominadas
+                if (masteredStrategies.size === revolutionStrategies.length) {
+                    setTimeout(() => {
+                        showVictoryScreen();
+                    }, 2000);
+                }
+            } else {
+                feedback.style.background = 'rgba(214, 48, 49, 0.1)';
+                feedback.style.borderColor = 'var(--revolution-red)';
+                feedback.style.color = 'var(--revolution-red)';
+                feedback.innerHTML = `❌ ${strategy.quiz.wrongFeedback}<br><br>
+                    <button class="revolution-btn" onclick="loadStrategy(currentStrategyIndex)" style="margin-top: 15px;">
+                        🔄 REVISAR ESTRATEGIA
+                    </button>`;
+            }
+            
+            feedback.style.display = 'block';
+        }
+
+        // ==================== DOMINAR ESTRATEGIA ====================
+        function masterStrategy() {
+            loadStrategy(currentStrategyIndex);
+        }
+
+        // ==================== GENERAR ARMA LEGAL ====================
+        function generateWeapon() {
+            const strategy = revolutionStrategies[currentStrategyIndex];
+            
+            const weaponDisplay = document.getElementById('weapon-display');
+            weaponDisplay.innerHTML = `
+                <h2 class="weapon-title">${strategy.weapon.name}</h2>
+                <div class="document-display">${strategy.weapon.template}</div>
+                <div style="margin-top: 30px; display: flex; gap: 15px; flex-wrap: wrap;">
+                    <button class="revolution-btn btn-download" onclick="downloadWeapon()">
+                        📥 DESCARGAR DOCUMENTO
+                    </button>
+                    <button class="revolution-btn btn-ucc" onclick="customizeWeapon()">
+                        ✏️ PERSONALIZAR
+                    </button>
+                    <button class="revolution-btn" onclick="closeWeaponDisplay()">
+                        ❌ CERRAR
+                    </button>
+                </div>
+            `;
+            
+            weaponDisplay.style.display = 'block';
+        }
+
+        // ==================== CERRAR VISUALIZACIÓN ====================
+        function closeWeaponDisplay() {
+            document.getElementById('weapon-display').style.display = 'none';
+        }
+
+        // ==================== DESCARGAR DOCUMENTO ====================
+        function downloadWeapon() {
+            const strategy = revolutionStrategies[currentStrategyIndex];
+            const blob = new Blob([strategy.weapon.template], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Liberacion_${strategy.title.replace(/\s+/g, '_')}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            alert(`✅ Documento descargado: ${a.download}`);
+        }
+
+        // ==================== PERSONALIZAR DOCUMENTO ====================
+        function customizeWeapon() {
+            const strategy = revolutionStrategies[currentStrategyIndex];
+            const newTemplate = prompt("Personaliza el documento (puedes cambiar datos entre []):", strategy.weapon.template);
+            if (newTemplate !== null) {
+                strategy.weapon.template = newTemplate;
+                generateWeapon();
+                alert("✅ Documento personalizado correctamente");
+            }
+        }
+
+        // ==================== SIGUIENTE ESTRATEGIA ====================
+        function nextStrategy() {
+            if (currentStrategyIndex < revolutionStrategies.length - 1) {
+                currentStrategyIndex++;
+                loadStrategy(currentStrategyIndex);
+            }
+        }
+
+        // ==================== MOSTRAR VICTORIA ====================
+        function showVictoryScreen() {
+            document.getElementById('content-display').style.display = 'none';
+            document.getElementById('action-panel').style.display = 'none';
+            document.getElementById('victory-screen').style.display = 'block';
+        }
+
+        // ==================== ACTUALIZAR NIVEL DE PODER ====================
+        function updatePowerLevel() {
+            liberationPower = (masteredStrategies.size / revolutionStrategies.length) * 100;
+            document.getElementById('progress-fill').style.width = `${liberationPower}%`;
+            document.getElementById('power-level').textContent = `${Math.round(liberationPower)}%`;
+        }
+
+        // ==================== CONTADOR DE LIBERACIÓN ====================
+        function startCountdown() {
+            let countdown = 30;
+            const countdownElement = document.getElementById('liberation-countdown');
+            
+            setInterval(() => {
+                countdown--;
+                if (countdown < 0) countdown = 30;
+                if (countdownElement) {
+                    countdownElement.textContent = countdown;
+                }
+            }, 1000);
+        }
+
+        // ==================== GENERAR MANIFIESTO ====================
+        function generateLiberationManifest() {
+            let manifest = `MANIFIESTO DE LIBERACIÓN VEHICULAR - LOS PATIOS\n`;
+            manifest += `===============================================\n\n`;
+            manifest += `Generado el: ${new Date().toLocaleString('es-CO')}\n`;
+            manifest += `Estrategias dominadas: ${masteredStrategies.size}/${revolutionStrategies.length}\n`;
+            manifest += `Nivel de poder: ${liberationPower}%\n\n`;
+            
+            manifest += `ESTRATEGIAS APROBADAS:\n`;
+            revolutionStrategies.forEach(strategy => {
+                if (masteredStrategies.has(strategy.id)) {
+                    manifest += `\n${strategy.icon} ${strategy.title}\n`;
+                    manifest += `   ${strategy.description}\n`;
+                }
+            });
+            
+            manifest += `\n\nDOCUMENTOS DE LIBERACIÓN:\n`;
+            revolutionStrategies.forEach(strategy => {
+                if (masteredStrategies.has(strategy.id)) {
+                    manifest += `\n═══════════════════════════════════════════\n`;
+                    manifest += `${strategy.weapon.name}\n`;
+                    manifest += `═══════════════════════════════════════════\n`;
+                    manifest += strategy.weapon.template + '\n';
+                }
+            });
+            
+            manifest += `\n\nPROTOCOLO DE ACCIÓN MASIVA:\n`;
+            manifest += `1. Convocar asamblea de afectados\n`;
+            manifest += `2. Capacitar en UCC-1 y contratos\n`;
+            manifest += `3. Presentación masiva de documentos\n`;
+            manifest += `4. Recuperación física coordinada\n`;
+            manifest += `5. Transformación educativa comunitaria\n`;
+            
+            const blob = new Blob([manifest], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'Manifiesto_Liberacion_Los_Patios.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            alert('📜 ¡Manifiesto generado! La revolución está documentada.');
+        }
+
+        // ==================== DESCARGAR TODO ====================
+        function downloadAllWeapons() {
+            let allWeapons = `ARSENAL COMPLETO DE LIBERACIÓN - LOS PATIOS\n`;
+            allWeapons += `============================================\n\n`;
+            
+            revolutionStrategies.forEach(strategy => {
+                if (masteredStrategies.has(strategy.id)) {
+                    allWeapons += `\n${strategy.weapon.icon} ${strategy.weapon.name}\n`;
+                    allWeapons += `${'═'.repeat(50)}\n`;
+                    allWeapons += strategy.weapon.template + '\n\n';
+                }
+            });
+            
+            const blob = new Blob([allWeapons], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'Arsenal_Completo_Liberacion.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            alert('⚡ ¡Arsenal completo descargado! La liberación comienza ahora.');
+        }
+
+        // ==================== INICIAR AL CARGAR ====================
+        window.onload = initializeRevolution;
+    </script>
+</body>
+</html>
