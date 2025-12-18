@@ -21,7 +21,282 @@
             box-sizing: border-box;
             font-family: 'Georgia', serif;
         }
+        <script>
+// Configuration
+const CONFIG = {
+    API_URL: 'YOUR_GOOGLE_APPS_SCRIPT_WEBAPP_URL', // Replace after deployment
+    STORE_CODE: 'AYNI_SALENTO',
+    TRIPS_ECOSYSTEM_URL: 'https://tripstocolombia.com/api/stores/'
+};
+
+// Load Products Dynamically
+async function loadProducts() {
+    try {
+        const response = await fetch(`${CONFIG.API_URL}?action=getProducts`);
+        const data = await response.json();
         
+        if (data.products && data.products.length > 0) {
+            renderProducts(data.products);
+            updateWhatsAppNumbers(data.whatsapp);
+        }
+    } catch (error) {
+        console.log('Using static products as fallback');
+        // Fallback to static products
+    }
+}
+
+// Render Products from Sheet Data
+function renderProducts(products) {
+    const grid = document.querySelector('.products-grid');
+    if (!grid) return;
+    
+    grid.innerHTML = products.map(product => `
+        <div class="product-card" data-id="${product.ID}">
+            <div class="product-image" style="background: linear-gradient(135deg, #DEB887, #2E8B57);">
+                <img src="${product.Image_URL || 'https://via.placeholder.com/350x250?text=Medicina+de+la+Tierra'}" 
+                     alt="${product.Name}" 
+                     style="width: 100%; height: 100%; object-fit: cover;">
+                <div class="product-badge">${product.Category || 'SABIDURÍA ANCESTRAL'}</div>
+            </div>
+            <div class="product-content">
+                <div class="product-header">
+                    <div class="product-icon">${getProductIcon(product.Category)}</div>
+                    <div class="product-info">
+                        <h3>${product.Name}</h3>
+                        <div class="product-origin">${product.Origin || 'Corazón de Colombia'}</div>
+                    </div>
+                </div>
+                <div class="product-description">${product.Description}</div>
+                
+                ${product.Benefits ? `
+                <div class="product-benefits">
+                    <div class="benefits-title">Beneficios Ancestrales:</div>
+                    <div class="benefits-list">${formatBenefits(product.Benefits)}</div>
+                </div>` : ''}
+                
+                <div class="product-actions">
+                    <div>
+                        <div class="product-price">${formatPrice(product.Price_COP)}</div>
+                        <div class="price-note">
+                            ${product.Unit || 'Unidad'} • 
+                            ${product.Stock > 0 ? `Stock: ${product.Stock}` : 'Stock limitado'}
+                            ${product.Community_Impact ? `<br><small style="color: var(--forest);">${product.Community_Impact}</small>` : ''}
+                        </div>
+                    </div>
+                    <button class="purchase-btn" onclick="addToCart('${product.ID}', '${product.Name}', ${product.Price_COP})">
+                        Agregar al Ritual
+                    </button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Shopping Cart Functionality
+let cart = [];
+
+function addToCart(id, name, price) {
+    const existing = cart.find(item => item.id === id);
+    
+    if (existing) {
+        existing.quantity++;
+    } else {
+        cart.push({
+            id: id,
+            name: name,
+            price: price,
+            quantity: 1
+        });
+    }
+    
+    updateCartUI();
+    showNotification(`${name} agregado al ritual`);
+}
+
+function updateCartUI() {
+    const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+    const cartTotal = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    
+    // Update cart indicator (you can add this element to your HTML)
+    const cartIndicator = document.getElementById('cart-indicator') || createCartIndicator();
+    cartIndicator.innerHTML = `🛒 Ritual (${cartCount}) - ${formatPrice(cartTotal)}`;
+}
+
+function createCartIndicator() {
+    const indicator = document.createElement('div');
+    indicator.id = 'cart-indicator';
+    indicator.style.cssText = `
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: var(--forest);
+        color: white;
+        padding: 15px 25px;
+        border-radius: 50px;
+        cursor: pointer;
+        z-index: 1000;
+        box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        font-weight: bold;
+    `;
+    indicator.onclick = showCartModal;
+    document.body.appendChild(indicator);
+    return indicator;
+}
+
+function showCartModal() {
+    const modal = document.createElement('div');
+    modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 2000;
+    `;
+    
+    modal.innerHTML = `
+        <div style="background: white; border-radius: 20px; padding: 30px; max-width: 500px; width: 90%;">
+            <h3 style="color: var(--earth); margin-bottom: 20px;">Tu Ritual de Sanación</h3>
+            ${cart.length === 0 ? 
+                '<p>Tu ritual está vacío. Agrega medicina de la tierra.</p>' : 
+                cart.map(item => `
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #eee;">
+                        <span>${item.name} × ${item.quantity}</span>
+                        <span>${formatPrice(item.price * item.quantity)}</span>
+                    </div>
+                `).join('')
+            }
+            ${cart.length > 0 ? `
+                <div style="font-weight: bold; margin-top: 20px; padding-top: 20px; border-top: 2px solid var(--earth);">
+                    Total: ${formatPrice(cart.reduce((sum, item) => sum + (item.price * item.quantity), 0))}
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 30px;">
+                    <button onclick="closeCart()" style="flex:1; padding: 12px; background: #ccc; border: none; border-radius: 10px;">Seguir Explorando</button>
+                    <button onclick="checkout()" style="flex:1; padding: 12px; background: var(--forest); color: white; border: none; border-radius: 10px;">Completar Ritual</button>
+                </div>
+            ` : ''}
+            <button onclick="closeCart()" style="position: absolute; top: 10px; right: 10px; background: none; border: none; font-size: 20px; cursor: pointer;">×</button>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+}
+
+function closeCart() {
+    document.querySelector('div[style*="position: fixed; top: 0"]')?.remove();
+}
+
+function checkout() {
+    const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    const productList = cart.map(item => `${item.name} (${item.quantity}x)`).join(', ');
+    
+    const whatsappMessage = `Hola AYNI SANTUARIO! Quiero hacer este pedido:%0A%0A${productList}%0A%0ATotal: ${formatPrice(total)}%0A%0AMi nombre: [TU NOMBRE]%0ADirección: [TU DIRECCIÓN]`;
+    const whatsappURL = `https://wa.me/573226921775?text=${whatsappMessage}`;
+    
+    window.open(whatsappURL, '_blank');
+    closeCart();
+    cart = [];
+    updateCartUI();
+}
+
+// Utility Functions
+function formatPrice(price) {
+    return '$' + parseInt(price).toLocaleString('es-CO') + ' COP';
+}
+
+function formatBenefits(benefits) {
+    if (!benefits) return '';
+    return benefits.split(',').map(b => `• ${b.trim()}`).join('<br>');
+}
+
+function getProductIcon(category) {
+    const icons = {
+        'aceite': '⚫',
+        'hongos': '🍄',
+        'aromaterapia': '🌿',
+        'miel': '🐝',
+        'pomada': '🔥',
+        'default': '🌱'
+    };
+    return icons[category?.toLowerCase()] || icons.default;
+}
+
+function showNotification(message) {
+    const notification = document.createElement('div');
+    notification.textContent = message;
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: var(--forest);
+        color: white;
+        padding: 15px 25px;
+        border-radius: 10px;
+        z-index: 3000;
+        animation: slideIn 0.3s ease;
+    `;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
+
+// Add animation styles
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+    @keyframes slideOut {
+        from { transform: translateX(0); opacity: 1; }
+        to { transform: translateX(100%); opacity: 0; }
+    }
+`;
+document.head.appendChild(style);
+
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', () => {
+    loadProducts();
+    
+    // Add store code to all external links
+    document.querySelectorAll('a[href*="tripstocolombia.com"]').forEach(link => {
+        const url = new URL(link.href);
+        url.searchParams.set('store', CONFIG.STORE_CODE);
+        link.href = url.toString();
+    });
+});
+
+// Multi-store integration
+async function connectToEcosystem() {
+    try {
+        const response = await fetch(`${CONFIG.TRIPS_ECOSYSTEM_URL}${CONFIG.STORE_CODE}`);
+        const ecosystem = await response.json();
+        
+        // Update stats with live data
+        if (ecosystem.stats) {
+            document.querySelectorAll('.sanctuary-stat').forEach((stat, index) => {
+                const labels = ['Productos', 'Comunidades', 'Orgánico', 'Impacto'];
+                if (stat.querySelector('.stat-label').textContent.includes(labels[index])) {
+                    const value = Object.values(ecosystem.stats)[index];
+                    if (value) {
+                        stat.querySelector('.stat-number').textContent = value;
+                    }
+                }
+            });
+        }
+    } catch (error) {
+        console.log('Ecosystem connection optional');
+    }
+}
+</script>
         body {
             background: linear-gradient(135deg, var(--earth), var(--forest));
             color: #333;
@@ -1055,5 +1330,80 @@
         // Simulate live impact updates
         setInterval(updateImpactPrices, 30000);
     </script>
+    <!-- Add to your HTML before </body> -->
+<div class="whatsapp-section">
+    <h3 class="section-title">Conéctate con la Tierra</h3>
+    <div class="whatsapp-buttons">
+        <a href="https://wa.me/573226921775?text=Hola%20AYNI%20SANCTUARY,%20quiero%20hacer%20un%20pedido%20de%20medicina%20de%20la%20tierra" 
+           class="whatsapp-btn orders-btn" target="_blank">
+           <span>📦 PEDIDOS & ENVÍOS</span>
+           <small>+57 322 692 1775</small>
+        </a>
+        
+        <a href="https://wa.me/573223319416?text=Hola%20AYNI%20SANCTUARY,%20quiero%20conversar%20sobre%20alianzas%20estratégicas%20y%20comunidad" 
+           class="whatsapp-btn alliances-btn" target="_blank">
+           <span>🤝 ALIANZAS ANCESTRALES</span>
+           <small>+57 322 331 9416</small>
+        </a>
+    </div>
+</div>
+
+<style>
+.whatsapp-section {
+    background: linear-gradient(135deg, #25D366, #128C7E);
+    border-radius: 20px;
+    padding: 40px;
+    margin: 40px 0;
+    text-align: center;
+    color: white;
+}
+
+.whatsapp-buttons {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 30px;
+}
+
+.whatsapp-btn {
+    padding: 20px 30px;
+    border-radius: 15px;
+    text-decoration: none;
+    font-weight: bold;
+    font-size: 1.1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: all 0.3s ease;
+    min-width: 250px;
+}
+
+.orders-btn {
+    background: white;
+    color: #25D366;
+}
+
+.alliances-btn {
+    background: var(--sun);
+    color: var(--earth);
+}
+
+.whatsapp-btn:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+.whatsapp-btn small {
+    font-size: 0.9rem;
+    opacity: 0.9;
+    margin-top: 5px;
+}
+
+@media (max-width: 768px) {
+    .whatsapp-buttons {
+        flex-direction: column;
+    }
+}
+</style>
 </body>
 </html>
