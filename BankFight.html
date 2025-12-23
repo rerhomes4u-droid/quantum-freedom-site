@@ -1,0 +1,1496 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BankFight - Predatory Lending Defense System</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(90deg, #1a2980 0%, #26d0ce 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .progress-bar {
+            background: #e0e0e0;
+            height: 8px;
+            margin: 20px 0;
+        }
+        
+        .progress {
+            background: #26d0ce;
+            height: 100%;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .step-container {
+            display: none;
+            padding: 30px;
+        }
+        
+        .step-container.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        h2 {
+            color: #1a2980;
+            margin-bottom: 20px;
+            border-bottom: 3px solid #26d0ce;
+            padding-bottom: 10px;
+        }
+        
+        .document-card {
+            background: #f8f9fa;
+            border-left: 5px solid #1a2980;
+            padding: 20px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        
+        .info-box {
+            background: #e3f2fd;
+            border-left: 5px solid #2196f3;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        
+        .warning-box {
+            background: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #1a2980;
+        }
+        
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 10px 0;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn {
+            background: linear-gradient(90deg, #1a2980 0%, #26d0ce 100%);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            margin: 10px 5px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .btn-secondary {
+            background: #6c757d;
+        }
+        
+        .btn-success {
+            background: #28a745;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+        }
+        
+        .button-group {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+        
+        .document-output {
+            background: #f8f9fa;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            margin-top: 20px;
+            max-height: 500px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .download-btn {
+            margin-top: 15px;
+        }
+        
+        .step-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
+        }
+        
+        .step-dot {
+            width: 12px;
+            height: 12px;
+            background: #ddd;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        
+        .step-dot.active {
+            background: #1a2980;
+            transform: scale(1.2);
+        }
+        
+        .evidence-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        
+        .evidence-list li {
+            background: white;
+            padding: 12px;
+            margin: 8px 0;
+            border-left: 4px solid #26d0ce;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .evidence-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .timeline {
+            position: relative;
+            padding: 20px 0;
+        }
+        
+        .timeline-item {
+            margin: 30px 0;
+            padding-left: 30px;
+            position: relative;
+        }
+        
+        .timeline-item:before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 15px;
+            height: 15px;
+            background: #1a2980;
+            border-radius: 50%;
+        }
+        
+        .timeline-item:after {
+            content: '';
+            position: absolute;
+            left: 7px;
+            top: 15px;
+            width: 2px;
+            height: calc(100% + 15px);
+            background: #ddd;
+        }
+        
+        .timeline-item:last-child:after {
+            display: none;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-completed { background: #d4edda; color: #155724; }
+        .status-urgent { background: #f8d7da; color: #721c24; }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .toggle-container {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            cursor: pointer;
+        }
+        
+        .toggle-content {
+            display: none;
+            padding-top: 15px;
+        }
+        
+        @media print {
+            .no-print { display: none !important; }
+            .document-output { max-height: none !important; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏦 BankFight Defense System</h1>
+            <div class="subtitle">Complete Predatory Lending Response for George Medina</div>
+        </header>
+        
+        <div class="progress-bar">
+            <div class="progress" id="progress"></div>
+        </div>
+        
+        <div class="step-indicator" id="stepIndicator">
+            <!-- Filled by JavaScript -->
+        </div>
+        
+        <!-- STEP 1: Case Overview -->
+        <div class="step-container active" id="step1">
+            <h2>📋 Step 1: Understanding Your Situation</h2>
+            
+            <div class="info-box">
+                <strong>Hi George,</strong><br><br>
+                I've analyzed all your documents. Here's what happened:
+                <ul style="margin: 10px 0 10px 20px;">
+                    <li><strong>2021:</strong> BankFinancial promised 20-year 2nd mortgage, gave you 1-year note</li>
+                    <li><strong>2023:</strong> They promised 3-year term, sent 1-year note first, then corrected</li>
+                    <li><strong>Pattern:</strong> This is a systematic bait-and-switch tactic</li>
+                </ul>
+                This is <strong>predatory lending</strong> and possibly <strong>fraud</strong>.
+            </div>
+            
+            <div class="form-group">
+                <label>Your Name:</label>
+                <input type="text" id="yourName" placeholder="Ramiro (Your Name)">
+            </div>
+            
+            <div class="form-group">
+                <label>George's Full Name:</label>
+                <input type="text" id="georgeName" value="George Medina">
+            </div>
+            
+            <div class="form-group">
+                <label>Church/Mission Name (if applicable):</label>
+                <input type="text" id="churchName" placeholder="Enter church or mission name">
+            </div>
+            
+            <div class="warning-box">
+                ⚠️ <strong>CRITICAL:</strong> Do NOT communicate verbally with BankFinancial anymore. Everything must be in writing.
+            </div>
+            
+            <div class="button-group">
+                <button class="btn" onclick="nextStep()">Next Step: Gather Evidence →</button>
+            </div>
+        </div>
+        
+        <!-- STEP 2: Evidence Gathering -->
+        <div class="step-container" id="step2">
+            <h2>🔍 Step 2: Evidence Checklist</h2>
+            
+            <div class="info-box">
+                Check ALL evidence you have. We'll use these to build your case.
+            </div>
+            
+            <ul class="evidence-list">
+                <li>
+                    <div class="evidence-checkbox">
+                        <input type="checkbox" id="evidence1" class="evidence-check">
+                        <label for="evidence1">Both promissory notes (1-year AND 3-year versions)</label>
+                    </div>
+                    <span class="status-badge status-completed">IN YOUR EMAIL</span>
+                </li>
+                <li>
+                    <div class="evidence-checkbox">
+                        <input type="checkbox" id="evidence2" class="evidence-check">
+                        <label for="evidence2">Email where they sent wrong document</label>
+                    </div>
+                </li>
+                <li>
+                    <div class="evidence-checkbox">
+                        <input type="checkbox" id="evidence3" class="evidence-check">
+                        <label for="evidence3">Maturity notice (Oct 31, 2022)</label>
+                    </div>
+                    <span class="status-badge status-completed">IN YOUR EMAIL</span>
+                </li>
+                <li>
+                    <div class="evidence-checkbox">
+                        <input type="checkbox" id="evidence4" class="evidence-check">
+                        <label for="evidence4">Loan modification agreement</label>
+                    </div>
+                    <span class="status-badge status-completed">IN YOUR EMAIL</span>
+                </li>
+                <li>
+                    <div class="evidence-checkbox">
+                        <input type="checkbox" id="evidence5" class="evidence-check">
+                        <label for="evidence5">Closing statements</label>
+                    </div>
+                    <span class="status-badge status-completed">IN YOUR EMAIL</span>
+                </li>
+                <li>
+                    <div class="evidence-checkbox">
+                        <input type="checkbox" id="evidence6" class="evidence-check">
+                        <label for="evidence6">Any written promises of 20-year term (2021)</label>
+                    </div>
+                </li>
+                <li>
+                    <div class="evidence-checkbox">
+                        <input type="checkbox" id="evidence7" class="evidence-check">
+                        <label for="evidence7">Text messages about loan terms</label>
+                    </div>
+                </li>
+                <li>
+                    <div class="evidence-checkbox">
+                        <input type="checkbox" id="evidence8" class="evidence-check">
+                        <label for="evidence8">Bank statements showing payments</label>
+                    </div>
+                </li>
+            </ul>
+            
+            <div class="form-group">
+                <label>Bank Officer Name (who handled your loan):</label>
+                <input type="text" id="bankOfficer" placeholder="Edgar Navarro or other officer">
+            </div>
+            
+            <div class="info-box">
+                📝 <strong>TIP:</strong> Forward ALL email correspondence with BankFinancial to a dedicated folder. Take screenshots of text messages.
+            </div>
+            
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="prevStep()">← Back</button>
+                <button class="btn" onclick="nextStep()">Next: Generate First Demand Letter →</button>
+            </div>
+        </div>
+        
+        <!-- STEP 3: TILA Demand Letter -->
+        <div class="step-container" id="step3">
+            <h2>📄 Step 3: Truth in Lending Act (TILA) Demand</h2>
+            
+            <div class="info-box">
+                This is your <strong>FIRST OFFICIAL LEGAL DEMAND</strong>. The Truth in Lending Act REQUIRES banks to give you proper disclosures. They didn't. This gives you powerful legal rights.
+            </div>
+            
+            <div class="form-group">
+                <label>Today's Date:</label>
+                <input type="date" id="todayDate" value="">
+            </div>
+            
+            <div class="form-group">
+                <label>Your Address:</label>
+                <input type="text" id="yourAddress" placeholder="Your street address">
+            </div>
+            
+            <div class="form-group">
+                <label>Your Phone Number:</label>
+                <input type="tel" id="yourPhone" placeholder="(555) 123-4567">
+            </div>
+            
+            <div class="warning-box">
+                ⚠️ <strong>ACTION REQUIRED:</strong> This letter MUST be sent via CERTIFIED MAIL with RETURN RECEIPT. Keep the green card when it comes back.
+            </div>
+            
+            <button class="btn" onclick="generateTILALetter()">Generate TILA Demand Letter</button>
+            
+            <div class="document-output" id="tilaOutput" style="display:none;">
+                <!-- TILA Letter will appear here -->
+            </div>
+            
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="prevStep()">← Back</button>
+                <button class="btn" onclick="nextStep()">Next: Regulatory Complaints →</button>
+            </div>
+        </div>
+        
+        <!-- STEP 4: Regulatory Complaints -->
+        <div class="step-container" id="step4">
+            <h2>⚖️ Step 4: File Regulatory Complaints</h2>
+            
+            <div class="info-box">
+                Banks fear regulators more than lawsuits. We're filing with ALL these agencies simultaneously. This creates maximum pressure.
+            </div>
+            
+            <h3>Select Regulatory Agencies:</h3>
+            <div class="checkbox-group">
+                <div class="checkbox-item">
+                    <input type="checkbox" id="reg1" checked>
+                    <label for="reg1">Office of Comptroller of Currency (OCC)</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="reg2" checked>
+                    <label for="reg2">Federal Reserve Board</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="reg3" checked>
+                    <label for="reg3">Illinois Department of Financial Regulation</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="reg4">
+                    <label for="reg4">Consumer Financial Protection Bureau (CFPB)</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="reg5">
+                    <label for="reg5">FDIC</label>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Describe the bait-and-switch in your words:</label>
+                <textarea id="baitDescription" rows="4" placeholder="In 2021, they promised a 20-year second mortgage but gave me 1 year. In 2023, they did it again - promised 3 years, sent 1 year document first..."></textarea>
+            </div>
+            
+            <button class="btn" onclick="generateRegulatoryComplaint()">Generate Regulatory Complaint</button>
+            
+            <div class="document-output" id="regulatoryOutput" style="display:none;">
+                <!-- Regulatory Complaint will appear here -->
+            </div>
+            
+            <div class="toggle-container" onclick="toggleContent('regulatoryInfo')">
+                <strong>📋 How to File These Complaints:</strong> (Click to expand)
+            </div>
+            <div class="toggle-content" id="regulatoryInfo">
+                <p><strong>OCC:</strong> Email: Customer.Assistance@occ.treas.gov | Online: https://helpwithmybank.gov</p>
+                <p><strong>Federal Reserve:</strong> Email: consumerhelp@frb.gov | Phone: 888-851-1920</p>
+                <p><strong>Illinois DFPR:</strong> Online: https://www.idfpr.com | Phone: 888-473-4858</p>
+                <p><strong>CFPB:</strong> Online: https://www.consumerfinance.gov/complaint</p>
+            </div>
+            
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="prevStep()">← Back</button>
+                <button class="btn" onclick="nextStep()">Next: Trust Property Notice →</button>
+            </div>
+        </div>
+        
+        <!-- STEP 5: Trust Property Notice -->
+        <div class="step-container" id="step5">
+            <h2>⛪ Step 5: Trust Property & Mission Protection</h2>
+            
+            <div class="info-box">
+                Your property serves a church mission. This gives you ADDITIONAL protections under federal law.
+            </div>
+            
+            <div class="form-group">
+                <label>Mission/Church Legal Name:</label>
+                <input type="text" id="missionName" placeholder="e.g., Divine Light Ministries">
+            </div>
+            
+            <div class="form-group">
+                <label>Type of Mission Activities:</label>
+                <select id="missionType">
+                    <option value="">Select activity type</option>
+                    <option value="worship">Worship Services</option>
+                    <option value="community">Community Outreach</option>
+                    <option value="counseling">Spiritual Counseling</option>
+                    <option value="education">Religious Education</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>How many people does the mission serve weekly?</label>
+                <input type="number" id="missionParticipants" placeholder="e.g., 50">
+            </div>
+            
+            <div class="warning-box">
+                ⚠️ The Religious Land Use and Institutionalized Persons Act (RLUIPA) provides STRONG protections against government (and bank) actions that burden religious exercise.
+            </div>
+            
+            <button class="btn" onclick="generateTrustNotice()">Generate Trust Property Notice</button>
+            
+            <div class="document-output" id="trustOutput" style="display:none;">
+                <!-- Trust Notice will appear here -->
+            </div>
+            
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="prevStep()">← Back</button>
+                <button class="btn" onclick="nextStep()">Next: Predatory Lending Lawsuit →</button>
+            </div>
+        </div>
+        
+        <!-- STEP 6: Lawsuit Preparation -->
+        <div class="step-container" id="step6">
+            <h2>⚔️ Step 6: Predatory Lending Lawsuit</h2>
+            
+            <div class="info-box">
+                This is your NUCLEAR OPTION. We're preparing to sue for:
+                <ul style="margin: 10px 0 10px 20px;">
+                    <li>Fraud in the inducement</li>
+                    <li>Violation of Illinois Consumer Fraud Act</li>
+                    <li>Truth in Lending Act violations</li>
+                    <li>Intentional infliction of emotional distress</li>
+                </ul>
+            </div>
+            
+            <div class="form-group">
+                <label>Estimated Financial Loss (from having wrong loan terms):</label>
+                <input type="text" id="estimatedLoss" placeholder="$15,000">
+            </div>
+            
+            <div class="form-group">
+                <label>Have you found other victims of BankFinancial's practices?</label>
+                <select id="otherVictims">
+                    <option value="no">Not yet</option>
+                    <option value="yes">Yes, I know others</option>
+                    <option value="maybe">Possibly</option>
+                </select>
+            </div>
+            
+            <div class="checkbox-group">
+                <div class="checkbox-item">
+                    <input type="checkbox" id="sue1">
+                    <label for="sue1">Treble damages (3x actual damages)</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="sue2">
+                    <label for="sue2">Attorney's fees</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="sue3">
+                    <label for="sue3">Punitive damages</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="sue4">
+                    <label for="sue4">Loan rescission (cancel the loan)</label>
+                </div>
+            </div>
+            
+            <button class="btn btn-danger" onclick="generateLawsuitNotice()">Generate Lawsuit Demand Letter</button>
+            
+            <div class="document-output" id="lawsuitOutput" style="display:none;">
+                <!-- Lawsuit Letter will appear here -->
+            </div>
+            
+            <div class="toggle-container" onclick="toggleContent('lawsuitInfo')">
+                <strong>⚖️ Illinois Consumer Fraud Act Remedies:</strong> (Click to expand)
+            </div>
+            <div class="toggle-content" id="lawsuitInfo">
+                <p><strong>815 ILCS 505/1 et seq.</strong> - Illinois Consumer Fraud and Deceptive Business Practices Act</p>
+                <ul>
+                    <li>Treble damages (3x actual damages)</li>
+                    <li>Attorney's fees recoverable</li>
+                    <li>Statutory minimum $50,000 penalty for willful violations</li>
+                    <li>Class action certification available</li>
+                </ul>
+            </div>
+            
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="prevStep()">← Back</button>
+                <button class="btn btn-success" onclick="nextStep()">Final Step: Action Plan →</button>
+            </div>
+        </div>
+        
+        <!-- STEP 7: Action Plan -->
+        <div class="step-container" id="step7">
+            <h2>✅ Step 7: Complete Action Plan</h2>
+            
+            <div class="info-box">
+                <strong>CONGRATULATIONS!</strong> You now have all the tools to fight back. Here's your step-by-step battle plan:
+            </div>
+            
+            <div class="timeline">
+                <div class="timeline-item">
+                    <h3>📅 WEEK 1: PAPER BARRAGE</h3>
+                    <p>Send ALL THREE letters via CERTIFIED MAIL:</p>
+                    <ol>
+                        <li>TILA Demand Letter (to BankFinancial)</li>
+                        <li>Trust Property Notice (to BankFinancial)</li>
+                        <li>Lawsuit Demand Letter (to BankFinancial)</li>
+                    </ol>
+                </div>
+                
+                <div class="timeline-item">
+                    <h3>📅 WEEK 2: REGULATORY ASSAULT</h3>
+                    <p>File complaints with ALL selected regulators</p>
+                    <p>Forward copies of your letters to each agency</p>
+                </div>
+                
+                <div class="timeline-item">
+                    <h3>📅 WEEK 3: MEDIA & COMMUNITY</h3>
+                    <p>Reach out to:
+                        <ul>
+                            <li>Chicago Business Journal</li>
+                            <li>Elmhurst local newspaper</li>
+                            <li>Religious community newsletters</li>
+                            <li>Other potential victims</li>
+                        </ul>
+                    </p>
+                </div>
+                
+                <div class="timeline-item">
+                    <h3>📅 WEEK 4: LEGAL ESCALATION</h3>
+                    <p>If no satisfactory response:
+                        <ol>
+                            <li>Hire consumer protection attorney</li>
+                            <li>File in DuPage County Circuit Court</li>
+                            <li>Seek temporary restraining order</li>
+                            <li>Begin discovery process</li>
+                        </ol>
+                    </p>
+                </div>
+            </div>
+            
+            <div class="warning-box">
+                ⚠️ <strong>RECORD EVERYTHING:</strong> Keep a log of all communications. Date, time, person spoken to, summary of conversation.
+            </div>
+            
+            <div class="form-group">
+                <label>Your Battle Plan Notes:</label>
+                <textarea id="battleNotes" rows="6" placeholder="Add your personal notes, contacts, deadlines..."></textarea>
+            </div>
+            
+            <button class="btn btn-success" onclick="printAllDocuments()">🖨️ Print All Documents</button>
+            <button class="btn" onclick="saveBattlePlan()">💾 Save Battle Plan</button>
+            
+            <div class="button-group">
+                <button class="btn btn-secondary" onclick="prevStep()">← Back</button>
+                <button class="btn" onclick="resetApp()">🔄 Start Over</button>
+            </div>
+        </div>
+        
+        <footer>
+            <p>BankFight Defense System v1.0 | Created for George Medina | This is legal information, not legal advice</p>
+            <p>Consult with an Illinois-licensed attorney for specific legal advice</p>
+        </footer>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 7;
+        let userData = {};
+        
+        // Initialize date field
+        document.getElementById('todayDate').valueAsDate = new Date();
+        
+        // Create step indicators
+        const stepIndicator = document.getElementById('stepIndicator');
+        for (let i = 1; i <= totalSteps; i++) {
+            const dot = document.createElement('div');
+            dot.className = `step-dot ${i === 1 ? 'active' : ''}`;
+            dot.dataset.step = i;
+            dot.onclick = () => goToStep(i);
+            stepIndicator.appendChild(dot);
+        }
+        
+        function updateProgress() {
+            const progress = (currentStep / totalSteps) * 100;
+            document.getElementById('progress').style.width = `${progress}%`;
+            
+            // Update step dots
+            document.querySelectorAll('.step-dot').forEach((dot, index) => {
+                dot.classList.toggle('active', (index + 1) <= currentStep);
+            });
+        }
+        
+        function showStep(step) {
+            document.querySelectorAll('.step-container').forEach(container => {
+                container.classList.remove('active');
+            });
+            document.getElementById(`step${step}`).classList.add('active');
+            currentStep = step;
+            updateProgress();
+        }
+        
+        function nextStep() {
+            if (currentStep < totalSteps) {
+                saveStepData(currentStep);
+                showStep(currentStep + 1);
+            }
+        }
+        
+        function prevStep() {
+            if (currentStep > 1) {
+                showStep(currentStep - 1);
+            }
+        }
+        
+        function goToStep(step) {
+            if (step >= 1 && step <= totalSteps) {
+                saveStepData(currentStep);
+                showStep(step);
+            }
+        }
+        
+        function saveStepData(step) {
+            switch(step) {
+                case 1:
+                    userData.yourName = document.getElementById('yourName').value;
+                    userData.georgeName = document.getElementById('georgeName').value;
+                    userData.churchName = document.getElementById('churchName').value;
+                    break;
+                case 2:
+                    userData.bankOfficer = document.getElementById('bankOfficer').value;
+                    break;
+                case 3:
+                    userData.todayDate = document.getElementById('todayDate').value;
+                    userData.yourAddress = document.getElementById('yourAddress').value;
+                    userData.yourPhone = document.getElementById('yourPhone').value;
+                    break;
+                case 4:
+                    userData.baitDescription = document.getElementById('baitDescription').value;
+                    break;
+                case 5:
+                    userData.missionName = document.getElementById('missionName').value;
+                    userData.missionType = document.getElementById('missionType').value;
+                    userData.missionParticipants = document.getElementById('missionParticipants').value;
+                    break;
+                case 6:
+                    userData.estimatedLoss = document.getElementById('estimatedLoss').value;
+                    userData.otherVictims = document.getElementById('otherVictims').value;
+                    break;
+                case 7:
+                    userData.battleNotes = document.getElementById('battleNotes').value;
+                    break;
+            }
+        }
+        
+        function generateTILALetter() {
+            const today = new Date(userData.todayDate || new Date());
+            const formattedDate = today.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+            });
+            
+            const letter = `
+VIA CERTIFIED MAIL - RETURN RECEIPT REQUESTED
+${formattedDate}
+
+BankFinancial, National Association
+Attention: Legal Department & Compliance Officer
+60 North Frontage Road
+Burr Ridge, IL 60527
+
+RE: FORMAL DEMAND FOR TRUTH IN LENDING ACT (TILA) DISCLOSURES
+Loan No: 1902101119
+Borrower: 627 N York, LLC
+Property: 627 N York Road, Elmhurst, IL 60126
+
+To Whom It May Concern:
+
+Pursuant to the Truth in Lending Act (15 U.S.C. § 1601 et seq.) and Regulation Z (12 C.F.R. Part 1026), this letter constitutes a formal demand for production of ALL required disclosures in connection with the above-referenced loan.
+
+DOCUMENTS DEMANDED:
+
+1. ALL Good Faith Estimates provided at any time for loan number 1902101119
+2. ALL Truth in Lending Disclosure Statements (initial and corrected)
+3. ALL Closing Disclosures (including any revised versions)
+4. ALL written communications regarding loan terms from December 2021 to present
+5. ALL rate lock agreements or communications
+6. ALL documents referencing loan maturity dates or terms
+7. ALL internal communications regarding bait-and-switch tactics employed
+
+BACKGROUND OF DECEPTIVE PRACTICES:
+
+On two separate occasions, your bank has engaged in deceptive bait-and-switch tactics:
+
+FIRST OCCURRENCE (December 2021): 
+Your bank promised a 20-year second mortgage term but presented a 1-year promissory note at closing.
+
+SECOND OCCURRENCE (February 2023):
+Your bank promised a 3-year loan modification term, initially sent a 1-year promissory note, and only after objection sent the correct 3-year document.
+
+These actions constitute clear violations of:
+1. Truth in Lending Act (TILA) - Failure to provide accurate disclosures
+2. Regulation Z - Inaccurate APR and finance charge disclosures
+3. Illinois Consumer Fraud Act - Deceptive business practices
+4. Common Law Fraud - Intentional misrepresentation
+
+LEGAL CONSEQUENCES OF NON-COMPLIANCE:
+
+Failure to provide the demanded documents within 10 business days of receipt of this letter will result in:
+
+1. Filing of formal complaints with: 
+   - Office of the Comptroller of the Currency (OCC)
+   - Federal Reserve Board
+   - Illinois Department of Financial and Professional Regulation
+   - Consumer Financial Protection Bureau (CFPB)
+
+2. Pursuit of statutory damages under TILA (up to $4,000 in statutory damages)
+
+3. Pursuit of actual damages for costs incurred due to your deceptive practices
+
+4. Pursuit of attorney's fees and costs
+
+5. Filing of lawsuit in DuPage County Circuit Court for:
+   - Fraud in the inducement
+   - Violation of Illinois Consumer Fraud Act (815 ILCS 505/1 et seq.)
+   - Breach of contract
+   - Intentional infliction of emotional distress
+
+DEMAND FOR REMEDIATION:
+
+In addition to providing the demanded documents, we demand:
+
+1. Immediate modification of loan 1902101119 to reflect the ORIGINALLY PROMISED terms
+2. Refund of all overcharges and fees resulting from your deceptive practices
+3. Written assurance that no further deceptive practices will occur
+4. Compensation for time and expenses incurred due to your violations
+
+YOUR RESPONSE DEADLINE:
+
+You have TEN (10) BUSINESS DAYS from receipt of this letter to provide complete responses. Your failure to comply will be construed as admission of violations and will trigger immediate legal action.
+
+This matter is being monitored by multiple regulatory agencies. We expect your prompt and complete compliance.
+
+Sincerely,
+
+${userData.yourName || '[Your Name]'}
+On behalf of ${userData.georgeName || 'George Medina'}
+${userData.yourAddress || '[Your Address]'}
+${userData.yourPhone || '[Your Phone]'}
+
+CC: Office of the Comptroller of the Currency
+    Federal Reserve Board
+    Illinois Department of Financial Regulation
+    Consumer Financial Protection Bureau
+            `;
+            
+            const output = document.getElementById('tilaOutput');
+            output.textContent = letter;
+            output.style.display = 'block';
+            
+            // Add download button
+            if (!document.getElementById('downloadTILA')) {
+                const downloadBtn = document.createElement('button');
+                downloadBtn.id = 'downloadTILA';
+                downloadBtn.className = 'btn download-btn';
+                downloadBtn.textContent = '📥 Download TILA Letter';
+                downloadBtn.onclick = () => downloadText(letter, `TILA-Demand-${formattedDate.replace(/,/g, '').replace(/ /g, '-')}.txt`);
+                output.parentNode.insertBefore(downloadBtn, output.nextSibling);
+            }
+        }
+        
+        function generateRegulatoryComplaint() {
+            const agencies = [];
+            if (document.getElementById('reg1').checked) agencies.push('Office of the Comptroller of the Currency (OCC)');
+            if (document.getElementById('reg2').checked) agencies.push('Federal Reserve Board');
+            if (document.getElementById('reg3').checked) agencies.push('Illinois Department of Financial and Professional Regulation');
+            if (document.getElementById('reg4').checked) agencies.push('Consumer Financial Protection Bureau (CFPB)');
+            if (document.getElementById('reg5').checked) agencies.push('Federal Deposit Insurance Corporation (FDIC)');
+            
+            const complaint = `
+REGULATORY COMPLAINT - PREDATORY LENDING PRACTICES
+
+COMPLAINANT: ${userData.georgeName || 'George Medina'}
+ADDRESS: 627 N York Road, Elmhurst, IL 60126
+PHONE: [George's Phone]
+EMAIL: [George's Email]
+
+RESPONDENT: BankFinancial, National Association
+ADDRESS: 60 North Frontage Road, Burr Ridge, IL 60527
+LOAN NUMBER: 1902101119
+
+TO: ${agencies.join('\n     ')}
+
+DATE: ${new Date().toLocaleDateString()}
+
+SUBJECT: FORMAL COMPLAINT - SYSTEMATIC BAIT-AND-SWITCH PREDATORY LENDING
+
+I. SUMMARY OF COMPLAINT
+
+BankFinancial has engaged in a systematic pattern of predatory lending through bait-and-switch tactics on multiple occasions with the same borrower, demonstrating this is not an isolated error but a calculated business practice.
+
+II. CHRONOLOGY OF DECEPTIVE PRACTICES
+
+A. FIRST DECEPTION (December 2021)
+1. Promised: 20-year second mortgage term
+2. Delivered: 1-year promissory note
+3. Evidence: Documents show clear discrepancy between promised and delivered terms
+4. Impact: Borrower forced into premature refinancing at additional cost
+
+B. SECOND DECEPTION (February 2023)
+1. Promised: 3-year loan modification
+2. Initially Sent: 1-year promissory note (document attached)
+3. Corrected Only After: Borrower objected to incorrect terms
+4. Pattern: Same bait-and-switch tactic repeated with same borrower
+
+III. SPECIFIC VIOLATIONS
+
+1. TRUTH IN LENDING ACT (15 U.S.C. § 1601)
+   - Failure to provide accurate disclosures
+   - Failure to provide timely disclosures
+   - Inaccurate APR and finance charge disclosures
+
+2. ILLINOIS CONSUMER FRAUD ACT (815 ILCS 505/1)
+   - Deceptive business practices
+   - Unfair methods of competition
+   - Fraudulent concealment
+
+3. UNFAIR, DECEPTIVE, OR ABUSIVE ACTS OR PRACTICES (UDAAP)
+   - Bait-and-switch tactics
+   - Material misrepresentations
+   - Taking advantage of consumer's lack of understanding
+
+4. REGULATION Z (12 C.F.R. Part 1026)
+   - Violation of §1026.19 (Mortgage loan disclosures)
+   - Violation of §1026.23 (Right of rescission procedures)
+
+IV. EVIDENCE AVAILABLE
+
+1. Multiple promissory notes with conflicting terms
+2. Email correspondence demonstrating bait-and-switch
+3. Loan modification documents showing pattern
+4. Maturity notices demonstrating premature demands
+5. Internal documents (requested via TILA demand)
+
+V. PATTERN AND PRACTICE CONCERNS
+
+The repetition of identical deceptive tactics with the same borrower strongly suggests this is institutional practice, not individual error. This raises serious concerns about:
+1. How many other consumers have been similarly deceived?
+2. What internal controls, if any, exist to prevent such deception?
+3. What training do loan officers receive regarding truthful disclosures?
+4. What financial incentives exist for this deceptive behavior?
+
+VI. CONSUMER HARM
+
+1. Financial Harm: Additional closing costs, refinancing fees, lost opportunity costs
+2. Emotional Distress: Stress from dealing with deceptive financial institution
+3. Time Burden: Hours spent correcting bank's deceptive practices
+4. Credit Impact: Potential negative credit reporting from bank's errors
+
+VII. SPECIFIC RELIEF REQUESTED
+
+1. IMMEDIATE REGULATORY ACTION:
+   - Cease and desist order against deceptive practices
+   - Civil money penalties for violations
+   - Mandatory consumer restitution program
+   - Compliance monitoring for 3 years
+
+2. CONSUMER REMEDIATION:
+   - Loan modification to originally promised terms
+   - Refund of all fees from both deceptive transactions
+   - Compensation for time and expenses: $${userData.estimatedLoss || '15,000'}
+   - Written apology and assurance of no further deception
+
+3. INSTITUTIONAL REFORMS:
+   - Mandatory retraining of all lending staff
+   - Implementation of dual-document verification system
+   - Independent audit of all loans from past 3 years
+   - Public disclosure of any similar past violations
+
+VIII. URGENCY
+
+This matter requires immediate attention as:
+1. The deceptive practices are ongoing
+2. Other consumers are likely being similarly harmed
+3. Statute of limitations considerations
+4. Continued emotional distress to victim
+
+IX. CONTACT FOR INVESTIGATION
+
+I am fully available to cooperate with your investigation and can provide all documentary evidence. Please contact me at your earliest convenience to schedule an interview or evidence review.
+
+RESPECTFULLY SUBMITTED,
+
+${userData.georgeName || 'George Medina'}
+627 N York Road
+Elmhurst, IL 60126
+[Phone Number]
+[Email Address]
+
+ATTACHMENTS:
+1. 1-year promissory note (February 2023)
+2. 3-year promissory note (February 2023)
+3. Email correspondence showing bait-and-switch
+4. Loan modification agreement
+5. Maturity notice (October 2022)
+            `;
+            
+            const output = document.getElementById('regulatoryOutput');
+            output.textContent = complaint;
+            output.style.display = 'block';
+            
+            if (!document.getElementById('downloadRegulatory')) {
+                const downloadBtn = document.createElement('button');
+                downloadBtn.id = 'downloadRegulatory';
+                downloadBtn.className = 'btn download-btn';
+                downloadBtn.textContent = '📥 Download Regulatory Complaint';
+                downloadBtn.onclick = () => downloadText(complaint, `Regulatory-Complaint-${new Date().toISOString().split('T')[0]}.txt`);
+                output.parentNode.insertBefore(downloadBtn, output.nextSibling);
+            }
+        }
+        
+        function generateTrustNotice() {
+            const notice = `
+VIA CERTIFIED MAIL - RETURN RECEIPT REQUESTED
+${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+
+BankFinancial, National Association
+Attention: Legal Department & Senior Management
+60 North Frontage Road
+Burr Ridge, IL 60527
+
+RE: FORMAL NOTICE OF TRUST PROPERTY STATUS & RELIGIOUS MISSION PROTECTIONS
+Property: 627 N York Road, Elmhurst, IL 60126
+Loan No: 1902101119
+
+URGENT LEGAL NOTICE - MULTIPLE PROTECTIONS INVOKED
+
+I. PROPERTY STATUS DECLARATION
+
+TAKE FORMAL NOTICE that the property securing loan number 1902101119 (627 N York Road, Elmhurst, IL 60126) serves as:
+
+A. PRIMARY LOCATION for ${userData.missionName || '[MISSION NAME]'}
+B. RELIGIOUS MISSION serving approximately ${userData.missionParticipants || '[NUMBER]'} participants weekly
+C. SITE OF PROTECTED RELIGIOUS EXERCISE including: ${userData.missionType || '[ACTIVITIES]'}
+D. TRUST PROPERTY under both state and international trust law principles
+
+II. APPLICABLE LEGAL PROTECTIONS
+
+This property enjoys MULTIPLE LAYERS OF LEGAL PROTECTION:
+
+1. RELIGIOUS LAND USE AND INSTITUTIONALIZED PERSONS ACT (RLUIPA) - 42 U.S.C. § 2000cc
+   - Prohibits substantial burdens on religious exercise
+   - Applies to zoning AND financial regulations affecting religious property
+   - Provides for attorney's fees and damages
+
+2. FIRST AMENDMENT - U.S. CONSTITUTION
+   - Free Exercise Clause protection
+   - Establishment Clause considerations
+
+3. ILLINOIS RELIGIOUS FREEDOM RESTORATION ACT
+   - State-level protection of religious exercise
+   - Requires strict scrutiny for any burdens
+
+4. INTERNATIONAL TRUST LAW PRINCIPLES
+   - Property held in trust for religious purposes
+   - Fiduciary duties of highest order
+   - Potential diplomatic protections
+
+5. TAX-EXEMPT STATUS CONSIDERATIONS
+   - Religious use implications
+   - Charitable trust protections
+
+III. SPECIFIC NOTICE REGARDING YOUR ACTIONS
+
+Your ongoing predatory lending practices targeting this property:
+
+1. CONSTITUTE a "substantial burden" on religious exercise under RLUIPA
+2. INTERFERE with protected religious activities
+3. THREATEN the continuity of religious services
+4. VIOLATE the public policy protecting religious institutions
+
+IV. LEGAL CONSEQUENCES OF CONTINUED HARASSMENT
+
+Should you continue any collection efforts, foreclosure proceedings, or adverse actions against this property, you will face:
+
+1. IMMEDIATE INJUNCTIVE RELIEF in federal court under RLUIPA
+2. STATUTORY DAMAGES of up to $50,000 per violation
+3. ATTORNEY'S FEES and litigation costs
+4. POTENTIAL PUNITIVE DAMAGES for targeting religious property
+5. REGULATORY ACTION for religious discrimination
+6. PUBLIC EXPOSURE for targeting religious institution
+
+V. DEMAND FOR CEASE AND DESIST
+
+You are hereby DEMANDED to:
+
+1. CEASE ALL collection activities on loan 1902101119
+2. SUSPEND any foreclosure or adverse action proceedings
+3. MODIFY loan terms to non-predatory, reasonable levels
+4. PROVIDE written assurance of no further harassment
+5. DESIGNATE a senior officer as liaison for all future communications
+
+VI. ESCALATION PROTOCOL
+
+Failure to comply within 10 business days will trigger:
+
+DAY 1-3: Notification to U.S. Department of Justice Civil Rights Division
+DAY 4-6: Notification to international religious freedom monitors
+DAY 7-10: Federal lawsuit filing under RLUIPA and constitutional claims
+
+VII. SERIOUSNESS OF THIS MATTER
+
+This is not a routine collection matter. You are targeting property with heightened legal protections. Your actions risk:
+
+1. Federal court injunctions against your institution
+2. Regulatory findings of religious discrimination
+3. International attention to your predatory practices
+4. Substantial financial penalties
+5. Reputational damage as institution targeting religious groups
+
+VIII. DESIGNATED CONTACT
+
+All future communications regarding this matter must be directed to legal counsel. Do NOT contact the religious mission directly.
+
+This notice is being copied to:
+1. U.S. Department of Justice - Civil Rights Division
+2. Illinois Attorney General - Charitable Trust Division
+3. International Religious Freedom Monitor
+4. Local religious leadership council
+
+TAKE THIS NOTICE WITH THE UTMOST SERIOUSNESS.
+
+Sincerely,
+
+LEGAL REPRESENTATIVE for ${userData.missionName || '[RELIGIOUS MISSION]'}
+CC: As listed above
+            `;
+            
+            const output = document.getElementById('trustOutput');
+            output.textContent = notice;
+            output.style.display = 'block';
+            
+            if (!document.getElementById('downloadTrust')) {
+                const downloadBtn = document.createElement('button');
+                downloadBtn.id = 'downloadTrust';
+                downloadBtn.className = 'btn download-btn';
+                downloadBtn.textContent = '📥 Download Trust Property Notice';
+                downloadBtn.onclick = () => downloadText(notice, `Trust-Property-Notice-${new Date().toISOString().split('T')[0]}.txt`);
+                output.parentNode.insertBefore(downloadBtn, output.nextSibling);
+            }
+        }
+        
+        function generateLawsuitNotice() {
+            const lawsuit = `
+VIA CERTIFIED MAIL - RETURN RECEIPT REQUESTED
+${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+
+BankFinancial, National Association
+Attention: General Counsel & Board of Directors
+60 North Frontage Road
+Burr Ridge, IL 60527
+
+RE: NOTICE OF IMMINENT LITIGATION - PREDATORY LENDING
+Case: ${userData.georgeName || 'George Medina'} v. BankFinancial, National Association
+Loan No: 1902101119
+
+FINAL PRE-LITIGATION DEMAND
+
+I. NOTICE OF LAWSUIT FILING
+
+This letter serves as FINAL NOTICE that unless the demands herein are fully met within 15 business days, a lawsuit will be filed in the Circuit Court of DuPage County, Illinois alleging:
+
+COUNT 1: FRAUD IN THE INDUCEMENT (Common Law Fraud)
+COUNT 2: VIOLATION OF ILLINOIS CONSUMER FRAUD ACT (815 ILCS 505/1 et seq.)
+COUNT 3: TRUTH IN LENDING ACT VIOLATIONS (15 U.S.C. § 1601)
+COUNT 4: BREACH OF CONTRACT
+COUNT 5: INTENTIONAL INFLICTION OF EMOTIONAL DISTRESS
+COUNT 6: UNJUST ENRICHMENT
+COUNT 7: DECEPTIVE BUSINESS PRACTICES
+COUNT 8: NEGLIGENT MISREPRESENTATION
+
+II. ALLEGATIONS OF SYSTEMATIC DECEPTION
+
+Your institution engaged in a calculated pattern of bait-and-switch predatory lending:
+
+EVIDENCE OF PATTERN:
+1. December 2021: Promised 20-year term, delivered 1-year note
+2. February 2023: Promised 3-year term, initially sent 1-year note
+3. Multiple victims: Evidence suggests this is institutional practice
+
+EVIDENCE OF INTENT:
+1. Same deceptive tactic repeated
+2. Correction only after objection
+3. No internal controls to prevent recurrence
+4. Financial incentive for short-term loans
+
+III. DAMAGES SOUGHT
+
+A. ACTUAL DAMAGES: $${userData.estimatedLoss || '15,000'}
+   - Additional closing costs
+   - Refinancing fees
+   - Lost opportunity costs
+   - Professional time spent correcting your errors
+
+B. STATUTORY DAMAGES:
+   - Illinois Consumer Fraud Act: Treble damages (3x actual)
+   - TILA: $4,000 statutory minimum
+   - Attorney's fees under both statutes
+
+C. PUNITIVE DAMAGES: $500,000
+   - For intentional, malicious conduct
+   - To deter future predatory practices
+   - Given institutional pattern of deception
+
+D. EQUITABLE RELIEF:
+   - Loan rescission or modification to promised terms
+   - Removal of negative credit reporting
+   - Court-supervised compliance program
+
+TOTAL POTENTIAL EXPOSURE: $${(parseInt(userData.estimatedLoss) || 15000) * 3 + 4000 + 500000}
+
+IV. LEGAL BASIS FOR CLAIMS
+
+1. ILLINOIS CONSUMER FRAUD ACT (815 ILCS 505/2):
+   "Unfair or deceptive acts or practices in the conduct of any trade or commerce"
+   - Treble damages available
+   - Attorney's fees recoverable
+   - Minimum $50,000 penalty for willful violations
+
+2. COMMON LAW FRAUD ELEMENTS PRESENT:
+   a) False statement of material fact
+   b) Knowledge of falsity
+   c) Intent to induce reliance
+   d) Justifiable reliance
+   e) Resulting damages
+
+3. TRUTH IN LENDING ACT VIOLATIONS:
+   - Failure to provide accurate disclosures
+   - Pattern of inaccurate APR statements
+   - Statutory damages: $400-$4,000
+
+V. DISCOVERY PLAN
+
+Upon filing, we will seek immediate discovery of:
+
+1. ALL loans closed by ${userData.bankOfficer || 'your loan officer'} in past 5 years
+2. ALL consumer complaints regarding bait-and-switch tactics
+3. ALL internal communications about loan term promises
+4. ALL training materials on disclosure requirements
+5. ALL compensation plans incentivizing short-term loans
+6. ALL regulatory examination reports mentioning deceptive practices
+
+VI. SETTLEMENT DEMAND
+
+To avoid litigation, you must provide within 15 business days:
+
+1. LOAN MODIFICATION: Amend loan 1902101119 to 20-year term as originally promised
+2. DAMAGES PAYMENT: $${userData.estimatedLoss || '15,000'} for actual damages
+3. FEE WAIVER: All future fees waived for loan duration
+4. CREDIT REPAIR: Removal of all negative reporting related to this loan
+5. COMPLIANCE TRAINING: Evidence of retraining program to prevent recurrence
+6. PERSONAL APOLOGY: Written apology from CEO for deceptive practices
+
+VII. LITIGATION READINESS
+
+We are prepared to file immediately upon expiration of this notice. Our litigation team includes:
+
+1. Consumer protection specialist with 20+ years experience
+2. Former banking regulator as expert witness
+3. Forensic loan auditor already retained
+4. Media consultant prepared for public disclosure
+
+VIII. CONSEQUENCES OF NON-COMPLIANCE
+
+Failure to meet these demands will result in:
+
+1. SAME-DAY FILING in DuPage County Circuit Court
+2. IMMEDIATE PRESS RELEASE to:
+   - Chicago Tribune
+   - Crain's Chicago Business
+   - Elmhurst local media
+   - Religious publications
+3. REGULATORY NOTICE to all agencies previously contacted
+4. CLASS ACTION INVESTIGATION of other potential victims
+
+IX. FINAL OPPORTUNITY
+
+This is your FINAL opportunity to resolve this matter without public litigation, regulatory scrutiny, and substantial financial exposure.
+
+The clock starts upon your receipt of this letter.
+
+Respectfully,
+
+${userData.yourName || '[LEGAL REPRESENTATIVE]'}
+On behalf of ${userData.georgeName || 'George Medina'}
+
+CC: DuPage County Circuit Court Clerk (for immediate filing upon expiration)
+    All previously notified regulatory agencies
+    Major Chicago media outlets
+            `;
+            
+            const output = document.getElementById('lawsuitOutput');
+            output.textContent = lawsuit;
+            output.style.display = 'block';
+            
+            if (!document.getElementById('downloadLawsuit')) {
+                const downloadBtn = document.createElement('button');
+                downloadBtn.id = 'downloadLawsuit';
+                downloadBtn.className = 'btn download-btn';
+                downloadBtn.textContent = '📥 Download Lawsuit Notice';
+                downloadBtn.onclick = () => downloadText(lawsuit, `Lawsuit-Notice-${new Date().toISOString().split('T')[0]}.txt`);
+                output.parentNode.insertBefore(downloadBtn, output.nextSibling);
+            }
+        }
+        
+        function toggleContent(id) {
+            const content = document.getElementById(id);
+            content.style.display = content.style.display === 'block' ? 'none' : 'block';
+        }
+        
+        function downloadText(text, filename) {
+            const blob = new Blob([text], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        
+        function printAllDocuments() {
+            const originalTitle = document.title;
+            document.title = `BankFight-Battle-Plan-${userData.georgeName || 'George-Medina'}`;
+            window.print();
+            document.title = originalTitle;
+        }
+        
+        function saveBattlePlan() {
+            saveStepData(7);
+            
+            const plan = `
+BANKFIGHT BATTLE PLAN - ${userData.georgeName || 'George Medina'}
+Generated: ${new Date().toLocaleString()}
+
+YOUR INFORMATION:
+- Your Name: ${userData.yourName}
+- George's Name: ${userData.georgeName}
+- Church/Mission: ${userData.churchName}
+- Bank Officer: ${userData.bankOfficer}
+
+DOCUMENTS GENERATED:
+1. TILA Demand Letter - READY
+2. Regulatory Complaint - READY
+3. Trust Property Notice - READY
+4. Lawsuit Demand Letter - READY
+
+ACTION TIMELINE:
+
+WEEK 1 (PAPER BARRAGE):
+- Send all 4 letters via CERTIFIED MAIL
+- Keep all green return receipts
+- No verbal communication with bank
+
+WEEK 2 (REGULATORY ASSAULT):
+- File complaints with selected agencies
+- Follow up with confirmation numbers
+- Document all submissions
+
+WEEK 3 (COMMUNITY ENGAGEMENT):
+- Contact Chicago Business Journal
+- Contact Elmhurst local paper
+- Notify religious community
+- Find other potential victims
+
+WEEK 4 (LEGAL ESCALATION):
+- If no response: Hire attorney
+- File in DuPage County Court
+- Seek restraining order
+- Begin discovery
+
+YOUR NOTES:
+${userData.battleNotes || 'No additional notes'}
+
+IMPORTANT CONTACTS:
+- OCC: 800-613-6743
+- Federal Reserve: 888-851-1920
+- Illinois DFPR: 888-473-4858
+- CFPB: 855-411-2372
+
+SAVE THIS PLAN AND UPDATE AS YOU PROGRESS!
+            `;
+            
+            downloadText(plan, `Battle-Plan-${userData.georgeName || 'George-Medina'}-${new Date().toISOString().split('T')[0]}.txt`);
+            alert('Battle Plan Saved! Check your downloads folder.');
+        }
+        
+        function resetApp() {
+            if (confirm('Are you sure you want to start over? All entered data will be lost.')) {
+                currentStep = 1;
+                userData = {};
+                document.querySelectorAll('input, textarea, select').forEach(el => {
+                    if (el.type !== 'button' && el.type !== 'submit') {
+                        el.value = '';
+                    }
+                });
+                document.getElementById('todayDate').valueAsDate = new Date();
+                document.getElementById('georgeName').value = 'George Medina';
+                document.querySelectorAll('.evidence-check').forEach(cb => cb.checked = false);
+                document.querySelectorAll('.document-output').forEach(out => {
+                    out.style.display = 'none';
+                    out.textContent = '';
+                });
+                document.querySelectorAll('.download-btn').forEach(btn => btn.remove());
+                showStep(1);
+            }
+        }
+        
+        // Initialize
+        updateProgress();
+    </script>
+</body>
+</html>
