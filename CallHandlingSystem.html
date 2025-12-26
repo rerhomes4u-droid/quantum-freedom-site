@@ -732,32 +732,34 @@
             });
         }
 
-        // UPDATE LIVE LOG - CORRECTED VERSION
-        function updateLog() {
-            // Get values from ALL input fields, regardless of visibility
-            const collectorName = document.getElementById('collectorName').value;
-            const employeeId = document.getElementById('employeeId').value;
-            const companyName = document.getElementById('companyName').value;
-            const companyAddress = document.getElementById('companyAddress').value;
-            const supervisorName = document.getElementById('supervisorName').value;
-            const accountNumber = document.getElementById('accountNumber').value;
-            const collectorDemand = document.getElementById('collectorDemand').value;
-            const responseToRequest = document.getElementById('responseToRequest').value;
-            const collectorObjection = document.getElementById('collectorObjection').value;
-            const endingType = document.getElementById('endingType').value;
-            
-            // Determine ending script text
-            let endingScriptText = '';
-            if (endingType === 'agreed') {
-                endingScriptText = '"Thank you. I will watch for your mailing. Please note today\'s date and my request for the record."';
-            } else if (endingType === 'refused') {
-                endingScriptText = '"Since you\'re unable to provide required commercial presentment in writing, nothing further can be honored on this call."';
-            } else if (endingType === 'hostile') {
-                endingScriptText = '"Conversation no longer productive. Ending call after requesting commercial presentment in writing."';
-            }
-            
-            // Build log content with proper fallbacks for empty values
-            let logContent = `========================================
+// UPDATE LIVE LOG - CORRECTED VERSION
+function updateLog() {
+    // Get values from ALL input fields, regardless of visibility
+    const collectorName = document.getElementById('collectorName').value;
+    const employeeId = document.getElementById('employeeId').value;
+    const companyName = document.getElementById('companyName').value;
+    const companyAddress = document.getElementById('companyAddress').value;
+    const supervisorName = document.getElementById('supervisorName').value;
+    const accountNumber = document.getElementById('accountNumber').value;
+    const collectorDemand = document.getElementById('collectorDemand').value;
+    const responseToRequest = document.getElementById('responseToRequest').value;
+    const collectorObjection = document.getElementById('collectorObjection').value;
+    const endingType = document.getElementById('endingType').value;
+    
+    // Determine ending script text
+    let endingScriptText = '';
+    if (endingType === 'agreed') {
+        endingScriptText = '"Thank you. I will watch for your mailing. Please note today\'s date and my request for the record."';
+    } else if (endingType === 'refused') {
+        endingScriptText = '"Since you\'re unable to provide required commercial presentment in writing, nothing further can be honored on this call."';
+    } else if (endingType === 'hostile') {
+        endingScriptText = '"Conversation no longer productive. Ending call after requesting commercial presentment in writing."';
+    } else if (endingType === 'other') {
+        endingScriptText = 'Call ended with other outcome.';
+    }
+    
+    // Build log content with proper fallbacks for empty values
+    let logContent = `========================================
 EQUITY CALL LOG - WITHOUT PREJUDICE UCC 1-308
 ========================================
 Date: ${document.getElementById('logDate').textContent}
@@ -800,56 +802,65 @@ My Closing: ${endingScriptText || '[Not specified yet]'}
 ========================================
 END OF LOG
 ========================================`;
-            
-            // Update the log display
-            document.getElementById('callLogOutput').textContent = logContent;
-            
-            // Visual feedback
-            const updateBtn = document.getElementById('updateLogBtn');
-            updateBtn.innerHTML = '<i class="fas fa-check"></i> Log Updated!';
-            updateBtn.style.backgroundColor = '#2e7d32';
-            setTimeout(() => {
-                updateBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Update Live Log';
-                updateBtn.style.backgroundColor = '';
-            }, 1500);
-        }
+    
+    // Update the log display - FIXED SELECTOR
+    document.getElementById('callLogOutput').textContent = logContent;
+    
+    // Visual feedback
+    const updateBtn = document.getElementById('updateLogBtn');
+    updateBtn.innerHTML = '<i class="fas fa-check"></i> Log Updated!';
+    updateBtn.style.backgroundColor = '#2e7d32';
+    setTimeout(() => {
+        updateBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Update Live Log';
+        updateBtn.style.backgroundColor = '';
+    }, 1500);
+}
 
-        // GENERATE FINAL LOG
-        function generateFinalLog() {
-            updateLog();
-            
-            // Create a downloadable file
-            const logContent = document.getElementById('callLogOutput').textContent;
-            const blob = new Blob([logContent], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `Equity-Call-Log-${callId}-${new Date().toISOString().slice(0,10)}.txt`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            
-            alert(`Final call log downloaded as: ${a.download}\n\nKeep this with your equity records.`);
-        }
+// GENERATE FINAL LOG - CORRECTED VERSION
+function generateFinalLog() {
+    updateLog(); // Ensure we have the latest content
+    
+    // Get the current log text - FIXED SELECTOR
+    const logText = document.getElementById('callLogOutput').textContent;
+    
+    // Create a downloadable file
+    const blob = new Blob([logText], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `Equity-Call-Log-${callId}-${new Date().toISOString().slice(0,10)}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    alert(`Final call log downloaded as: ${a.download}\n\nKeep this with your equity records.`);
+}
 
-        // COPY LOG TO CLIPBOARD
-        function copyLogToClipboard() {
-            const logText = document.getElementById('callLogOutput').textContent;
-            navigator.clipboard.writeText(logText).then(() => {
-                const btn = document.querySelector('.btn-outline');
-                const originalHTML = btn.innerHTML;
-                btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
-                btn.style.backgroundColor = '#2e7d32';
-                btn.style.color = 'white';
-                setTimeout(() => {
-                    btn.innerHTML = originalHTML;
-                    btn.style.backgroundColor = '';
-                    btn.style.color = '';
-                }, 2000);
-            });
-        }
-
+// COPY LOG TO CLIPBOARD - CORRECTED VERSION
+function copyLogToClipboard() {
+    // Get the current log text - FIXED SELECTOR
+    const logText = document.getElementById('callLogOutput').textContent;
+    
+    // Use the Clipboard API
+    navigator.clipboard.writeText(logText).then(() => {
+        // Visual feedback
+        const copyBtn = document.querySelector('.btn-outline');
+        const originalHTML = copyBtn.innerHTML;
+        copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied to Clipboard!';
+        copyBtn.style.backgroundColor = '#2e7d32';
+        copyBtn.style.color = 'white';
+        
+        setTimeout(() => {
+            copyBtn.innerHTML = originalHTML;
+            copyBtn.style.backgroundColor = '';
+            copyBtn.style.color = '';
+        }, 2000);
+    }).catch(err => {
+        console.error('Failed to copy: ', err);
+        alert('Failed to copy to clipboard. Please select and copy the text manually.');
+    });
+}
         // RESET SIMULATION
         function resetSimulation() {
             simulationActive = false;
