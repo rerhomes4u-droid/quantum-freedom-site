@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EQUITY POWER TOOLS: Equity Journal & Principle Mapper</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #1a237e;
+            --secondary: #283593;
+            --accent: #3949ab;
+            --light: #e8eaf6;
+            --dark: #0d1435;
+            --success: #2e7d32;
+            --warning: #f9a825;
+            --paper: #fffef7;
+            --ink: #1a1a1a;
+            --highlight: #fff9c4;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            line-height: 1.6;
+            color: var(--ink);
+            background: linear-gradient(135deg, #f3e5f5 0%, #e3f2fd 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: var(--paper);
+            border-radius: 20px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+        }
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 2.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .header-content { position: relative; z-index: 2; }
+        .equity-badge {
+            display: inline-block;
+            background: var(--accent);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 1.2rem;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+        h1 {
+            font-family: 'Times New Roman', serif;
+            font-size: 2.8rem;
+            margin-bottom: 0.8rem;
+            font-weight: 700;
+        }
+        .subtitle {
+            font-size: 1.3rem;
+            opacity: 0.95;
+            max-width: 900px;
+            margin: 0 auto;
+            font-weight: 300;
+        }
+        .tools-suite-label {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 12px 25px;
+            border-radius: 12px;
+            display: inline-block;
+            margin-top: 1.5rem;
+            font-weight: 600;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            min-height: 80vh;
+        }
+        @media (max-width: 1024px) {
+            .main-content { grid-template-columns: 1fr; }
+        }
+        .journal-panel {
+            padding: 2.5rem;
+            border-right: 1px solid #eee;
+        }
+        .library-panel {
+            padding: 2.5rem;
+            background: #f9f9ff;
+            display: flex;
+            flex-direction: column;
+        }
+        h2 {
+            color: var(--primary);
+            font-family: 'Times New Roman', serif;
+            font-size: 2.2rem;
+            margin-bottom: 1.8rem;
+            padding-bottom: 12px;
+            border-bottom: 3px solid var(--accent);
+        }
+        h3 {
+            color: var(--secondary);
+            margin: 1.5rem 0 1rem;
+            font-size: 1.5rem;
+        }
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+        .btn-primary:hover {
+            background: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: 0 7px 14px rgba(57, 73, 171, 0.25);
+        }
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        .btn-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--accent);
+        }
+        .form-section {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
+            border: 1px solid #eee;
+        }
+        .input-group {
+            margin: 1.5rem 0;
+        }
+        .input-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        .input-field, textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        .input-field:focus, textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(57, 73, 171, 0.2);
+        }
+        .principle-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 1rem;
+        }
+        .tag {
+            background: #e3f2fd;
+            color: var(--primary);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        .tag:hover {
+            background: #bbdefb;
+            transform: translateY(-2px);
+        }
+        .tag.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--primary);
+        }
+        .entries-container {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-top: 2rem;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
+            border: 1px solid #eee;
+            flex-grow: 1;
+            overflow-y: auto;
+            max-height: 600px;
+        }
+        .entry {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-left: 5px solid var(--accent);
+            transition: all 0.3s;
+        }
+        .entry:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+        .entry-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .entry-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        .entry-date {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        .entry-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 1rem 0;
+        }
+        .entry-tag {
+            background: #e8f5e9;
+            color: var(--success);
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        .maxim-box {
+            background: #fff3e0;
+            padding: 1.2rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+            border-left: 5px solid var(--warning);
+            font-style: italic;
+            font-weight: 600;
+        }
+        .principle-library {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-top: 2rem;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
+            border: 1px solid #eee;
+            flex-grow: 1;
+            overflow-y: auto;
+            max-height: 700px;
+        }
+        .principle-item {
+            background: #f5f5f5;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+        .principle-item:hover {
+            border-color: var(--accent);
+            background: #fff;
+        }
+        .principle-latin {
+            color: var(--primary);
+            font-weight: 700;
+            font-style: italic;
+            margin-bottom: 0.5rem;
+        }
+        .principle-translation {
+            color: #333;
+            line-height: 1.6;
+        }
+        .principle-context {
+            color: #666;
+            font-size: 0.95rem;
+            margin-top: 0.8rem;
+            font-style: italic;
+        }
+        .search-box {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 15px 15px 15px 50px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1.1rem;
+        }
+        .search-box i {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+        }
+        .footer {
+            background: var(--dark);
+            color: white;
+            text-align: center;
+            padding: 2.5rem;
+            margin-top: 2rem;
+        }
+        .invitation-box {
+            background: linear-gradient(135deg, #5e35b1, #3949ab);
+            color: white;
+            border-radius: 15px;
+            padding: 2.5rem;
+            margin: 2.5rem;
+            text-align: center;
+        }
+        .telegram-handle {
+            display: inline-block;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-family: monospace;
+            font-size: 1.4rem;
+            letter-spacing: 1px;
+            margin: 1.5rem 0;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #ccc;
+        }
+        .wisdom-quote {
+            background: #e8f5e9;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            border-left: 5px solid var(--success);
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <div class="equity-badge"><i class="fas fa-balance-scale"></i> EQUITY POWER TOOLS SUITE</div>
+                <h1>Equity Journal & Principle Mapper</h1>
+                <p class="subtitle">"Glean the Equity" from definitions. Track maxims, apply principles to your situations, and build your internalized knowledge.</p>
+                <div class="tools-suite-label"><i class="fas fa-toolbox"></i> TOOL #2: PRINCIPLE JOURNAL & MAPPER</div>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <!-- LEFT PANEL: JOURNAL ENTRY -->
+            <section class="journal-panel">
+                <h2>Your Equity Journal</h2>
+                <p style="margin-bottom: 1.5rem; color: #555;">As <strong>Margaret advised</strong>: "Pay particular attention to the passages that are highlighted... highlight any that seem pertinent to you." This journal helps you do exactly that.</p>
+
+                <div class="form-section">
+                    <h3><i class="fas fa-edit"></i> New Journal Entry</h3>
+                    
+                    <div class="input-group">
+                        <label class="input-label">Situation / Case Title</label>
+                        <input type="text" class="input-field" id="entryTitle" placeholder="e.g., Credit Card Discharge, Traffic Ticket, Employer Withholding">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label class="input-label">Today's Study / Discovery</label>
+                        <textarea id="entryContent" placeholder="What definition, maxim, or principle did you study today? What 'gleaning' of equity did you find? (As Julian says: 'We glean the Equity out of them.')"></textarea>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label class="input-label">How This Applies to Your Situation</label>
+                        <textarea id="entryApplication" placeholder="How does this principle apply to your specific situation? What is the equitable remedy? (As Barb said: 'Having a specific situation to apply equity to is helpful.')"></textarea>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label class="input-label">Key Maxim or Latin Phrase</label>
+                        <input type="text" class="input-field" id="entryMaxim" placeholder="e.g., 'That which is equitable and good is the law of laws'">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label class="input-label">Tags / Principles Applied</label>
+                        <div class="principle-tags" id="principleTags">
+                            <!-- Tags will be added by JavaScript -->
+                        </div>
+                        <input type="text" class="input-field" id="customTag" placeholder="Or type a custom tag and press Enter" style="margin-top: 10px;">
+                    </div>
+                    
+                    <div style="display: flex; gap: 15px; margin-top: 2rem;">
+                        <button class="btn btn-primary" onclick="saveJournalEntry()">
+                            <i class="fas fa-save"></i> Save Journal Entry
+                        </button>
+                        <button class="btn btn-outline" onclick="clearJournalForm()">
+                            <i class="fas fa-eraser"></i> Clear Form
+                        </button>
+                    </div>
+                </div>
+
+                <div class="entries-container" id="entriesContainer">
+                    <h3><i class="fas fa-history"></i> Recent Entries</h3>
+                    <div id="journalEntries">
+                        <!-- Entries will appear here -->
+                        <div class="empty-state" id="emptyEntries">
+                            <i class="fas fa-book-open"></i>
+                            <h3>No entries yet</h3>
+                            <p>Your journal entries will appear here. Start by creating your first entry above.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- RIGHT PANEL: PRINCIPLE LIBRARY -->
+            <section class="library-panel">
+                <h2><i class="fas fa-book"></i> Principle Library</h2>
+                <p style="margin-bottom: 1.5rem; color: #555;">Based on the Equity class discussions and maxims. <strong>Click any principle to add it to your current journal entry.</strong></p>
+
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="principleSearch" placeholder="Search principles and maxims...">
+                </div>
+
+                <div class="principle-library" id="principleLibrary">
+                    <!-- Principles will be loaded by JavaScript -->
+                </div>
+
+                <div class="wisdom-quote">
+                    <p><strong>From the Class Chat:</strong> "I remember 2 things Julian mentioned... having a specific situation to apply equity to is helpful... your remedy may come in one specific definition." - <em>Barb</em></p>
+                    <p style="margin-top: 10px;">This tool helps you find that "one specific definition" and track how it applies to your situation.</p>
+                </div>
+            </section>
+        </div>
+
+        <!-- INVITATION SECTION -->
+        <div class="invitation-box">
+            <h3 style="color: white; margin-bottom: 1rem; font-size: 2rem;">Building Your Equity Foundation</h3>
+            <p style="font-size: 1.2rem; margin-bottom: 1.5rem; opacity: 0.95;">
+                This journal helps you internalize principles as Julian teaches. For mastery of how these principles apply to <strong>secured loans, trusts, court procedures, and complex matters</strong>, continue your journey with the masters.
+            </p>
+            <p style="font-size: 1.3rem; margin: 1.5rem 0;">
+                For direct mentorship, contact Julian Swan on Telegram:
+            </p>
+            <div class="telegram-handle">@vitiate0</div>
+            <p style="margin-top: 1.5rem; font-style: italic; opacity: 0.9;">
+                Mention you're using the <strong>Equity Power Tools Suite</strong> to show you're building your foundation seriously.
+            </p>
+        </div>
+
+        <footer class="footer">
+            <h3 style="color: white; margin-bottom: 1.5rem;">Equity Power Tools Suite • Tool #2: Principle Journal</h3>
+            <p style="opacity: 0.9; max-width: 800px; margin: 0 auto;">
+                A gift to support the internalization of equity. Based on the teachings of Julian and Margaret Swan.
+            </p>
+            <p style="margin-top: 1.5rem; opacity: 0.7;">
+                Next tool: <strong>Document Presentment Handler</strong>
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        // EQUITY PRINCIPLES LIBRARY
+        const equityPrinciples = [
+            {
+                latin: "Aequum et bonum est lex legum",
+                translation: "That which is equitable and good is the law of laws",
+                context: "The supreme maxim from Burton's. Establishes equity as the highest law.",
+                tags: ["Maxim", "Foundation", "Burton's"]
+            },
+            {
+                latin: "Acceptatio = Solutio",
+                translation: "Acceptance = Payment",
+                context: "Core principle from class chat. Proper acceptance of presentment constitutes payment in equity.",
+                tags: ["Payment", "Discharge", "Presentment"]
+            },
+            {
+                latin: "In eodem modo quo creatum est, dissolvitur",
+                translation: "It is discharged in the same manner in which it was created",
+                context: "Key to discharge process. If created by signature, discharged by proper acceptance of presentment.",
+                tags: ["Discharge", "Creation", "Process"]
+            },
+            {
+                latin: "Ubi jus, ibi remedium",
+                translation: "Where there is a right, there is a remedy",
+                context: "Equity will not suffer a wrong without a remedy.",
+                tags: ["Remedy", "Right", "Maxim"]
+            },
+            {
+                latin: "Honor commercialis, non moralis",
+                translation: "Commercial honor, not moral",
+                context: "From class chat: 'Commercial honor or dishonor, not ethical or moral.' Focus on commercial process.",
+                tags: ["Honor", "Commercial", "Process"]
+            },
+            {
+                latin: "Nemo dat quod non habet",
+                translation: "No one gives what they do not have",
+                context: "One cannot convey better title than one possesses.",
+                tags: ["Title", "Property", "Maxim"]
+            },
+            {
+                latin: "Qui prior est tempore, potior est jure",
+                translation: "Who is earlier in time, is stronger in right",
+                context: "Priority in time gives preference in law (important for liens and secured interests).",
+                tags: ["Priority", "Liens", "Secured"]
+            },
+            {
+                latin: "Res ipsa loquitur",
+                translation: "The thing speaks for itself",
+                context: "The facts are self-evident; no need for extensive proof when equity is clear.",
+                tags: ["Evidence", "Proof", "Maxim"]
+            },
+            {
+                latin: "Ex aequo et bono",
+                translation: "According to what is equitable and good",
+                context: "Deciding based on fairness and conscience rather than strict law.",
+                tags: ["Fairness", "Conscience", "Equity"]
+            },
+            {
+                latin: "Actus legis nemini est damnosus",
+                translation: "The act of the law shall harm no one",
+                context: "Legal process should not itself cause injury when properly followed.",
+                tags: ["Process", "Harm", "Justice"]
+            },
+            {
+                latin: "Written Presentment Requirement",
+                translation: "Commercial claims require proper written presentment",
+                context: "From call handling system: Equity requires proper form for acceptance and discharge.",
+                tags: ["Presentment", "Written", "Form"]
+            },
+            {
+                latin: "UCC 1-308 Reservation of Rights",
+                translation: "Right to reserve all rights while proceeding",
+                context: "Can engage while preserving all equitable and legal rights.",
+                tags: ["UCC", "Rights", "Reservation"]
+            },
+            {
+                latin: "Secured vs. Unsecured",
+                translation: "Different equity approaches for different obligations",
+                context: "As Margaret noted: 'Secured loans do require more effort and paperwork.'",
+                tags: ["Secured", "Unsecured", "Loans"]
+            },
+            {
+                latin: "Trust as Separate Entity",
+                translation: "Trust stands alone outside the commercial system",
+                context: "From chat: 'A Trust that stands alone outside the system on the complete recognition of Equity.'",
+                tags: ["Trust", "Entity", "Private"]
+            }
+        ];
+
+        // JOURNAL STATE
+        let journalEntries = JSON.parse(localStorage.getItem('equityJournalEntries')) || [];
+        let selectedTags = [];
+
+        // INITIALIZE PRINCIPLE LIBRARY
+        function initializePrincipleLibrary() {
+            const library = document.getElementById('principleLibrary');
+            library.innerHTML = '';
+            
+            equityPrinciples.forEach((principle, index) => {
+                const principleElement = document.createElement('div');
+                principleElement.className = 'principle-item';
+                principleElement.innerHTML = `
+                    <div class="principle-latin">${principle.latin}</div>
+                    <div class="principle-translation">${principle.translation}</div>
+                    <div class="principle-context">${principle.context}</div>
+                    <div class="entry-tags" style="margin-top: 10px;">
+                        ${principle.tags.map(tag => `<span class="entry-tag">${tag}</span>`).join('')}
+                    </div>
+                    <button class="btn btn-outline" style="margin-top: 15px; padding: 8px 16px;" onclick="addPrincipleToJournal(${index})">
+                        <i class="fas fa-plus"></i> Add to Journal
+                    </button>
+                `;
+                library.appendChild(principleElement);
+            });
+        }
+
+        // INITIALIZE TAGS
+        function initializeTags() {
+            const tagsContainer = document.getElementById('principleTags');
+            const allTags = [...new Set(equityPrinciples.flatMap(p => p.tags))];
+            
+            allTags.forEach(tag => {
+                const tagElement = document.createElement('div');
+                tagElement.className = 'tag';
+                tagElement.textContent = tag;
+                tagElement.onclick = function() {
+                    this.classList.toggle('active');
+                    const tagText = this.textContent;
+                    if (this.classList.contains('active')) {
+                        if (!selectedTags.includes(tagText)) selectedTags.push(tagText);
+                    } else {
+                        selectedTags = selectedTags.filter(t => t !== tagText);
+                    }
+                    updateSelectedTagsDisplay();
+                };
+                tagsContainer.appendChild(tagElement);
+            });
+        }
+
+        // UPDATE SELECTED TAGS DISPLAY
+        function updateSelectedTagsDisplay() {
+            // This function just ensures the tag selection is visually tracked
+            const tags = document.querySelectorAll('#principleTags .tag');
+            tags.forEach(tag => {
+                if (selectedTags.includes(tag.textContent)) {
+                    tag.classList.add('active');
+                } else {
+                    tag.classList.remove('active');
+                }
+            });
+        }
+
+        // ADD PRINCIPLE TO JOURNAL
+        function addPrincipleToJournal(index) {
+            const principle = equityPrinciples[index];
+            const contentField = document.getElementById('entryContent');
+            const maximField = document.getElementById('entryMaxim');
+            
+            // Add to content field
+            const currentContent = contentField.value;
+            const newContent = currentContent ? currentContent + '\n\n' : '';
+            contentField.value = newContent + `Studied: ${principle.latin}\nTranslation: ${principle.translation}\nContext: ${principle.context}`;
+            
+            // Add to maxim field if empty
+            if (!maximField.value) {
+                maximField.value = principle.latin;
+            }
+            
+            // Add tags
+            principle.tags.forEach(tag => {
+                if (!selectedTags.includes(tag)) {
+                    selectedTags.push(tag);
+                }
+            });
+            updateSelectedTagsDisplay();
+            
+            // Scroll to form
+            document.getElementById('entryTitle').focus();
+            
+            // Visual feedback
+            const principleElement = document.querySelectorAll('.principle-item')[index];
+            principleElement.style.backgroundColor = '#e8f5e9';
+            principleElement.style.borderColor = '#4caf50';
+            setTimeout(() => {
+                principleElement.style.backgroundColor = '';
+                principleElement.style.borderColor = '';
+            }, 1500);
+            
+            alert(`Added "${principle.latin}" to your journal entry. Now fill in how it applies to your situation.`);
+        }
+
+        // SAVE JOURNAL ENTRY
+        function saveJournalEntry() {
+            const title = document.getElementById('entryTitle').value.trim();
+            const content = document.getElementById('entryContent').value.trim();
+            const application = document.getElementById('entryApplication').value.trim();
+            const maxim = document.getElementById('entryMaxim').value.trim();
+            
+            if (!title || !content) {
+                alert('Please at least provide a Title and Today\'s Study content.');
+                return;
+            }
+            
+            const entry = {
+                id: Date.now(),
+                date: new Date().toLocaleDateString('en-US', { 
+                    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+                    hour: '2-digit', minute: '2-digit'
+                }),
+                title,
+                content,
+                application,
+                maxim,
+                tags: [...selectedTags],
+                timestamp: new Date().toISOString()
+            };
+            
+            journalEntries.unshift(entry); // Add to beginning
+            localStorage.setItem('equityJournalEntries', JSON.stringify(journalEntries));
+            
+            displayJournalEntries();
+            clearJournalForm();
+            
+            // Success feedback
+            const saveBtn = document.querySelector('.btn-primary');
+            const originalText = saveBtn.innerHTML;
+            saveBtn.innerHTML = '<i class="fas fa-check"></i> Entry Saved!';
+            saveBtn.style.backgroundColor = '#2e7d32';
+            setTimeout(() => {
+                saveBtn.innerHTML = originalText;
+                saveBtn.style.backgroundColor = '';
+            }, 2000);
+        }
+
+        // DISPLAY JOURNAL ENTRIES
+        function displayJournalEntries() {
+            const container = document.getElementById('journalEntries');
+            const emptyState = document.getElementById('emptyEntries');
+            
+            if (journalEntries.length === 0) {
+                emptyState.style.display = 'block';
+                container.innerHTML = '';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            container.innerHTML = '';
+            
+            journalEntries.forEach(entry => {
+                const entryElement = document.createElement('div');
+                entryElement.className = 'entry';
+                entryElement.innerHTML = `
+                    <div class="entry-header">
+                        <div class="entry-title">${entry.title}</div>
+                        <div class="entry-date">${entry.date}</div>
+                    </div>
+                    <div class="entry-tags">
+                        ${entry.tags.map(tag => `<span class="entry-tag">${tag}</span>`).join('')}
+                    </div>
+                    ${entry.maxim ? `<div class="maxim-box">"${entry.maxim}"</div>` : ''}
+                    <div style="margin: 1rem 0;"><strong>Study:</strong> ${entry.content.replace(/\n/g, '<br>')}</div>
+                    ${entry.application ? `<div style="margin: 1rem 0;"><strong>Application:</strong> ${entry.application.replace(/\n/g, '<br>')}</div>` : ''}
+                    <div style="display: flex; gap: 10px; margin-top: 1.5rem;">
+                        <button class="btn btn-outline" style="padding: 8px 16px;" onclick="editEntry(${entry.id})">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="btn btn-outline" style="padding: 8px 16px;" onclick="deleteEntry(${entry.id})">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </div>
+                `;
+                container.appendChild(entryElement);
+            });
+        }
+
+        // EDIT ENTRY
+        function editEntry(id) {
+            const entry = journalEntries.find(e => e.id === id);
+            if (!entry) return;
+            
+            document.getElementById('entryTitle').value = entry.title;
+            document.getElementById('entryContent').value = entry.content;
+            document.getElementById('entryApplication').value = entry.application;
+            document.getElementById('entryMaxim').value = entry.maxim;
+            
+            selectedTags = [...entry.tags];
+            updateSelectedTagsDisplay();
+            
+            // Remove the entry being edited
+            journalEntries = journalEntries.filter(e => e.id !== id);
+            localStorage.setItem('equityJournalEntries', JSON.stringify(journalEntries));
+            displayJournalEntries();
+            
+            alert('Entry loaded for editing. Make changes and click Save Journal Entry.');
+        }
+
+        // DELETE ENTRY
+        function deleteEntry(id) {
+            if (confirm('Are you sure you want to delete this journal entry?')) {
+                journalEntries = journalEntries.filter(e => e.id !== id);
+                localStorage.setItem('equityJournalEntries', JSON.stringify(journalEntries));
+                displayJournalEntries();
+            }
+        }
+
+        // CLEAR JOURNAL FORM
+        function clearJournalForm() {
+            document.getElementById('entryTitle').value = '';
+            document.getElementById('entryContent').value = '';
+            document.getElementById('entryApplication').value = '';
+            document.getElementById('entryMaxim').value = '';
+            document.getElementById('customTag').value = '';
+            
+            selectedTags = [];
+            updateSelectedTagsDisplay();
+        }
+
+        // SEARCH PRINCIPLES
+        document.getElementById('principleSearch').addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const principles = document.querySelectorAll('.principle-item');
+            
+            principles.forEach(principle => {
+                const text = principle.textContent.toLowerCase();
+                principle.style.display = text.includes(searchTerm) ? 'block' : 'none';
+            });
+        });
+
+        // CUSTOM TAG HANDLER
+        document.getElementById('customTag').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                const tag = this.value.trim();
+                if (tag && !selectedTags.includes(tag)) {
+                    selectedTags.push(tag);
+                    
+                    // Add to tags display
+                    const tagsContainer = document.getElementById('principleTags');
+                    const tagElement = document.createElement('div');
+                    tagElement.className = 'tag active';
+                    tagElement.textContent = tag;
+                    tagElement.onclick = function() {
+                        this.classList.toggle('active');
+                        const tagText = this.textContent;
+                        if (!this.classList.contains('active')) {
+                            selectedTags = selectedTags.filter(t => t !== tagText);
+                        }
+                    };
+                    tagsContainer.appendChild(tagElement);
+                    
+                    this.value = '';
+                }
+            }
+        });
+
+        // EXPORT JOURNAL
+        function exportJournal() {
+            const dataStr = JSON.stringify(journalEntries, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(dataBlob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `equity-journal-${new Date().toISOString().slice(0,10)}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // IMPORT JOURNAL
+        function importJournal() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = function(e) {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    try {
+                        const importedEntries = JSON.parse(event.target.result);
+                        journalEntries = [...importedEntries, ...journalEntries];
+                        localStorage.setItem('equityJournalEntries', JSON.stringify(journalEntries));
+                        displayJournalEntries();
+                        alert(`Successfully imported ${importedEntries.length} journal entries.`);
+                    } catch (error) {
+                        alert('Error importing journal file. Please check the file format.');
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        // INITIALIZE ON LOAD
+        document.addEventListener('DOMContentLoaded', function() {
+            initializePrincipleLibrary();
+            initializeTags();
+            displayJournalEntries();
+            
+            // Add export/import buttons
+            const journalHeader = document.querySelector('.journal-panel h2');
+            const exportDiv = document.createElement('div');
+            exportDiv.style.display = 'flex';
+            exportDiv.style.gap = '10px';
+            exportDiv.style.marginTop = '10px';
+            exportDiv.innerHTML = `
+                <button class="btn btn-outline" onclick="exportJournal()" style="padding: 10px 20px;">
+                    <i class="fas fa-download"></i> Export Journal
+                </button>
+                <button class="btn btn-outline" onclick="importJournal()" style="padding: 10px 20px;">
+                    <i class="fas fa-upload"></i> Import Journal
+                </button>
+            `;
+            journalHeader.parentNode.insertBefore(exportDiv, journalHeader.nextSibling);
+        });
+    </script>
+</body>
+</html>
