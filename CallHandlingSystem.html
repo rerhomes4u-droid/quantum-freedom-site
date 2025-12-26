@@ -5,657 +5,290 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EQUITY POWER TOOLS: Interactive Call Simulator</title>
     <style>
-        :root {
-            --primary: #1a237e;
-            --secondary: #283593;
-            --accent: #3949ab;
-            --success: #2e7d32;
-            --warning: #f9a825;
-            --paper: #fffef7;
-            --ink: #1a1a1a;
-        }
+        :root { --primary: #1a237e; --secondary: #283593; --accent: #3949ab; --success: #2e7d32; --warning: #f9a825; }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: system-ui, -apple-system, sans-serif;
-            background: #f5f7fa;
-            color: var(--ink);
-            padding: 20px;
-            line-height: 1.6;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-        header {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-            padding: 2rem;
-            text-align: center;
-        }
-        .badge {
-            display: inline-block;
-            background: var(--accent);
-            padding: 8px 20px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            font-weight: bold;
-            margin-bottom: 1rem;
-        }
-        h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
-        .subtitle { font-size: 1.1rem; opacity: 0.9; max-width: 800px; margin: 0 auto; }
-        .main { display: flex; flex-wrap: wrap; min-height: 70vh; }
-        @media (max-width: 768px) { .main { flex-direction: column; } }
-        .simulator { flex: 3; padding: 2rem; border-right: 1px solid #eee; }
-        .log-panel { flex: 2; padding: 2rem; background: #f9f9ff; }
-        h2 { color: var(--primary); margin-bottom: 1.5rem; padding-bottom: 10px; border-bottom: 3px solid var(--accent); }
-        .status-bar {
-            background: #edf7ff;
-            border-radius: 10px;
-            padding: 1rem;
-            margin-bottom: 1.5rem;
-            display: flex;
-            justify-content: space-around;
-            text-align: center;
-        }
-        .status-label { display: block; font-size: 0.9rem; color: #555; }
+        body { font-family: system-ui, sans-serif; background: #f5f7fa; padding: 20px; color: #333; line-height: 1.6; }
+        .container { max-width: 1200px; margin: 0 auto; background: white; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); overflow: hidden; }
+        header { background: linear-gradient(135deg, var(--primary), var(--secondary)); color: white; padding: 2rem; text-align: center; }
+        h1 { font-size: 2.2rem; margin-bottom: 0.5rem; }
+        .main { display: flex; flex-wrap: wrap; min-height: 60vh; }
+        .simulator, .log-panel { padding: 1.5rem; }
+        .simulator { flex: 3; border-right: 1px solid #eee; }
+        .log-panel { flex: 2; background: #f9f9ff; }
+        .status-bar { background: #e8f4ff; border-radius: 10px; padding: 1rem; margin-bottom: 1.5rem; display: flex; justify-content: space-around; text-align: center; }
         .status-value { font-size: 1.8rem; font-weight: bold; color: var(--accent); font-family: monospace; }
-        .controls { display: flex; gap: 10px; margin-bottom: 2rem; flex-wrap: wrap; }
-        .btn {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.2s;
-        }
+        .btn { padding: 12px 24px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin: 5px; }
         .btn-primary { background: var(--accent); color: white; }
-        .btn-primary:hover { background: var(--primary); transform: translateY(-2px); }
         .btn-success { background: var(--success); color: white; }
-        .btn-outline { background: transparent; color: var(--primary); border: 2px solid var(--accent); }
-        .step {
-            background: #fff;
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            border: 1px solid #eee;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-        }
-        .step.active { border-left: 5px solid var(--accent); }
+        .step { background: #fff; border-radius: 10px; padding: 1.5rem; margin-bottom: 1rem; border: 1px solid #eee; }
         .step.hidden { display: none; }
-        .step-header { display: flex; align-items: center; gap: 15px; margin-bottom: 1rem; }
-        .step-number {
-            background: var(--accent);
-            color: white;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 1.2rem;
-        }
-        .step-title { font-size: 1.3rem; font-weight: bold; color: var(--primary); }
-        .user-line {
-            background: #e8f5e9;
-            padding: 1rem;
-            border-radius: 8px;
-            margin: 1rem 0;
-            border-left: 4px solid var(--success);
-            font-weight: 600;
-        }
-        .input-group { margin: 1.2rem 0; }
-        label { display: block; margin-bottom: 6px; font-weight: 600; color: var(--primary); }
-        input, textarea, select {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-family: inherit;
-        }
-        input:focus, textarea:focus, select:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(57, 73, 171, 0.1);
-        }
-        .principle-box {
-            background: #f0f7ff;
-            padding: 1rem;
-            border-radius: 8px;
-            margin-top: 1rem;
-            border-left: 4px solid var(--accent);
-        }
-        .call-log {
-            background: white;
-            border-radius: 12px;
-            padding: 1.5rem;
-            height: 400px;
-            overflow-y: auto;
-            font-family: 'Courier New', monospace;
-            white-space: pre-wrap;
-            font-size: 0.9rem;
-            line-height: 1.5;
-            border: 2px solid #e0e0e0;
-            margin-bottom: 1.5rem;
-        }
-        .log-actions { display: flex; gap: 10px; justify-content: center; }
-        .invitation {
-            background: linear-gradient(135deg, #5e35b1, #3949ab);
-            color: white;
-            padding: 2rem;
-            margin: 2rem;
-            border-radius: 15px;
-            text-align: center;
-        }
-        .telegram-handle {
-            background: rgba(0,0,0,0.2);
-            padding: 10px 25px;
-            border-radius: 25px;
-            font-family: monospace;
-            font-size: 1.2rem;
-            margin: 1rem 0;
-            display: inline-block;
-        }
-        footer {
-            background: var(--primary);
-            color: white;
-            text-align: center;
-            padding: 1.5rem;
-        }
+        .user-line { background: #e8f5e9; padding: 1rem; border-radius: 8px; margin: 1rem 0; border-left: 4px solid var(--success); font-weight: 600; }
+        .input-group { margin: 1rem 0; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; color: var(--primary); }
+        input, textarea, select { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 6px; font-size: 1rem; }
+        .call-log { background: white; border-radius: 10px; padding: 1.5rem; font-family: 'Courier New', monospace; white-space: pre-wrap; border: 2px solid #e0e0e0; height: 350px; overflow-y: auto; margin-bottom: 1rem; }
+        footer { background: var(--primary); color: white; text-align: center; padding: 1.5rem; margin-top: 2rem; }
+        @media (max-width: 768px) { .main { flex-direction: column; } .simulator { border-right: none; border-bottom: 1px solid #eee; } }
     </style>
 </head>
 <body>
     <div class="container">
         <header>
-            <div class="badge">EQUITY POWER TOOLS SUITE</div>
+            <div style="background:var(--accent); display:inline-block; padding:5px 15px; border-radius:20px; margin-bottom:1rem; font-size:0.9rem; font-weight:bold;">EQUITY POWER TOOLS SUITE</div>
             <h1>Interactive Call Simulator</h1>
-            <p class="subtitle">Practice, record, and internalize the equity-based call handling script. Create a perfect record every time.</p>
-            <div style="margin-top: 1rem; font-weight: bold;">TOOL #1: CALL SIMULATOR & LOG</div>
+            <p>Practice, record, and internalize the equity-based call handling script.</p>
+            <div style="margin-top:1rem; font-weight:bold;">TOOL #1: CALL SIMULATOR & LOG</div>
         </header>
 
         <div class="main">
+            <!-- SIMULATOR PANEL -->
             <section class="simulator">
                 <h2>Call Simulation</h2>
-
                 <div class="status-bar">
-                    <div>
-                        <span class="status-label">Status</span>
-                        <div class="status-value" id="statusDisplay">READY</div>
-                    </div>
-                    <div>
-                        <span class="status-label">Duration</span>
-                        <div class="status-value" id="timerDisplay">00:00</div>
-                    </div>
-                    <div>
-                        <span class="status-label">Step</span>
-                        <div class="status-value" id="stepDisplay">1/4</div>
-                    </div>
+                    <div><div style="font-size:0.9rem; color:#555;">Status</div><div class="status-value" id="statusDisplay">READY</div></div>
+                    <div><div style="font-size:0.9rem; color:#555;">Duration</div><div class="status-value" id="timerDisplay">00:00</div></div>
+                    <div><div style="font-size:0.9rem; color:#555;">Step</div><div class="status-value" id="stepDisplay">1/4</div></div>
                 </div>
 
-                <div class="controls">
-                    <button class="btn btn-primary" id="startBtn" onclick="startCall()">
-                        ▶ Start Simulation
-                    </button>
-                    <button class="btn btn-success" id="nextBtn" onclick="nextStep()" disabled>
-                        Next Step ►
-                    </button>
-                    <button class="btn" onclick="resetAll()" style="background:#f1f1f1;">
-                        ↻ Reset
-                    </button>
+                <div style="margin-bottom:1.5rem;">
+                    <button class="btn btn-primary" id="startBtn" onclick="startCall()">▶ Start Simulation</button>
+                    <button class="btn btn-success" id="nextBtn" onclick="nextStep()" disabled>Next Step ►</button>
+                    <button class="btn" onclick="resetAll()" style="background:#f1f1f1;">↻ Reset</button>
                 </div>
 
-                <div class="step active" id="step1">
-                    <div class="step-header">
-                        <div class="step-number">1</div>
-                        <div class="step-title">Gather Information</div>
-                    </div>
+                <!-- STEP 1 -->
+                <div class="step" id="step1">
+                    <h3>1. Gather Information</h3>
                     <div class="user-line">"Well, thank you so much for calling. Who am I speaking with?"</div>
-                    <div class="input-group">
-                        <label>Collector's Full Name:</label>
-                        <input type="text" id="collectorName" placeholder="Enter name...">
-                    </div>
-                    <div class="user-line">"Do you have an employee ID? Company? Mailing address? Supervisor's name?"</div>
-                    <div class="input-group">
-                        <label>Employee ID:</label>
-                        <input type="text" id="employeeId" placeholder="e.g., 45872-X">
-                    </div>
-                    <div class="input-group">
-                        <label>Company & Dept:</label>
-                        <input type="text" id="companyName" placeholder="e.g., National Credit Solutions">
-                    </div>
-                    <div class="input-group">
-                        <label>Mailing Address:</label>
-                        <input type="text" id="companyAddress" placeholder="Full address...">
-                    </div>
-                    <div class="input-group">
-                        <label>Supervisor (if given):</label>
-                        <input type="text" id="supervisorName" placeholder="Optional">
-                    </div>
+                    <div class="input-group"><label>Collector's Name:</label><input type="text" id="collectorName" placeholder="Enter name..."></div>
+                    <div class="user-line">"Do you have an employee ID? Company? Mailing address?"</div>
+                    <div class="input-group"><label>Employee ID:</label><input type="text" id="employeeId" placeholder="e.g., 45872-X"></div>
+                    <div class="input-group"><label>Company:</label><input type="text" id="companyName" placeholder="e.g., National Credit Solutions"></div>
+                    <div class="input-group"><label>Mailing Address:</label><input type="text" id="companyAddress" placeholder="Full address..."></div>
                     <div class="user-line">"What is the reference number for the commercial instrument?"</div>
-                    <div class="input-group">
-                        <label>Instrument / Account #:</label>
-                        <input type="text" id="accountNumber" placeholder="Enter number...">
-                    </div>
-                    <div class="principle-box">
-                        <strong>EQUITY PRINCIPLE:</strong> Grounding the call in a specific "instrument" creates the proper commercial record.
-                    </div>
+                    <div class="input-group"><label>Instrument / Account #:</label><input type="text" id="accountNumber" placeholder="Enter number..."></div>
                 </div>
 
+                <!-- STEP 2 -->
                 <div class="step hidden" id="step2">
-                    <div class="step-header">
-                        <div class="step-number">2</div>
-                        <div class="step-title">Make the Equity Request</div>
-                    </div>
+                    <h3>2. Make the Equity Request</h3>
                     <div class="user-line">"Great. So, what is it you're needing from me today?"</div>
-                    <div class="input-group">
-                        <label>Collector's Demand:</label>
-                        <input type="text" id="collectorDemand" placeholder="e.g., 'Payment of $1,250 by Friday'">
-                    </div>
-                    <div class="user-line">"Thank you. For equitable settlement, I require proper written presentment. Mail it to me and I will honor it immediately."</div>
-                    <div class="input-group">
-                        <label>Their Response:</label>
-                        <input type="text" id="responseToRequest" placeholder="What do they say?">
-                    </div>
-                    <div class="principle-box">
-                        <strong>MAXIM APPLIED:</strong> "That which is equitable and good is the law of laws."
-                    </div>
+                    <div class="input-group"><label>Collector's Demand:</label><input type="text" id="collectorDemand" placeholder="e.g., 'Payment of $1,250'"></div>
+                    <div class="user-line">"Thank you. For equitable settlement, I require proper written presentment. Mail it to me and I will honor it."</div>
+                    <div class="input-group"><label>Their Response:</label><input type="text" id="responseToRequest" placeholder="What do they say?"></div>
                 </div>
 
+                <!-- STEP 3 -->
                 <div class="step hidden" id="step3">
-                    <div class="step-header">
-                        <div class="step-number">3</div>
-                        <div class="step-title">Handle Objections</div>
-                    </div>
-                    <div style="background:#fff3e0; padding:1rem; border-radius:8px; margin:1rem 0; border-left:4px solid var(--warning);">
-                        <strong>COLLECTOR:</strong> "You haven't made payments on this account."
-                    </div>
+                    <h3>3. Handle Objections</h3>
+                    <div style="background:#fff3e0; padding:1rem; border-radius:8px; margin:1rem 0;">"You haven't made payments on this account."</div>
                     <div class="user-line">"Does your record reflect that I have accepted and returned all presentments?"</div>
-                    <div class="input-group">
-                        <label>Their Reaction / Argument:</label>
-                        <textarea id="collectorObjection" rows="3" placeholder="Type their response..."></textarea>
-                    </div>
+                    <div class="input-group"><label>Their Reaction:</label><textarea id="collectorObjection" rows="2" placeholder="Type response..."></textarea></div>
                     <div class="user-line">"A presentment requires acceptance. I require proper written form to accept and honor equitably."</div>
-                    <div class="principle-box">
-                        <strong>MINDSET SHIFT:</strong> Knowing equity prevails, rather than hoping it will work.
-                    </div>
                 </div>
 
+                <!-- STEP 4 -->
                 <div class="step hidden" id="step4">
-                    <div class="step-header">
-                        <div class="step-number">4</div>
-                        <div class="step-title">Call Conclusion</div>
-                    </div>
-                    <div class="input-group">
-                        <label>How did the call end?</label>
+                    <h3>4. Call Conclusion</h3>
+                    <div class="input-group"><label>How did the call end?</label>
                         <select id="endingType">
                             <option value="">Select...</option>
                             <option value="agreed">They agreed to send written presentment</option>
                             <option value="refused">They refused</option>
-                            <option value="hostile">Became hostile - Terminated</option>
                             <option value="other">Other</option>
                         </select>
                     </div>
                     <div class="user-line" id="endingAgreed">"Thank you. I will watch for your mailing. Have a good day."</div>
                     <div class="user-line hidden" id="endingRefused">"Since you cannot provide written presentment, nothing further can be honored. Thank you."</div>
-                    <div class="user-line hidden" id="endingHostile">"This conversation is no longer productive. I am ending the call. Goodbye."</div>
-                    <div class="principle-box">
-                        <strong>STAY ON SCRIPT:</strong> Regardless of what they say, stay on the equity script.
-                    </div>
                 </div>
             </section>
 
+            <!-- LOG PANEL -->
             <section class="log-panel">
                 <h2>Call Log & Record</h2>
                 <p>This log builds as you complete the simulation.</p>
-
                 <div class="call-log" id="callLog">
 ========================================
-EQUITY CALL LOG - WITHOUT PREJUDICE UCC 1-308
+EQUITY CALL LOG
 ========================================
-Date: <span id="logDate"></span>
-Time Started: <span id="logTime"></span>
+Date: <span id="logDate">[Date]</span>
+Time: <span id="logTime">[Time]</span>
 Call Reference: EQUITY-CALL-<span id="logId">0000</span>
-Call Duration: <span id="logDuration">00:00</span>
+Duration: <span id="logDuration">00:00</span>
 
---------------------------------------------------------
-1. COLLECTOR INFORMATION:
---------------------------------------------------------
-Name: [Waiting for input...]
-Employee ID: [Waiting for input...]
-Company: [Waiting for input...]
-Address: [Waiting for input...]
-Supervisor: [Waiting for input...]
-Instrument #: [Waiting for input...]
+1. COLLECTOR INFO:
+Name: [Waiting...]
+ID: [Waiting...]
+Company: [Waiting...]
+Address: [Waiting...]
+Instrument #: [Waiting...]
 
-2. COLLECTOR'S DEMAND:
-[Waiting for input...]
+2. DEMAND:
+[Waiting...]
 
 3. EQUITY REQUEST & RESPONSE:
-[Waiting for input...]
+[Waiting...]
 
-4. OBJECTIONS & CLARIFICATION:
-[Waiting for input...]
+4. OBJECTIONS:
+[Waiting...]
 
-5. CALL CONCLUSION:
-[Waiting for input...]
-
-6. EQUITY PRINCIPLES INVOKED:
-- Written presentment required for discharge
-- "Acceptance = Payment" upon proper presentment
-- Reservation of rights under UCC 1-308
-- "That which is equitable and good is the law of laws"
-
-========================================
-END OF LOG
+5. CONCLUSION:
+[Waiting...]
 ========================================
                 </div>
-
-                <div class="log-actions">
-                    <button class="btn btn-primary" onclick="updateLogNow()">
-                        Update Live Log
-                    </button>
-                    <button class="btn btn-success" onclick="downloadLog()">
-                        Download Final Log
-                    </button>
-                    <button class="btn btn-outline" onclick="copyLog()">
-                        Copy to Clipboard
-                    </button>
-                </div>
-
-                <div style="margin-top:2rem; padding:1rem; background:#e1f5fe; border-radius:10px;">
-                    <h3>How to Use</h3>
-                    <ol style="margin-top:0.5rem; padding-left:1.2rem;">
-                        <li>Click <strong>Start Simulation</strong></li>
-                        <li>Fill each field as if on a real call</li>
-                        <li>Click <strong>Next Step</strong> to progress</li>
-                        <li>Use <strong>Update Live Log</strong> to refresh the record</li>
-                        <li><strong>Download</strong> or <strong>Copy</strong> the final log</li>
-                    </ol>
+                <div>
+                    <button class="btn btn-primary" onclick="updateLogNow()">Update Live Log</button>
+                    <button class="btn btn-success" onclick="downloadLog()">Download Final Log</button>
+                    <button class="btn" onclick="copyLog()" style="border:2px solid var(--accent); background:transparent;">Copy to Clipboard</button>
                 </div>
             </section>
-        </div>
-
-        <div class="invitation">
-            <h3 style="color:white; margin-bottom:1rem;">The Path to Mastery Continues</h3>
-            <p>This simulator helps practice the script. For deep understanding of secured loans, trusts, and complex matters, continue your study with the masters.</p>
-            <p style="margin:1rem 0;">Reach Julian Swan directly on Telegram:</p>
-            <div class="telegram-handle">@vitiate0</div>
-            <p style="margin-top:1rem; font-style:italic;">When you contact him, mention you come via the Equity Power Tools Suite.</p>
         </div>
 
         <footer>
             <p>Equity Power Tools Suite • Tool #1: Call Simulator</p>
-            <p style="opacity:0.8; margin-top:0.5rem;">A gift to mankind. Built with respect for the teachings of Julian and Margaret Swan.</p>
+            <p style="opacity:0.8; margin-top:0.5rem; font-size:0.9rem;">A gift built with respect for the teachings of Julian and Margaret Swan.</p>
         </footer>
     </div>
 
     <script>
-        // FILE HASH: equity-simulator-v1-final
-        // STATE
-        let callActive = false;
-        let currentStep = 1;
-        let startTime = null;
-        let timerInterval = null;
+        // SIMPLE, WORKING JAVASCRIPT
+        let callActive = false, currentStep = 1, startTime = null, timerInterval = null;
         let callId = Math.floor(1000 + Math.random() * 9000);
 
-        // ELEMENTS
-        const statusDisplay = document.getElementById('statusDisplay');
-        const timerDisplay = document.getElementById('timerDisplay');
-        const stepDisplay = document.getElementById('stepDisplay');
-        const startBtn = document.getElementById('startBtn');
-        const nextBtn = document.getElementById('nextBtn');
-        const steps = [document.getElementById('step1'), document.getElementById('step2'), document.getElementById('step3'), document.getElementById('step4')];
-        const endingSelect = document.getElementById('endingType');
-        const endingMessages = {
-            agreed: document.getElementById('endingAgreed'),
-            refused: document.getElementById('endingRefused'),
-            hostile: document.getElementById('endingHostile')
-        };
-
-        // INITIALIZE
+        // Initialize
         window.onload = function() {
             document.getElementById('logId').textContent = callId;
             const now = new Date();
-            document.getElementById('logDate').textContent = now.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-            document.getElementById('logTime').textContent = now.toLocaleTimeString('en-US');
-            
-            endingSelect.addEventListener('change', function() {
-                Object.values(endingMessages).forEach(el => el.classList.add('hidden'));
-                if (this.value && endingMessages[this.value]) {
-                    endingMessages[this.value].classList.remove('hidden');
-                }
+            document.getElementById('logDate').textContent = now.toLocaleDateString();
+            document.getElementById('logTime').textContent = now.toLocaleTimeString();
+            document.getElementById('endingType').addEventListener('change', function() {
+                document.getElementById('endingAgreed').classList.toggle('hidden', this.value !== 'agreed');
+                document.getElementById('endingRefused').classList.toggle('hidden', this.value !== 'refused');
             });
         };
 
-        // START CALL
         function startCall() {
             if (callActive) return;
             callActive = true;
             startTime = new Date();
-            statusDisplay.textContent = 'IN PROGRESS';
-            statusDisplay.style.color = '#2e7d32';
-            startBtn.disabled = true;
-            startBtn.textContent = 'Simulation Active';
-            nextBtn.disabled = false;
-            
+            document.getElementById('statusDisplay').textContent = 'IN PROGRESS';
+            document.getElementById('startBtn').disabled = true;
+            document.getElementById('nextBtn').disabled = false;
             timerInterval = setInterval(updateTimer, 1000);
-            updateTimer();
-            
             enableInputs(1);
-            alert("Simulation started! Fill in the information as if this were a real call.");
+            alert("Simulation started!");
         }
 
-        // UPDATE TIMER
         function updateTimer() {
             if (!startTime) return;
-            const now = new Date();
-            const diff = Math.floor((now - startTime) / 1000);
+            const diff = Math.floor((new Date() - startTime) / 1000);
             const min = Math.floor(diff / 60).toString().padStart(2, '0');
             const sec = (diff % 60).toString().padStart(2, '0');
-            timerDisplay.textContent = `${min}:${sec}`;
+            document.getElementById('timerDisplay').textContent = `${min}:${sec}`;
             document.getElementById('logDuration').textContent = `${min}:${sec}`;
         }
 
-        // NEXT STEP
         function nextStep() {
             if (currentStep >= 4) return;
-            
-            steps[currentStep - 1].classList.remove('active');
-            steps[currentStep - 1].classList.add('hidden');
-            
+            document.getElementById('step' + currentStep).classList.add('hidden');
             currentStep++;
-            steps[currentStep - 1].classList.remove('hidden');
-            steps[currentStep - 1].classList.add('active');
-            
-            stepDisplay.textContent = `${currentStep}/4`;
+            document.getElementById('step' + currentStep).classList.remove('hidden');
+            document.getElementById('stepDisplay').textContent = currentStep + '/4';
             enableInputs(currentStep);
             updateLogNow();
-            
-            if (currentStep === 4) {
-                nextBtn.textContent = 'Final Step';
-            }
         }
 
-        // ENABLE INPUTS FOR CURRENT STEP
         function enableInputs(step) {
-            document.querySelectorAll('input, textarea, select').forEach(el => {
-                el.disabled = true;
-                el.style.backgroundColor = '#f5f5f5';
-            });
-            
+            document.querySelectorAll('input, textarea, select').forEach(el => el.disabled = true);
             let ids = [];
-            if (step === 1) ids = ['collectorName', 'employeeId', 'companyName', 'companyAddress', 'supervisorName', 'accountNumber'];
+            if (step === 1) ids = ['collectorName', 'employeeId', 'companyName', 'companyAddress', 'accountNumber'];
             if (step === 2) ids = ['collectorDemand', 'responseToRequest'];
             if (step === 3) ids = ['collectorObjection'];
             if (step === 4) ids = ['endingType'];
-            
-            ids.forEach(id => {
-                const el = document.getElementById(id);
-                if (el) {
-                    el.disabled = false;
-                    el.style.backgroundColor = 'white';
-                }
-            });
+            ids.forEach(id => { let el = document.getElementById(id); if(el) el.disabled = false; });
         }
 
-        // UPDATE LOG NOW
         function updateLogNow() {
             const data = {
                 name: document.getElementById('collectorName').value,
                 id: document.getElementById('employeeId').value,
                 company: document.getElementById('companyName').value,
                 address: document.getElementById('companyAddress').value,
-                supervisor: document.getElementById('supervisorName').value,
                 instrument: document.getElementById('accountNumber').value,
                 demand: document.getElementById('collectorDemand').value,
                 response: document.getElementById('responseToRequest').value,
                 objection: document.getElementById('collectorObjection').value,
                 ending: document.getElementById('endingType').value
             };
-            
-            let endingText = '';
-            if (data.ending === 'agreed') endingText = 'They agreed to send written presentment.';
-            if (data.ending === 'refused') endingText = 'They refused to provide written presentment.';
-            if (data.ending === 'hostile') endingText = 'Call terminated due to hostile behavior.';
-            if (data.ending === 'other') endingText = 'Call ended with other outcome.';
-            
-            const logContent = `========================================
-EQUITY CALL LOG - WITHOUT PREJUDICE UCC 1-308
+            const logText = `========================================
+EQUITY CALL LOG
 ========================================
 Date: ${document.getElementById('logDate').textContent}
-Time Started: ${document.getElementById('logTime').textContent}
+Time: ${document.getElementById('logTime').textContent}
 Call Reference: EQUITY-CALL-${callId}
-Call Duration: ${timerDisplay.textContent}
+Duration: ${document.getElementById('logDuration').textContent}
 
---------------------------------------------------------
-1. COLLECTOR INFORMATION:
---------------------------------------------------------
-Name: ${data.name || '[Not recorded yet]'}
-Employee ID: ${data.id || '[Not recorded yet]'}
-Company: ${data.company || '[Not recorded yet]'}
-Address: ${data.address || '[Not recorded yet]'}
-Supervisor: ${data.supervisor || '[Not recorded yet]'}
-Instrument #: ${data.instrument || '[Not recorded yet]'}
+1. COLLECTOR INFO:
+Name: ${data.name || '[Waiting...]'}
+ID: ${data.id || '[Waiting...]'}
+Company: ${data.company || '[Waiting...]'}
+Address: ${data.address || '[Waiting...]'}
+Instrument #: ${data.instrument || '[Waiting...]'}
 
-2. COLLECTOR'S DEMAND:
-${data.demand || '[Not recorded yet]'}
+2. DEMAND:
+${data.demand || '[Waiting...]'}
 
 3. EQUITY REQUEST & RESPONSE:
-My Request: "Please provide written presentment for equitable settlement."
-Their Response: ${data.response || '[Not recorded yet]'}
+${data.response || '[Waiting...]'}
 
-4. OBJECTIONS & CLARIFICATION:
-Their Objection: ${data.objection || '[Not recorded yet]'}
-My Equity Response: "A presentment requires acceptance. I require proper written form to accept and honor equitably."
+4. OBJECTIONS:
+${data.objection || '[Waiting...]'}
 
-5. CALL CONCLUSION:
-Ending Type: ${data.ending || '[Not selected yet]'}
-${endingText ? 'Outcome: ' + endingText : ''}
-
-6. EQUITY PRINCIPLES INVOKED:
-- Written presentment required for discharge
-- "Acceptance = Payment" upon proper presentment
-- Reservation of rights under UCC 1-308
-- "That which is equitable and good is the law of laws"
-
-========================================
-END OF LOG
+5. CONCLUSION:
+${data.ending || '[Waiting...]'}
 ========================================`;
-            
-            document.getElementById('callLog').textContent = logContent;
-            
-            const btn = document.querySelector('.log-actions .btn-primary');
-            const original = btn.innerHTML;
-            btn.innerHTML = '✓ Log Updated';
-            btn.style.backgroundColor = '#2e7d32';
-            setTimeout(() => {
-                btn.innerHTML = original;
-                btn.style.backgroundColor = '';
-            }, 1500);
+            document.getElementById('callLog').textContent = logText;
         }
 
-        // DOWNLOAD LOG
         function downloadLog() {
             updateLogNow();
             const logText = document.getElementById('callLog').textContent;
-            const blob = new Blob([logText], { type: 'text/plain' });
+            const blob = new Blob([logText], {type: 'text/plain'});
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `Equity-Call-Log-${callId}.txt`;
+            a.download = 'Equity-Call-Log-' + callId + '.txt';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
-            alert(`Log downloaded as: ${a.download}`);
         }
 
-        // COPY LOG
         function copyLog() {
             updateLogNow();
             const logText = document.getElementById('callLog').textContent;
-            navigator.clipboard.writeText(logText).then(() => {
-                const btn = document.querySelector('.log-actions .btn-outline');
-                const original = btn.innerHTML;
-                btn.innerHTML = '✓ Copied!';
-                btn.style.backgroundColor = '#2e7d32';
-                btn.style.color = 'white';
-                setTimeout(() => {
-                    btn.innerHTML = original;
-                    btn.style.backgroundColor = '';
-                    btn.style.color = '';
-                }, 2000);
-            }).catch(err => {
-                alert('Could not copy. Please select and copy the text manually.');
-            });
+            navigator.clipboard.writeText(logText).then(() => alert('Log copied to clipboard!'));
         }
 
-        // RESET ALL
         function resetAll() {
             callActive = false;
             currentStep = 1;
             clearInterval(timerInterval);
-            
-            statusDisplay.textContent = 'READY';
-            statusDisplay.style.color = '';
-            timerDisplay.textContent = '00:00';
-            stepDisplay.textContent = '1/4';
-            startBtn.disabled = false;
-            startBtn.textContent = '▶ Start Simulation';
-            nextBtn.disabled = true;
-            nextBtn.textContent = 'Next Step ►';
-            
-            steps.forEach((step, idx) => {
-                step.classList.remove('active', 'hidden');
-                if (idx === 0) step.classList.add('active');
-                else step.classList.add('hidden');
+            document.getElementById('statusDisplay').textContent = 'READY';
+            document.getElementById('timerDisplay').textContent = '00:00';
+            document.getElementById('stepDisplay').textContent = '1/4';
+            document.getElementById('startBtn').disabled = false;
+            document.getElementById('nextBtn').disabled = true;
+            [1,2,3,4].forEach(i => {
+                let el = document.getElementById('step' + i);
+                el.classList[i===1?'remove':'add']('hidden');
             });
-            
-            document.querySelectorAll('input, textarea, select').forEach(el => {
-                if (el.type !== 'button') {
-                    el.value = '';
-                    el.disabled = true;
-                    el.style.backgroundColor = '#f5f5f5';
-                }
-            });
-            
+            document.querySelectorAll('input, textarea, select').forEach(el => { el.value = ''; el.disabled = true; });
             document.getElementById('endingType').value = '';
-            Object.values(endingMessages).forEach(el => el.classList.add('hidden'));
-            endingMessages.agreed.classList.remove('hidden');
-            
             callId = Math.floor(1000 + Math.random() * 9000);
             document.getElementById('logId').textContent = callId;
-            
             updateLogNow();
-            alert('Simulation reset. Ready for a new call.');
+            alert('Simulation reset.');
         }
     </script>
 </body>
