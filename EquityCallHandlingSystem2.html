@@ -406,9 +406,24 @@
         .debug-info.active {
             display: block;
         }
+        .log-update-notice {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--success);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: bold;
+            display: none;
+            z-index: 1000;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+        }
     </style>
 </head>
 <body>
+    <div class="log-update-notice" id="logUpdateNotice">✓ Log Updated</div>
+    
     <div class="container">
         <header>
             <div class="header-content">
@@ -778,6 +793,7 @@
         const audioTimer = document.getElementById('audioTimer');
         const debugInfo = document.getElementById('debugInfo');
         const recordingStatusDisplay = document.getElementById('recordingStatusDisplay');
+        const logUpdateNotice = document.getElementById('logUpdateNotice');
         
         // Browser compatibility check
         function checkBrowserCompatibility() {
@@ -1134,6 +1150,13 @@
             debugInfo.classList.toggle('active', showDebug);
             logDebug(`Debug mode ${showDebug ? 'enabled' : 'disabled'}`);
         }
+        
+        function showLogUpdateNotice() {
+            logUpdateNotice.style.display = 'block';
+            setTimeout(() => {
+                logUpdateNotice.style.display = 'none';
+            }, 2000);
+        }
 
         // ==============================================
         // CALL SIMULATION FUNCTIONALITY
@@ -1152,6 +1175,35 @@
         const callTimer = document.getElementById('callTimer');
         const currentStepDisplay = document.getElementById('currentStep');
         
+        // List of all input fields that should trigger log updates
+        const inputFields = [
+            'collectorName', 'employeeId', 'companyName', 'companyAddress', 
+            'supervisorName', 'accountNumber', 'collectorDemand', 
+            'responseToRequest', 'collectorObjection', 'endingType'
+        ];
+        
+        function setupAutoLogUpdates() {
+            // Add event listeners to all input fields
+            inputFields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (field) {
+                    if (field.tagName === 'TEXTAREA' || field.type === 'text') {
+                        field.addEventListener('input', () => {
+                            updateLog();
+                            showLogUpdateNotice();
+                        });
+                    } else if (field.tagName === 'SELECT') {
+                        field.addEventListener('change', () => {
+                            updateLog();
+                            showLogUpdateNotice();
+                        });
+                    }
+                }
+            });
+            
+            logDebug('Auto-log update listeners set up');
+        }
+        
         function startSimulation() {
             simulationActive = true;
             startTime = new Date();
@@ -1164,6 +1216,10 @@
             timerInterval = setInterval(updateTimer, 1000);
             updateTimer();
             enableInputsForStep(1);
+            
+            // Force initial log update
+            updateLog();
+            
             alert("Simulation started! Fill in the collector's information as if this were a real call.");
         }
         
@@ -1184,6 +1240,8 @@
             currentStepDisplay.textContent = `${currentStep}/4`;
             enableInputsForStep(currentStep);
             updateLog();
+            showLogUpdateNotice();
+            
             if (currentStep === 4) {
                 nextBtn.innerHTML = '<i class="fas fa-flag-checkered"></i> Complete Simulation';
             }
@@ -1217,6 +1275,10 @@
             const collectorObjection = document.getElementById('collectorObjection').value;
             const endingType = document.getElementById('endingType').value;
             
+            // Format the values for display
+            const formatValue = (value) => value.trim() || '[Not recorded yet]';
+            const formatSelect = (value) => value || '[Not selected yet]';
+            
             let endingScriptText = '';
             if (endingType === 'agreed') endingScriptText = '"Thank you. I will watch for your mailing. Please note today\'s date and my request for the record."';
             else if (endingType === 'refused') endingScriptText = '"Since you\'re unable to provide required commercial presentment in writing, nothing further can be honored on this call."';
@@ -1234,26 +1296,26 @@ Audio Recording: ${isRecording ? 'IN PROGRESS' : (audioBlob ? 'AVAILABLE' : 'NOT
 --------------------------------------------------------
 1. COLLECTOR INFORMATION:
 --------------------------------------------------------
-Name: ${collectorName || '[Not recorded yet]'}
-Employee ID: ${employeeId || '[Not recorded yet]'}
-Company: ${companyName || '[Not recorded yet]'}
-Address: ${companyAddress || '[Not recorded yet]'}
-Supervisor: ${supervisorName || '[Not recorded yet]'}
-Instrument #: ${accountNumber || '[Not recorded yet]'}
+Name: ${formatValue(collectorName)}
+Employee ID: ${formatValue(employeeId)}
+Company: ${formatValue(companyName)}
+Address: ${formatValue(companyAddress)}
+Supervisor: ${formatValue(supervisorName)}
+Instrument #: ${formatValue(accountNumber)}
 
 2. COLLECTOR'S DEMAND:
-${collectorDemand || '[Not recorded yet]'}
+${formatValue(collectorDemand)}
 
 3. EQUITY REQUEST & RESPONSE:
 My Request: "Please provide written presentment for equitable settlement."
-Their Response: ${responseToRequest || '[Not recorded yet]'}
+Their Response: ${formatValue(responseToRequest)}
 
 4. OBJECTIONS & EQUITY CLARIFICATION:
-Their Objection: ${collectorObjection || '[Not recorded yet]'}
+Their Objection: ${formatValue(collectorObjection)}
 My Equity Response: "A presentment requires acceptance. I require proper written form to accept and honor equitably."
 
 5. CALL CONCLUSION:
-Ending Type: ${endingType || '[Not selected yet]'}
+Ending Type: ${formatSelect(endingType)}
 My Closing: ${endingScriptText || '[Not specified yet]'}
 
 6. EQUITY PRINCIPLES INVOKED:
@@ -1266,7 +1328,9 @@ My Closing: ${endingScriptText || '[Not specified yet]'}
 ========================================
 END OF LOG
 ========================================`;
+            
             document.getElementById('callLogOutput').textContent = logContent;
+            logDebug('Log updated successfully');
         }
         
         function generateFinalLog() {
@@ -1281,10 +1345,13 @@ END OF LOG
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
+            
             alert(`Log downloaded: ${a.download}`);
+            logDebug(`Final log generated: ${a.download}`);
         }
         
         function copyLogToClipboard() {
+            updateLog();
             const logText = document.getElementById('callLogOutput').textContent;
             navigator.clipboard.writeText(logText).then(() => {
                 const btn = document.querySelector('.log-actions .btn-outline');
@@ -1292,13 +1359,20 @@ END OF LOG
                 btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
                 btn.style.backgroundColor = '#2e7d32';
                 btn.style.color = 'white';
+                
+                // Show notification
+                showLogUpdateNotice();
+                
                 setTimeout(() => {
                     btn.innerHTML = original;
                     btn.style.backgroundColor = '';
                     btn.style.color = '';
                 }, 2000);
+                
+                logDebug('Log copied to clipboard');
             }).catch(err => {
                 alert('Please copy the text manually.');
+                logDebug('Clipboard copy failed: ' + err.message);
             });
         }
         
@@ -1331,6 +1405,8 @@ END OF LOG
             callId = Math.floor(1000 + Math.random() * 9000);
             document.getElementById('logCallId').textContent = callId;
             updateLog();
+            
+            logDebug('Simulation reset');
         }
         
         function toggleQuickTips() {
@@ -1361,7 +1437,12 @@ END OF LOG
                 } else if (this.value === 'hostile') {
                     document.getElementById('endingScriptHostile').classList.remove('hidden');
                 }
+                // Auto-update log when selection changes
+                updateLog();
             });
+            
+            // Set up auto-log updates for all input fields
+            setupAutoLogUpdates();
             
             // Initialize audio recording
             initAudioRecording();
