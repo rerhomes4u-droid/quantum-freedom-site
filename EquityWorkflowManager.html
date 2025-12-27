@@ -1,0 +1,1089 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EQUITY WORKFLOW MANAGER | Forbidden Knowledge Power Tools</title>
+    <style>
+        :root {
+            --primary: #1a237e;
+            --secondary: #4a148c;
+            --accent: #ff6f00;
+            --light: #f5f5f5;
+            --dark: #121212;
+            --success: #2e7d32;
+            --warning: #ff8f00;
+            --danger: #c62828;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(18, 18, 18, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            border: 1px solid rgba(255, 111, 0, 0.3);
+        }
+        
+        header {
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            padding: 30px;
+            text-align: center;
+            border-bottom: 3px solid var(--accent);
+            position: relative;
+        }
+        
+        h1 {
+            font-size: 3.5rem;
+            margin-bottom: 10px;
+            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+            background: linear-gradient(45deg, #fff, #ffcc80);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        .tagline {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+        
+        .powered-by {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.5);
+            padding: 8px 15px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .powered-by a {
+            color: #ffcc80;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            min-height: 800px;
+        }
+        
+        .sidebar {
+            background: rgba(26, 35, 126, 0.1);
+            border-right: 2px solid rgba(74, 20, 140, 0.5);
+            padding: 30px 20px;
+        }
+        
+        .module {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+        
+        .module:hover {
+            background: rgba(74, 20, 140, 0.3);
+            border-color: var(--accent);
+            transform: translateX(5px);
+        }
+        
+        .module.active {
+            background: rgba(74, 20, 140, 0.5);
+            border-color: var(--accent);
+            box-shadow: 0 5px 15px rgba(255, 111, 0, 0.2);
+        }
+        
+        .module-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .workspace {
+            padding: 30px;
+            position: relative;
+            overflow-y: auto;
+            max-height: 800px;
+        }
+        
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .presentment-upload {
+            border: 3px dashed rgba(255, 111, 0, 0.5);
+            border-radius: 15px;
+            padding: 60px 40px;
+            text-align: center;
+            cursor: pointer;
+            margin-bottom: 30px;
+            transition: all 0.3s ease;
+        }
+        
+        .presentment-upload:hover {
+            border-color: var(--accent);
+            background: rgba(255, 111, 0, 0.05);
+        }
+        
+        .upload-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: var(--accent);
+        }
+        
+        .analysis-results {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 25px;
+            margin-top: 30px;
+            border-left: 5px solid var(--accent);
+        }
+        
+        .alert {
+            background: rgba(198, 40, 40, 0.2);
+            border: 1px solid var(--danger);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+            display: none;
+        }
+        
+        .alert.show {
+            display: block;
+            animation: shake 0.5s ease;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+        
+        .document-builder {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            padding: 25px;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #ffcc80;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+        }
+        
+        textarea {
+            min-height: 150px;
+            resize: vertical;
+            font-family: 'Courier New', monospace;
+        }
+        
+        button {
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px 5px;
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        button.primary {
+            background: linear-gradient(45deg, var(--accent), #ff8f00);
+        }
+        
+        .timeline {
+            position: relative;
+            padding: 30px 0;
+        }
+        
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 30px;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(to bottom, var(--primary), var(--accent));
+        }
+        
+        .timeline-item {
+            position: relative;
+            margin-left: 70px;
+            margin-bottom: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 5px solid var(--success);
+        }
+        
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -45px;
+            top: 20px;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--accent);
+            border: 4px solid var(--dark);
+        }
+        
+        .timeline-date {
+            color: #ffcc80;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .scripture-box {
+            background: linear-gradient(135deg, rgba(46, 125, 50, 0.2), rgba(76, 175, 80, 0.1));
+            border-radius: 15px;
+            padding: 25px;
+            margin: 30px 0;
+            border: 1px solid rgba(76, 175, 80, 0.3);
+        }
+        
+        .verse {
+            font-style: italic;
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .reference {
+            text-align: right;
+            color: #a5d6a7;
+        }
+        
+        .course-nudge {
+            background: linear-gradient(45deg, rgba(255, 111, 0, 0.2), rgba(255, 152, 0, 0.1));
+            border: 2px solid var(--accent);
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            margin-top: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .course-nudge::before {
+            content: '⚖️';
+            position: absolute;
+            top: -30px;
+            right: -30px;
+            font-size: 8rem;
+            opacity: 0.1;
+            transform: rotate(15deg);
+        }
+        
+        .telegram-button {
+            display: inline-block;
+            background: #0088cc;
+            color: white;
+            padding: 15px 40px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.2rem;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .telegram-button:hover {
+            background: #006699;
+            transform: scale(1.05);
+        }
+        
+        .counter {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            border: 1px solid var(--accent);
+        }
+        
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                display: flex;
+                overflow-x: auto;
+                padding: 15px;
+                border-right: none;
+                border-bottom: 2px solid rgba(74, 20, 140, 0.5);
+            }
+            
+            .module {
+                min-width: 200px;
+                margin-right: 15px;
+                margin-bottom: 0;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>EQUITY WORKFLOW MANAGER</h1>
+            <div class="tagline">Forbidden Knowledge Power Tools - Stay in Honor, Secure Discharge</div>
+            <div class="powered-by">Powered by <a href="https://tripstocolombia.com" target="_blank">TripsToColombia.com</a></div>
+        </header>
+        
+        <div class="main-content">
+            <div class="sidebar">
+                <div class="module active" data-tab="analyzer">
+                    <div class="module-icon">🔍</div>
+                    <h3>Presentment Analyzer</h3>
+                    <p>Upload & analyze offers for mirroring</p>
+                </div>
+                
+                <div class="module" data-tab="builder">
+                    <div class="module-icon">📝</div>
+                    <h3>Document Builder</h3>
+                    <p>Create NNNoA, NoD, CoD, UCC-1</p>
+                </div>
+                
+                <div class="module" data-tab="timeline">
+                    <div class="module-icon">📅</div>
+                    <h3>Process Tracker</h3>
+                    <p>Track grace periods & next steps</p>
+                </div>
+                
+                <div class="module" data-tab="parties">
+                    <div class="module-icon">👥</div>
+                    <h3>Party Manager</h3>
+                    <p>Store contacts & "Also Noticed" lists</p>
+                </div>
+                
+                <div class="module" data-tab="spiritual">
+                    <div class="module-icon">🙏</div>
+                    <h3>Spiritual Integration</h3>
+                    <p>Scriptures & prayer for matters</p>
+                </div>
+                
+                <div class="module" data-tab="resources">
+                    <div class="module-icon">📚</div>
+                    <h3>Resource Hub</h3>
+                    <p>Key references & learning materials</p>
+                </div>
+            </div>
+            
+            <div class="workspace">
+                <!-- Presentment Analyzer Tab -->
+                <div id="analyzer" class="tab-content active">
+                    <h2><i class="fas fa-search"></i> Presentment Analyzer</h2>
+                    <p>Upload a presentment (PDF/image) to analyze for mirroring language and flag problematic terms.</p>
+                    
+                    <div class="presentment-upload" id="uploadArea">
+                        <div class="upload-icon">📄</div>
+                        <h3>Drop Presentment Here or Click to Upload</h3>
+                        <p>Supported: PDF, JPG, PNG (max 10MB)</p>
+                        <input type="file" id="fileInput" accept=".pdf,.jpg,.jpeg,.png" style="display: none;">
+                    </div>
+                    
+                    <div class="alert" id="errorAlert">
+                        <strong><i class="fas fa-exclamation-triangle"></i> Warning:</strong> Document contains problematic terms: <span id="flaggedTerms"></span>. Mirror carefully.
+                    </div>
+                    
+                    <div class="analysis-results" id="analysisResults" style="display: none;">
+                        <h3><i class="fas fa-chart-bar"></i> Analysis Results</h3>
+                        <div id="mirroringSuggestions"></div>
+                        <div class="form-group">
+                            <label>Recommended Action:</label>
+                            <select id="actionRecommendation">
+                                <option value="accept">Accept & Return (Full)</option>
+                                <option value="accept_rescind">Accept Front, Rescind Back</option>
+                                <option value="rescind">Rescind Entire Document</option>
+                                <option value="inquiry">Send Inquiry Notice First</option>
+                            </select>
+                        </div>
+                        <button class="primary" onclick="proceedToBuilder()"><i class="fas fa-arrow-right"></i> Proceed to Document Builder</button>
+                    </div>
+                </div>
+                
+                <!-- Document Builder Tab -->
+                <div id="builder" class="tab-content">
+                    <h2><i class="fas fa-file-contract"></i> Document Builder</h2>
+                    <p>Create legally sound Equity documents step-by-step. Ensure proper capitalization and avoid mixing inquiry questions with acceptance.</p>
+                    
+                    <div class="document-builder">
+                        <div class="form-group">
+                            <label>Document Type:</label>
+                            <select id="docType" onchange="updateBuilder()">
+                                <option value="nnnoa">Non-Negotiable Notice of Acceptance (NNNoA)</option>
+                                <option value="inquiry">Inquiry Notice</option>
+                                <option value="nod">Notice of Dishonor (NoD)</option>
+                                <option value="cod">Certificate of Dishonor (CoD)</option>
+                                <option value="ucc1">UCC-1 Financing Statement</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Your Name (as sentient moral being):</label>
+                            <input type="text" id="yourName" placeholder="John Henry Doe">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Respondent(s):</label>
+                            <textarea id="respondents" placeholder="Capital One Bank, NA\nCEO: Richard Fairbank\nCFO: Andrew Young"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Presentment Details:</label>
+                            <textarea id="presentmentDetails" placeholder="Account ending in 1234, dated 12/27/2025, amount $1,234.56"></textarea>
+                        </div>
+                        
+                        <div id="additionalFields"></div>
+                        
+                        <div class="alert" id="builderAlert">
+                            <strong><i class="fas fa-exclamation-circle"></i> Validation Error:</strong> <span id="builderError"></span>
+                        </div>
+                        
+                        <div id="generatedDocument" style="display: none; margin-top: 30px;">
+                            <h3><i class="fas fa-file-alt"></i> Generated Document Preview</h3>
+                            <div id="documentPreview" style="background: white; color: black; padding: 20px; border-radius: 10px; font-family: 'Courier New', monospace; white-space: pre-wrap; max-height: 400px; overflow-y: auto;"></div>
+                            <button onclick="downloadDocument()" style="margin-top: 20px;"><i class="fas fa-download"></i> Download as .txt</button>
+                        </div>
+                        
+                        <div style="text-align: center; margin-top: 30px;">
+                            <button class="primary" onclick="validateAndGenerate()"><i class="fas fa-magic"></i> Generate Document</button>
+                            <button onclick="clearBuilder()"><i class="fas fa-redo"></i> Clear</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Process Tracker Tab -->
+                <div id="timeline" class="tab-content">
+                    <h2><i class="fas fa-project-diagram"></i> Process Tracker</h2>
+                    <p>Track your Equity matters from presentment to discharge. Grace periods are calculated automatically.</p>
+                    
+                    <button onclick="addNewMatter()" style="margin-bottom: 30px;"><i class="fas fa-plus"></i> Add New Matter</button>
+                    
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-date">Today, 12/28/2025</div>
+                            <h4>Capital One Credit Card</h4>
+                            <p>Presentment received & accepted. 15-day grace period ends: <strong>01/12/2026</strong></p>
+                            <button onclick="showNextStep(this)" data-matter="capitalone" style="margin-top: 10px; padding: 8px 15px; font-size: 0.9rem;">Next Step: Notice of Dishonor</button>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-date">12/20/2025</div>
+                            <h4>IRS Notice CP2000</h4>
+                            <p>Inquiry Notice sent. 3-day response period ended 12/23/2025. No response received.</p>
+                            <div style="margin-top: 10px;">
+                                <span class="status-badge" style="background: var(--warning); padding: 5px 10px; border-radius: 5px; font-size: 0.9rem;">Ready for NNNoA</span>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item">
+                            <div class="timeline-date">11/15/2025</div>
+                            <h4>Parking Ticket #TR-789123</h4>
+                            <p>Certificate of Dishonor filed. UCC-1 recorded. Matter closed with discharge.</p>
+                            <div style="margin-top: 10px;">
+                                <span class="status-badge" style="background: var(--success); padding: 5px 10px; border-radius: 5px; font-size: 0.9rem;">DISCHARGED</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="nextStepModal" style="display: none; background: rgba(0,0,0,0.9); position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 1000; padding: 50px;">
+                        <div style="background: var(--dark); max-width: 800px; margin: 0 auto; padding: 30px; border-radius: 15px; border: 2px solid var(--accent);">
+                            <h2 id="modalTitle"></h2>
+                            <p id="modalDescription"></p>
+                            <div id="modalContent"></div>
+                            <div style="text-align: right; margin-top: 30px;">
+                                <button onclick="closeModal()">Close</button>
+                                <button class="primary" onclick="goToBuilderFromModal()">Create Document</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Party Manager Tab -->
+                <div id="parties" class="tab-content">
+                    <h2><i class="fas fa-address-book"></i> Party Manager</h2>
+                    <p>Store contacts for quick access. Ensure correct addresses and jurisdictions.</p>
+                    
+                    <div class="document-builder">
+                        <div class="form-group">
+                            <label>Add New Party:</label>
+                            <input type="text" id="partyName" placeholder="Company or Individual Name">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Role:</label>
+                            <select id="partyRole">
+                                <option value="creditor">Creditor</option>
+                                <option value="ceo">CEO</option>
+                                <option value="cfo">CFO</option>
+                                <option value="trustee">Indentured Trustee</option>
+                                <option value="court">Court Clerk</option>
+                                <option value="creditbureau">Credit Bureau</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Address (Verified):</label>
+                            <textarea id="partyAddress" placeholder="1550 Peachtree Street NE\nAtlanta, Georgia 30309"></textarea>
+                        </div>
+                        
+                        <button onclick="addParty()"><i class="fas fa-plus"></i> Add to Database</button>
+                        
+                        <div id="partyDatabase" style="margin-top: 40px;">
+                            <h3>Stored Parties</h3>
+                            <div id="partyList"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Spiritual Integration Tab -->
+                <div id="spiritual" class="tab-content">
+                    <h2><i class="fas fa-church"></i> Spiritual Integration</h2>
+                    <p>Equity is rooted in scripture. Begin each matter with prayer and biblical foundation.</p>
+                    
+                    <div class="scripture-box">
+                        <div class="verse" id="dailyVerse">"Agree with thine adversary quickly, whiles thou art in the way with him; lest at any time the adversary deliver thee to the judge, and the judge deliver thee to the officer, and thou be cast into prison. Verily I say unto thee, Thou shalt by no means come out thence, till thou hast paid the uttermost farthing."</div>
+                        <div class="reference" id="verseRef">Matthew 5:25-26 (KJV)</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Prayer for Current Matter:</label>
+                        <textarea id="prayerText" placeholder="Father, I come before you in the name of Yeshua. I ask for wisdom and discernment in this matter. Let your will be done, and may I stay in honor throughout this process..."></textarea>
+                    </div>
+                    
+                    <button onclick="savePrayer()"><i class="fas fa-save"></i> Save to Equity Journal</button>
+                    <button onclick="newVerse()"><i class="fas fa-random"></i> New Scripture</button>
+                    
+                    <div style="margin-top: 40px;">
+                        <h3>Key Biblical Maxims for Equity</h3>
+                        <ul style="margin-left: 20px; margin-top: 15px; line-height: 1.8;">
+                            <li><strong>"He who seeks equity must do equity."</strong> - Foundation of reciprocal fairness</li>
+                            <li><strong>"Equity regards as done that which ought to be done."</strong> - Performance as payment</li>
+                            <li><strong>"Equity will not suffer a wrong to be without a remedy."</strong> - Every injury has a solution</li>
+                            <li><strong>"Equity aids the vigilant, not those who slumber on their rights."</strong> - Timeliness matters</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <!-- Resource Hub Tab -->
+                <div id="resources" class="tab-content">
+                    <h2><i class="fas fa-book-open"></i> Resource Hub</h2>
+                    <p>Essential references, tools, and learning materials for your Equity journey.</p>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; margin-top: 30px;">
+                        <div class="module" style="cursor: default;">
+                            <h3><i class="fas fa-balance-scale"></i> Legal References</h3>
+                            <ul style="margin-top: 15px; margin-left: 20px;">
+                                <li>Black's Law Dictionary (6th Ed.)</li>
+                                <li>Bills of Exchange Act (Canada)</li>
+                                <li>Uniform Commercial Code (UCC)</li>
+                                <li>Lavine's Manual on Commercial Law</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="module" style="cursor: default;">
+                            <h3><i class="fas fa-tools"></i> Recommended Tools</h3>
+                            <ul style="margin-top: 15px; margin-left: 20px;">
+                                <li>Trodat Printy 4913 Stamp</li>
+                                <li>RubberStampChamp.com</li>
+                                <li>Notary Locator (Canada)</li>
+                                <li>PS Form 3665 (USPS)</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="module" style="cursor: default;">
+                            <h3><i class="fas fa-video"></i> Learning Materials</h3>
+                            <ul style="margin-top: 15px; margin-left: 20px;">
+                                <li>Honors Class in Equity (Full Course)</li>
+                                <li>"Behold a Pale Horse"</li>
+                                <li>"Constitution: Fact or Fiction"</li>
+                                <li>Terrain Theory vs Germ Theory</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="course-nudge">
+                        <h2><i class="fab fa-telegram"></i> Master Equity with Julian's Full Course</h2>
+                        <p>This tool provides foundational guidance, but true mastery requires the complete Honors Class in Equity.</p>
+                        <p>Join 272+ alumni learning directly from Julian & Maggie. Access all class videos, live sessions, and the private alumni community.</p>
+                        <a href="https://t.me/+your-invite-link" class="telegram-button" target="_blank" id="telegramLink">
+                            <i class="fab fa-telegram"></i> Join Honors Class in Equity
+                        </a>
+                        <p style="margin-top: 15px; font-size: 0.9rem; opacity: 0.8;">Message @JulianEquity on Telegram for enrollment details</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="counter">
+        <i class="fas fa-bolt"></i> Tools Used Today: <span id="toolCounter">0</span>
+    </div>
+
+    <script>
+        // Initialize
+        let toolCounter = 0;
+        let currentMatter = {};
+        let parties = [];
+        
+        // Tab switching
+        document.querySelectorAll('.module').forEach(module => {
+            module.addEventListener('click', function() {
+                document.querySelectorAll('.module').forEach(m => m.classList.remove('active'));
+                this.classList.add('active');
+                
+                const tab = this.getAttribute('data-tab');
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.remove('active');
+                });
+                document.getElementById(tab).classList.add('active');
+                
+                // Count tool usage
+                toolCounter++;
+                document.getElementById('toolCounter').textContent = toolCounter;
+            });
+        });
+        
+        // File upload
+        document.getElementById('uploadArea').addEventListener('click', () => {
+            document.getElementById('fileInput').click();
+        });
+        
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            if (e.target.files.length > 0) {
+                analyzeDocument(e.target.files[0].name);
+            }
+        });
+        
+        // Drag and drop
+        document.getElementById('uploadArea').addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.currentTarget.style.borderColor = '#ff6f00';
+            e.currentTarget.style.background = 'rgba(255, 111, 0, 0.1)';
+        });
+        
+        document.getElementById('uploadArea').addEventListener('dragleave', (e) => {
+            e.currentTarget.style.borderColor = 'rgba(255, 111, 0, 0.5)';
+            e.currentTarget.style.background = '';
+        });
+        
+        document.getElementById('uploadArea').addEventListener('drop', (e) => {
+            e.preventDefault();
+            e.currentTarget.style.borderColor = 'rgba(255, 111, 0, 0.5)';
+            e.currentTarget.style.background = '';
+            
+            if (e.dataTransfer.files.length > 0) {
+                analyzeDocument(e.dataTransfer.files[0].name);
+            }
+        });
+        
+        function analyzeDocument(filename) {
+            document.getElementById('uploadArea').innerHTML = `
+                <div class="upload-icon">✅</div>
+                <h3>${filename} Uploaded</h3>
+                <p>Analyzing for problematic terms...</p>
+            `;
+            
+            setTimeout(() => {
+                // Simulated analysis results
+                const flagged = ['taxpayer', 'debtor', 'defendant', 'obligation'];
+                const mirror = ['Account Holder', 'Sentient Being', 'Principal', 'Presentment'];
+                
+                document.getElementById('flaggedTerms').textContent = flagged.join(', ');
+                document.getElementById('errorAlert').classList.add('show');
+                
+                document.getElementById('mirroringSuggestions').innerHTML = `
+                    <h4>Mirroring Suggestions:</h4>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        ${mirror.map(term => `<li>Replace problematic terms with: <strong>${term}</strong></li>`).join('')}
+                    </ul>
+                    <p style="margin-top: 15px;"><strong>Remember:</strong> Mirror 3-4 conspicuous terms exactly as written on each page.</p>
+                `;
+                
+                document.getElementById('analysisResults').style.display = 'block';
+            }, 1500);
+        }
+        
+        function proceedToBuilder() {
+            document.querySelector('[data-tab="builder"]').click();
+        }
+        
+        // Document Builder
+        function updateBuilder() {
+            const type = document.getElementById('docType').value;
+            let html = '';
+            
+            if (type === 'nnnoa') {
+                html = `
+                    <div class="form-group">
+                        <label>Mirroring Language (3-4 terms per page):</label>
+                        <textarea id="mirroring" placeholder="Account number: ****1234\nDate: 12/27/2025\nAmount Due: $1,234.56"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Acceptance Type:</label>
+                        <select id="acceptanceType">
+                            <option value="full">Full Acceptance & Return</option>
+                            <option value="partial">Accept Front, Rescind Back</option>
+                        </select>
+                    </div>
+                `;
+            } else if (type === 'inquiry') {
+                html = `
+                    <div class="form-group">
+                        <label>Inquiry Questions (numbered, with question marks):</label>
+                        <textarea id="inquiryQuestions" placeholder="1. Does the record reflect payment in full?\n2. Is [Company] continuing this for financial benefit?\n3. Is [Company] attempting to adjust a hidden ledger?"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Response Deadline (days):</label>
+                        <input type="number" id="responseDays" value="3" min="1" max="30">
+                    </div>
+                `;
+            } else if (type === 'nod') {
+                html = `
+                    <div class="form-group">
+                        <label>Original Presentment Date:</label>
+                        <input type="date" id="originalDate">
+                    </div>
+                    <div class="form-group">
+                        <label>Grace Period Expired:</label>
+                        <input type="checkbox" id="graceExpired" checked> Yes, 15-day grace period has expired
+                    </div>
+                `;
+            } else if (type === 'cod') {
+                html = `
+                    <div class="form-group">
+                        <label>Notary Information:</label>
+                        <input type="text" id="notaryName" placeholder="Notary Public Name">
+                    </div>
+                    <div class="form-group">
+                        <label>Commission Expires:</label>
+                        <input type="date" id="commissionExpires">
+                    </div>
+                `;
+            } else if (type === 'ucc1') {
+                html = `
+                    <div class="form-group">
+                        <label>Secured Party (You):</label>
+                        <input type="text" id="securedParty" placeholder="JOHN HENRY DOE, a sentient moral being">
+                    </div>
+                    <div class="form-group">
+                        <label>Debtor (Dishonored Party):</label>
+                        <input type="text" id="debtorParty" placeholder="CAPITAL ONE BANK, NA">
+                    </div>
+                `;
+            }
+            
+            document.getElementById('additionalFields').innerHTML = html;
+            document.getElementById('generatedDocument').style.display = 'none';
+        }
+        
+        function validateAndGenerate() {
+            const type = document.getElementById('docType').value;
+            const name = document.getElementById('yourName').value.trim();
+            const respondents = document.getElementById('respondents').value.trim();
+            
+            if (!name || !respondents) {
+                showBuilderError('Please fill in your name and respondent(s)');
+                return;
+            }
+            
+            // Critical validation for NNNoA
+            if (type === 'nnnoa') {
+                const questionsCheck = document.getElementById('presentmentDetails').value;
+                if (questionsCheck.includes('?')) {
+                    showBuilderError('NNNoA should not contain questions. Use Inquiry Notice for questions.');
+                    return;
+                }
+            }
+            
+            // Capitalize key terms
+            const processedDetails = document.getElementById('presentmentDetails').value
+                .replace(/\b(acceptance|discharge|presentment|set-off)\b/gi, match => match.toUpperCase());
+            
+            // Generate document
+            let documentText = '';
+            const date = new Date().toLocaleDateString('en-US', { 
+                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
+            });
+            
+            switch(type) {
+                case 'nnnoa':
+                    documentText = `NON-NEGOTIABLE NOTICE OF ACCEPTANCE\n\n`;
+                    documentText += `Date: ${date}\n\n`;
+                    documentText += `FROM: ${name.toUpperCase()}, a sentient moral being\n\n`;
+                    documentText += `TO: ${respondents.toUpperCase()}\n\n`;
+                    documentText += `PLEASE TAKE NOTICE that I, ${name.toUpperCase()}, accept your PRESENTMENT "${processedDetails}" and return your offer herein attached to you.\n\n`;
+                    documentText += `By this ACCEPTANCE, I request:\n`;
+                    documentText += `1. ADJUSTMENT of your ledger to reflect this ACCEPTANCE as PERFORMANCE\n`;
+                    documentText += `2. SET-OFF of any alleged balance\n`;
+                    documentText += `3. DISCHARGE of this matter\n`;
+                    documentText += `4. Closure and settlement within 15 days\n\n`;
+                    documentText += `All rights reserved. Without prejudice.`;
+                    break;
+                    
+                case 'inquiry':
+                    documentText = `NON-NEGOTIABLE INQUIRY NOTICE\n\n`;
+                    documentText += `Date: ${date}\n\n`;
+                    documentText += `FROM: ${name.toUpperCase()}\n\n`;
+                    documentText += `TO: ${respondents.toUpperCase()}\n\n`;
+                    documentText += `PLEASE TAKE NOTICE of the following inquiries regarding your PRESENTMENT:\n\n`;
+                    documentText += document.getElementById('inquiryQuestions').value + '\n\n';
+                    documentText += `Failure to respond point-by-point within 3 days may result in DISHONOR.\n\n`;
+                    documentText += `All rights reserved. Without prejudice.`;
+                    break;
+                    
+                case 'nod':
+                    documentText = `NOTICE OF DISHONOR\n\n`;
+                    documentText += `Date: ${date}\n\n`;
+                    documentText += `FROM: ${name.toUpperCase()}\n\n`;
+                    documentText += `TO: ${respondents.toUpperCase()}\n\n`;
+                    documentText += `PLEASE TAKE NOTICE that you are in DISHONOR for failure to respond to the NON-NEGOTIABLE NOTICE OF ACCEPTANCE dated [Date].\n\n`;
+                    documentText += `You have 3 days to cure this DISHONOR or a CERTIFICATE OF DISHONOR will be filed.\n\n`;
+                    documentText += `All rights reserved. Without prejudice.`;
+                    break;
+                    
+                case 'cod':
+                    documentText = `CERTIFICATE OF DISHONOR\n\n`;
+                    documentText += `I, ${name}, hereby certify that ${respondents} have failed to honor the PRESENTMENT and subsequent notices.\n\n`;
+                    documentText += `This DISHONOR is memorialized for all commercial purposes.\n\n`;
+                    documentText += `Date: ${date}\n\n`;
+                    documentText += `Signature: _________________________\n\n`;
+                    documentText += `Notarization:`;
+                    break;
+                    
+                case 'ucc1':
+                    documentText = `UCC-1 FINANCING STATEMENT\n\n`;
+                    documentText += `SECURED PARTY: ${document.getElementById('securedParty')?.value || name}\n\n`;
+                    documentText += `DEBTOR: ${document.getElementById('debtorParty')?.value || respondents}\n\n`;
+                    documentText += `COLLATERAL: Dishonored commercial instrument and all associated rights\n\n`;
+                    documentText += `This filing memorializes the DISHONOR of ${respondents}.\n\n`;
+                    documentText += `Date: ${date}\n\n`;
+                    break;
+            }
+            
+            document.getElementById('documentPreview').textContent = documentText;
+            document.getElementById('generatedDocument').style.display = 'block';
+            document.getElementById('builderAlert').classList.remove('show');
+            
+            // Add to timeline
+            if (type === 'nnnoa') {
+                addTimelineItem(`NNNoA sent to ${respondents.split('\n')[0]}`, 'Today');
+            }
+        }
+        
+        function showBuilderError(message) {
+            document.getElementById('builderError').textContent = message;
+            document.getElementById('builderAlert').classList.add('show');
+        }
+        
+        function clearBuilder() {
+            document.getElementById('yourName').value = '';
+            document.getElementById('respondents').value = '';
+            document.getElementById('presentmentDetails').value = '';
+            document.getElementById('additionalFields').innerHTML = '';
+            document.getElementById('generatedDocument').style.display = 'none';
+            document.getElementById('builderAlert').classList.remove('show');
+        }
+        
+        function downloadDocument() {
+            const text = document.getElementById('documentPreview').textContent;
+            const filename = document.getElementById('docType').value.toUpperCase() + '_' + 
+                            new Date().toISOString().split('T')[0] + '.txt';
+            
+            const element = document.createElement('a');
+            element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+            element.setAttribute('download', filename);
+            element.style.display = 'none';
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+        }
+        
+        // Process Tracker
+        function addNewMatter() {
+            const matterName = prompt('Enter matter name (e.g., "Capital One Credit Card"):');
+            if (matterName) {
+                const timeline = document.querySelector('.timeline');
+                const newItem = document.createElement('div');
+                newItem.className = 'timeline-item';
+                newItem.innerHTML = `
+                    <div class="timeline-date">Today, ${new Date().toLocaleDateString()}</div>
+                    <h4>${matterName}</h4>
+                    <p>New matter created. Upload presentment to begin.</p>
+                    <button onclick="showNextStep(this)" data-matter="${matterName.toLowerCase().replace(/\s+/g, '')}" style="margin-top: 10px; padding: 8px 15px; font-size: 0.9rem;">Begin Process</button>
+                `;
+                timeline.insertBefore(newItem, timeline.firstChild);
+            }
+        }
+        
+        function showNextStep(button) {
+            const matter = button.getAttribute('data-matter');
+            
+            document.getElementById('modalTitle').textContent = 'Next Step: Notice of Dishonor';
+            document.getElementById('modalDescription').textContent = `For matter: ${matter}`;
+            document.getElementById('modalContent').innerHTML = `
+                <p>Since the 15-day grace period has expired with no response, the next step is to file a Notice of Dishonor.</p>
+                <h4>Requirements:</h4>
+                <ul>
+                    <li>Reference the original NNNoA date</li>
+                    <li>Give 3-day cure period</li>
+                    <li>Send to all originally noticed parties</li>
+                    <li>Use tracking/certified mail</li>
+                </ul>
+                <p>After 3 days with no cure, you can proceed to Certificate of Dishonor.</p>
+            `;
+            
+            document.getElementById('nextStepModal').style.display = 'block';
+        }
+        
+        function closeModal() {
+            document.getElementById('nextStepModal').style.display = 'none';
+        }
+        
+        function goToBuilderFromModal() {
+            closeModal();
+            document.querySelector('[data-tab="builder"]').click();
+            document.getElementById('docType').value = 'nod';
+            updateBuilder();
+        }
+        
+        // Party Manager
+        function addParty() {
+            const name = document.getElementById('partyName').value.trim();
+            const role = document.getElementById('partyRole').value;
+            const address = document.getElementById('partyAddress').value.trim();
+            
+            if (!name || !address) {
+                alert('Please enter name and address');
+                return;
+            }
+            
+            const party = { name, role, address };
+            parties.push(party);
+            
+            // Add to UI
+            const list = document.getElementById('partyList');
+            const div = document.createElement('div');
+            div.className = 'module';
+            div.style.marginBottom = '10px';
+            div.innerHTML = `
+                <h4>${name}</h4>
+                <p><strong>Role:</strong> ${role.toUpperCase()}</p>
+                <p style="white-space: pre-wrap;">${address}</p>
+            `;
+            list.appendChild(div);
+            
+            // Clear form
+            document.getElementById('partyName').value = '';
+            document.getElementById('partyAddress').value = '';
+        }
+        
+        // Spiritual Integration
+        const scriptures = [
+            { verse: "Agree with thine adversary quickly, whiles thou art in the way with him; lest at any time the adversary deliver thee to the judge, and the judge deliver thee to the officer, and thou be cast into prison. Verily I say unto thee, Thou shalt by no means come out thence, till thou hast paid the uttermost farthing.", ref: "Matthew 5:25-26 (KJV)" },
+            { verse: "He who seeks equity must do equity.", ref: "Maxim of Equity" },
+            { verse: "The law of God and the law of the land are all one.", ref: "1 Co. 8:6, Isaiah 33:22" },
+            { verse: "Equity regards as done that which ought to be done.", ref: "Maxim of Equity" },
+            { verse: "And forgive us our debts, as we forgive our debtors.", ref: "Matthew 6:12 (KJV)" },
+            { verse: "Equity will not suffer a wrong to be without a remedy.", ref: "Maxim of Equity" }
+        ];
+        
+        function newVerse() {
+            const random = Math.floor(Math.random() * scriptures.length);
+            document.getElementById('dailyVerse').textContent = scriptures[random].verse;
+            document.getElementById('verseRef').textContent = scriptures[random].ref;
+        }
+        
+        function savePrayer() {
+            const prayer = document.getElementById('prayerText').value;
+            if (prayer.trim()) {
+                alert('Prayer saved to your Equity Journal. Continue your process in honor.');
+                // In a full app, this would save to localStorage or backend
+            }
+        }
+        
+        // Initialize
+        updateBuilder();
+        newVerse();
+        
+        // Update Telegram link with realistic placeholder
+        document.getElementById('telegramLink').href = "https://t.me/JulianEquity";
+        
+        // Make the tool counter persist
+        if (localStorage.getItem('equityToolCounter')) {
+            toolCounter = parseInt(localStorage.getItem('equityToolCounter'));
+            document.getElementById('toolCounter').textContent = toolCounter;
+        }
+        
+        setInterval(() => {
+            localStorage.setItem('equityToolCounter', toolCounter);
+        }, 5000);
+        
+        // Easter egg - increment counter on certain actions
+        document.addEventListener('click', function(e) {
+            if (e.target.tagName === 'BUTTON' || e.target.closest('button')) {
+                toolCounter++;
+                document.getElementById('toolCounter').textContent = toolCounter;
+            }
+        });
+    </script>
+</body>
+</html>
