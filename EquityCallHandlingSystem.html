@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Call Handling System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+        
+        main {
+            padding: 2rem;
+        }
+        
+        .section {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #eee;
+        }
+        
+        h2 {
+            color: #1a237e;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+        
+        p {
+            margin-bottom: 1rem;
+        }
+        
+        .notice-box {
+            background: #f8f9fa;
+            border-left: 4px solid #1a237e;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            font-style: italic;
+        }
+        
+        .legal-box {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 5px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            font-weight: bold;
+            text-align: center;
+        }
+        
+        .legal-box h3 {
+            color: #856404;
+            margin-bottom: 0.5rem;
+        }
+        
+        .button-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        #recordBtn {
+            background: #dc3545;
+            color: white;
+            flex: 1;
+        }
+        
+        #recordBtn:hover {
+            background: #c82333;
+        }
+        
+        #recordBtn.recording {
+            background: #28a745;
+            animation: pulse 1.5s infinite;
+        }
+        
+        #stopBtn {
+            background: #6c757d;
+            color: white;
+        }
+        
+        #stopBtn:hover {
+            background: #5a6268;
+        }
+        
+        #playBtn, #downloadBtn {
+            background: #007bff;
+            color: white;
+        }
+        
+        #playBtn:hover, #downloadBtn:hover {
+            background: #0056b3;
+        }
+        
+        #clearBtn {
+            background: #ffc107;
+            color: #212529;
+        }
+        
+        #clearBtn:hover {
+            background: #e0a800;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+        
+        .status {
+            margin: 1rem 0;
+            padding: 0.75rem;
+            border-radius: 5px;
+            display: none;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+        
+        .recording-info {
+            background: #e9ecef;
+            padding: 1rem;
+            border-radius: 5px;
+            margin: 1rem 0;
+            display: none;
+        }
+        
+        .recording-info.active {
+            display: block;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            color: #666;
+            font-size: 0.9rem;
+            border-top: 1px solid #eee;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+            }
+            
+            main {
+                padding: 1rem;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .button-container {
+                flex-direction: column;
+            }
+            
+            button {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Call Handling System</h1>
+            <p class="subtitle">Protected Communication Interface</p>
+        </header>
+        
+        <main>
+            <div class="section">
+                <h2>Important Notice</h2>
+                <p>This system is designed to handle communications while protecting your rights under various legal frameworks.</p>
+                
+                <div class="legal-box">
+                    <h3>LEGAL NOTICE</h3>
+                    <p>All communications through this interface are made:</p>
+                    <p style="font-size: 1.2rem; margin: 0.5rem 0; color: #856404;">without prejudice</p>
+                    <p>This preserves all rights and does not constitute acceptance of any claim, jurisdiction, or contract.</p>
+                </div>
+                
+                <div class="notice-box">
+                    <p><strong>Note:</strong> According to UCC 1-308, the statement "without prejudice" alone is sufficient to preserve all rights. No additional UCC reference is required.</p>
+                </div>
+            </div>
+            
+            <div class="section">
+                <h2>Recording Controls</h2>
+                <p>This interface allows you to record telephone calls. Click "Start Recording" to begin, and "Stop Recording" when finished.</p>
+                
+                <div class="button-container">
+                    <button id="recordBtn">Start Recording</button>
+                    <button id="stopBtn">Stop Recording</button>
+                    <button id="playBtn">Play Recording</button>
+                    <button id="downloadBtn">Download Recording</button>
+                    <button id="clearBtn">Clear All</button>
+                </div>
+                
+                <div class="recording-info" id="recordingInfo">
+                    <p><strong>Recording in progress...</strong></p>
+                    <p>Duration: <span id="timer">00:00</span></p>
+                    <p>Status: <span id="recordingStatus">Active</span></p>
+                </div>
+                
+                <div id="statusMessage" class="status"></div>
+            </div>
+            
+            <div class="section">
+                <h2>How to Use This System</h2>
+                <p>1. Place your call using your preferred telephone service</p>
+                <p>2. Click "Start Recording" to begin recording the conversation</p>
+                <p>3. Speak normally while the recording is active</p>
+                <p>4. Click "Stop Recording" when finished</p>
+                <p>5. Download the recording for your records if needed</p>
+                <p>6. Remember: All communications are made <strong>without prejudice</strong></p>
+            </div>
+            
+            <div class="section">
+                <h2>Legal Protection</h2>
+                <p>By using the phrase "without prejudice," you are:</p>
+                <ul style="margin-left: 1.5rem; margin-bottom: 1rem;">
+                    <li>Preserving all your rights and claims</li>
+                    <li>Reserving your right to performance</li>
+                    <li>Preventing the formation of an unintended contract</li>
+                    <li>Protecting yourself from unintentional acceptance of terms</li>
+                </ul>
+                <p>This simple yet powerful statement is legally sufficient under UCC 1-308 and related commercial codes.</p>
+            </div>
+        </main>
+        
+        <footer>
+            <p>This interface is for lawful purposes only. Always comply with applicable laws regarding call recording.</p>
+            <p>© 2024 Call Handling System. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        // State management
+        let mediaRecorder;
+        let audioChunks = [];
+        let audioBlob;
+        let audioUrl;
+        let isRecording = false;
+        let startTime;
+        let timerInterval;
+        let stream;
+        
+        // DOM Elements
+        const recordBtn = document.getElementById('recordBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const playBtn = document.getElementById('playBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const recordingInfo = document.getElementById('recordingInfo');
+        const timerDisplay = document.getElementById('timer');
+        const statusMessage = document.getElementById('statusMessage');
+        const recordingStatus = document.getElementById('recordingStatus');
+        
+        // Initialize
+        function init() {
+            // Check for browser compatibility
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                showStatus('Your browser does not support audio recording. Please use Chrome, Firefox, or Edge.', 'error');
+                disableAllButtons();
+                return;
+            }
+            
+            setupEventListeners();
+            updateButtonStates();
+        }
+        
+        // Set up event listeners
+        function setupEventListeners() {
+            recordBtn.addEventListener('click', startRecording);
+            stopBtn.addEventListener('click', stopRecording);
+            playBtn.addEventListener('click', playRecording);
+            downloadBtn.addEventListener('click', downloadRecording);
+            clearBtn.addEventListener('click', clearAll);
+        }
+        
+        // Update button states based on current state
+        function updateButtonStates() {
+            const hasRecording = audioBlob !== undefined;
+            
+            stopBtn.disabled = !isRecording;
+            playBtn.disabled = !hasRecording || isRecording;
+            downloadBtn.disabled = !hasRecording || isRecording;
+            clearBtn.disabled = !hasRecording && !isRecording;
+            
+            // Visual feedback
+            stopBtn.style.opacity = isRecording ? '1' : '0.5';
+            playBtn.style.opacity = (hasRecording && !isRecording) ? '1' : '0.5';
+            downloadBtn.style.opacity = (hasRecording && !isRecording) ? '1' : '0.5';
+            clearBtn.style.opacity = (hasRecording || isRecording) ? '1' : '0.5';
+        }
+        
+        // Start recording function
+        async function startRecording() {
+            try {
+                // Request microphone access
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        sampleRate: 44100
+                    }
+                });
+                
+                // Create MediaRecorder instance
+                mediaRecorder = new MediaRecorder(stream, {
+                    mimeType: 'audio/webm;codecs=opus'
+                });
+                
+                // Reset audio chunks
+                audioChunks = [];
+                
+                // Set up data handler
+                mediaRecorder.ondataavailable = (event) => {
+                    if (event.data.size > 0) {
+                        audioChunks.push(event.data);
+                    }
+                };
+                
+                // Set up completion handler
+                mediaRecorder.onstop = () => {
+                    audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    audioUrl = URL.createObjectURL(audioBlob);
+                    
+                    // Update UI
+                    recordingInfo.classList.remove('active');
+                    clearInterval(timerInterval);
+                    isRecording = false;
+                    
+                    // Show success message
+                    showStatus('Recording completed successfully. You can now play or download the recording.', 'success');
+                    updateButtonStates();
+                    
+                    // Stop all tracks
+                    stream.getTracks().forEach(track => track.stop());
+                };
+                
+                // Start recording
+                mediaRecorder.start(100); // Collect data every 100ms
+                isRecording = true;
+                
+                // Update UI
+                recordBtn.textContent = 'Recording...';
+                recordBtn.classList.add('recording');
+                recordingInfo.classList.add('active');
+                recordingStatus.textContent = 'Active';
+                
+                // Start timer
+                startTime = Date.now();
+                updateTimer();
+                timerInterval = setInterval(updateTimer, 1000);
+                
+                showStatus('Recording started. Speak into your microphone.', 'success');
+                updateButtonStates();
+                
+            } catch (error) {
+                console.error('Error accessing microphone:', error);
+                showStatus('Error accessing microphone. Please check permissions and try again.', 'error');
+                isRecording = false;
+                updateButtonStates();
+            }
+        }
+        
+        // Stop recording function
+        function stopRecording() {
+            if (mediaRecorder && isRecording) {
+                mediaRecorder.stop();
+                isRecording = false;
+                recordBtn.textContent = 'Start Recording';
+                recordBtn.classList.remove('recording');
+                updateButtonStates();
+            }
+        }
+        
+        // Play recording function
+        function playRecording() {
+            if (audioUrl && !isRecording) {
+                const audio = new Audio(audioUrl);
+                audio.play().catch(error => {
+                    showStatus('Error playing audio: ' + error.message, 'error');
+                });
+                
+                // Show playing status
+                const originalText = playBtn.textContent;
+                playBtn.textContent = 'Playing...';
+                playBtn.disabled = true;
+                
+                audio.onended = () => {
+                    playBtn.textContent = originalText;
+                    playBtn.disabled = false;
+                    updateButtonStates();
+                };
+            }
+        }
+        
+        // Download recording function
+        function downloadRecording() {
+            if (audioBlob && !isRecording) {
+                const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+                const filename = `call-recording-${timestamp}.webm`;
+                
+                const a = document.createElement('a');
+                a.href = audioUrl;
+                a.download = filename;
+                a.click();
+                
+                showStatus('Recording downloaded as ' + filename, 'success');
+            }
+        }
+        
+        // Clear all function
+        function clearAll() {
+            if (isRecording) {
+                stopRecording();
+            }
+            
+            // Clean up
+            if (audioUrl) {
+                URL.revokeObjectURL(audioUrl);
+            }
+            
+            // Reset state
+            audioBlob = undefined;
+            audioUrl = undefined;
+            audioChunks = [];
+            
+            // Reset UI
+            recordBtn.textContent = 'Start Recording';
+            recordBtn.classList.remove('recording');
+            recordingInfo.classList.remove('active');
+            clearInterval(timerInterval);
+            timerDisplay.textContent = '00:00';
+            statusMessage.className = 'status';
+            statusMessage.textContent = '';
+            
+            showStatus('All recordings cleared.', 'success');
+            updateButtonStates();
+        }
+        
+        // Update timer display
+        function updateTimer() {
+            if (isRecording && startTime) {
+                const elapsed = Date.now() - startTime;
+                const seconds = Math.floor(elapsed / 1000);
+                const minutes = Math.floor(seconds / 60);
+                const displaySeconds = seconds % 60;
+                
+                timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${displaySeconds.toString().padStart(2, '0')}`;
+            }
+        }
+        
+        // Show status messages
+        function showStatus(message, type) {
+            statusMessage.textContent = message;
+            statusMessage.className = `status ${type}`;
+            
+            // Auto-hide success messages after 5 seconds
+            if (type === 'success') {
+                setTimeout(() => {
+                    statusMessage.className = 'status';
+                }, 5000);
+            }
+        }
+        
+        // Disable all buttons (for incompatible browsers)
+        function disableAllButtons() {
+            const buttons = document.querySelectorAll('button');
+            buttons.forEach(button => {
+                button.disabled = true;
+                button.style.opacity = '0.5';
+            });
+        }
+        
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', init);
+        
+        // Prevent accidental tab/window close during recording
+        window.addEventListener('beforeunload', (e) => {
+            if (isRecording) {
+                e.preventDefault();
+                e.returnValue = 'You are currently recording. Are you sure you want to leave?';
+                return e.returnValue;
+            }
+        });
+    </script>
+</body>
+</html>
