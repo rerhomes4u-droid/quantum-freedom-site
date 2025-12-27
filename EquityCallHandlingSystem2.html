@@ -419,6 +419,15 @@
             z-index: 1000;
             box-shadow: 0 3px 10px rgba(0,0,0,0.2);
         }
+        .test-button {
+            margin-top: 10px;
+            background: #9c27b0;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -512,6 +521,9 @@
                     </button>
                     <button class="btn btn-outline" onclick="toggleDebug()">
                         <i class="fas fa-bug"></i> Debug
+                    </button>
+                    <button class="btn btn-outline" onclick="testLogUpdate()">
+                        <i class="fas fa-vial"></i> Test Log
                     </button>
                 </div>
 
@@ -1159,7 +1171,7 @@
         }
 
         // ==============================================
-        // CALL SIMULATION FUNCTIONALITY
+        // CALL SIMULATION FUNCTIONALITY - FIXED LOG UPDATES
         // ==============================================
         let simulationActive = false;
         let currentStep = 1;
@@ -1175,31 +1187,63 @@
         const callTimer = document.getElementById('callTimer');
         const currentStepDisplay = document.getElementById('currentStep');
         
-        // List of all input fields that should trigger log updates
-        const inputFields = [
+        // List of all input field IDs
+        const inputFieldIds = [
             'collectorName', 'employeeId', 'companyName', 'companyAddress', 
             'supervisorName', 'accountNumber', 'collectorDemand', 
             'responseToRequest', 'collectorObjection', 'endingType'
         ];
         
+        // Global function to handle ALL input changes
+        function handleInputChange(event) {
+            logDebug(`Input changed: ${event.target.id} = "${event.target.value}"`);
+            updateLog();
+            showLogUpdateNotice();
+        }
+        
         function setupAutoLogUpdates() {
-            // Add event listeners to all input fields
-            inputFields.forEach(fieldId => {
+            logDebug('Setting up auto-log updates...');
+            
+            // Add event listeners to ALL input fields immediately
+            inputFieldIds.forEach(fieldId => {
                 const field = document.getElementById(fieldId);
                 if (field) {
+                    // Remove any existing listeners first
+                    field.removeEventListener('input', handleInputChange);
+                    field.removeEventListener('change', handleInputChange);
+                    
+                    // Add new listeners
                     if (field.tagName === 'TEXTAREA' || field.type === 'text') {
-                        field.addEventListener('input', () => {
-                            updateLog();
-                            showLogUpdateNotice();
-                        });
+                        field.addEventListener('input', handleInputChange);
+                        logDebug(`Added input listener to: ${fieldId}`);
                     } else if (field.tagName === 'SELECT') {
-                        field.addEventListener('change', () => {
-                            updateLog();
-                            showLogUpdateNotice();
-                        });
+                        field.addEventListener('change', handleInputChange);
+                        logDebug(`Added change listener to: ${fieldId}`);
                     }
+                } else {
+                    logDebug(`Field not found: ${fieldId}`);
                 }
             });
+            
+            // Also attach to the endingType dropdown
+            const endingType = document.getElementById('endingType');
+            if (endingType) {
+                endingType.addEventListener('change', function() {
+                    document.querySelectorAll('[id^="endingScript"]').forEach(el => {
+                        el.classList.add('hidden');
+                    });
+                    if (this.value === 'agreed') {
+                        document.getElementById('endingScriptAgreed').classList.remove('hidden');
+                    } else if (this.value === 'refused') {
+                        document.getElementById('endingScriptRefused').classList.remove('hidden');
+                    } else if (this.value === 'hostile') {
+                        document.getElementById('endingScriptHostile').classList.remove('hidden');
+                    }
+                    // Force log update
+                    updateLog();
+                    showLogUpdateNotice();
+                });
+            }
             
             logDebug('Auto-log update listeners set up');
         }
@@ -1217,10 +1261,15 @@
             updateTimer();
             enableInputsForStep(1);
             
+            // Re-attach event listeners now that inputs are enabled
+            setupAutoLogUpdates();
+            
             // Force initial log update
             updateLog();
+            showLogUpdateNotice();
             
             alert("Simulation started! Fill in the collector's information as if this were a real call.");
+            logDebug('Simulation started');
         }
         
         function updateTimer() {
@@ -1239,52 +1288,79 @@
             stepElements[currentStep - 1].classList.remove('hidden');
             currentStepDisplay.textContent = `${currentStep}/4`;
             enableInputsForStep(currentStep);
+            
+            // Re-attach event listeners for newly enabled inputs
+            setupAutoLogUpdates();
+            
             updateLog();
             showLogUpdateNotice();
             
             if (currentStep === 4) {
                 nextBtn.innerHTML = '<i class="fas fa-flag-checkered"></i> Complete Simulation';
             }
+            
+            logDebug(`Moved to step ${currentStep}`);
         }
         
         function enableInputsForStep(step) {
+            // First, disable all inputs
             document.querySelectorAll('.input-field').forEach(input => {
                 input.disabled = true;
                 input.style.backgroundColor = '#f5f5f5';
             });
+            
+            // Then enable the ones for this step
             let inputsToEnable = [];
             if (step === 1) inputsToEnable = ['collectorName', 'employeeId', 'companyName', 'companyAddress', 'supervisorName', 'accountNumber'];
             else if (step === 2) inputsToEnable = ['collectorDemand', 'responseToRequest'];
             else if (step === 3) inputsToEnable = ['collectorObjection'];
             else if (step === 4) inputsToEnable = ['endingType'];
+            
             inputsToEnable.forEach(id => {
                 const input = document.getElementById(id);
-                if (input) { input.disabled = false; input.style.backgroundColor = 'white'; }
+                if (input) { 
+                    input.disabled = false; 
+                    input.style.backgroundColor = 'white'; 
+                    logDebug(`Enabled input: ${id}`);
+                }
             });
         }
         
         function updateLog() {
-            const collectorName = document.getElementById('collectorName').value;
-            const employeeId = document.getElementById('employeeId').value;
-            const companyName = document.getElementById('companyName').value;
-            const companyAddress = document.getElementById('companyAddress').value;
-            const supervisorName = document.getElementById('supervisorName').value;
-            const accountNumber = document.getElementById('accountNumber').value;
-            const collectorDemand = document.getElementById('collectorDemand').value;
-            const responseToRequest = document.getElementById('responseToRequest').value;
-            const collectorObjection = document.getElementById('collectorObjection').value;
-            const endingType = document.getElementById('endingType').value;
-            
-            // Format the values for display
-            const formatValue = (value) => value.trim() || '[Not recorded yet]';
-            const formatSelect = (value) => value || '[Not selected yet]';
-            
-            let endingScriptText = '';
-            if (endingType === 'agreed') endingScriptText = '"Thank you. I will watch for your mailing. Please note today\'s date and my request for the record."';
-            else if (endingType === 'refused') endingScriptText = '"Since you\'re unable to provide required commercial presentment in writing, nothing further can be honored on this call."';
-            else if (endingType === 'hostile') endingScriptText = '"Conversation no longer productive. Ending call after requesting commercial presentment in writing."';
-            
-            const logContent = `========================================
+            try {
+                logDebug('Updating log...');
+                
+                const collectorName = document.getElementById('collectorName').value;
+                const employeeId = document.getElementById('employeeId').value;
+                const companyName = document.getElementById('companyName').value;
+                const companyAddress = document.getElementById('companyAddress').value;
+                const supervisorName = document.getElementById('supervisorName').value;
+                const accountNumber = document.getElementById('accountNumber').value;
+                const collectorDemand = document.getElementById('collectorDemand').value;
+                const responseToRequest = document.getElementById('responseToRequest').value;
+                const collectorObjection = document.getElementById('collectorObjection').value;
+                const endingType = document.getElementById('endingType').value;
+                
+                logDebug(`Collector Name: "${collectorName}"`);
+                logDebug(`Employee ID: "${employeeId}"`);
+                
+                // Format the values for display
+                const formatValue = (value) => {
+                    if (!value || value.trim() === '') return '[Not recorded yet]';
+                    return value.trim();
+                };
+                
+                const formatSelect = (value) => {
+                    if (!value || value.trim() === '') return '[Not selected yet]';
+                    return value;
+                };
+                
+                let endingScriptText = '';
+                if (endingType === 'agreed') endingScriptText = '"Thank you. I will watch for your mailing. Please note today\'s date and my request for the record."';
+                else if (endingType === 'refused') endingScriptText = '"Since you\'re unable to provide required commercial presentment in writing, nothing further can be honored on this call."';
+                else if (endingType === 'hostile') endingScriptText = '"Conversation no longer productive. Ending call after requesting commercial presentment in writing."';
+                
+                const logContent = `========================================
 EQUITY CALL LOG - WITHOUT PREJUDICE
 ========================================
 Date: ${document.getElementById('logDate').textContent}
@@ -1328,9 +1404,19 @@ My Closing: ${endingScriptText || '[Not specified yet]'}
 ========================================
 END OF LOG
 ========================================`;
-            
-            document.getElementById('callLogOutput').textContent = logContent;
-            logDebug('Log updated successfully');
+                
+                const logOutput = document.getElementById('callLogOutput');
+                if (logOutput) {
+                    logOutput.textContent = logContent;
+                    logDebug('Log updated successfully in DOM');
+                } else {
+                    logDebug('ERROR: callLogOutput element not found!');
+                }
+                
+            } catch (error) {
+                logDebug(`ERROR in updateLog: ${error.message}`);
+                console.error('Log update error:', error);
+            }
         }
         
         function generateFinalLog() {
@@ -1404,6 +1490,10 @@ END OF LOG
             document.getElementById('endingType').value = '';
             callId = Math.floor(1000 + Math.random() * 9000);
             document.getElementById('logCallId').textContent = callId;
+            
+            // Re-attach event listeners
+            setupAutoLogUpdates();
+            
             updateLog();
             
             logDebug('Simulation reset');
@@ -1412,11 +1502,33 @@ END OF LOG
         function toggleQuickTips() {
             alert(`EQUITY CALL TIPS:\n\n1. Stay calm & kind throughout\n2. Record everything (use the recorder above)\n3. Stay on script no matter what\n4. Focus on the process, not the person\n5. Know the principle behind each step\n6. End with honor and clarity\n7. Keep perfect records\n8. "Without prejudice" preserves all rights`);
         }
+        
+        function testLogUpdate() {
+            // Test function to verify log updates
+            logDebug('=== TEST LOG UPDATE ===');
+            
+            // Test getting values
+            const testName = document.getElementById('collectorName').value;
+            logDebug(`Test - collectorName value: "${testName}"`);
+            
+            // Force update
+            updateLog();
+            
+            // Check if log was updated
+            const logText = document.getElementById('callLogOutput').textContent;
+            const hasTestName = logText.includes(testName || '[Not recorded yet]');
+            
+            alert(`Log Update Test:\n- collectorName value: "${testName}"\n- Log contains value: ${hasTestName ? 'YES ✓' : 'NO ✗'}\n\nCheck debug panel for details.`);
+            
+            showLogUpdateNotice();
+        }
 
         // ==============================================
-        // INITIALIZATION
+        // INITIALIZATION - SIMPLIFIED & FIXED
         // ==============================================
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOM loaded, initializing...');
+            
             // Set initial log info
             document.getElementById('logCallId').textContent = callId;
             const now = new Date();
@@ -1425,30 +1537,20 @@ END OF LOG
             });
             document.getElementById('logStartTime').textContent = now.toLocaleTimeString('en-US');
             
-            // Set up ending type selector
-            document.getElementById('endingType').addEventListener('change', function() {
-                document.querySelectorAll('[id^="endingScript"]').forEach(el => {
-                    el.classList.add('hidden');
-                });
-                if (this.value === 'agreed') {
-                    document.getElementById('endingScriptAgreed').classList.remove('hidden');
-                } else if (this.value === 'refused') {
-                    document.getElementById('endingScriptRefused').classList.remove('hidden');
-                } else if (this.value === 'hostile') {
-                    document.getElementById('endingScriptHostile').classList.remove('hidden');
-                }
-                // Auto-update log when selection changes
-                updateLog();
-            });
-            
-            // Set up auto-log updates for all input fields
-            setupAutoLogUpdates();
-            
             // Initialize audio recording
             initAudioRecording();
             
+            // Set up event listeners immediately (even on disabled inputs)
+            setupAutoLogUpdates();
+            
             // Initial log update
             updateLog();
+            
+            // Add event listeners to update log buttons
+            document.getElementById('updateLogBtn').addEventListener('click', function() {
+                updateLog();
+                showLogUpdateNotice();
+            });
             
             // Prevent accidental tab/window close during recording
             window.addEventListener('beforeunload', (e) => {
@@ -1459,7 +1561,14 @@ END OF LOG
                 }
             });
             
+            console.log('Application fully initialized');
             logDebug('Application fully initialized');
+            
+            // Force a test update to show it's working
+            setTimeout(() => {
+                updateLog();
+                logDebug('Initial log update completed');
+            }, 500);
         });
     </script>
 </body>
