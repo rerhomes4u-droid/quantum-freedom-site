@@ -1,0 +1,1204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EQUITY POWER TOOLS: Interactive Call Simulator & Recorder</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #1a237e;
+            --secondary: #283593;
+            --accent: #3949ab;
+            --light: #e8eaf6;
+            --dark: #0d1435;
+            --success: #2e7d32;
+            --warning: #f9a825;
+            --danger: #c62828;
+            --paper: #fffef7;
+            --ink: #1a1a1a;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            line-height: 1.6;
+            color: var(--ink);
+            background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: var(--paper);
+            border-radius: 20px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+        }
+        header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 2.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .header-content { position: relative; z-index: 2; }
+        .equity-badge {
+            display: inline-block;
+            background: var(--accent);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 1.2rem;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+        h1 {
+            font-family: 'Times New Roman', serif;
+            font-size: 3rem;
+            margin-bottom: 0.8rem;
+            font-weight: 700;
+        }
+        .subtitle {
+            font-size: 1.3rem;
+            opacity: 0.95;
+            max-width: 900px;
+            margin: 0 auto;
+            font-weight: 300;
+        }
+        .tools-suite-label {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 12px 25px;
+            border-radius: 12px;
+            display: inline-block;
+            margin-top: 1.5rem;
+            font-weight: 600;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            min-height: 70vh;
+        }
+        @media (max-width: 1024px) {
+            .main-content { grid-template-columns: 1fr; }
+        }
+        .simulator-panel {
+            padding: 2.5rem;
+            border-right: 1px solid #eee;
+        }
+        .log-panel {
+            padding: 2.5rem;
+            background: #f9f9ff;
+            display: flex;
+            flex-direction: column;
+        }
+        h2 {
+            color: var(--primary);
+            font-family: 'Times New Roman', serif;
+            font-size: 2.2rem;
+            margin-bottom: 1.8rem;
+            padding-bottom: 12px;
+            border-bottom: 3px solid var(--accent);
+        }
+        h3 {
+            color: var(--secondary);
+            margin: 1.8rem 0 1rem;
+            font-size: 1.5rem;
+        }
+        .status-bar {
+            background: #edf7ff;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 2px solid #d1e9ff;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1.5rem;
+        }
+        .status-item {
+            text-align: center;
+        }
+        .status-label {
+            display: block;
+            font-size: 0.95rem;
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+        .status-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--accent);
+            font-family: monospace;
+        }
+        .call-controls {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+        .btn-primary:hover {
+            background: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: 0 7px 14px rgba(57, 73, 171, 0.25);
+        }
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        .btn-warning {
+            background: var(--warning);
+            color: var(--dark);
+        }
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+        .btn-outline {
+            background: transparent;
+            color: var(--primary);
+            border: 2px solid var(--accent);
+        }
+        .btn-outline:hover {
+            background: var(--accent);
+            color: white;
+        }
+        .script-step {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.04);
+            border: 1px solid #eee;
+            transition: transform 0.3s ease;
+        }
+        .script-step:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.08);
+        }
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 1.5rem;
+        }
+        .step-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--accent), var(--primary));
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+        .step-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--dark);
+        }
+        .user-line {
+            background: #e8f5e9;
+            padding: 1.2rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+            border-left: 5px solid var(--success);
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        .collector-line {
+            background: #fff3e0;
+            padding: 1.2rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+            border-left: 5px solid var(--warning);
+        }
+        .input-group {
+            margin: 1.5rem 0;
+        }
+        .input-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        .input-field {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+        .input-field:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(57, 73, 171, 0.2);
+        }
+        .call-log {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            flex-grow: 1;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            overflow-y: auto;
+            border: 2px solid #e0e0e0;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            margin-bottom: 1.5rem;
+        }
+        .log-header {
+            color: var(--primary);
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 1.5rem;
+            padding-bottom: 10px;
+            border-bottom: 2px dashed #ccc;
+        }
+        .log-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .principle-box {
+            background: #f0f7ff;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            border-left: 5px solid var(--accent);
+        }
+        .principle-title {
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .footer {
+            background: var(--dark);
+            color: white;
+            text-align: center;
+            padding: 2.5rem;
+            margin-top: 2rem;
+        }
+        .invitation-box {
+            background: linear-gradient(135deg, #8e24aa, #3949ab);
+            color: white;
+            border-radius: 15px;
+            padding: 2.5rem;
+            margin: 2.5rem;
+            text-align: center;
+        }
+        .telegram-handle {
+            display: inline-block;
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px 30px;
+            border-radius: 30px;
+            font-family: monospace;
+            font-size: 1.4rem;
+            letter-spacing: 1px;
+            margin: 1.5rem 0;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .hidden { display: none; }
+        .completed { opacity: 0.7; }
+        .completed .step-icon { background: #ccc; }
+        
+        /* Audio Recording Styles */
+        .recording-section {
+            background: #fff8e1;
+            border-radius: 15px;
+            padding: 2rem;
+            margin: 2rem 0;
+            border: 2px solid #ffecb3;
+        }
+        .recording-controls {
+            display: flex;
+            gap: 10px;
+            margin: 1.5rem 0;
+            flex-wrap: wrap;
+        }
+        .recording-status {
+            padding: 1rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+            display: none;
+        }
+        .recording-status.active {
+            display: block;
+            background: #e8f5e9;
+            color: var(--success);
+            border: 1px solid #c8e6c9;
+        }
+        .recording-status.recording {
+            background: #ffebee;
+            color: var(--danger);
+            border: 1px solid #ffcdd2;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+        .audio-player {
+            width: 100%;
+            margin: 1rem 0;
+        }
+        .legal-notice-box {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            font-weight: bold;
+            text-align: center;
+        }
+        .legal-notice-box h3 {
+            color: #856404;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <div class="equity-badge"><i class="fas fa-balance-scale"></i> EQUITY POWER TOOLS SUITE</div>
+                <h1>Interactive Call Simulator & Recorder</h1>
+                <p class="subtitle">Practice, record, and internalize the equity-based call handling script. Create a perfect record every time.</p>
+                <div class="tools-suite-label"><i class="fas fa-toolbox"></i> TOOL #1: CALL SIMULATOR & RECORDER</div>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <!-- LEFT PANEL: INTERACTIVE SIMULATOR -->
+            <section class="simulator-panel">
+                <h2>Call Simulation</h2>
+
+                <div class="status-bar">
+                    <div class="status-item">
+                        <span class="status-label">Call Status</span>
+                        <div class="status-value" id="callStatus">READY</div>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Duration</span>
+                        <div class="status-value" id="callTimer">00:00</div>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Step</span>
+                        <div class="status-value" id="currentStep">1/4</div>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-label">Recording</span>
+                        <div class="status-value" id="recordingStatus">OFF</div>
+                    </div>
+                </div>
+
+                <!-- AUDIO RECORDING SECTION -->
+                <div class="recording-section">
+                    <h3><i class="fas fa-microphone"></i> Audio Recording</h3>
+                    <div class="legal-notice-box">
+                        <h3>LEGAL NOTICE</h3>
+                        <p>All communications through this interface are made:</p>
+                        <p style="font-size: 1.2rem; margin: 0.5rem 0; color: #856404;">without prejudice</p>
+                        <p>This preserves all rights and does not constitute acceptance of any claim, jurisdiction, or contract.</p>
+                    </div>
+                    
+                    <p>Record actual calls for your records. Click "Start Recording" before your call begins.</p>
+                    
+                    <div class="recording-controls">
+                        <button class="btn btn-danger" id="recordBtn">
+                            <i class="fas fa-circle"></i> Start Recording
+                        </button>
+                        <button class="btn btn-outline" id="stopBtn" disabled>
+                            <i class="fas fa-square"></i> Stop Recording
+                        </button>
+                        <button class="btn btn-primary" id="playBtn" disabled>
+                            <i class="fas fa-play"></i> Play Recording
+                        </button>
+                        <button class="btn btn-success" id="downloadBtn" disabled>
+                            <i class="fas fa-download"></i> Download
+                        </button>
+                        <button class="btn btn-warning" id="clearBtn">
+                            <i class="fas fa-trash"></i> Clear
+                        </button>
+                    </div>
+                    
+                    <div class="recording-status" id="audioStatus">
+                        <i class="fas fa-info-circle"></i> <span id="statusMessage">Ready to record</span>
+                        <div id="audioTimer">Duration: 00:00</div>
+                    </div>
+                    
+                    <audio class="audio-player" id="audioPlayer" controls style="display: none;"></audio>
+                </div>
+
+                <div class="call-controls">
+                    <button class="btn btn-primary" onclick="startSimulation()" id="startBtn">
+                        <i class="fas fa-play-circle"></i> Start Simulation
+                    </button>
+                    <button class="btn btn-success" onclick="nextStep()" id="nextBtn" disabled>
+                        <i class="fas fa-forward"></i> Next Step
+                    </button>
+                    <button class="btn btn-warning" onclick="resetSimulation()">
+                        <i class="fas fa-redo"></i> Reset All
+                    </button>
+                    <button class="btn btn-outline" onclick="toggleQuickTips()">
+                        <i class="fas fa-lightbulb"></i> Quick Tips
+                    </button>
+                </div>
+
+                <!-- STEP 1: INFORMATION GATHERING -->
+                <div class="script-step" id="step1">
+                    <div class="step-header">
+                        <div class="step-icon">1</div>
+                        <div class="step-title">Gather Complete Information</div>
+                    </div>
+
+                    <div class="user-line">
+                        <strong>YOU (calmly):</strong> "Well, thank you so much for calling. Who am I speaking with?"
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">Collector's Full Name:</label>
+                        <input type="text" class="input-field" id="collectorName" placeholder="Enter the name they give...">
+                    </div>
+
+                    <div class="user-line">
+                        <strong>YOU:</strong> "Do you have an employee ID number? What's the company you work for? What's your mailing address? May I have your supervisor's name?"
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">Employee ID / Badge Number:</label>
+                        <input type="text" class="input-field" id="employeeId" placeholder="e.g., 45872-X">
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">Company Name & Department:</label>
+                        <input type="text" class="input-field" id="companyName" placeholder="e.g., National Credit Solutions, Recovery Dept.">
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">Mailing Address for Correspondence:</label>
+                        <input type="text" class="input-field" id="companyAddress" placeholder="Full street address, city, state, ZIP">
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">Supervisor's Name (if given):</label>
+                        <input type="text" class="input-field" id="supervisorName" placeholder="Optional">
+                    </div>
+
+                    <div class="user-line">
+                        <strong>YOU (Key Question):</strong> "And what is the specific reference or account number for the commercial instrument you're inquiring about?"
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">Reference / Account / Instrument #:</label>
+                        <input type="text" class="input-field" id="accountNumber" placeholder="Enter the number they reference">
+                    </div>
+
+                    <div class="principle-box">
+                        <div class="principle-title"><i class="fas fa-book"></i> EQUITY PRINCIPLE</div>
+                        <p>Grounding the call in a specific "instrument" creates the proper commercial record. Equity requires clarity on what is being presented for acceptance.</p>
+                    </div>
+                </div>
+
+                <!-- STEP 2: THE EQUITY REQUEST -->
+                <div class="script-step hidden" id="step2">
+                    <div class="step-header">
+                        <div class="step-icon">2</div>
+                        <div class="step-title">Make the Equity Request</div>
+                    </div>
+
+                    <div class="user-line">
+                        <strong>YOU:</strong> "Great. So, what is it you're needing from me today?"
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">Collector's Demand (what they say they need):</label>
+                        <input type="text" class="input-field" id="collectorDemand" placeholder="e.g., 'Payment of $1,250 by Friday'">
+                    </div>
+
+                    <div class="user-line">
+                        <strong>YOU (Core Equity Move):</strong> "Thank you. For this to be settled equitably, I require a proper written presentment of the claim. If you put that in writing and mail it to me, I will honor it immediately upon receipt. Could you do that for me?"
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">Their Response to Your Request:</label>
+                        <input type="text" class="input-field" id="responseToRequest" placeholder="What do they say? Agree, refuse, argue?">
+                    </div>
+
+                    <div class="principle-box">
+                        <div class="principle-title"><i class="fas fa-scroll"></i> MAXIM APPLIED</div>
+                        <p>"That which is equitable and good is the law of laws." You are invoking the higher law of Equity by demanding proper commercial form (written presentment).</p>
+                    </div>
+                </div>
+
+                <!-- STEP 3: HANDLING OBJECTIONS -->
+                <div class="script-step hidden" id="step3">
+                    <div class="step-header">
+                        <div class="step-icon">3</div>
+                        <div class="step-title">Handle Objections with "Acceptance = Payment"</div>
+                    </div>
+
+                    <div class="collector-line">
+                        <strong>COLLECTOR (likely objection):</strong> "You haven't made payments on this account."
+                    </div>
+
+                    <div class="user-line">
+                        <strong>YOU:</strong> "Does your record reflect that I have accepted and returned all presentments sent to me for the settlement and closure of this matter?"
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">Their Reaction / Follow-up Argument:</label>
+                        <textarea class="input-field" id="collectorObjection" rows="3" placeholder="Type their response here..."></textarea>
+                    </div>
+
+                    <div class="user-line">
+                        <strong>YOU (Equity Clarification):</strong> "That is the point of your call. A presentment requires my acceptance. I am offering to accept and honor your presentment, but I require it in proper written form to do so equitably."
+                    </div>
+
+                    <div class="principle-box">
+                        <div class="principle-title"><i class="fas fa-brain"></i> MINDSET SHIFT</div>
+                        <p>As <strong>Barb</strong> taught: "The power of knowing that equity prevails, rather than hoping it will work." You are not arguing; you are explaining the equitable process.</p>
+                    </div>
+                </div>
+
+                <!-- STEP 4: CALL CONCLUSION -->
+                <div class="script-step hidden" id="step4">
+                    <div class="step-header">
+                        <div class="step-icon">4</div>
+                        <div class="step-title">Firm & Kind Conclusion</div>
+                    </div>
+
+                    <div class="input-group">
+                        <label class="input-label">How did the call end?</label>
+                        <select class="input-field" id="endingType">
+                            <option value="">Select an ending...</option>
+                            <option value="agreed">They agreed to send written presentment</option>
+                            <option value="refused">They refused to provide written presentment</option>
+                            <option value="hostile">Became hostile/abusive - Terminated call</option>
+                            <option value="other">Other outcome</option>
+                        </select>
+                    </div>
+
+                    <div class="user-line" id="endingScriptAgreed">
+                        <strong>YOU (if they agree):</strong> "Thank you. I will watch for your mailing. Please note today's date and my request for the record. Have a good day."
+                    </div>
+
+                    <div class="user-line hidden" id="endingScriptRefused">
+                        <strong>YOU (if they refuse):</strong> "Since you're unable to provide the required commercial presentment in writing, there is nothing further I can honor on this call. Please note my request for the record. Thank you for your time."
+                    </div>
+
+                    <div class="user-line hidden" id="endingScriptHostile">
+                        <strong>YOU (if hostile):</strong> "This conversation is no longer productive. I've requested the required commercial presentment in writing. I am ending this call now. Goodbye."
+                    </div>
+
+                    <div class="principle-box">
+                        <div class="principle-title"><i class="fas fa-user-shield"></i> STAYING ON SCRIPT</div>
+                        <p>As <strong>Richard</strong> advised: "Stay on script with all of these people regardless of what they say." This tool helps internalize the script to combat doubt.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- RIGHT PANEL: CALL LOG & OUTPUT -->
+            <section class="log-panel">
+                <h2><i class="fas fa-clipboard-list"></i> Call Log & Record</h2>
+                <p style="margin-bottom: 1.5rem; color: #555;">This log builds automatically as you complete the simulation. It's the record you would keep in a real equity matter.</p>
+
+                <div class="call-log" id="callLogOutput">
+                    ========================================
+                    EQUITY CALL LOG - WITHOUT PREJUDICE
+                    ========================================
+                    Date: <span id="logDate">[Date will appear here]</span>
+                    Time Started: <span id="logStartTime">[Time will appear here]</span>
+                    Call Reference: EQUITY-CALL-<span id="logCallId">0001</span>
+
+                    --------------------------------------------------------
+                    1. COLLECTOR INFORMATION:
+                    --------------------------------------------------------
+                    Name: [Waiting for input...]
+                    Employee ID: [Waiting for input...]
+                    Company: [Waiting for input...]
+                    Address: [Waiting for input...]
+                    Supervisor: [Waiting for input...]
+                    Instrument #: [Waiting for input...]
+
+                    2. COLLECTOR'S DEMAND:
+                    [Waiting for input...]
+
+                    3. EQUITY REQUEST & RESPONSE:
+                    [Waiting for input...]
+
+                    4. OBJECTIONS & EQUITY CLARIFICATION:
+                    [Waiting for input...]
+
+                    5. CALL CONCLUSION:
+                    [Waiting for input...]
+
+                    6. EQUITY PRINCIPLES INVOKED:
+                    - Written presentment required for discharge
+                    - "Acceptance = Payment" upon proper presentment
+                    - Reservation of rights under UCC 1-308
+                    - Maxim: "That which is equitable and good is the law of laws"
+
+                    ========================================
+                    END OF LOG
+                    ========================================
+                </div>
+
+                <div class="log-actions">
+                    <button class="btn btn-primary" onclick="updateLog()" id="updateLogBtn">
+                        <i class="fas fa-sync-alt"></i> Update Live Log
+                    </button>
+                    <button class="btn btn-success" onclick="generateFinalLog()">
+                        <i class="fas fa-file-export"></i> Generate Final Log
+                    </button>
+                    <button class="btn btn-outline" onclick="copyLogToClipboard()">
+                        <i class="far fa-copy"></i> Copy to Clipboard
+                    </button>
+                </div>
+
+                <div style="margin-top: 2rem; padding: 1.5rem; background: #e1f5fe; border-radius: 10px;">
+                    <h3><i class="fas fa-graduation-cap"></i> How to Use This Simulator</h3>
+                    <ol style="margin-top: 1rem; padding-left: 1.5rem;">
+                        <li><strong>Start Recording</strong> to begin actual audio recording of your call</li>
+                        <li><strong>Start Simulation</strong> to begin the timer and activate inputs</li>
+                        <li>Fill in each field with <strong>exactly what the collector says</strong></li>
+                        <li>Click <strong>Next Step</strong> to progress through the equity script</li>
+                        <li>Watch the <strong>Call Log</strong> update in real-time</li>
+                        <li><strong>Download Recording</strong> to save audio evidence</li>
+                        <li><strong>Generate Final Log</strong> to create a complete record for your files</li>
+                    </ol>
+                </div>
+            </section>
+        </div>
+
+        <!-- INVITATION SECTION -->
+        <div class="invitation-box">
+            <h3 style="color: white; margin-bottom: 1rem; font-size: 2rem;">The Path to Mastery Continues</h3>
+            <p style="font-size: 1.2rem; margin-bottom: 1.5rem; opacity: 0.95;">
+                This simulator helps you practice the "script" and create proper records. For deep understanding of <strong>why</strong> this works, guidance on secured loans, trusts, and complex matters, continue your study with the masters.
+            </p>
+            <p style="font-size: 1.3rem; margin: 1.5rem 0;">
+                Reach Julian Swan directly on Telegram:
+            </p>
+            <div class="telegram-handle">@vitiate0</div>
+            <p style="margin-top: 1.5rem; font-style: italic; opacity: 0.9;">
+                When you contact him, mention you come via the <strong>Equity Power Tools Suite</strong>. This honors the pathway and shows your commitment to foundational learning.
+            </p>
+        </div>
+
+        <footer class="footer">
+            <h3 style="color: white; margin-bottom: 1.5rem;">Equity Power Tools Suite • Tool #1: Call Simulator & Recorder</h3>
+            <p style="opacity: 0.9; max-width: 800px; margin: 0 auto;">
+                A gift to mankind, built with respect for the teachings of Julian and Margaret Swan. Use in honor of the love Jesus taught us.
+            </p>
+            <p style="margin-top: 1.5rem; opacity: 0.7;">
+                Note: According to UCC 1-308, "without prejudice" alone is sufficient to preserve all rights.
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        // ==============================================
+        // AUDIO RECORDING FUNCTIONALITY
+        // ==============================================
+        let mediaRecorder;
+        let audioChunks = [];
+        let audioBlob;
+        let audioUrl;
+        let isRecording = false;
+        let audioStartTime;
+        let audioTimerInterval;
+        let audioStream;
+        
+        // Audio recording elements
+        const recordBtn = document.getElementById('recordBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const playBtn = document.getElementById('playBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const audioPlayer = document.getElementById('audioPlayer');
+        const audioStatus = document.getElementById('audioStatus');
+        const statusMessage = document.getElementById('statusMessage');
+        const audioTimer = document.getElementById('audioTimer');
+        
+        // Initialize audio recording
+        function initAudioRecording() {
+            // Check browser compatibility
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                showAudioStatus('Your browser does not support audio recording. Please use Chrome, Firefox, or Edge.', 'error');
+                disableAudioButtons();
+                return;
+            }
+            
+            setupAudioEventListeners();
+            updateAudioButtonStates();
+        }
+        
+        function setupAudioEventListeners() {
+            recordBtn.addEventListener('click', startAudioRecording);
+            stopBtn.addEventListener('click', stopAudioRecording);
+            playBtn.addEventListener('click', playAudioRecording);
+            downloadBtn.addEventListener('click', downloadAudioRecording);
+            clearBtn.addEventListener('click', clearAudioRecording);
+        }
+        
+        function updateAudioButtonStates() {
+            const hasRecording = audioBlob !== undefined;
+            
+            stopBtn.disabled = !isRecording;
+            playBtn.disabled = !hasRecording || isRecording;
+            downloadBtn.disabled = !hasRecording || isRecording;
+            
+            // Visual feedback
+            recordBtn.style.opacity = !isRecording ? '1' : '0.5';
+            stopBtn.style.opacity = isRecording ? '1' : '0.5';
+            playBtn.style.opacity = (hasRecording && !isRecording) ? '1' : '0.5';
+            downloadBtn.style.opacity = (hasRecording && !isRecording) ? '1' : '0.5';
+            
+            // Update recording status in status bar
+            document.getElementById('recordingStatus').textContent = isRecording ? 'ON' : 'OFF';
+            document.getElementById('recordingStatus').style.color = isRecording ? 'var(--success)' : 'var(--danger)';
+        }
+        
+        async function startAudioRecording() {
+            try {
+                // Request microphone access
+                audioStream = await navigator.mediaDevices.getUserMedia({ 
+                    audio: {
+                        echoCancellation: true,
+                        noiseSuppression: true,
+                        sampleRate: 44100
+                    }
+                });
+                
+                // Create MediaRecorder instance
+                mediaRecorder = new MediaRecorder(audioStream, {
+                    mimeType: 'audio/webm;codecs=opus'
+                });
+                
+                // Reset audio chunks
+                audioChunks = [];
+                
+                // Set up data handler
+                mediaRecorder.ondataavailable = (event) => {
+                    if (event.data.size > 0) {
+                        audioChunks.push(event.data);
+                    }
+                };
+                
+                // Set up completion handler
+                mediaRecorder.onstop = () => {
+                    audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    audioUrl = URL.createObjectURL(audioBlob);
+                    
+                    // Update UI
+                    audioStatus.classList.remove('recording');
+                    audioStatus.classList.add('active');
+                    clearInterval(audioTimerInterval);
+                    isRecording = false;
+                    
+                    // Show success message
+                    showAudioStatus('Recording completed successfully. You can now play or download the recording.', 'success');
+                    updateAudioButtonStates();
+                    
+                    // Stop all tracks
+                    if (audioStream) {
+                        audioStream.getTracks().forEach(track => track.stop());
+                    }
+                };
+                
+                // Start recording
+                mediaRecorder.start(100); // Collect data every 100ms
+                isRecording = true;
+                
+                // Update UI
+                recordBtn.innerHTML = '<i class="fas fa-circle"></i> Recording...';
+                audioStatus.classList.add('active', 'recording');
+                audioStatus.textContent = 'Recording in progress...';
+                
+                // Start timer
+                audioStartTime = Date.now();
+                updateAudioTimer();
+                audioTimerInterval = setInterval(updateAudioTimer, 1000);
+                
+                showAudioStatus('Recording started. Speak into your microphone.', 'success');
+                updateAudioButtonStates();
+                
+            } catch (error) {
+                console.error('Error accessing microphone:', error);
+                showAudioStatus('Error accessing microphone. Please check permissions and try again.', 'error');
+                isRecording = false;
+                updateAudioButtonStates();
+            }
+        }
+        
+        function stopAudioRecording() {
+            if (mediaRecorder && isRecording) {
+                mediaRecorder.stop();
+                isRecording = false;
+                recordBtn.innerHTML = '<i class="fas fa-circle"></i> Start Recording';
+                updateAudioButtonStates();
+            }
+        }
+        
+        function playAudioRecording() {
+            if (audioUrl && !isRecording) {
+                audioPlayer.src = audioUrl;
+                audioPlayer.style.display = 'block';
+                audioPlayer.play().catch(error => {
+                    showAudioStatus('Error playing audio: ' + error.message, 'error');
+                });
+            }
+        }
+        
+        function downloadAudioRecording() {
+            if (audioBlob && !isRecording) {
+                const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+                const filename = `equity-call-recording-${timestamp}.webm`;
+                
+                const a = document.createElement('a');
+                a.href = audioUrl;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                
+                showAudioStatus('Recording downloaded as ' + filename, 'success');
+            }
+        }
+        
+        function clearAudioRecording() {
+            if (isRecording) {
+                stopAudioRecording();
+            }
+            
+            // Clean up
+            if (audioUrl) {
+                URL.revokeObjectURL(audioUrl);
+            }
+            
+            // Reset state
+            audioBlob = undefined;
+            audioUrl = undefined;
+            audioChunks = [];
+            
+            // Reset UI
+            audioPlayer.src = '';
+            audioPlayer.style.display = 'none';
+            recordBtn.innerHTML = '<i class="fas fa-circle"></i> Start Recording';
+            audioStatus.classList.remove('active', 'recording');
+            clearInterval(audioTimerInterval);
+            audioTimer.textContent = 'Duration: 00:00';
+            
+            showAudioStatus('All recordings cleared.', 'success');
+            updateAudioButtonStates();
+        }
+        
+        function updateAudioTimer() {
+            if (isRecording && audioStartTime) {
+                const elapsed = Date.now() - audioStartTime;
+                const seconds = Math.floor(elapsed / 1000);
+                const minutes = Math.floor(seconds / 60);
+                const displaySeconds = seconds % 60;
+                
+                audioTimer.textContent = `Duration: ${minutes.toString().padStart(2, '0')}:${displaySeconds.toString().padStart(2, '0')}`;
+            }
+        }
+        
+        function showAudioStatus(message, type) {
+            statusMessage.textContent = message;
+            audioStatus.className = 'recording-status';
+            
+            if (type === 'success') {
+                audioStatus.classList.add('active');
+            } else if (type === 'error') {
+                audioStatus.classList.add('active');
+                audioStatus.style.backgroundColor = '#ffebee';
+                audioStatus.style.color = var('--danger');
+            }
+            
+            // Auto-hide success messages after 5 seconds
+            if (type === 'success' && !isRecording) {
+                setTimeout(() => {
+                    if (!audioStatus.classList.contains('recording')) {
+                        audioStatus.classList.remove('active');
+                    }
+                }, 5000);
+            }
+        }
+        
+        function disableAudioButtons() {
+            [recordBtn, stopBtn, playBtn, downloadBtn, clearBtn].forEach(btn => {
+                btn.disabled = true;
+                btn.style.opacity = '0.5';
+            });
+        }
+
+        // ==============================================
+        // CALL SIMULATION FUNCTIONALITY
+        // ==============================================
+        let simulationActive = false;
+        let currentStep = 1;
+        let startTime = null;
+        let timerInterval = null;
+        let callId = Math.floor(1000 + Math.random() * 9000);
+        
+        const stepElements = [document.getElementById('step1'), document.getElementById('step2'), 
+                              document.getElementById('step3'), document.getElementById('step4')];
+        const startBtn = document.getElementById('startBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const callStatus = document.getElementById('callStatus');
+        const callTimer = document.getElementById('callTimer');
+        const currentStepDisplay = document.getElementById('currentStep');
+        
+        function startSimulation() {
+            simulationActive = true;
+            startTime = new Date();
+            callStatus.textContent = 'IN PROGRESS';
+            callStatus.style.color = '#2e7d32';
+            startBtn.disabled = true;
+            startBtn.innerHTML = '<i class="fas fa-pause-circle"></i> Simulation Active';
+            nextBtn.disabled = false;
+            
+            timerInterval = setInterval(updateTimer, 1000);
+            updateTimer();
+            enableInputsForStep(1);
+            alert("Simulation started! Fill in the collector's information as if this were a real call.");
+        }
+        
+        function updateTimer() {
+            if (!startTime) return;
+            const now = new Date();
+            const diff = Math.floor((now - startTime) / 1000);
+            const minutes = Math.floor(diff / 60);
+            const seconds = diff % 60;
+            callTimer.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+        
+        function nextStep() {
+            if (currentStep >= 4) return;
+            stepElements[currentStep - 1].classList.add('hidden');
+            currentStep++;
+            stepElements[currentStep - 1].classList.remove('hidden');
+            currentStepDisplay.textContent = `${currentStep}/4`;
+            enableInputsForStep(currentStep);
+            updateLog();
+            if (currentStep === 4) {
+                nextBtn.innerHTML = '<i class="fas fa-flag-checkered"></i> Complete Simulation';
+            }
+        }
+        
+        function enableInputsForStep(step) {
+            document.querySelectorAll('.input-field').forEach(input => {
+                input.disabled = true;
+                input.style.backgroundColor = '#f5f5f5';
+            });
+            let inputsToEnable = [];
+            if (step === 1) inputsToEnable = ['collectorName', 'employeeId', 'companyName', 'companyAddress', 'supervisorName', 'accountNumber'];
+            else if (step === 2) inputsToEnable = ['collectorDemand', 'responseToRequest'];
+            else if (step === 3) inputsToEnable = ['collectorObjection'];
+            else if (step === 4) inputsToEnable = ['endingType'];
+            inputsToEnable.forEach(id => {
+                const input = document.getElementById(id);
+                if (input) { input.disabled = false; input.style.backgroundColor = 'white'; }
+            });
+        }
+        
+        function updateLog() {
+            const collectorName = document.getElementById('collectorName').value;
+            const employeeId = document.getElementById('employeeId').value;
+            const companyName = document.getElementById('companyName').value;
+            const companyAddress = document.getElementById('companyAddress').value;
+            const supervisorName = document.getElementById('supervisorName').value;
+            const accountNumber = document.getElementById('accountNumber').value;
+            const collectorDemand = document.getElementById('collectorDemand').value;
+            const responseToRequest = document.getElementById('responseToRequest').value;
+            const collectorObjection = document.getElementById('collectorObjection').value;
+            const endingType = document.getElementById('endingType').value;
+            
+            let endingScriptText = '';
+            if (endingType === 'agreed') endingScriptText = '"Thank you. I will watch for your mailing. Please note today\'s date and my request for the record."';
+            else if (endingType === 'refused') endingScriptText = '"Since you\'re unable to provide required commercial presentment in writing, nothing further can be honored on this call."';
+            else if (endingType === 'hostile') endingScriptText = '"Conversation no longer productive. Ending call after requesting commercial presentment in writing."';
+            
+            const logContent = `========================================
+EQUITY CALL LOG - WITHOUT PREJUDICE
+========================================
+Date: ${document.getElementById('logDate').textContent}
+Time Started: ${document.getElementById('logStartTime').textContent}
+Call Reference: EQUITY-CALL-${callId}
+Call Duration: ${callTimer.textContent}
+Audio Recording: ${isRecording ? 'IN PROGRESS' : (audioBlob ? 'AVAILABLE' : 'NOT RECORDED')}
+
+--------------------------------------------------------
+1. COLLECTOR INFORMATION:
+--------------------------------------------------------
+Name: ${collectorName || '[Not recorded yet]'}
+Employee ID: ${employeeId || '[Not recorded yet]'}
+Company: ${companyName || '[Not recorded yet]'}
+Address: ${companyAddress || '[Not recorded yet]'}
+Supervisor: ${supervisorName || '[Not recorded yet]'}
+Instrument #: ${accountNumber || '[Not recorded yet]'}
+
+2. COLLECTOR'S DEMAND:
+${collectorDemand || '[Not recorded yet]'}
+
+3. EQUITY REQUEST & RESPONSE:
+My Request: "Please provide written presentment for equitable settlement."
+Their Response: ${responseToRequest || '[Not recorded yet]'}
+
+4. OBJECTIONS & EQUITY CLARIFICATION:
+Their Objection: ${collectorObjection || '[Not recorded yet]'}
+My Equity Response: "A presentment requires acceptance. I require proper written form to accept and honor equitably."
+
+5. CALL CONCLUSION:
+Ending Type: ${endingType || '[Not selected yet]'}
+My Closing: ${endingScriptText || '[Not specified yet]'}
+
+6. EQUITY PRINCIPLES INVOKED:
+- Written presentment required for commercial discharge
+- "Acceptance = Payment" upon proper presentment (Maxim)
+- Reservation of rights under UCC 1-308
+- "That which is equitable and good is the law of laws" (Burton's)
+- Principle: Equity prevails over mere commercial demands
+
+========================================
+END OF LOG
+========================================`;
+            document.getElementById('callLogOutput').textContent = logContent;
+        }
+        
+        function generateFinalLog() {
+            updateLog();
+            const logText = document.getElementById('callLogOutput').textContent;
+            const blob = new Blob([logText], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Equity-Call-Log-${callId}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            alert(`Log downloaded: ${a.download}`);
+        }
+        
+        function copyLogToClipboard() {
+            const logText = document.getElementById('callLogOutput').textContent;
+            navigator.clipboard.writeText(logText).then(() => {
+                const btn = document.querySelector('.log-actions .btn-outline');
+                const original = btn.innerHTML;
+                btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                btn.style.backgroundColor = '#2e7d32';
+                btn.style.color = 'white';
+                setTimeout(() => {
+                    btn.innerHTML = original;
+                    btn.style.backgroundColor = '';
+                    btn.style.color = '';
+                }, 2000);
+            }).catch(err => {
+                alert('Please copy the text manually.');
+            });
+        }
+        
+        function resetSimulation() {
+            simulationActive = false;
+            currentStep = 1;
+            clearInterval(timerInterval);
+            callStatus.textContent = 'READY';
+            callStatus.style.color = '';
+            callTimer.textContent = '00:00';
+            currentStepDisplay.textContent = '1/4';
+            startBtn.disabled = false;
+            startBtn.innerHTML = '<i class="fas fa-play-circle"></i> Start Simulation';
+            nextBtn.disabled = true;
+            nextBtn.innerHTML = '<i class="fas fa-forward"></i> Next Step';
+            stepElements.forEach((step, index) => {
+                step.classList.add('hidden');
+                if (index === 0) step.classList.remove('hidden');
+            });
+            document.querySelectorAll('.input-field').forEach(input => {
+                if (input.type !== 'button') {
+                    input.value = '';
+                    input.disabled = true;
+                    input.style.backgroundColor = '#f5f5f5';
+                }
+            });
+            document.querySelectorAll('[id^="endingScript"]').forEach(el => el.classList.add('hidden'));
+            document.getElementById('endingScriptAgreed').classList.remove('hidden');
+            document.getElementById('endingType').value = '';
+            callId = Math.floor(1000 + Math.random() * 9000);
+            document.getElementById('logCallId').textContent = callId;
+            updateLog();
+        }
+        
+        function toggleQuickTips() {
+            alert(`EQUITY CALL TIPS:\n\n1. Stay calm & kind throughout\n2. Record everything (use the recorder above)\n3. Stay on script no matter what\n4. Focus on the process, not the person\n5. Know the principle behind each step\n6. End with honor and clarity\n7. Keep perfect records\n8. "Without prejudice" preserves all rights`);
+        }
+
+        // ==============================================
+        // INITIALIZATION
+        // ==============================================
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set initial log info
+            document.getElementById('logCallId').textContent = callId;
+            const now = new Date();
+            document.getElementById('logDate').textContent = now.toLocaleDateString('en-US', { 
+                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
+            });
+            document.getElementById('logStartTime').textContent = now.toLocaleTimeString('en-US');
+            
+            // Set up ending type selector
+            document.getElementById('endingType').addEventListener('change', function() {
+                document.querySelectorAll('[id^="endingScript"]').forEach(el => {
+                    el.classList.add('hidden');
+                });
+                if (this.value === 'agreed') {
+                    document.getElementById('endingScriptAgreed').classList.remove('hidden');
+                } else if (this.value === 'refused') {
+                    document.getElementById('endingScriptRefused').classList.remove('hidden');
+                } else if (this.value === 'hostile') {
+                    document.getElementById('endingScriptHostile').classList.remove('hidden');
+                }
+            });
+            
+            // Initialize audio recording
+            initAudioRecording();
+            
+            // Initial log update
+            updateLog();
+        });
+    </script>
+</body>
+</html>
