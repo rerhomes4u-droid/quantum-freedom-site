@@ -507,22 +507,22 @@
                 </div>
 
                 <div class="call-controls">
-                    <button class="btn btn-primary" onclick="startSimulation()" id="startBtn">
+                    <button class="btn btn-primary" id="startBtn">
                         <i class="fas fa-play-circle"></i> Start Simulation
                     </button>
-                    <button class="btn btn-success" onclick="nextStep()" id="nextBtn" disabled>
+                    <button class="btn btn-success" id="nextBtn" disabled>
                         <i class="fas fa-forward"></i> Next Step
                     </button>
-                    <button class="btn btn-warning" onclick="resetSimulation()">
+                    <button class="btn btn-warning" id="resetBtn">
                         <i class="fas fa-redo"></i> Reset All
                     </button>
-                    <button class="btn btn-outline" onclick="toggleQuickTips()">
+                    <button class="btn btn-outline" id="tipsBtn">
                         <i class="fas fa-lightbulb"></i> Quick Tips
                     </button>
-                    <button class="btn btn-outline" onclick="toggleDebug()">
+                    <button class="btn btn-outline" id="debugBtn">
                         <i class="fas fa-bug"></i> Debug
                     </button>
-                    <button class="btn btn-outline" onclick="testLogUpdate()">
+                    <button class="btn btn-outline" id="testBtn">
                         <i class="fas fa-vial"></i> Test Log
                     </button>
                 </div>
@@ -727,13 +727,13 @@
                 </div>
 
                 <div class="log-actions">
-                    <button class="btn btn-primary" onclick="updateLog()" id="updateLogBtn">
+                    <button class="btn btn-primary" id="updateLogBtn">
                         <i class="fas fa-sync-alt"></i> Update Live Log
                     </button>
-                    <button class="btn btn-success" onclick="generateFinalLog()">
+                    <button class="btn btn-success" id="generateLogBtn">
                         <i class="fas fa-file-export"></i> Generate Final Log
                     </button>
-                    <button class="btn btn-outline" onclick="copyLogToClipboard()">
+                    <button class="btn btn-outline" id="copyLogBtn">
                         <i class="far fa-copy"></i> Copy to Clipboard
                     </button>
                 </div>
@@ -781,45 +781,105 @@
 
     <script>
         // ==============================================
-        // AUDIO RECORDING FUNCTIONALITY - TESTED & WORKING
+        // MAIN APPLICATION STATE
         // ==============================================
-        let mediaRecorder = null;
-        let audioChunks = [];
-        let audioBlob = null;
-        let audioUrl = null;
-        let isRecording = false;
-        let audioStartTime = null;
-        let audioTimerInterval = null;
-        let audioStream = null;
-        let showDebug = false;
-        
-        // Audio recording elements
-        const recordBtn = document.getElementById('recordBtn');
-        const stopBtn = document.getElementById('stopBtn');
-        const playBtn = document.getElementById('playBtn');
-        const downloadBtn = document.getElementById('downloadBtn');
-        const clearBtn = document.getElementById('clearBtn');
-        const audioPlayer = document.getElementById('audioPlayer');
-        const audioStatus = document.getElementById('audioStatus');
-        const statusMessage = document.getElementById('statusMessage');
-        const audioTimer = document.getElementById('audioTimer');
-        const debugInfo = document.getElementById('debugInfo');
-        const recordingStatusDisplay = document.getElementById('recordingStatusDisplay');
-        const logUpdateNotice = document.getElementById('logUpdateNotice');
-        
-        // Browser compatibility check
+        const appState = {
+            simulationActive: false,
+            currentStep: 1,
+            startTime: null,
+            timerInterval: null,
+            callId: Math.floor(1000 + Math.random() * 9000),
+            
+            // Audio recording state
+            mediaRecorder: null,
+            audioChunks: [],
+            audioBlob: null,
+            audioUrl: null,
+            isRecording: false,
+            audioStartTime: null,
+            audioTimerInterval: null,
+            audioStream: null,
+            showDebug: false
+        };
+
+        // ==============================================
+        // DOM ELEMENTS - SINGLE REFERENCE
+        // ==============================================
+        const elements = {
+            // Status elements
+            callStatus: document.getElementById('callStatus'),
+            callTimer: document.getElementById('callTimer'),
+            currentStepDisplay: document.getElementById('currentStep'),
+            recordingStatusDisplay: document.getElementById('recordingStatusDisplay'),
+            
+            // Control buttons
+            startBtn: document.getElementById('startBtn'),
+            nextBtn: document.getElementById('nextBtn'),
+            resetBtn: document.getElementById('resetBtn'),
+            tipsBtn: document.getElementById('tipsBtn'),
+            debugBtn: document.getElementById('debugBtn'),
+            testBtn: document.getElementById('testBtn'),
+            updateLogBtn: document.getElementById('updateLogBtn'),
+            generateLogBtn: document.getElementById('generateLogBtn'),
+            copyLogBtn: document.getElementById('copyLogBtn'),
+            
+            // Step containers
+            step1: document.getElementById('step1'),
+            step2: document.getElementById('step2'),
+            step3: document.getElementById('step3'),
+            step4: document.getElementById('step4'),
+            
+            // Audio elements
+            recordBtn: document.getElementById('recordBtn'),
+            stopBtn: document.getElementById('stopBtn'),
+            playBtn: document.getElementById('playBtn'),
+            downloadBtn: document.getElementById('downloadBtn'),
+            clearBtn: document.getElementById('clearBtn'),
+            audioPlayer: document.getElementById('audioPlayer'),
+            audioStatus: document.getElementById('audioStatus'),
+            statusMessage: document.getElementById('statusMessage'),
+            audioTimer: document.getElementById('audioTimer'),
+            debugInfo: document.getElementById('debugInfo'),
+            
+            // Input fields
+            collectorName: document.getElementById('collectorName'),
+            employeeId: document.getElementById('employeeId'),
+            companyName: document.getElementById('companyName'),
+            companyAddress: document.getElementById('companyAddress'),
+            supervisorName: document.getElementById('supervisorName'),
+            accountNumber: document.getElementById('accountNumber'),
+            collectorDemand: document.getElementById('collectorDemand'),
+            responseToRequest: document.getElementById('responseToRequest'),
+            collectorObjection: document.getElementById('collectorObjection'),
+            endingType: document.getElementById('endingType'),
+            
+            // Log elements
+            callLogOutput: document.getElementById('callLogOutput'),
+            logDate: document.getElementById('logDate'),
+            logStartTime: document.getElementById('logStartTime'),
+            logCallId: document.getElementById('logCallId'),
+            logUpdateNotice: document.getElementById('logUpdateNotice'),
+            
+            // Ending scripts
+            endingScriptAgreed: document.getElementById('endingScriptAgreed'),
+            endingScriptRefused: document.getElementById('endingScriptRefused'),
+            endingScriptHostile: document.getElementById('endingScriptHostile')
+        };
+
+        // ==============================================
+        // AUDIO RECORDING - FIXED VERSION
+        // ==============================================
         function checkBrowserCompatibility() {
             const compatibility = {
                 hasGetUserMedia: !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia),
                 hasMediaRecorder: !!window.MediaRecorder,
-                isSecureContext: window.isSecureContext,
-                browser: navigator.userAgent
+                isSecureContext: window.isSecureContext
             };
             
-            logDebug(`Browser Check: ${JSON.stringify(compatibility, null, 2)}`);
+            logDebug(`Browser Check: ${JSON.stringify(compatibility)}`);
             
             if (!compatibility.hasGetUserMedia) {
-                showAudioStatus('Error: Your browser does not support getUserMedia API. Try Chrome, Firefox, or Edge.', 'error');
+                showAudioStatus('Error: Your browser does not support audio recording. Try Chrome, Firefox, or Edge.', 'error');
                 return false;
             }
             
@@ -828,14 +888,9 @@
                 return false;
             }
             
-            if (!compatibility.isSecureContext) {
-                showAudioStatus('Warning: Page not loaded in secure context (HTTPS/localhost). Some features may not work.', 'warning');
-            }
-            
             return true;
         }
         
-        // Initialize audio recording
         function initAudioRecording() {
             logDebug('Initializing audio recording...');
             
@@ -847,129 +902,79 @@
             setupAudioEventListeners();
             updateAudioButtonStates();
             showAudioStatus('Ready to record. Click Start Recording to begin.', 'ready');
-            
-            logDebug('Audio recording initialized successfully');
         }
         
         function setupAudioEventListeners() {
-            recordBtn.addEventListener('click', startAudioRecording);
-            stopBtn.addEventListener('click', stopAudioRecording);
-            playBtn.addEventListener('click', playAudioRecording);
-            downloadBtn.addEventListener('click', downloadAudioRecording);
-            clearBtn.addEventListener('click', clearAudioRecording);
-            
-            logDebug('Audio event listeners set up');
+            elements.recordBtn.addEventListener('click', startAudioRecording);
+            elements.stopBtn.addEventListener('click', stopAudioRecording);
+            elements.playBtn.addEventListener('click', playAudioRecording);
+            elements.downloadBtn.addEventListener('click', downloadAudioRecording);
+            elements.clearBtn.addEventListener('click', clearAudioRecording);
         }
         
         function updateAudioButtonStates() {
-            const hasRecording = audioBlob !== null;
+            const hasRecording = appState.audioBlob !== null;
             
-            recordBtn.disabled = isRecording;
-            stopBtn.disabled = !isRecording;
-            playBtn.disabled = !hasRecording || isRecording;
-            downloadBtn.disabled = !hasRecording || isRecording;
+            elements.recordBtn.disabled = appState.isRecording;
+            elements.stopBtn.disabled = !appState.isRecording;
+            elements.playBtn.disabled = !hasRecording || appState.isRecording;
+            elements.downloadBtn.disabled = !hasRecording || appState.isRecording;
             
-            // Update recording status in status bar
-            recordingStatusDisplay.textContent = isRecording ? 'ON' : (hasRecording ? 'SAVED' : 'OFF');
-            recordingStatusDisplay.style.color = isRecording ? '#2e7d32' : (hasRecording ? '#3949ab' : '#666');
-            
-            logDebug(`Button states updated: recording=${isRecording}, hasRecording=${hasRecording}`);
+            elements.recordingStatusDisplay.textContent = appState.isRecording ? 'ON' : (hasRecording ? 'SAVED' : 'OFF');
+            elements.recordingStatusDisplay.style.color = appState.isRecording ? '#2e7d32' : (hasRecording ? '#3949ab' : '#666');
         }
         
         async function startAudioRecording() {
             try {
                 logDebug('Starting audio recording...');
                 
-                // Reset previous data
-                audioChunks = [];
-                audioBlob = null;
-                if (audioUrl) {
-                    URL.revokeObjectURL(audioUrl);
-                    audioUrl = null;
+                appState.audioChunks = [];
+                appState.audioBlob = null;
+                if (appState.audioUrl) {
+                    URL.revokeObjectURL(appState.audioUrl);
+                    appState.audioUrl = null;
                 }
                 
-                // Request microphone access with better error handling
-                logDebug('Requesting microphone access...');
-                audioStream = await navigator.mediaDevices.getUserMedia({ 
-                    audio: {
-                        echoCancellation: true,
-                        noiseSuppression: true,
-                        sampleRate: 44100,
-                        channelCount: 1
-                    }
-                }).catch(err => {
-                    logDebug(`Microphone access error: ${err.name}: ${err.message}`);
-                    throw err;
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    audio: true
                 });
                 
-                logDebug('Microphone access granted, creating MediaRecorder...');
+                appState.audioStream = stream;
                 
-                // Check available MIME types
-                const mimeTypes = [
-                    'audio/webm;codecs=opus',
-                    'audio/webm',
-                    'audio/mp4',
-                    'audio/ogg;codecs=opus'
-                ];
+                const mimeType = MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 
+                               MediaRecorder.isTypeSupported('audio/mp4') ? 'audio/mp4' : '';
                 
-                let selectedType = '';
-                for (const type of mimeTypes) {
-                    if (MediaRecorder.isTypeSupported(type)) {
-                        selectedType = type;
-                        break;
-                    }
-                }
-                
-                if (!selectedType) {
-                    selectedType = 'audio/webm';
-                }
-                
-                logDebug(`Selected MIME type: ${selectedType}`);
-                
-                // Create MediaRecorder instance
-                mediaRecorder = new MediaRecorder(audioStream, {
-                    mimeType: selectedType
+                appState.mediaRecorder = new MediaRecorder(stream, {
+                    mimeType: mimeType
                 });
                 
-                // Set up data handler
-                mediaRecorder.ondataavailable = (event) => {
-                    logDebug(`Data available: ${event.data.size} bytes`);
+                appState.mediaRecorder.ondataavailable = (event) => {
                     if (event.data.size > 0) {
-                        audioChunks.push(event.data);
+                        appState.audioChunks.push(event.data);
                     }
                 };
                 
-                // Set up completion handler
-                mediaRecorder.onstop = () => {
-                    logDebug('MediaRecorder stopped, processing audio...');
+                appState.mediaRecorder.onstop = () => {
                     try {
-                        audioBlob = new Blob(audioChunks, { 
-                            type: mediaRecorder.mimeType || 'audio/webm'
+                        appState.audioBlob = new Blob(appState.audioChunks, { 
+                            type: appState.mediaRecorder.mimeType || 'audio/webm'
                         });
-                        audioUrl = URL.createObjectURL(audioBlob);
+                        appState.audioUrl = URL.createObjectURL(appState.audioBlob);
                         
-                        logDebug(`Audio blob created: ${audioBlob.size} bytes, URL: ${audioUrl ? 'created' : 'failed'}`);
+                        elements.audioStatus.classList.remove('recording');
+                        elements.audioStatus.classList.add('active');
+                        clearInterval(appState.audioTimerInterval);
+                        appState.isRecording = false;
                         
-                        // Update UI
-                        audioStatus.classList.remove('recording');
-                        audioStatus.classList.add('active');
-                        clearInterval(audioTimerInterval);
-                        isRecording = false;
-                        
-                        // Show success message
-                        showAudioStatus(`Recording completed successfully (${formatFileSize(audioBlob.size)}). You can now play or download.`, 'success');
+                        showAudioStatus(`Recording completed (${formatFileSize(appState.audioBlob.size)}).`, 'success');
                         updateAudioButtonStates();
                         
-                        // Stop all tracks
-                        if (audioStream) {
-                            audioStream.getTracks().forEach(track => {
-                                track.stop();
-                                logDebug(`Track stopped: ${track.kind}`);
-                            });
+                        if (appState.audioStream) {
+                            appState.audioStream.getTracks().forEach(track => track.stop());
                         }
                         
-                        audioPlayer.src = audioUrl;
-                        audioPlayer.style.display = 'block';
+                        elements.audioPlayer.src = appState.audioUrl;
+                        elements.audioPlayer.style.display = 'block';
                         
                     } catch (error) {
                         logDebug(`Error in onstop: ${error.message}`);
@@ -977,24 +982,20 @@
                     }
                 };
                 
-                mediaRecorder.onerror = (event) => {
+                appState.mediaRecorder.onerror = (event) => {
                     logDebug(`MediaRecorder error: ${event.error.name}`);
                     showAudioStatus(`Recording error: ${event.error.message}`, 'error');
                 };
                 
-                // Start recording
-                mediaRecorder.start(100); // Collect data every 100ms
-                isRecording = true;
-                logDebug('MediaRecorder started successfully');
+                appState.mediaRecorder.start(100);
+                appState.isRecording = true;
                 
-                // Update UI
-                recordBtn.innerHTML = '<i class="fas fa-circle"></i> Recording...';
-                audioStatus.classList.add('active', 'recording');
+                elements.recordBtn.innerHTML = '<i class="fas fa-circle"></i> Recording...';
+                elements.audioStatus.classList.add('active', 'recording');
                 
-                // Start timer
-                audioStartTime = Date.now();
+                appState.audioStartTime = Date.now();
                 updateAudioTimer();
-                audioTimerInterval = setInterval(updateAudioTimer, 1000);
+                appState.audioTimerInterval = setInterval(updateAudioTimer, 1000);
                 
                 showAudioStatus('Recording started. Speak into your microphone.', 'recording');
                 updateAudioButtonStates();
@@ -1005,39 +1006,32 @@
                 let errorMessage = 'Error accessing microphone. ';
                 if (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError') {
                     errorMessage += 'Please allow microphone access in your browser settings.';
-                } else if (error.name === 'NotFoundError' || error.name === 'DevicesNotFoundError') {
-                    errorMessage += 'No microphone found. Please connect a microphone.';
-                } else if (error.name === 'NotSupportedError') {
-                    errorMessage += 'Your browser does not support audio recording.';
+                } else if (error.name === 'NotFoundError') {
+                    errorMessage += 'No microphone found.';
                 } else {
                     errorMessage += error.message;
                 }
                 
                 showAudioStatus(errorMessage, 'error');
-                isRecording = false;
+                appState.isRecording = false;
                 updateAudioButtonStates();
                 
-                // Clean up on error
-                if (audioStream) {
-                    audioStream.getTracks().forEach(track => track.stop());
+                if (appState.audioStream) {
+                    appState.audioStream.getTracks().forEach(track => track.stop());
                 }
             }
         }
         
         function stopAudioRecording() {
-            if (mediaRecorder && isRecording) {
-                logDebug('Stopping audio recording...');
-                mediaRecorder.stop();
-                recordBtn.innerHTML = '<i class="fas fa-circle"></i> Start Recording';
-            } else {
-                logDebug('Stop called but not recording');
+            if (appState.mediaRecorder && appState.isRecording) {
+                appState.mediaRecorder.stop();
+                elements.recordBtn.innerHTML = '<i class="fas fa-circle"></i> Start Recording';
             }
         }
         
         function playAudioRecording() {
-            if (audioUrl && !isRecording) {
-                logDebug('Playing audio recording...');
-                audioPlayer.play().catch(error => {
+            if (appState.audioUrl && !appState.isRecording) {
+                elements.audioPlayer.play().catch(error => {
                     logDebug(`Play error: ${error.message}`);
                     showAudioStatus(`Error playing audio: ${error.message}`, 'error');
                 });
@@ -1045,91 +1039,77 @@
         }
         
         function downloadAudioRecording() {
-            if (audioBlob && !isRecording) {
-                logDebug('Downloading audio recording...');
+            if (appState.audioBlob && !appState.isRecording) {
                 const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
                 const filename = `equity-call-recording-${timestamp}.webm`;
                 
                 const a = document.createElement('a');
-                a.href = audioUrl;
+                a.href = appState.audioUrl;
                 a.download = filename;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
                 
                 showAudioStatus(`Recording downloaded: ${filename}`, 'success');
-                logDebug(`Download initiated: ${filename}`);
             }
         }
         
         function clearAudioRecording() {
-            logDebug('Clearing audio recording...');
-            
-            if (isRecording) {
+            if (appState.isRecording) {
                 stopAudioRecording();
             }
             
-            // Clean up
-            if (audioUrl) {
-                URL.revokeObjectURL(audioUrl);
-                audioUrl = null;
+            if (appState.audioUrl) {
+                URL.revokeObjectURL(appState.audioUrl);
+                appState.audioUrl = null;
             }
             
-            // Reset state
-            audioBlob = null;
-            audioChunks = [];
+            appState.audioBlob = null;
+            appState.audioChunks = [];
             
-            // Reset UI
-            audioPlayer.src = '';
-            audioPlayer.style.display = 'none';
-            recordBtn.innerHTML = '<i class="fas fa-circle"></i> Start Recording';
-            audioStatus.classList.remove('active', 'recording');
-            clearInterval(audioTimerInterval);
-            audioTimer.textContent = 'Duration: 00:00';
+            elements.audioPlayer.src = '';
+            elements.audioPlayer.style.display = 'none';
+            elements.recordBtn.innerHTML = '<i class="fas fa-circle"></i> Start Recording';
+            elements.audioStatus.classList.remove('active', 'recording');
+            clearInterval(appState.audioTimerInterval);
+            elements.audioTimer.textContent = 'Duration: 00:00';
             
             showAudioStatus('All recordings cleared. Ready to record.', 'ready');
             updateAudioButtonStates();
-            
-            logDebug('Audio recording cleared');
         }
         
         function updateAudioTimer() {
-            if (isRecording && audioStartTime) {
-                const elapsed = Date.now() - audioStartTime;
+            if (appState.isRecording && appState.audioStartTime) {
+                const elapsed = Date.now() - appState.audioStartTime;
                 const seconds = Math.floor(elapsed / 1000);
                 const minutes = Math.floor(seconds / 60);
                 const displaySeconds = seconds % 60;
                 
-                audioTimer.textContent = `Duration: ${minutes.toString().padStart(2, '0')}:${displaySeconds.toString().padStart(2, '0')}`;
+                elements.audioTimer.textContent = `Duration: ${minutes.toString().padStart(2, '0')}:${displaySeconds.toString().padStart(2, '0')}`;
             }
         }
         
         function showAudioStatus(message, type) {
-            statusMessage.textContent = message;
-            audioStatus.className = 'recording-status';
+            elements.statusMessage.textContent = message;
+            elements.audioStatus.className = 'recording-status';
             
             switch(type) {
                 case 'ready':
-                    audioStatus.style.backgroundColor = '#e3f2fd';
-                    audioStatus.style.color = '#1565c0';
+                    elements.audioStatus.style.backgroundColor = '#e3f2fd';
+                    elements.audioStatus.style.color = '#1565c0';
                     break;
                 case 'recording':
-                    audioStatus.classList.add('active', 'recording');
+                    elements.audioStatus.classList.add('active', 'recording');
                     break;
                 case 'success':
-                    audioStatus.classList.add('active');
-                    audioStatus.style.backgroundColor = '#e8f5e9';
-                    audioStatus.style.color = '#2e7d32';
+                    elements.audioStatus.classList.add('active');
+                    elements.audioStatus.style.backgroundColor = '#e8f5e9';
+                    elements.audioStatus.style.color = '#2e7d32';
                     break;
                 case 'error':
-                    audioStatus.classList.add('active');
-                    audioStatus.style.backgroundColor = '#ffebee';
-                    audioStatus.style.color = '#c62828';
-                    break;
-                case 'warning':
-                    audioStatus.classList.add('active');
-                    audioStatus.style.backgroundColor = '#fff3e0';
-                    audioStatus.style.color = '#f57c00';
+                    elements.audioStatus.classList.add('active');
+                    elements.audioStatus.style.backgroundColor = '#ffebee';
+                    elements.audioStatus.style.color = '#c62828';
                     break;
             }
             
@@ -1137,8 +1117,8 @@
         }
         
         function disableAudioButtons() {
-            [recordBtn, stopBtn, playBtn, downloadBtn, clearBtn].forEach(btn => {
-                btn.disabled = true;
+            [elements.recordBtn, elements.stopBtn, elements.playBtn, elements.downloadBtn, elements.clearBtn].forEach(btn => {
+                if (btn) btn.disabled = true;
             });
         }
         
@@ -1149,202 +1129,146 @@
         }
         
         function logDebug(message) {
-            if (showDebug) {
+            if (appState.showDebug) {
                 const timestamp = new Date().toLocaleTimeString();
-                debugInfo.innerHTML += `[${timestamp}] ${message}<br>`;
-                debugInfo.scrollTop = debugInfo.scrollHeight;
-                console.debug(`[AudioRecorder] ${message}`);
+                elements.debugInfo.innerHTML += `[${timestamp}] ${message}<br>`;
+                elements.debugInfo.scrollTop = elements.debugInfo.scrollHeight;
             }
-        }
-        
-        function toggleDebug() {
-            showDebug = !showDebug;
-            debugInfo.classList.toggle('active', showDebug);
-            logDebug(`Debug mode ${showDebug ? 'enabled' : 'disabled'}`);
-        }
-        
-        function showLogUpdateNotice() {
-            logUpdateNotice.style.display = 'block';
-            setTimeout(() => {
-                logUpdateNotice.style.display = 'none';
-            }, 2000);
         }
 
         // ==============================================
-        // CALL SIMULATION FUNCTIONALITY - FIXED LOG UPDATES
+        // CALL SIMULATION - FIXED VERSION
         // ==============================================
-        let simulationActive = false;
-        let currentStep = 1;
-        let startTime = null;
-        let timerInterval = null;
-        let callId = Math.floor(1000 + Math.random() * 9000);
-        
-        const stepElements = [document.getElementById('step1'), document.getElementById('step2'), 
-                              document.getElementById('step3'), document.getElementById('step4')];
-        const startBtn = document.getElementById('startBtn');
-        const nextBtn = document.getElementById('nextBtn');
-        const callStatus = document.getElementById('callStatus');
-        const callTimer = document.getElementById('callTimer');
-        const currentStepDisplay = document.getElementById('currentStep');
-        
-        // List of all input field IDs
-        const inputFieldIds = [
-            'collectorName', 'employeeId', 'companyName', 'companyAddress', 
-            'supervisorName', 'accountNumber', 'collectorDemand', 
-            'responseToRequest', 'collectorObjection', 'endingType'
-        ];
-        
-        // Global function to handle ALL input changes
-        function handleInputChange(event) {
-            logDebug(`Input changed: ${event.target.id} = "${event.target.value}"`);
-            updateLog();
-            showLogUpdateNotice();
-        }
-        
-        function setupAutoLogUpdates() {
-            logDebug('Setting up auto-log updates...');
-            
-            // Add event listeners to ALL input fields immediately
-            inputFieldIds.forEach(fieldId => {
-                const field = document.getElementById(fieldId);
-                if (field) {
-                    // Remove any existing listeners first
-                    field.removeEventListener('input', handleInputChange);
-                    field.removeEventListener('change', handleInputChange);
-                    
-                    // Add new listeners
-                    if (field.tagName === 'TEXTAREA' || field.type === 'text') {
-                        field.addEventListener('input', handleInputChange);
-                        logDebug(`Added input listener to: ${fieldId}`);
-                    } else if (field.tagName === 'SELECT') {
-                        field.addEventListener('change', handleInputChange);
-                        logDebug(`Added change listener to: ${fieldId}`);
-                    }
-                } else {
-                    logDebug(`Field not found: ${fieldId}`);
-                }
-            });
-            
-            // Also attach to the endingType dropdown
-            const endingType = document.getElementById('endingType');
-            if (endingType) {
-                endingType.addEventListener('change', function() {
-                    document.querySelectorAll('[id^="endingScript"]').forEach(el => {
-                        el.classList.add('hidden');
-                    });
-                    if (this.value === 'agreed') {
-                        document.getElementById('endingScriptAgreed').classList.remove('hidden');
-                    } else if (this.value === 'refused') {
-                        document.getElementById('endingScriptRefused').classList.remove('hidden');
-                    } else if (this.value === 'hostile') {
-                        document.getElementById('endingScriptHostile').classList.remove('hidden');
-                    }
-                    // Force log update
-                    updateLog();
-                    showLogUpdateNotice();
-                });
-            }
-            
-            logDebug('Auto-log update listeners set up');
-        }
-        
         function startSimulation() {
-            simulationActive = true;
-            startTime = new Date();
-            callStatus.textContent = 'IN PROGRESS';
-            callStatus.style.color = '#2e7d32';
-            startBtn.disabled = true;
-            startBtn.innerHTML = '<i class="fas fa-pause-circle"></i> Simulation Active';
-            nextBtn.disabled = false;
+            appState.simulationActive = true;
+            appState.startTime = new Date();
+            elements.callStatus.textContent = 'IN PROGRESS';
+            elements.callStatus.style.color = '#2e7d32';
+            elements.startBtn.disabled = true;
+            elements.startBtn.innerHTML = '<i class="fas fa-pause-circle"></i> Simulation Active';
+            elements.nextBtn.disabled = false;
             
-            timerInterval = setInterval(updateTimer, 1000);
+            appState.timerInterval = setInterval(updateTimer, 1000);
             updateTimer();
             enableInputsForStep(1);
             
-            // Re-attach event listeners now that inputs are enabled
-            setupAutoLogUpdates();
-            
-            // Force initial log update
+            setupInputEventListeners();
             updateLog();
             showLogUpdateNotice();
             
-            alert("Simulation started! Fill in the collector's information as if this were a real call.");
             logDebug('Simulation started');
         }
         
         function updateTimer() {
-            if (!startTime) return;
+            if (!appState.startTime) return;
             const now = new Date();
-            const diff = Math.floor((now - startTime) / 1000);
+            const diff = Math.floor((now - appState.startTime) / 1000);
             const minutes = Math.floor(diff / 60);
             const seconds = diff % 60;
-            callTimer.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            elements.callTimer.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
         }
         
         function nextStep() {
-            if (currentStep >= 4) return;
-            stepElements[currentStep - 1].classList.add('hidden');
-            currentStep++;
-            stepElements[currentStep - 1].classList.remove('hidden');
-            currentStepDisplay.textContent = `${currentStep}/4`;
-            enableInputsForStep(currentStep);
+            if (appState.currentStep >= 4) return;
             
-            // Re-attach event listeners for newly enabled inputs
-            setupAutoLogUpdates();
+            // Hide current step
+            if (appState.currentStep === 1) elements.step1.classList.add('hidden');
+            else if (appState.currentStep === 2) elements.step2.classList.add('hidden');
+            else if (appState.currentStep === 3) elements.step3.classList.add('hidden');
             
-            updateLog();
-            showLogUpdateNotice();
+            appState.currentStep++;
+            elements.currentStepDisplay.textContent = `${appState.currentStep}/4`;
             
-            if (currentStep === 4) {
-                nextBtn.innerHTML = '<i class="fas fa-flag-checkered"></i> Complete Simulation';
+            // Show next step
+            if (appState.currentStep === 2) elements.step2.classList.remove('hidden');
+            else if (appState.currentStep === 3) elements.step3.classList.remove('hidden');
+            else if (appState.currentStep === 4) {
+                elements.step4.classList.remove('hidden');
+                elements.nextBtn.innerHTML = '<i class="fas fa-flag-checkered"></i> Complete Simulation';
             }
             
-            logDebug(`Moved to step ${currentStep}`);
+            enableInputsForStep(appState.currentStep);
+            updateLog();
+            showLogUpdateNotice();
         }
         
         function enableInputsForStep(step) {
-            // First, disable all inputs
-            document.querySelectorAll('.input-field').forEach(input => {
-                input.disabled = true;
-                input.style.backgroundColor = '#f5f5f5';
+            // Disable all inputs first
+            const allInputs = [
+                elements.collectorName, elements.employeeId, elements.companyName,
+                elements.companyAddress, elements.supervisorName, elements.accountNumber,
+                elements.collectorDemand, elements.responseToRequest, elements.collectorObjection,
+                elements.endingType
+            ];
+            
+            allInputs.forEach(input => {
+                if (input) {
+                    input.disabled = true;
+                    input.style.backgroundColor = '#f5f5f5';
+                }
             });
             
-            // Then enable the ones for this step
-            let inputsToEnable = [];
-            if (step === 1) inputsToEnable = ['collectorName', 'employeeId', 'companyName', 'companyAddress', 'supervisorName', 'accountNumber'];
-            else if (step === 2) inputsToEnable = ['collectorDemand', 'responseToRequest'];
-            else if (step === 3) inputsToEnable = ['collectorObjection'];
-            else if (step === 4) inputsToEnable = ['endingType'];
-            
-            inputsToEnable.forEach(id => {
-                const input = document.getElementById(id);
-                if (input) { 
-                    input.disabled = false; 
-                    input.style.backgroundColor = 'white'; 
-                    logDebug(`Enabled input: ${id}`);
+            // Enable inputs for current step
+            if (step === 1) {
+                enableInputs([elements.collectorName, elements.employeeId, elements.companyName,
+                             elements.companyAddress, elements.supervisorName, elements.accountNumber]);
+            } else if (step === 2) {
+                enableInputs([elements.collectorDemand, elements.responseToRequest]);
+            } else if (step === 3) {
+                enableInputs([elements.collectorObjection]);
+            } else if (step === 4) {
+                enableInputs([elements.endingType]);
+            }
+        }
+        
+        function enableInputs(inputs) {
+            inputs.forEach(input => {
+                if (input) {
+                    input.disabled = false;
+                    input.style.backgroundColor = 'white';
                 }
             });
         }
         
+        function setupInputEventListeners() {
+            const inputFields = [
+                elements.collectorName, elements.employeeId, elements.companyName,
+                elements.companyAddress, elements.supervisorName, elements.accountNumber,
+                elements.collectorDemand, elements.responseToRequest, elements.collectorObjection
+            ];
+            
+            inputFields.forEach(field => {
+                if (field) {
+                    field.addEventListener('input', () => {
+                        updateLog();
+                        showLogUpdateNotice();
+                    });
+                }
+            });
+            
+            if (elements.endingType) {
+                elements.endingType.addEventListener('change', () => {
+                    [elements.endingScriptAgreed, elements.endingScriptRefused, 
+                     elements.endingScriptHostile].forEach(el => {
+                        if (el) el.classList.add('hidden');
+                    });
+                    
+                    if (elements.endingType.value === 'agreed' && elements.endingScriptAgreed) {
+                        elements.endingScriptAgreed.classList.remove('hidden');
+                    } else if (elements.endingType.value === 'refused' && elements.endingScriptRefused) {
+                        elements.endingScriptRefused.classList.remove('hidden');
+                    } else if (elements.endingType.value === 'hostile' && elements.endingScriptHostile) {
+                        elements.endingScriptHostile.classList.remove('hidden');
+                    }
+                    
+                    updateLog();
+                    showLogUpdateNotice();
+                });
+            }
+        }
+        
         function updateLog() {
             try {
-                logDebug('Updating log...');
-                
-                const collectorName = document.getElementById('collectorName').value;
-                const employeeId = document.getElementById('employeeId').value;
-                const companyName = document.getElementById('companyName').value;
-                const companyAddress = document.getElementById('companyAddress').value;
-                const supervisorName = document.getElementById('supervisorName').value;
-                const accountNumber = document.getElementById('accountNumber').value;
-                const collectorDemand = document.getElementById('collectorDemand').value;
-                const responseToRequest = document.getElementById('responseToRequest').value;
-                const collectorObjection = document.getElementById('collectorObjection').value;
-                const endingType = document.getElementById('endingType').value;
-                
-                logDebug(`Collector Name: "${collectorName}"`);
-                logDebug(`Employee ID: "${employeeId}"`);
-                
-                // Format the values for display
                 const formatValue = (value) => {
                     if (!value || value.trim() === '') return '[Not recorded yet]';
                     return value.trim();
@@ -1356,42 +1280,46 @@
                 };
                 
                 let endingScriptText = '';
-                if (endingType === 'agreed') endingScriptText = '"Thank you. I will watch for your mailing. Please note today\'s date and my request for the record."';
-                else if (endingType === 'refused') endingScriptText = '"Since you\'re unable to provide required commercial presentment in writing, nothing further can be honored on this call."';
-                else if (endingType === 'hostile') endingScriptText = '"Conversation no longer productive. Ending call after requesting commercial presentment in writing."';
+                if (elements.endingType.value === 'agreed') {
+                    endingScriptText = '"Thank you. I will watch for your mailing. Please note today\'s date and my request for the record."';
+                } else if (elements.endingType.value === 'refused') {
+                    endingScriptText = '"Since you\'re unable to provide required commercial presentment in writing, nothing further can be honored on this call."';
+                } else if (elements.endingType.value === 'hostile') {
+                    endingScriptText = '"Conversation no longer productive. Ending call after requesting commercial presentment in writing."';
+                }
                 
                 const logContent = `========================================
 EQUITY CALL LOG - WITHOUT PREJUDICE
 ========================================
-Date: ${document.getElementById('logDate').textContent}
-Time Started: ${document.getElementById('logStartTime').textContent}
-Call Reference: EQUITY-CALL-${callId}
-Call Duration: ${callTimer.textContent}
-Audio Recording: ${isRecording ? 'IN PROGRESS' : (audioBlob ? 'AVAILABLE' : 'NOT RECORDED')}
+Date: ${elements.logDate.textContent}
+Time Started: ${elements.logStartTime.textContent}
+Call Reference: EQUITY-CALL-${appState.callId}
+Call Duration: ${elements.callTimer.textContent}
+Audio Recording: ${appState.isRecording ? 'IN PROGRESS' : (appState.audioBlob ? 'AVAILABLE' : 'NOT RECORDED')}
 
 --------------------------------------------------------
 1. COLLECTOR INFORMATION:
 --------------------------------------------------------
-Name: ${formatValue(collectorName)}
-Employee ID: ${formatValue(employeeId)}
-Company: ${formatValue(companyName)}
-Address: ${formatValue(companyAddress)}
-Supervisor: ${formatValue(supervisorName)}
-Instrument #: ${formatValue(accountNumber)}
+Name: ${formatValue(elements.collectorName.value)}
+Employee ID: ${formatValue(elements.employeeId.value)}
+Company: ${formatValue(elements.companyName.value)}
+Address: ${formatValue(elements.companyAddress.value)}
+Supervisor: ${formatValue(elements.supervisorName.value)}
+Instrument #: ${formatValue(elements.accountNumber.value)}
 
 2. COLLECTOR'S DEMAND:
-${formatValue(collectorDemand)}
+${formatValue(elements.collectorDemand.value)}
 
 3. EQUITY REQUEST & RESPONSE:
 My Request: "Please provide written presentment for equitable settlement."
-Their Response: ${formatValue(responseToRequest)}
+Their Response: ${formatValue(elements.responseToRequest.value)}
 
 4. OBJECTIONS & EQUITY CLARIFICATION:
-Their Objection: ${formatValue(collectorObjection)}
+Their Objection: ${formatValue(elements.collectorObjection.value)}
 My Equity Response: "A presentment requires acceptance. I require proper written form to accept and honor equitably."
 
 5. CALL CONCLUSION:
-Ending Type: ${formatSelect(endingType)}
+Ending Type: ${formatSelect(elements.endingType.value)}
 My Closing: ${endingScriptText || '[Not specified yet]'}
 
 6. EQUITY PRINCIPLES INVOKED:
@@ -1405,170 +1333,187 @@ My Closing: ${endingScriptText || '[Not specified yet]'}
 END OF LOG
 ========================================`;
                 
-                const logOutput = document.getElementById('callLogOutput');
-                if (logOutput) {
-                    logOutput.textContent = logContent;
-                    logDebug('Log updated successfully in DOM');
-                } else {
-                    logDebug('ERROR: callLogOutput element not found!');
+                if (elements.callLogOutput) {
+                    elements.callLogOutput.textContent = logContent;
                 }
                 
             } catch (error) {
-                logDebug(`ERROR in updateLog: ${error.message}`);
                 console.error('Log update error:', error);
             }
         }
         
         function generateFinalLog() {
             updateLog();
-            const logText = document.getElementById('callLogOutput').textContent;
+            const logText = elements.callLogOutput.textContent;
             const blob = new Blob([logText], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `Equity-Call-Log-${callId}.txt`;
+            a.download = `Equity-Call-Log-${appState.callId}.txt`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
             
-            alert(`Log downloaded: ${a.download}`);
             logDebug(`Final log generated: ${a.download}`);
         }
         
         function copyLogToClipboard() {
             updateLog();
-            const logText = document.getElementById('callLogOutput').textContent;
+            const logText = elements.callLogOutput.textContent;
             navigator.clipboard.writeText(logText).then(() => {
-                const btn = document.querySelector('.log-actions .btn-outline');
-                const original = btn.innerHTML;
-                btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
-                btn.style.backgroundColor = '#2e7d32';
-                btn.style.color = 'white';
+                const original = elements.copyLogBtn.innerHTML;
+                elements.copyLogBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                elements.copyLogBtn.style.backgroundColor = '#2e7d32';
+                elements.copyLogBtn.style.color = 'white';
                 
-                // Show notification
                 showLogUpdateNotice();
                 
                 setTimeout(() => {
-                    btn.innerHTML = original;
-                    btn.style.backgroundColor = '';
-                    btn.style.color = '';
+                    elements.copyLogBtn.innerHTML = original;
+                    elements.copyLogBtn.style.backgroundColor = '';
+                    elements.copyLogBtn.style.color = '';
                 }, 2000);
-                
-                logDebug('Log copied to clipboard');
             }).catch(err => {
                 alert('Please copy the text manually.');
-                logDebug('Clipboard copy failed: ' + err.message);
             });
         }
         
         function resetSimulation() {
-            simulationActive = false;
-            currentStep = 1;
-            clearInterval(timerInterval);
-            callStatus.textContent = 'READY';
-            callStatus.style.color = '';
-            callTimer.textContent = '00:00';
-            currentStepDisplay.textContent = '1/4';
-            startBtn.disabled = false;
-            startBtn.innerHTML = '<i class="fas fa-play-circle"></i> Start Simulation';
-            nextBtn.disabled = true;
-            nextBtn.innerHTML = '<i class="fas fa-forward"></i> Next Step';
-            stepElements.forEach((step, index) => {
-                step.classList.add('hidden');
-                if (index === 0) step.classList.remove('hidden');
+            appState.simulationActive = false;
+            appState.currentStep = 1;
+            clearInterval(appState.timerInterval);
+            
+            elements.callStatus.textContent = 'READY';
+            elements.callStatus.style.color = '';
+            elements.callTimer.textContent = '00:00';
+            elements.currentStepDisplay.textContent = '1/4';
+            elements.startBtn.disabled = false;
+            elements.startBtn.innerHTML = '<i class="fas fa-play-circle"></i> Start Simulation';
+            elements.nextBtn.disabled = true;
+            elements.nextBtn.innerHTML = '<i class="fas fa-forward"></i> Next Step';
+            
+            // Show only step 1
+            [elements.step1, elements.step2, elements.step3, elements.step4].forEach((step, index) => {
+                if (step) {
+                    step.classList.add('hidden');
+                    if (index === 0) step.classList.remove('hidden');
+                }
             });
-            document.querySelectorAll('.input-field').forEach(input => {
-                if (input.type !== 'button') {
+            
+            // Clear all inputs
+            const allInputs = [
+                elements.collectorName, elements.employeeId, elements.companyName,
+                elements.companyAddress, elements.supervisorName, elements.accountNumber,
+                elements.collectorDemand, elements.responseToRequest, elements.collectorObjection
+            ];
+            
+            allInputs.forEach(input => {
+                if (input) {
                     input.value = '';
                     input.disabled = true;
                     input.style.backgroundColor = '#f5f5f5';
                 }
             });
-            document.querySelectorAll('[id^="endingScript"]').forEach(el => el.classList.add('hidden'));
-            document.getElementById('endingScriptAgreed').classList.remove('hidden');
-            document.getElementById('endingType').value = '';
-            callId = Math.floor(1000 + Math.random() * 9000);
-            document.getElementById('logCallId').textContent = callId;
             
-            // Re-attach event listeners
-            setupAutoLogUpdates();
+            if (elements.endingType) {
+                elements.endingType.value = '';
+                elements.endingType.disabled = true;
+                elements.endingType.style.backgroundColor = '#f5f5f5';
+            }
+            
+            // Reset ending scripts
+            [elements.endingScriptAgreed, elements.endingScriptRefused, 
+             elements.endingScriptHostile].forEach(el => {
+                if (el) el.classList.add('hidden');
+            });
+            
+            if (elements.endingScriptAgreed) {
+                elements.endingScriptAgreed.classList.remove('hidden');
+            }
+            
+            appState.callId = Math.floor(1000 + Math.random() * 9000);
+            if (elements.logCallId) {
+                elements.logCallId.textContent = appState.callId;
+            }
             
             updateLog();
-            
             logDebug('Simulation reset');
         }
         
+        function showLogUpdateNotice() {
+            if (elements.logUpdateNotice) {
+                elements.logUpdateNotice.style.display = 'block';
+                setTimeout(() => {
+                    elements.logUpdateNotice.style.display = 'none';
+                }, 2000);
+            }
+        }
+        
         function toggleQuickTips() {
-            alert(`EQUITY CALL TIPS:\n\n1. Stay calm & kind throughout\n2. Record everything (use the recorder above)\n3. Stay on script no matter what\n4. Focus on the process, not the person\n5. Know the principle behind each step\n6. End with honor and clarity\n7. Keep perfect records\n8. "Without prejudice" preserves all rights`);
+            alert(`EQUITY CALL TIPS:\n\n1. Stay calm & kind throughout\n2. Record everything\n3. Stay on script no matter what\n4. Focus on the process, not the person\n5. Know the principle behind each step\n6. End with honor and clarity\n7. Keep perfect records\n8. "Without prejudice" preserves all rights`);
+        }
+        
+        function toggleDebug() {
+            appState.showDebug = !appState.showDebug;
+            if (elements.debugInfo) {
+                elements.debugInfo.classList.toggle('active', appState.showDebug);
+            }
+            logDebug(`Debug mode ${appState.showDebug ? 'enabled' : 'disabled'}`);
         }
         
         function testLogUpdate() {
-            // Test function to verify log updates
-            logDebug('=== TEST LOG UPDATE ===');
-            
-            // Test getting values
-            const testName = document.getElementById('collectorName').value;
-            logDebug(`Test - collectorName value: "${testName}"`);
-            
-            // Force update
             updateLog();
-            
-            // Check if log was updated
-            const logText = document.getElementById('callLogOutput').textContent;
-            const hasTestName = logText.includes(testName || '[Not recorded yet]');
-            
-            alert(`Log Update Test:\n- collectorName value: "${testName}"\n- Log contains value: ${hasTestName ? 'YES ✓' : 'NO ✗'}\n\nCheck debug panel for details.`);
-            
+            alert(`Log Update Test Complete\n\nCall ID: ${appState.callId}\nCurrent Step: ${appState.currentStep}\nRecording: ${appState.isRecording ? 'Active' : 'Inactive'}`);
             showLogUpdateNotice();
         }
 
         // ==============================================
-        // INITIALIZATION - SIMPLIFIED & FIXED
+        // INITIALIZATION
         // ==============================================
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('DOM loaded, initializing...');
+            console.log('Equity Call Simulator Initializing...');
             
             // Set initial log info
-            document.getElementById('logCallId').textContent = callId;
             const now = new Date();
-            document.getElementById('logDate').textContent = now.toLocaleDateString('en-US', { 
-                weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
-            });
-            document.getElementById('logStartTime').textContent = now.toLocaleTimeString('en-US');
+            if (elements.logCallId) elements.logCallId.textContent = appState.callId;
+            if (elements.logDate) {
+                elements.logDate.textContent = now.toLocaleDateString('en-US', { 
+                    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
+                });
+            }
+            if (elements.logStartTime) {
+                elements.logStartTime.textContent = now.toLocaleTimeString('en-US');
+            }
             
             // Initialize audio recording
             initAudioRecording();
             
-            // Set up event listeners immediately (even on disabled inputs)
-            setupAutoLogUpdates();
+            // Set up control button listeners
+            if (elements.startBtn) elements.startBtn.addEventListener('click', startSimulation);
+            if (elements.nextBtn) elements.nextBtn.addEventListener('click', nextStep);
+            if (elements.resetBtn) elements.resetBtn.addEventListener('click', resetSimulation);
+            if (elements.tipsBtn) elements.tipsBtn.addEventListener('click', toggleQuickTips);
+            if (elements.debugBtn) elements.debugBtn.addEventListener('click', toggleDebug);
+            if (elements.testBtn) elements.testBtn.addEventListener('click', testLogUpdate);
+            if (elements.updateLogBtn) elements.updateLogBtn.addEventListener('click', updateLog);
+            if (elements.generateLogBtn) elements.generateLogBtn.addEventListener('click', generateFinalLog);
+            if (elements.copyLogBtn) elements.copyLogBtn.addEventListener('click', copyLogToClipboard);
             
-            // Initial log update
-            updateLog();
-            
-            // Add event listeners to update log buttons
-            document.getElementById('updateLogBtn').addEventListener('click', function() {
-                updateLog();
-                showLogUpdateNotice();
-            });
-            
-            // Prevent accidental tab/window close during recording
+            // Prevent accidental close during recording
             window.addEventListener('beforeunload', (e) => {
-                if (isRecording) {
+                if (appState.isRecording) {
                     e.preventDefault();
                     e.returnValue = 'You are currently recording. Are you sure you want to leave?';
                     return e.returnValue;
                 }
             });
             
-            console.log('Application fully initialized');
-            logDebug('Application fully initialized');
+            // Initial log update
+            updateLog();
             
-            // Force a test update to show it's working
-            setTimeout(() => {
-                updateLog();
-                logDebug('Initial log update completed');
-            }, 500);
+            console.log('Equity Call Simulator Ready');
+            logDebug('Application fully initialized');
         });
     </script>
 </body>
