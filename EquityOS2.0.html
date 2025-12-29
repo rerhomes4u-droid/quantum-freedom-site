@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EQUITYOS v2.0 | Sovereign Equity Operating System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --primary: #1a365d;
+            --secondary: #2d3748;
+            --accent: #d69e2e;
+            --success: #38a169;
+            --warning: #dd6b20;
+            --danger: #e53e3e;
+            --light: #f7fafc;
+            --dark: #1a202c;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: var(--light);
+            min-height: 100vh;
+        }
+        
+        .equity-font {
+            font-family: 'Libre Baskerville', serif;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .card-glass {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+        
+        .document-preview {
+            font-family: 'Courier New', monospace;
+            background: #1e293b;
+            border-left: 4px solid var(--accent);
+        }
+        
+        .ai-response {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+        
+        .spiritual-highlight {
+            background: linear-gradient(120deg, rgba(214, 158, 46, 0.2) 0%, transparent 100%);
+            border-left: 3px solid var(--accent);
+        }
+        
+        .success-glow {
+            box-shadow: 0 0 20px rgba(56, 161, 105, 0.3);
+        }
+    </style>
+</head>
+<body x-data="equityOS()" x-init="init()">
+    <!-- Main Container -->
+    <div class="min-h-screen p-4 md:p-6">
+        
+        <!-- Header -->
+        <header class="mb-8">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <h1 class="text-3xl md:text-4xl font-bold equity-font gradient-text bg-gradient-to-r from-yellow-300 to-yellow-500 bg-clip-text text-transparent">
+                        <i class="fas fa-scale-balanced mr-3"></i>EQUITYOS v2.0
+                    </h1>
+                    <p class="text-gray-400 mt-2">Sovereign Equity Operating System • Spiritual-Legal AI Co-Pilot</p>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="relative group">
+                        <button @click="showSpiritualPanel = !showSpiritualPanel" class="px-4 py-2 rounded-lg bg-yellow-900/30 hover:bg-yellow-800/40 transition border border-yellow-700/50 flex items-center">
+                            <i class="fas fa-praying-hands mr-2"></i> Spiritual Warfare
+                        </button>
+                        <div x-show="showSpiritualPanel" @click.away="showSpiritualPanel = false" class="absolute right-0 mt-2 w-64 card-glass p-4 z-50 hidden" x-transition>
+                            <p class="text-sm mb-2"><strong>Doubt Detected:</strong> <span x-text="doubtLevel"></span></p>
+                            <div class="h-2 bg-gray-700 rounded mb-3">
+                                <div class="h-full bg-red-500 rounded" :style="'width: ' + doubtLevel.replace('%', '') + '%'"></div>
+                            </div>
+                            <button @click="rebukeDoubt()" class="w-full px-3 py-2 bg-red-900/40 hover:bg-red-800/50 rounded text-sm">
+                                <i class="fas fa-cross mr-1"></i> Rebuke Doubt
+                            </button>
+                        </div>
+                    </div>
+                    <button @click="showSuccessStories = true" class="px-4 py-2 rounded-lg bg-green-900/30 hover:bg-green-800/40 transition border border-green-700/50">
+                        <i class="fas fa-trophy mr-2"></i> Success Stories
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Navigation -->
+            <div class="flex flex-wrap gap-2 mt-6">
+                <button @click="activeTab = 'nnin'" :class="activeTab === 'nnin' ? 'bg-blue-900/50 border-blue-500' : 'bg-gray-900/30 border-gray-700'" class="px-4 py-2 rounded-lg border transition flex items-center">
+                    <i class="fas fa-file-invoice mr-2"></i> NNIN Quantum Builder
+                </button>
+                <button @click="activeTab = 'court'" :class="activeTab === 'court' ? 'bg-blue-900/50 border-blue-500' : 'bg-gray-900/30 border-gray-700'" class="px-4 py-2 rounded-lg border transition flex items-center">
+                    <i class="fas fa-gavel mr-2"></i> Court Script Simulator
+                </button>
+                <button @click="activeTab = 'rescission'" :class="activeTab === 'rescission' ? 'bg-blue-900/50 border-blue-500' : 'bg-gray-900/30 border-gray-700'" class="px-4 py-2 rounded-lg border transition flex items-center">
+                    <i class="fas fa-file-contract mr-2"></i> Rescission Intelligence
+                </button>
+                <button @click="activeTab = 'sovereign'" :class="activeTab === 'sovereign' ? 'bg-blue-900/50 border-blue-500' : 'bg-gray-900/30 border-gray-700'" class="px-4 py-2 rounded-lg border transition flex items-center">
+                    <i class="fas fa-user-shield mr-2"></i> Sovereign Identity
+                </button>
+                <button @click="activeTab = 'community'" :class="activeTab === 'community' ? 'bg-blue-900/50 border-blue-500' : 'bg-gray-900/30 border-gray-700'" class="px-4 py-2 rounded-lg border transition flex items-center">
+                    <i class="fas fa-users mr-2"></i> Community
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Left Panel: Current Module -->
+            <div class="lg:col-span-2">
+                
+                <!-- NNIN Quantum Builder -->
+                <div x-show="activeTab === 'nnin'" class="card-glass p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold"><i class="fas fa-brain mr-2"></i>NNIN Quantum Builder</h2>
+                        <div class="flex items-center text-sm">
+                            <span class="mr-3">Effectiveness Score:</span>
+                            <div class="px-3 py-1 rounded-full bg-green-900/40 border border-green-700">
+                                <span x-text="nninScore" class="font-bold"></span>/10
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Input Section -->
+                        <div>
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-2">Case Type</label>
+                                <select x-model="caseType" @change="generateQuestions()" class="w-full bg-gray-900/50 border border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-yellow-500">
+                                    <option value="credit_card">Credit Card Debt</option>
+                                    <option value="irs">IRS/Tax</option>
+                                    <option value="traffic">Traffic Court</option>
+                                    <option value="employer">Employer W-8BEN</option>
+                                    <option value="property_tax">Property Tax</option>
+                                    <option value="bond">Court Bonds</option>
+                                </select>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-2">Specific Issue</label>
+                                <textarea x-model="specificIssue" @input="generateQuestions()" rows="3" class="w-full bg-gray-900/50 border border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-yellow-500" placeholder="E.g., 'Bank says I must pay by check only, violates public policy...'"></textarea>
+                            </div>
+                            
+                            <div class="mb-6">
+                                <label class="block text-sm font-medium mb-2">Jurisdiction</label>
+                                <div class="flex flex-wrap gap-2">
+                                    <template x-for="juris in jurisdictions">
+                                        <button @click="toggleJurisdiction(juris)" :class="selectedJurisdictions.includes(juris) ? 'bg-yellow-900/50 border-yellow-600' : 'bg-gray-900/30 border-gray-700'" class="px-3 py-1 rounded border transition text-sm">
+                                            <span x-text="juris"></span>
+                                        </button>
+                                    </template>
+                                </div>
+                            </div>
+                            
+                            <div class="spiritual-highlight p-4 rounded-lg mb-6">
+                                <div class="flex items-center mb-2">
+                                    <i class="fas fa-cross text-yellow-400 mr-2"></i>
+                                    <span class="font-medium">Spiritual Guidance</span>
+                                </div>
+                                <p class="text-sm" x-text="spiritualGuidance"></p>
+                            </div>
+                        </div>
+                        
+                        <!-- Generated Questions -->
+                        <div>
+                            <h3 class="font-bold mb-3">Conscience-Piercing Questions</h3>
+                            <div class="space-y-3">
+                                <template x-for="(question, index) in generatedQuestions" :key="index">
+                                    <div class="document-preview p-4 rounded">
+                                        <div class="flex justify-between items-start mb-2">
+                                            <span class="text-xs text-gray-400">Question <span x-text="index + 1"></span></span>
+                                            <div class="flex items-center">
+                                                <span class="text-xs px-2 py-1 rounded mr-2" :class="getQuestionScoreClass(question.score)" x-text="question.score + '/10'"></span>
+                                                <button @click="removeQuestion(index)" class="text-red-400 hover:text-red-300">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <p x-text="question.text" class="text-sm"></p>
+                                        <div class="mt-2 text-xs text-gray-500">
+                                            <span x-text="question.maxim"></span>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                            
+                            <div class="mt-6">
+                                <div class="flex items-center justify-between mb-3">
+                                    <span class="text-sm">Question Count: <span x-text="generatedQuestions.length" class="font-bold"></span>/5 max</span>
+                                    <span class="text-sm" :class="generatedQuestions.length > 5 ? 'text-red-400' : 'text-green-400'">
+                                        <template x-if="generatedQuestions.length > 5">❌ Too many questions!</template>
+                                        <template x-if="generatedQuestions.length <= 5">✓ Optimal</template>
+                                    </span>
+                                </div>
+                                
+                                <button @click="generateMoreQuestions()" :disabled="generatedQuestions.length >= 10" class="w-full px-4 py-3 bg-gray-800/50 hover:bg-gray-700/50 border border-gray-700 rounded-lg transition mb-4">
+                                    <i class="fas fa-robot mr-2"></i>AI Generate More Questions
+                                </button>
+                                
+                                <button @click="downloadNNIN()" class="w-full px-4 py-3 bg-yellow-900/50 hover:bg-yellow-800/50 border border-yellow-700 rounded-lg transition font-medium">
+                                    <i class="fas fa-download mr-2"></i>Download NNIN Document
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Court Script Simulator -->
+                <div x-show="activeTab === 'court'" class="card-glass p-6">
+                    <h2 class="text-2xl font-bold mb-6"><i class="fas fa-gavel mr-2"></i>Court Script Simulator</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <!-- Scenario Selector -->
+                        <div>
+                            <h3 class="font-bold mb-4">Select Scenario</h3>
+                            <div class="space-y-2">
+                                <button @click="selectScenario('bond')" :class="activeScenario === 'bond' ? 'bg-yellow-900/50 border-yellow-600' : 'bg-gray-900/30 border-gray-700'" class="w-full text-left p-3 rounded border transition">
+                                    <div class="font-medium">Judge Asks About Bonds</div>
+                                    <div class="text-xs text-gray-400 mt-1">"What will you do with the bonds?"</div>
+                                </button>
+                                <button @click="selectScenario('benefit')" :class="activeScenario === 'benefit' ? 'bg-yellow-900/50 border-yellow-600' : 'bg-gray-900/30 border-gray-700'" class="w-full text-left p-3 rounded border transition">
+                                    <div class="font-medium">Received Benefit Challenge</div>
+                                    <div class="text-xs text-gray-400 mt-1">"You received benefit from the contract!"</div>
+                                </button>
+                                <button @click="selectScenario('opca')" :class="activeScenario === 'opca' ? 'bg-yellow-900/50 border-yellow-600' : 'bg-gray-900/30 border-gray-700'" class="w-full text-left p-3 rounded border transition">
+                                    <div class="font-medium">OPCA/Sovereign Citizen Accusation</div>
+                                    <div class="text-xs text-gray-400 mt-1">"This looks like debt elimination scheme!"</div>
+                                </button>
+                            </div>
+                            
+                            <div class="mt-6">
+                                <h4 class="font-bold mb-3">Practice Mode</h4>
+                                <button @click="startPractice()" class="w-full px-4 py-3 bg-blue-900/50 hover:bg-blue-800/50 border border-blue-700 rounded-lg transition">
+                                    <i class="fas fa-microphone mr-2"></i>Start Voice Practice
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Dialogue Display -->
+                        <div class="md:col-span-2">
+                            <div class="bg-gray-900/50 rounded-lg p-4 h-64 overflow-y-auto mb-4">
+                                <template x-for="(msg, index) in courtDialogue" :key="index">
+                                    <div class="mb-3" :class="msg.role === 'judge' ? 'text-blue-300' : 'text-yellow-300'">
+                                        <div class="font-medium mb-1">
+                                            <template x-if="msg.role === 'judge'">👨‍⚖️ Judge:</template>
+                                            <template x-if="msg.role === 'you'">⚖️ You:</template>
+                                        </div>
+                                        <div x-text="msg.text" class="text-sm"></div>
+                                        <div x-show="msg.score" class="text-xs mt-1" :class="msg.score >= 8 ? 'text-green-400' : 'text-yellow-400'">
+                                            AI Score: <span x-text="msg.score"></span>/10
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                            
+                            <!-- Response Options -->
+                            <div class="mb-4">
+                                <h4 class="font-bold mb-2">Your Response Options:</h4>
+                                <div class="space-y-2">
+                                    <template x-for="(option, index) in responseOptions" :key="index">
+                                        <button @click="selectResponse(option)" class="w-full text-left p-3 bg-gray-900/30 hover:bg-gray-800/50 border border-gray-700 rounded transition">
+                                            <div x-text="option.text" class="text-sm"></div>
+                                            <div class="text-xs text-gray-400 mt-1" x-text="option.strategy"></div>
+                                        </button>
+                                    </template>
+                                </div>
+                            </div>
+                            
+                            <!-- Custom Response -->
+                            <div>
+                                <textarea x-model="customResponse" rows="2" class="w-full bg-gray-900/50 border border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:border-yellow-500 mb-2" placeholder="Or craft your own response..."></textarea>
+                                <button @click="submitCustomResponse()" class="px-4 py-2 bg-green-900/50 hover:bg-green-800/50 border border-green-700 rounded-lg transition">
+                                    Submit Response
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Rescission Intelligence -->
+                <div x-show="activeTab === 'rescission'" class="card-glass p-6">
+                    <h2 class="text-2xl font-bold mb-6"><i class="fas fa-file-contract mr-2"></i>Rescission Intelligence</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Document Upload/Analysis -->
+                        <div>
+                            <div class="border-2 border-dashed border-gray-700 rounded-lg p-6 text-center mb-6">
+                                <i class="fas fa-file-upload text-3xl text-gray-500 mb-3"></i>
+                                <p class="text-sm text-gray-400 mb-3">Upload contract/document for analysis</p>
+                                <button @click="simulateUpload()" class="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg transition">
+                                    Upload Document
+                                </button>
+                            </div>
+                            
+                            <div class="spiritual-highlight p-4 rounded-lg">
+                                <h4 class="font-bold mb-2">Rescission Strategy</h4>
+                                <p class="text-sm mb-3" x-text="rescissionStrategy"></p>
+                                <div class="text-xs text-gray-400">
+                                    <div class="flex items-center mb-1">
+                                        <i class="fas fa-check-circle text-green-400 mr-2"></i>
+                                        <span>Public Policy Violation Detected</span>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <i class="fas fa-check-circle text-green-400 mr-2"></i>
+                                        <span>Signature Found - Eligible for Rescission</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Recommendations -->
+                        <div>
+                            <h3 class="font-bold mb-4">AI Recommendations</h3>
+                            
+                            <div class="mb-6">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="font-medium">Pages to Rescind</span>
+                                    <span class="text-sm px-2 py-1 bg-blue-900/40 rounded">AI Suggests</span>
+                                </div>
+                                <div class="flex flex-wrap gap-2">
+                                    <button @click="togglePage(page)" :class="selectedPages.includes(page) ? 'bg-yellow-900/50 border-yellow-600' : 'bg-gray-900/30 border-gray-700'" class="px-3 py-1 rounded border transition text-sm" x-text="'Page ' + page" :key="page" x-for="page in [1,2,3,4,5,6,7,8,9,10]"></button>
+                                </div>
+                                <p class="text-xs text-gray-400 mt-3">AI Analysis: <span x-text="pageAnalysis"></span></p>
+                            </div>
+                            
+                            <div class="mb-6">
+                                <h4 class="font-medium mb-2">Recipients</h4>
+                                <div class="space-y-2">
+                                    <template x-for="recipient in recipients">
+                                        <div class="flex items-center justify-between p-2 bg-gray-900/30 rounded">
+                                            <span x-text="recipient.name" class="text-sm"></span>
+                                            <span class="text-xs px-2 py-1 rounded" :class="recipient.required ? 'bg-red-900/40' : 'bg-gray-800'">
+                                                <template x-if="recipient.required">Required</template>
+                                                <template x-if="!recipient.required">Optional</template>
+                                            </span>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                            
+                            <button @click="generateRescission()" class="w-full px-4 py-3 bg-yellow-900/50 hover:bg-yellow-800/50 border border-yellow-700 rounded-lg transition font-medium">
+                                <i class="fas fa-file-pdf mr-2"></i>Generate Rescission Document
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sovereign Identity -->
+                <div x-show="activeTab === 'sovereign'" class="card-glass p-6">
+                    <h2 class="text-2xl font-bold mb-6"><i class="fas fa-user-shield mr-2"></i>Sovereign Identity Manager</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <!-- Persona Manager -->
+                        <div class="md:col-span-2">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="font-bold">Active Personas</h3>
+                                <span class="text-xs px-3 py-1 bg-blue-900/40 rounded">BOI Deadline: Jan 1, 2025</span>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                                <div @click="setActivePersona('private')" :class="activePersona === 'private' ? 'success-glow border-yellow-500' : 'border-gray-700'" class="border rounded-lg p-4 transition cursor-pointer">
+                                    <div class="flex items-center mb-2">
+                                        <div class="w-8 h-8 rounded-full bg-yellow-900/50 flex items-center justify-center mr-3">
+                                            <i class="fas fa-user text-yellow-400"></i>
+                                        </div>
+                                        <div>
+                                            <div class="font-bold">Private Living Being</div>
+                                            <div class="text-xs text-gray-400">Sovereign, Natural Person</div>
+                                        </div>
+                                    </div>
+                                    <div class="text-xs text-gray-400">
+                                        <div class="mb-1">• No SSN/TIN required</div>
+                                        <div class="mb-1">• W-8BEN eligible</div>
+                                        <div>• Trust beneficiary</div>
+                                    </div>
+                                </div>
+                                
+                                <div @click="setActivePersona('trust')" :class="activePersona === 'trust' ? 'success-glow border-yellow-500' : 'border-gray-700'" class="border rounded-lg p-4 transition cursor-pointer">
+                                    <div class="flex items-center mb-2">
+                                        <div class="w-8 h-8 rounded-full bg-green-900/50 flex items-center justify-center mr-3">
+                                            <i class="fas fa-landmark text-green-400"></i>
+                                        </div>
+                                        <div>
+                                            <div class="font-bold">Equity Trust</div>
+                                            <div class="text-xs text-gray-400">BOI Exempt Structure</div>
+                                        </div>
+                                    </div>
+                                    <div class="text-xs text-gray-400">
+                                        <div class="mb-1">• No state registration</div>
+                                        <div class="mb-1">• Privacy protected</div>
+                                        <div>• Controls LLCs/assets</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-red-900/20 border border-red-800 rounded-lg p-4 mb-6">
+                                <div class="flex items-center mb-2">
+                                    <i class="fas fa-exclamation-triangle text-red-400 mr-2"></i>
+                                    <span class="font-bold">BOI Compliance Alert</span>
+                                </div>
+                                <p class="text-sm mb-3">Your current LLC structure requires BOI reporting by Jan 1, 2025. Consider migrating to Equity Trust.</p>
+                                <button @click="showTrustMigration = true" class="px-4 py-2 bg-red-900/40 hover:bg-red-800/50 rounded-lg transition">
+                                    Start Trust Migration
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Document Generator -->
+                        <div>
+                            <h3 class="font-bold mb-4">Document Generator</h3>
+                            <div class="space-y-3">
+                                <button @click="generateDocument('w8ben')" class="w-full text-left p-3 bg-gray-900/30 hover:bg-gray-800/50 border border-gray-700 rounded transition">
+                                    <div class="font-medium">W-8BEN Form</div>
+                                    <div class="text-xs text-gray-400">For employer withholding</div>
+                                </button>
+                                <button @click="generateDocument('notice')" class="w-full text-left p-3 bg-gray-900/30 hover:bg-gray-800/50 border border-gray-700 rounded transition">
+                                    <div class="font-medium">Restructuring Notice</div>
+                                    <div class="text-xs text-gray-400">"Taking January off to restructure"</div>
+                                </button>
+                                <button @click="generateDocument('trust')" class="w-full text-left p-3 bg-gray-900/30 hover:bg-gray-800/50 border border-gray-700 rounded transition">
+                                    <div class="font-medium">Trust Indenture</div>
+                                    <div class="text-xs text-gray-400">(After completing Trust Class)</div>
+                                </button>
+                            </div>
+                            
+                            <div class="mt-6 p-4 bg-gray-900/30 rounded-lg">
+                                <h4 class="font-bold mb-2">Active Persona Settings</h4>
+                                <div class="text-sm space-y-2">
+                                    <div class="flex justify-between">
+                                        <span>Document Prefix:</span>
+                                        <span x-text="personaSettings.prefix" class="font-mono"></span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>Signature Style:</span>
+                                        <span x-text="personaSettings.signature" class="font-mono"></span>
+                                    </div>
+                                    <div class="flex justify-between">
+                                        <span>Without Prejudice:</span>
+                                        <span x-text="personaSettings.withoutPrejudice ? 'Yes' : 'No'" :class="personaSettings.withoutPrejudice ? 'text-green-400' : 'text-gray-400'"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Community -->
+                <div x-show="activeTab === 'community'" class="card-glass p-6">
+                    <h2 class="text-2xl font-bold mb-6"><i class="fas fa-users mr-2"></i>Community & Practice</h2>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Practice Sessions -->
+                        <div>
+                            <h3 class="font-bold mb-4">Upcoming Practice Sessions</h3>
+                            <div class="space-y-4">
+                                <div class="border border-gray-700 rounded-lg p-4">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <div>
+                                            <div class="font-bold">Court Script Role-Play</div>
+                                            <div class="text-sm text-gray-400">Today, 6 PM Central</div>
+                                        </div>
+                                        <span class="px-2 py-1 bg-green-900/40 rounded text-xs">3 spots left</span>
+                                    </div>
+                                    <p class="text-sm mb-3">Practice bonds dialogue with experienced members</p>
+                                    <button @click="joinSession()" class="px-4 py-2 bg-blue-900/50 hover:bg-blue-800/50 rounded-lg transition text-sm">
+                                        Join Session
+                                    </button>
+                                </div>
+                                
+                                <div class="border border-gray-700 rounded-lg p-4">
+                                    <div class="flex justify-between items-start mb-2">
+                                        <div>
+                                            <div class="font-bold">W-8BEN Employer Strategies</div>
+                                            <div class="text-sm text-gray-400">Tomorrow, 1 PM EST</div>
+                                        </div>
+                                        <span class="px-2 py-1 bg-yellow-900/40 rounded text-xs">Newbies welcome</span>
+                                    </div>
+                                    <p class="text-sm mb-3">Share success stories and persistence techniques</p>
+                                    <button @click="joinSession()" class="px-4 py-2 bg-blue-900/50 hover:bg-blue-800/50 rounded-lg transition text-sm">
+                                        Join Session
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-6">
+                                <h4 class="font-bold mb-3">Schedule Your Own</h4>
+                                <button @click="scheduleSession()" class="w-full px-4 py-3 bg-gray-800 hover:bg-gray-700 rounded-lg transition">
+                                    <i class="fas fa-calendar-plus mr-2"></i>Schedule Practice Session
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Success Stories -->
+                        <div>
+                            <h3 class="font-bold mb-4">Recent Success Stories</h3>
+                            <div class="space-y-4 max-h-96 overflow-y-auto pr-2">
+                                <template x-for="story in successStories" :key="story.id">
+                                    <div class="border border-gray-700 rounded-lg p-4">
+                                        <div class="flex items-center mb-2">
+                                            <div class="w-8 h-8 rounded-full bg-green-900/50 flex items-center justify-center mr-3">
+                                                <i class="fas fa-trophy text-green-400"></i>
+                                            </div>
+                                            <div>
+                                                <div class="font-bold" x-text="story.title"></div>
+                                                <div class="text-xs text-gray-400" x-text="story.date"></div>
+                                            </div>
+                                        </div>
+                                        <p class="text-sm mb-3" x-text="story.description"></p>
+                                        <div class="flex flex-wrap gap-2">
+                                            <span class="px-2 py-1 bg-gray-800 rounded text-xs" x-text="story.type"></span>
+                                            <span class="px-2 py-1 bg-gray-800 rounded text-xs" x-text="story.jurisdiction"></span>
+                                            <span class="px-2 py-1 bg-green-900/40 rounded text-xs" x-text="story.duration"></span>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                            
+                            <div class="mt-6 p-4 bg-gray-900/30 rounded-lg">
+                                <h4 class="font-bold mb-2">Encouragement Feed</h4>
+                                <p class="text-sm mb-3" x-text="encouragementMessage"></p>
+                                <button @click="refreshEncouragement()" class="text-sm text-yellow-400 hover:text-yellow-300">
+                                    <i class="fas fa-sync-alt mr-1"></i>New Encouragement
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Right Panel: AI Co-Pilot & Status -->
+            <div class="lg:col-span-1">
+                <div class="card-glass p-6 h-full">
+                    <div class="flex items-center mb-6">
+                        <div class="w-12 h-12 rounded-full gradient-bg flex items-center justify-center mr-4">
+                            <i class="fas fa-robot text-2xl"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-xl font-bold">EQUITY AI Co-Pilot</h2>
+                            <p class="text-sm text-gray-400">Spiritual-Legal Assistant</p>
+                        </div>
+                    </div>
+                    
+                    <!-- AI Status -->
+                    <div class="mb-6 p-4 bg-gray-900/30 rounded-lg">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm">Current Analysis:</span>
+                            <span class="text-xs px-2 py-1 rounded" :class="aiStatus.color" x-text="aiStatus.text"></span>
+                        </div>
+                        <p class="text-sm" x-text="aiStatus.message"></p>
+                    </div>
+                    
+                    <!-- Black's Law Lookup -->
+                    <div class="mb-6">
+                        <h3 class="font-bold mb-3 flex items-center">
+                            <i class="fas fa-book mr-2"></i>Black's Law Lookup
+                        </h3>
+                        <input x-model="lawTerm" @input="lookupLawTerm()" type="text" class="w-full bg-gray-900/50 border border-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:border-yellow-500 mb-3" placeholder="Type a legal term...">
+                        
+                        <div x-show="lawDefinition" class="p-3 bg-gray-900/50 rounded">
+                            <div class="font-medium mb-1" x-text="lawTerm"></div>
+                            <div class="text-sm" x-text="lawDefinition"></div>
+                            <div class="text-xs text-gray-400 mt-2">Equity Application: <span x-text="equityApplication"></span></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Actions -->
+                    <div class="mb-6">
+                        <h3 class="font-bold mb-3">Quick Actions</h3>
+                        <div class="grid grid-cols-2 gap-3">
+                            <button @click="quickAction('public_policy')" class="p-3 bg-gray-900/30 hover:bg-gray-800/50 border border-gray-700 rounded transition text-sm">
+                                <i class="fas fa-gavel mr-1"></i>Public Policy Check
+                            </button>
+                            <button @click="quickAction('doubt_check')" class="p-3 bg-gray-900/30 hover:bg-gray-800/50 border border-gray-700 rounded transition text-sm">
+                                <i class="fas fa-brain mr-1"></i>Doubt Check
+                            </button>
+                            <button @click="quickAction('maxim')" class="p-3 bg-gray-900/30 hover:bg-gray-800/50 border border-gray-700 rounded transition text-sm">
+                                <i class="fas fa-balance-scale mr-1"></i>Equity Maxim
+                            </button>
+                            <button @click="quickAction('scripture')" class="p-3 bg-gray-900/30 hover:bg-gray-800/50 border border-gray-700 rounded transition text-sm">
+                                <i class="fas fa-bible mr-1"></i>Scripture
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Progress -->
+                    <div>
+                        <h3 class="font-bold mb-3">Sovereignty Progress</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span>Spiritual Warfare</span>
+                                    <span x-text="spiritualProgress + '%'"></span>
+                                </div>
+                                <div class="h-2 bg-gray-700 rounded">
+                                    <div class="h-full bg-yellow-500 rounded" :style="'width: ' + spiritualProgress + '%'"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span>Legal Proficiency</span>
+                                    <span x-text="legalProgress + '%'"></span>
+                                </div>
+                                <div class="h-2 bg-gray-700 rounded">
+                                    <div class="h-full bg-blue-500 rounded" :style="'width: ' + legalProgress + '%'"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm mb-1">
+                                    <span>Community Support</span>
+                                    <span x-text="communityProgress + '%'"></span>
+                                </div>
+                                <div class="h-2 bg-gray-700 rounded">
+                                    <div class="h-full bg-green-500 rounded" :style="'width: ' + communityProgress + '%'"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Success Stories Modal -->
+        <div x-show="showSuccessStories" class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4" @click.away="showSuccessStories = false">
+            <div class="card-glass max-w-4xl max-h-[90vh] overflow-y-auto p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold">Success Stories</h2>
+                    <button @click="showSuccessStories = false" class="text-2xl">&times;</button>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <template x-for="story in detailedSuccessStories" :key="story.id">
+                        <div class="border border-gray-700 rounded-lg p-4">
+                            <div class="flex items-center mb-3">
+                                <div class="w-10 h-10 rounded-full bg-green-900/50 flex items-center justify-center mr-3">
+                                    <i class="fas fa-star text-green-400"></i>
+                                </div>
+                                <div>
+                                    <div class="font-bold" x-text="story.title"></div>
+                                    <div class="text-xs text-gray-400" x-text="story.user"></div>
+                                </div>
+                            </div>
+                            <p class="text-sm mb-4" x-text="story.fullStory"></p>
+                            <div class="text-xs text-gray-500">
+                                Key Victory: <span x-text="story.keyVictory" class="text-green-400"></span>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </div>
+
+        <!-- Trust Migration Modal -->
+        <div x-show="showTrustMigration" class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4" @click.away="showTrustMigration = false">
+            <div class="card-glass max-w-2xl p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold">Trust Migration Assistant</h2>
+                    <button @click="showTrustMigration = false" class="text-2xl">&times;</button>
+                </div>
+                
+                <div class="mb-6">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="font-bold">BOI Compliance Countdown</h3>
+                        <div class="px-3 py-1 bg-red-900/40 rounded">
+                            <span x-text="boiCountdown"></span> days until Jan 1, 2025
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div class="p-4 bg-gray-900/30 rounded">
+                            <div class="font-medium mb-2">Step 1: Create Equity Trust</div>
+                            <p class="text-sm mb-3">(Available after completing Trust Class in January)</p>
+                            <div class="text-xs text-gray-400">• Private, non-registered trust structure</div>
+                        </div>
+                        
+                        <div class="p-4 bg-gray-900/30 rounded">
+                            <div class="font-medium mb-2">Step 2: Transfer Assets</div>
+                            <p class="text-sm mb-3">Assign LLC membership to trust as beneficiary</p>
+                            <div class="text-xs text-gray-400">• Maintain control without ownership</div>
+                        </div>
+                        
+                        <div class="p-4 bg-gray-900/30 rounded">
+                            <div class="font-medium mb-2">Step 3: Issue Restructuring Notice</div>
+                            <p class="text-sm">Notify clients/customers of temporary closure</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <button @click="startMigration()" class="w-full px-4 py-3 bg-yellow-900/50 hover:bg-yellow-800/50 border border-yellow-700 rounded-lg transition font-medium">
+                    <i class="fas fa-sync-alt mr-2"></i>Begin Migration Process
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alpine.js Data & Logic -->
+    <script>
+        function equityOS() {
+            return {
+                // State
+                activeTab: 'nnin',
+                showSpiritualPanel: false,
+                showSuccessStories: false,
+                showTrustMigration: false,
+                
+                // NNIN Builder
+                caseType: 'credit_card',
+                specificIssue: 'Bank requires payment only by check or money order',
+                selectedJurisdictions: ['UCC'],
+                jurisdictions: ['UCC', 'PPSA', 'Florida', 'UK', 'Australia', 'Canada'],
+                generatedQuestions: [],
+                nninScore: 7,
+                spiritualGuidance: 'Remember: Payment terms that restrict form of payment violate public policy. Stand firm.',
+                
+                // Court Simulator
+                activeScenario: 'bond',
+                courtDialogue: [],
+                responseOptions: [],
+                customResponse: '',
+                
+                // Rescission
+                selectedPages: [1, 10],
+                rescissionStrategy: 'Rescind entire contract as payment terms violate public policy. Your acceptance already fulfilled obligation.',
+                pageAnalysis: 'First and last page recommended for lengthy documents',
+                recipients: [
+                    { name: 'Synchrony Bank Legal Dept', required: true },
+                    { name: 'Also Noticed: Law Society', required: false },
+                    { name: 'Also Noticed: State Bar', required: false }
+                ],
+                
+                // Sovereign Identity
+                activePersona: 'private',
+                personaSettings: {
+                    prefix: 'Without Prejudice',
+                    signature: 'By: Private Living Being',
+                    withoutPrejudice: true
+                },
+                
+                // Community
+                successStories: [],
+                encouragementMessage: 'He who leaves the battlefield first loses. Persistence is victory.',
+                
+                // AI Co-Pilot
+                aiStatus: {
+                    text: 'Analyzing NNIN',
+                    color: 'bg-blue-900/40',
+                    message: 'Your questions show good understanding of public policy violations.'
+                },
+                lawTerm: '',
+                lawDefinition: '',
+                equityApplication: '',
+                
+                // Progress
+                doubtLevel: '30%',
+                spiritualProgress: 65,
+                legalProgress: 80,
+                communityProgress: 45,
+                
+                // Data
+                detailedSuccessStories: [
+                    {
+                        id: 1,
+                        title: 'IRS Debt Discharged',
+                        user: 'Margaret & Julian',
+                        fullStory: 'Discharged $28,000 IRS debt using notices of repentance and acceptance. Received "No further action needed" letter.',
+                        keyVictory: 'Public policy violation on withholding requirements'
+                    },
+                    {
+                        id: 2,
+                        title: 'Credit Card Judgement Removed',
+                        user: 'Anonymous',
+                        fullStory: 'Capital One judgement discharged after filing CoD with Secretary of State. Court vacated judgement.',
+                        keyVictory: 'Proper dishonor memorialization'
+                    },
+                    {
+                        id: 3,
+                        title: 'W-8BEN Accepted After 6 Months',
+                        user: 'Flymom2',
+                        fullStory: 'Persistent questioning and meetings finally compelled employer to accept W-8BEN instead of W-4.',
+                        keyVictory: 'Politeness + persistence + equitable questions'
+                    },
+                    {
+                        id: 4,
+                        title: 'Traffic Ticket Dismissed in Court',
+                        user: 'Ken Crawford Jr.',
+                        fullStory: 'Used court script to request bonds, judge dismissed case after questioning jurisdiction.',
+                        keyVictory: 'Bond request + jurisdictional challenge'
+                    }
+                ],
+                
+                // Methods
+                init() {
+                    this.generateQuestions();
+                    this.selectScenario('bond');
+                    this.loadSuccessStories();
+                    this.calculateBOICountdown();
+                },
+                
+                generateQuestions() {
+                    const questions = {
+                        credit_card: [
+                            {
+                                text: "Does the record reflect that requiring payment only by check or money order violates public policy and is therefore unenforceable?",
+                                score: 9,
+                                maxim: "Equity regards as done what ought to be done"
+                            },
+                            {
+                                text: "How in good conscience can you enforce payment terms that restrict the form of legal tender?",
+                                score: 8,
+                                maxim: "He who seeks equity must do equity"
+                            },
+                            {
+                                text: "What mechanism is in place for you to discharge the account upon receipt of a negotiable instrument, as required by commercial law?",
+                                score: 7,
+                                maxim: "Equity follows the law"
+                            }
+                        ],
+                        irs: [
+                            {
+                                text: "Does the record reflect that the IRS is bound by public policy to accept all forms of payment for settlement?",
+                                score: 9,
+                                maxim: "Equity will not suffer a wrong without a remedy"
+                            },
+                            {
+                                text: "How can withholding requirements be enforced when they violate the equitable right to tender payment in any form?",
+                                score: 8,
+                                maxim: "Equity looks to intent rather than form"
+                            }
+                        ],
+                        bond: [
+                            {
+                                text: "Your honor, does the record reflect that I am requesting the bid, performance, and settlement bonds for this case?",
+                                score: 10,
+                                maxim: "Equity aids the vigilant"
+                            },
+                            {
+                                text: "What bonds have you issued regarding this matter, and may I examine them?",
+                                score: 9,
+                                maxim: "Equity regards substance over form"
+                            }
+                        ]
+                    };
+                    
+                    this.generatedQuestions = questions[this.caseType] || questions.credit_card;
+                    this.calculateNNINScore();
+                    
+                    // Update AI status
+                    this.aiStatus = {
+                        text: 'NNIN Analysis Complete',
+                        color: 'bg-green-900/40',
+                        message: 'Generated ' + this.generatedQuestions.length + ' conscience-piercing questions.'
+                    };
+                },
+                
+                generateMoreQuestions() {
+                    const additional = [
+                        {
+                            text: "Can you demonstrate how your payment terms align with public policy regarding negotiable instruments?",
+                            score: 7,
+                            maxim: "Equity delights in equality"
+                        },
+                        {
+                            text: "What is your lawful excuse for refusing settlement via accepted negotiable instrument?",
+                            score: 8,
+                            maxim: "Equity will not permit a statute to be used as an instrument of fraud"
+                        }
+                    ];
+                    
+                    if (this.generatedQuestions.length < 10) {
+                        this.generatedQuestions.push(...additional.slice(0, 2));
+                        this.calculateNNINScore();
+                    }
+                },
+                
+                removeQuestion(index) {
+                    this.generatedQuestions.splice(index, 1);
+                    this.calculateNNINScore();
+                },
+                
+                calculateNNINScore() {
+                    if (this.generatedQuestions.length === 0) {
+                        this.nninScore = 0;
+                        return;
+                    }
+                    
+                    let total = 0;
+                    this.generatedQuestions.forEach(q => total += q.score);
+                    this.nninScore = Math.round(total / this.generatedQuestions.length);
+                    
+                    // Update guidance based on score
+                    if (this.nninScore >= 8) {
+                        this.spiritualGuidance = 'Excellent! Your questions pierce the conscience and compel performance.';
+                    } else if (this.nninScore >= 6) {
+                        this.spiritualGuidance = 'Good questions. Consider adding more public policy challenges.';
+                    } else {
+                        this.spiritualGuidance = 'Add more "How in good conscience" questions to strengthen.';
+                    }
+                },
+                
+                getQuestionScoreClass(score) {
+                    if (score >= 8) return 'bg-green-900/40 text-green-300';
+                    if (score >= 6) return 'bg-yellow-900/40 text-yellow-300';
+                    return 'bg-red-900/40 text-red-300';
+                },
+                
+                toggleJurisdiction(juris) {
+                    const index = this.selectedJurisdictions.indexOf(juris);
+                    if (index > -1) {
+                        this.selectedJurisdictions.splice(index, 1);
+                    } else {
+                        this.selectedJurisdictions.push(juris);
+                    }
+                },
+                
+                downloadNNIN() {
+                    alert('NNIN Document Generated!\n\nWould download as PDF in production version.\n\nQuestions: ' + this.generatedQuestions.length + '\nScore: ' + this.nninScore + '/10');
+                },
+                
+                selectScenario(scenario) {
+                    this.activeScenario = scenario;
+                    this.courtDialogue = [];
+                    this.responseOptions = [];
+                    
+                    if (scenario === 'bond') {
+                        this.courtDialogue.push({
+                            role: 'judge',
+                            text: "Mr. Crawford, you've requested the bid, performance, and settlement bonds. What exactly do you intend to do with these bonds?",
+                            score: null
+                        });
+                        
+                        this.responseOptions = [
+                            {
+                                text: "Your honor, does the record reflect that I wish to examine the bonds?",
+                                strategy: "Deflect with examination request"
+                            },
+                            {
+                                text: "Don't you think it might be just to let me decide where those valuable instruments ought to be held, since it's my performance justifying their existence?",
+                                strategy: "Julian's recommended response"
+                            },
+                            {
+                                text: "I request the bonds in order to settle and close the accounting in this matter.",
+                                strategy: "Direct accounting closure"
+                            }
+                        ];
+                    } else if (scenario === 'benefit') {
+                        this.courtDialogue.push({
+                            role: 'judge',
+                            text: "How do you expect to rescind a contract when you've already received benefit from it?",
+                            score: null
+                        });
+                        
+                        this.responseOptions = [
+                            {
+                                text: "Your honor, my acceptance and return of all benefits through negotiable instruments has already fulfilled the contract.",
+                                strategy: "Benefit returned via acceptance"
+                            },
+                            {
+                                text: "Does the record reflect that any benefit received has been accounted for through my accepted instruments?",
+                                strategy: "Accounting defense"
+                            },
+                            {
+                                text: "Was there consideration on the part of the plaintiff, or did my signature create the digits making me the creditor?",
+                                strategy: "Signature/creditor argument"
+                            }
+                        ];
+                    }
+                },
+                
+                selectResponse(option) {
+                    this.courtDialogue.push({
+                        role: 'you',
+                        text: option.text,
+                        score: Math.floor(Math.random() * 3) + 7 // Random score 7-9
+                    });
+                    
+                    // Generate judge response
+                    const judgeResponses = {
+                        bond: [
+                            "The court doesn't typically issue bonds in civil cases.",
+                            "Very well, the record will reflect your request.",
+                            "Let's move on to the substantive matters."
+                        ],
+                        benefit: [
+                            "That's an interesting argument. Proceed.",
+                            "The court notes your position.",
+                            "I'll need to see documentation of this accounting."
+                        ]
+                    };
+                    
+                    const responses = judgeResponses[this.activeScenario] || ['Proceed.'];
+                    const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                    
+                    this.courtDialogue.push({
+                        role: 'judge',
+                        text: randomResponse,
+                        score: null
+                    });
+                },
+                
+                submitCustomResponse() {
+                    if (this.customResponse.trim()) {
+                        this.courtDialogue.push({
+                            role: 'you',
+                            text: this.customResponse,
+                            score: 6 // Default score for custom
+                        });
+                        this.customResponse = '';
+                    }
+                },
+                
+                startPractice() {
+                    alert('Voice practice would activate in production version.\n\nFeature includes:\n• Voice recording\n• Tone analysis\n• Response timing\n• Confidence scoring');
+                },
+                
+                togglePage(page) {
+                    const index = this.selectedPages.indexOf(page);
+                    if (index > -1) {
+                        this.selectedPages.splice(index, 1);
+                    } else {
+                        this.selectedPages.push(page);
+                    }
+                    this.selectedPages.sort((a, b) => a - b);
+                },
+                
+                simulateUpload() {
+                    this.rescissionStrategy = 'Document analyzed: 12-page credit card agreement. AI detected public policy violation in Section 4(b): "Payment must be by check, money order, or bank instrument." This term is unenforceable.';
+                    this.pageAnalysis = 'Rescind first page (signature) and last page (terms). Middle pages contain boilerplate.';
+                    
+                    alert('Document uploaded and analyzed!\n\nAI found public policy violation.\n\nRecommended: Rescind pages 1 and 12.');
+                },
+                
+                generateRescission() {
+                    alert('Rescission Document Generated!\n\nPages: ' + this.selectedPages.join(', ') + '\nRecipients: ' + this.recipients.filter(r => r.required).length + ' required\n\nWould download as PDF in production.');
+                },
+                
+                setActivePersona(persona) {
+                    this.activePersona = persona;
+                    if (persona === 'private') {
+                        this.personaSettings = {
+                            prefix: 'Without Prejudice',
+                            signature: 'By: Private Living Being',
+                            withoutPrejudice: true
+                        };
+                    } else {
+                        this.personaSettings = {
+                            prefix: 'Per: Equity Trust',
+                            signature: 'Trustee for [Family Name] Equity Trust',
+                            withoutPrejudice: false
+                        };
+                    }
+                },
+                
+                generateDocument(type) {
+                    const docs = {
+                        w8ben: 'W-8BEN form generated with sovereign signature.',
+                        notice: 'Restructuring notice template created.',
+                        trust: 'Trust indenture template (requires class completion).'
+                    };
+                    alert(docs[type] || 'Document generated.');
+                },
+                
+                loadSuccessStories() {
+                    this.successStories = [
+                        {
+                            id: 1,
+                            title: 'IRS Debt Discharged',
+                            date: 'Nov 2024',
+                            description: '$28,000 discharged using equity process',
+                            type: 'Tax',
+                            jurisdiction: 'Federal',
+                            duration: '3 months'
+                        },
+                        {
+                            id: 2,
+                            title: 'Credit Card Judgement Vacated',
+                            date: 'Oct 2024',
+                            description: 'Court vacated $15,000 judgement after CoD filing',
+                            type: 'Debt',
+                            jurisdiction: 'State',
+                            duration: '6 months'
+                        },
+                        {
+                            id: 3,
+                            title: 'W-8BEN Accepted',
+                            date: 'Sep 2024',
+                            description: 'Employer finally accepted after 6 months persistence',
+                            type: 'Employment',
+                            jurisdiction: 'Corporate',
+                            duration: '6 months'
+                        },
+                        {
+                            id: 4,
+                            title: 'Traffic Case Dismissed',
+                            date: 'Aug 2024',
+                            description: 'Judge dismissed after bond request dialogue',
+                            type: 'Traffic',
+                            jurisdiction: 'Local',
+                            duration: '1 month'
+                        }
+                    ];
+                },
+                
+                joinSession() {
+                    alert('Joining practice session...\n\nZoom link would activate in production.\n\nRole assigned: Defendant\nPractice partner: Experienced member');
+                },
+                
+                scheduleSession() {
+                    alert('Scheduling interface would open in production.\n\nFeatures:\n• Timezone detection\n• Role assignment\n• Skill matching\n• Automated reminders');
+                },
+                
+                refreshEncouragement() {
+                    const encouragements = [
+                        'He who stays calm, wins.',
+                        'Doubt is the enemy of faith. Rebuke it!',
+                        'Every victory started as an attempt.',
+                        'The system tests your resolve. Stand firm.',
+                        'Your persistence is their weakness.'
+                    ];
+                    this.encouragementMessage = encouragements[Math.floor(Math.random() * encouragements.length)];
+                },
+                
+                lookupLawTerm() {
+                    const terms = {
+                        'offer': 'A promise to do or refrain from doing something in exchange for something else. In equity, all offers must be examined and may be accepted.',
+                        'bond': 'A written instrument requiring payment of money. In court context, refers to performance/settlement bonds securing judicial process.',
+                        'issue': 'To send out, promulgate, or put into circulation. When a judge "issues" bonds, they become offers that must be accepted.',
+                        'obligation': 'A legal duty to do or not do something. In equity, obligations are discharged by acceptance of proper tender.'
+                    };
+                    
+                    const term = this.lawTerm.toLowerCase();
+                    if (terms[term]) {
+                        this.lawDefinition = terms[term];
+                        this.equityApplication = 'Examine and accept any offers/obligations presented to you.';
+                    } else if (term.length > 2) {
+                        this.lawDefinition = 'Definition not in database. Check Black\'s Law Dictionary 11th Edition.';
+                        this.equityApplication = 'Always look up definitions to understand precise legal meaning.';
+                    } else {
+                        this.lawDefinition = '';
+                        this.equityApplication = '';
+                    }
+                },
+                
+                quickAction(action) {
+                    const actions = {
+                        public_policy: {
+                            message: 'Public Policy Check: Payment restrictions violate public policy. Terms requiring specific payment forms are unenforceable.',
+                            color: 'bg-red-900/40'
+                        },
+                        doubt_check: {
+                            message: 'Doubt Level: 30%. Rebuke doubt with scripture. Remember: "Be sober, be vigilant" (1 Peter 5:8).',
+                            color: 'bg-yellow-900/40'
+                        },
+                        maxim: {
+                            message: 'Equity Maxim: "Equity regards as done what ought to be done." Your acceptance completes what should have been done.',
+                            color: 'bg-blue-900/40'
+                        },
+                        scripture: {
+                            message: 'Scripture: "He has shown you, O man, what is good... to do justly, to love mercy, and to walk humbly with your God." (Micah 6:8)',
+                            color: 'bg-purple-900/40'
+                        }
+                    };
+                    
+                    if (actions[action]) {
+                        this.aiStatus = {
+                            text: action.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
+                            color: actions[action].color,
+                            message: actions[action].message
+                        };
+                    }
+                },
+                
+                rebukeDoubt() {
+                    this.doubtLevel = '10%';
+                    this.spiritualProgress = 75;
+                    alert('Doubt rebuked in Jesus name!\n\n"Get out doubt! I cast you out!"\n\nSpiritual warfare progress increased.');
+                },
+                
+                calculateBOICountdown() {
+                    const today = new Date();
+                    const boiDate = new Date('2025-01-01');
+                    const diffTime = boiDate - today;
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    this.boiCountdown = diffDays > 0 ? diffDays : 0;
+                },
+                
+                startMigration() {
+                    alert('Trust Migration Started!\n\nProcess initiated:\n1. Notice to customers drafted\n2. Trust class enrollment scheduled\n3. BOI exemption procedure started\n\nCheck "Sovereign Identity" panel for next steps.');
+                    this.showTrustMigration = false;
+                }
+            };
+        }
+    </script>
+</body>
+</html>
