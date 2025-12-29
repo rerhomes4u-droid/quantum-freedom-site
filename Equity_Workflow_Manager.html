@@ -1,0 +1,1770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Equity Workflow Manager - Complete Document Processor</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --spiritual: #9b59b6;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(to right, var(--primary), var(--dark));
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #fff, #ecf0f1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .header .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .status-badge {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: var(--success);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+        
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+            padding: 30px;
+        }
+        
+        .sidebar {
+            background: var(--light);
+            padding: 25px;
+            border-radius: 15px;
+        }
+        
+        .content-area {
+            background: white;
+        }
+        
+        .upload-zone {
+            border: 3px dashed var(--secondary);
+            border-radius: 15px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            margin-bottom: 30px;
+        }
+        
+        .upload-zone:hover {
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(52, 152, 219, 0.2);
+        }
+        
+        .upload-zone i {
+            font-size: 3rem;
+            color: var(--secondary);
+            margin-bottom: 15px;
+        }
+        
+        #fileInput {
+            display: none;
+        }
+        
+        .document-list {
+            margin-top: 30px;
+        }
+        
+        .document-item {
+            background: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 10px;
+            border-left: 5px solid var(--secondary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        
+        .document-item:hover {
+            transform: translateX(5px);
+            border-left-color: var(--success);
+        }
+        
+        .workflow-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .workflow-steps::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 10%;
+            right: 10%;
+            height: 3px;
+            background: var(--light);
+            z-index: 1;
+        }
+        
+        .step {
+            text-align: center;
+            position: relative;
+            z-index: 2;
+            flex: 1;
+        }
+        
+        .step-number {
+            width: 40px;
+            height: 40px;
+            background: var(--light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            font-weight: bold;
+            color: var(--dark);
+        }
+        
+        .step.active .step-number {
+            background: var(--secondary);
+            color: white;
+            animation: bounce 0.5s;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+        
+        .document-preview {
+            border: 1px solid var(--light);
+            border-radius: 10px;
+            padding: 20px;
+            min-height: 400px;
+            background: #f8f9fa;
+            overflow: auto;
+            position: relative;
+        }
+        
+        .mirror-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+        
+        .mirror-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn-primary {
+            background: var(--secondary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn-warning {
+            background: var(--warning);
+            color: white;
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .btn-spiritual {
+            background: var(--spiritual);
+            color: white;
+        }
+        
+        .ai-analysis {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 30px;
+        }
+        
+        .ai-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .ai-icon {
+            font-size: 2rem;
+            animation: spin 3s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .analysis-results {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+        
+        .violation-item {
+            background: rgba(231, 76, 60, 0.2);
+            border-left: 4px solid var(--danger);
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        
+        .spiritual-guidance {
+            background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        
+        .scripture-box {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            font-style: italic;
+            margin-top: 10px;
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background: var(--light);
+            border-radius: 5px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, var(--success), var(--secondary));
+            width: 0%;
+            transition: width 0.5s;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid var(--light);
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 15px 30px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            font-weight: bold;
+        }
+        
+        .tab.active {
+            border-bottom-color: var(--secondary);
+            color: var(--secondary);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .document-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .document-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border: 2px solid transparent;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .document-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--secondary);
+            box-shadow: 0 10px 30px rgba(52, 152, 219, 0.2);
+        }
+        
+        .document-card.active {
+            border-color: var(--success);
+            background: linear-gradient(135deg, #f8fff8 0%, #e8f5e9 100%);
+        }
+        
+        .persona-selector {
+            background: var(--light);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .persona-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-bottom: 5px;
+            transition: background 0.3s;
+        }
+        
+        .persona-option:hover {
+            background: rgba(52, 152, 219, 0.1);
+        }
+        
+        .persona-option.active {
+            background: var(--secondary);
+            color: white;
+        }
+        
+        .download-section {
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 10px;
+            margin-top: 30px;
+        }
+        
+        .download-btn {
+            background: linear-gradient(to right, var(--success), #2ecc71);
+            color: white;
+            padding: 15px 40px;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .download-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(46, 204, 113, 0.3);
+        }
+        
+        .success-banner {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--success);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            animation: slideIn 0.5s;
+            z-index: 1000;
+            display: none;
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--danger);
+        }
+        
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .workflow-steps {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .workflow-steps::before {
+                display: none;
+            }
+            
+            .mirror-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .doubt-meter {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .doubt-level {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .encouragement {
+            font-style: italic;
+            margin-top: 10px;
+            opacity: 0.9;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="status-badge">
+                <i class="fas fa-shield-alt"></i> Sovereignty Active
+            </div>
+            <h1><i class="fas fa-balance-scale"></i> Equity Workflow Manager</h1>
+            <div class="subtitle">Complete Document Processing & Mirroring System</div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <!-- Persona Selector -->
+                <div class="persona-selector">
+                    <h3><i class="fas fa-user-secret"></i> Select Persona</h3>
+                    <div class="persona-option active" data-persona="private">
+                        <i class="fas fa-user"></i>
+                        <div>
+                            <strong>Private Living Being</strong>
+                            <small>Without Prejudice</small>
+                        </div>
+                    </div>
+                    <div class="persona-option" data-persona="trust">
+                        <i class="fas fa-landmark"></i>
+                        <div>
+                            <strong>Equity Trust</strong>
+                            <small>Fiduciary Capacity</small>
+                        </div>
+                    </div>
+                    <div class="persona-option" data-persona="minister">
+                        <i class="fas fa-pray"></i>
+                        <div>
+                            <strong>Minister</strong>
+                            <small>Divine Authority</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Upload Zone -->
+                <div class="upload-zone" id="uploadZone">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <h3>Upload Document</h3>
+                    <p>Drag & drop or click to upload PDF, image, or text</p>
+                    <input type="file" id="fileInput" accept=".pdf,.jpg,.jpeg,.png,.txt,.doc,.docx" multiple>
+                    <div class="progress-bar" style="display: none;">
+                        <div class="progress-fill" id="uploadProgress"></div>
+                    </div>
+                </div>
+                
+                <!-- Document List -->
+                <div class="document-list">
+                    <h3><i class="fas fa-file-alt"></i> Uploaded Documents</h3>
+                    <div id="documentList">
+                        <!-- Documents will appear here -->
+                    </div>
+                </div>
+                
+                <!-- Doubt Meter -->
+                <div class="doubt-meter">
+                    <h4><i class="fas fa-heartbeat"></i> Faith & Confidence Level</h4>
+                    <div class="doubt-level" id="doubtLevel">100%</div>
+                    <div class="encouragement" id="encouragement">
+                        You are sovereign. The system expects you to quit. Your persistence is your power.
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Workflow Steps -->
+                <div class="workflow-steps">
+                    <div class="step active" data-step="1">
+                        <div class="step-number">1</div>
+                        <div>Upload</div>
+                    </div>
+                    <div class="step" data-step="2">
+                        <div class="step-number">2</div>
+                        <div>Analyze</div>
+                    </div>
+                    <div class="step" data-step="3">
+                        <div class="step-number">3</div>
+                        <div>Mirror</div>
+                    </div>
+                    <div class="step" data-step="4">
+                        <div class="step-number">4</div>
+                        <div>Enhance</div>
+                    </div>
+                    <div class="step" data-step="5">
+                        <div class="step-number">5</div>
+                        <div>Download</div>
+                    </div>
+                </div>
+                
+                <!-- Tabs -->
+                <div class="tabs">
+                    <div class="tab active" data-tab="preview">Document Preview</div>
+                    <div class="tab" data-tab="analysis">AI Analysis</div>
+                    <div class="tab" data-tab="templates">Templates</div>
+                    <div class="tab" data-tab="history">History</div>
+                </div>
+                
+                <!-- Tab Contents -->
+                <div id="tabContents">
+                    <!-- Document Preview Tab -->
+                    <div class="tab-content active" id="previewTab">
+                        <div class="document-preview" id="documentPreview">
+                            <div class="mirror-overlay" id="mirrorOverlay">
+                                <div style="text-align: center;">
+                                    <h3>Document Ready for Mirroring</h3>
+                                    <p>Upload a document to begin automatic analysis and mirroring</p>
+                                    <button class="btn btn-primary" onclick="document.getElementById('uploadZone').click()">
+                                        <i class="fas fa-upload"></i> Upload Document
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Mirror Buttons -->
+                        <div class="mirror-buttons">
+                            <button class="btn btn-primary" onclick="mirrorDocument('accept')">
+                                <i class="fas fa-stamp"></i> ACCEPT & RETURN
+                            </button>
+                            <button class="btn btn-success" onclick="mirrorDocument('rescind')">
+                                <i class="fas fa-undo"></i> RESCISSION
+                            </button>
+                            <button class="btn btn-warning" onclick="mirrorDocument('question')">
+                                <i class="fas fa-question-circle"></i> INQUIRY NOTICE
+                            </button>
+                            <button class="btn btn-danger" onclick="mirrorDocument('dishonor')">
+                                <i class="fas fa-ban"></i> NOTICE OF DISHONOR
+                            </button>
+                            <button class="btn btn-spiritual" onclick="mirrorDocument('scripture')">
+                                <i class="fas fa-bible"></i> ADD SCRIPTURE
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- AI Analysis Tab -->
+                    <div class="tab-content" id="analysisTab">
+                        <div class="ai-analysis">
+                            <div class="ai-header">
+                                <i class="fas fa-robot ai-icon"></i>
+                                <h3>AI Equity Analysis</h3>
+                            </div>
+                            <div class="analysis-results" id="analysisResults">
+                                <p>Upload a document to get AI analysis of potential public policy violations and equity strategies.</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Spiritual Guidance -->
+                        <div class="spiritual-guidance">
+                            <h3><i class="fas fa-praying-hands"></i> Spiritual Guidance</h3>
+                            <div class="scripture-box" id="scriptureBox">
+                                "Agree with thine adversary quickly, whiles thou art in the way with him..." - Matthew 5:25
+                            </div>
+                            <button class="btn btn-spiritual" onclick="getSpiritualGuidance()">
+                                <i class="fas fa-redo"></i> Refresh Guidance
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Templates Tab -->
+                    <div class="tab-content" id="templatesTab">
+                        <h3>Equity Document Templates</h3>
+                        <div class="document-grid">
+                            <div class="document-card" onclick="loadTemplate('nnin')">
+                                <h4><i class="fas fa-question-circle"></i> NNIN Template</h4>
+                                <p>Non-Negotiable Notice of Inquiry</p>
+                            </div>
+                            <div class="document-card" onclick="loadTemplate('rescission')">
+                                <h4><i class="fas fa-undo"></i> Rescission Letter</h4>
+                                <p>Contract Rescission Template</p>
+                            </div>
+                            <div class="document-card" onclick="loadTemplate('acceptance')">
+                                <h4><i class="fas fa-stamp"></i> Acceptance & Return</h4>
+                                <p>Mirror with Acceptance Stamp</p>
+                            </div>
+                            <div class="document-card" onclick="loadTemplate('court')">
+                                <h4><i class="fas fa-gavel"></i> Court Script</h4>
+                                <p>Bond Dialogue & Responses</p>
+                            </div>
+                            <div class="document-card" onclick="loadTemplate('ucc1')">
+                                <h4><i class="fas fa-file-contract"></i> UCC-1 Filing</h4>
+                                <p>Perfect Security Interest</p>
+                            </div>
+                            <div class="document-card" onclick="loadTemplate('cod')">
+                                <h4><i class="fas fa-certificate"></i> Certificate of Dishonor</h4>
+                                <p>Dishonor Process Document</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- History Tab -->
+                    <div class="tab-content" id="historyTab">
+                        <h3><i class="fas fa-history"></i> Document History</h3>
+                        <div id="historyList">
+                            <!-- History items will appear here -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Download Section -->
+                <div class="download-section">
+                    <h3><i class="fas fa-download"></i> Download Processed Documents</h3>
+                    <p>Your mirrored and enhanced documents are ready</p>
+                    <button class="download-btn" onclick="downloadAll()">
+                        <i class="fas fa-file-archive"></i> Download All as ZIP
+                    </button>
+                    <div style="margin-top: 15px;">
+                        <button class="btn btn-primary" onclick="downloadPDF()">
+                            <i class="fas fa-file-pdf"></i> PDF
+                        </button>
+                        <button class="btn btn-success" onclick="downloadWord()">
+                            <i class="fas fa-file-word"></i> Word
+                        </button>
+                        <button class="btn btn-warning" onclick="printDocuments()">
+                            <i class="fas fa-print"></i> Print
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Success Banner -->
+    <div class="success-banner" id="successBanner">
+        <i class="fas fa-check-circle"></i> Document processed successfully!
+    </div>
+    
+    <!-- Modal for Advanced Options -->
+    <div class="modal" id="advancedModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Advanced Mirroring Options</h3>
+                <button class="close-modal" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="modalContent">
+                <!-- Dynamic content -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let documents = [];
+        let currentDocument = null;
+        let currentPersona = 'private';
+        let workflowStep = 1;
+        let isProcessing = false;
+        
+        // Persona configurations
+        const personas = {
+            private: {
+                name: 'Private Living Being',
+                prefix: 'Without Prejudice',
+                signature: 'By: Private Living Being',
+                disclaimer: 'All rights reserved. No consent to contract.',
+                color: '#2c3e50'
+            },
+            trust: {
+                name: 'Equity Trust',
+                prefix: 'Per: Family Equity Trust',
+                signature: 'Trustee for the [FAMILY NAME] Equity Trust',
+                disclaimer: 'Acting in fiduciary capacity for beneficiaries.',
+                color: '#3498db'
+            },
+            minister: {
+                name: 'Minister',
+                prefix: 'In Service to God',
+                signature: 'Minister of the Gospel',
+                disclaimer: 'Acting under divine authority and natural law.',
+                color: '#9b59b6'
+            }
+        };
+        
+        // Equity maxims database
+        const equityMaxims = [
+            "Equity regards as done that which ought to be done",
+            "He who seeks equity must do equity",
+            "Equity delights in equality",
+            "Equity looks to the intent rather than the form",
+            "Equity imputes an intention to fulfill an obligation",
+            "Equity acts in personam",
+            "Equity will not suffer a wrong to be without a remedy",
+            "Equity follows the law",
+            "Where there is equal equity, the law shall prevail",
+            "Equity aids the vigilant, not those who slumber on their rights"
+        ];
+        
+        // Public policy violations database
+        const publicPolicyViolations = [
+            {
+                pattern: /must pay.*check.*money order|only.*check|payment must be.*check/i,
+                violation: "Restricting payment method violates public policy",
+                remedy: "Rescind contract or cite UCC § 1-308",
+                question: "Does the record reflect that restricting payment to specific instruments violates public policy?"
+            },
+            {
+                pattern: /cannot.*discharge|prohibit.*discharge|not.*discharge.*account/i,
+                violation: "Prohibiting discharge violates equitable principles",
+                remedy: "Cite maxim: Equity regards as done that which ought to be done",
+                question: "How in good conscience can you prohibit discharge when performance has been rendered?"
+            },
+            {
+                pattern: /interest rate.*%\d+/i,
+                violation: "Excessive interest may violate usury laws",
+                remedy: "Request validation of interest calculation",
+                question: "Does the record show proper calculation of interest under applicable usury laws?"
+            },
+            {
+                pattern: /late fee.*\$\d+|penalty.*\$\d+/i,
+                violation: "Unconscionable penalties may be unenforceable",
+                remedy: "Challenge as unconscionable under UCC § 2-302",
+                question: "How in good conscience can you justify this penalty as reasonable?"
+            }
+        ];
+        
+        // Scripture database
+        const scriptures = [
+            {
+                verse: "Matthew 5:25-26",
+                text: "Agree with thine adversary quickly, whiles thou art in the way with him; lest at any time the adversary deliver thee to the judge, and the judge deliver thee to the officer, and thou be cast into prison. Verily I say unto thee, Thou shalt by no means come out thence, till thou hast paid the uttermost farthing.",
+                context: "Accepting responsibility leads to discharge"
+            },
+            {
+                verse: "Hebrews 10:36",
+                text: "You need endurance so that after you have done God's will, you may receive what was promised.",
+                context: "Persistence in equity work"
+            },
+            {
+                verse: "Philippians 4:6-7",
+                text: "Do not be anxious about anything, but in every situation, by prayer and petition, with thanksgiving, present your requests to God. And the peace of God, which transcends all understanding, will guard your hearts and your minds in Christ Jesus.",
+                context: "Overcoming fear in legal matters"
+            },
+            {
+                verse: "Isaiah 54:17",
+                text: "No weapon forged against you will prevail, and you will refute every tongue that accuses you. This is the heritage of the servants of the Lord, and this is their vindication from me.",
+                context: "Protection in legal battles"
+            }
+        ];
+        
+        // Document templates
+        const templates = {
+            nnin: {
+                title: "NON-NEGOTIABLE NOTICE OF INQUIRY",
+                content: `
+                    <div style="border: 2px solid #000; padding: 40px; font-family: 'Times New Roman', serif;">
+                        <div style="text-align: center; margin-bottom: 40px;">
+                            <h1 style="text-decoration: underline;">NON-NEGOTIABLE NOTICE OF INQUIRY</h1>
+                            <h3>${personas[currentPersona].prefix}</h3>
+                        </div>
+                        
+                        <div style="margin-bottom: 30px;">
+                            <p><strong>TO:</strong> [RECIPIENT NAME/ENTITY]</p>
+                            <p><strong>DATE:</strong> ${new Date().toLocaleDateString()}</p>
+                            <p><strong>RE:</strong> Notice of Inquiry Regarding [SUBJECT MATTER]</p>
+                        </div>
+                        
+                        <div style="margin-bottom: 30px;">
+                            <p>This notice constitutes a non-negotiable inquiry pursuant to equitable principles and common law. Please respond to the following inquiries in writing within 10 days:</p>
+                            
+                            <ol style="margin: 20px 0; padding-left: 20px;">
+                                <li>Does the record reflect that you have standing to make this presentment?</li>
+                                <li>Does the record show an accounting of all benefits received versus benefits given?</li>
+                                <li>Does the record reflect that your terms comply with public policy?</li>
+                                <li>Does the record show the chain of title/assignment for this matter?</li>
+                                <li>How in good conscience can you proceed without answering these equitable inquiries?</li>
+                            </ol>
+                        </div>
+                        
+                        <div style="margin-top: 50px; border-top: 1px solid #000; padding-top: 20px;">
+                            <p><strong>Maxim of Equity:</strong> ${equityMaxims[0]}</p>
+                            <br><br>
+                            <p>${personas[currentPersona].signature}</p>
+                            <p>${personas[currentPersona].disclaimer}</p>
+                        </div>
+                    </div>
+                `
+            },
+            rescission: {
+                title: "NOTICE OF RESCISSION",
+                content: `
+                    <div style="border: 2px solid #000; padding: 40px; font-family: 'Times New Roman', serif;">
+                        <div style="text-align: center; margin-bottom: 40px;">
+                            <h1 style="text-decoration: underline;">NOTICE OF RESCISSION</h1>
+                            <h3>${personas[currentPersona].prefix}</h3>
+                        </div>
+                        
+                        <div style="margin-bottom: 30px;">
+                            <p><strong>TO:</strong> [RECIPIENT NAME/ENTITY]</p>
+                            <p><strong>DATE:</strong> ${new Date().toLocaleDateString()}</p>
+                            <p><strong>RE:</strong> Rescission of [CONTRACT/DOCUMENT NAME] dated [DATE]</p>
+                        </div>
+                        
+                        <div style="margin-bottom: 30px;">
+                            <p>TAKE NOTICE that I hereby exercise my equitable right of rescission regarding the above-referenced matter for the following reasons:</p>
+                            
+                            <ol style="margin: 20px 0; padding-left: 20px;">
+                                <li>The terms contain provisions that violate public policy</li>
+                                <li>There was inadequate consideration on your part</li>
+                                <li>The agreement contains unconscionable terms</li>
+                                <li>I was under duress or undue influence</li>
+                                <li>There has been a failure of consideration</li>
+                            </ol>
+                            
+                            <p>Pursuant to equitable principles and common law, this rescission places all parties in the position they occupied before the agreement.</p>
+                            
+                            <p>I hereby accept and return any and all benefits received, and request you do the same.</p>
+                        </div>
+                        
+                        <div style="margin-top: 50px; border-top: 1px solid #000; padding-top: 20px;">
+                            <p><strong>Maxim of Equity:</strong> Equity will not suffer a wrong to be without a remedy</p>
+                            <br><br>
+                            <p>${personas[currentPersona].signature}</p>
+                            <p>${personas[currentPersona].disclaimer}</p>
+                        </div>
+                    </div>
+                `
+            }
+        };
+        
+        // Initialize the application
+        function initApp() {
+            // Set up event listeners
+            document.getElementById('uploadZone').addEventListener('click', () => {
+                document.getElementById('fileInput').click();
+            });
+            
+            document.getElementById('fileInput').addEventListener('change', handleFileUpload);
+            
+            // Set up drag and drop
+            const uploadZone = document.getElementById('uploadZone');
+            uploadZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                uploadZone.style.borderColor = '#27ae60';
+                uploadZone.style.transform = 'scale(1.02)';
+            });
+            
+            uploadZone.addEventListener('dragleave', () => {
+                uploadZone.style.borderColor = '#3498db';
+                uploadZone.style.transform = 'scale(1)';
+            });
+            
+            uploadZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                uploadZone.style.borderColor = '#3498db';
+                uploadZone.style.transform = 'scale(1)';
+                
+                const files = Array.from(e.dataTransfer.files);
+                processFiles(files);
+            });
+            
+            // Tab switching
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabId = tab.getAttribute('data-tab');
+                    switchTab(tabId);
+                });
+            });
+            
+            // Persona selection
+            document.querySelectorAll('.persona-option').forEach(option => {
+                option.addEventListener('click', () => {
+                    document.querySelectorAll('.persona-option').forEach(o => o.classList.remove('active'));
+                    option.classList.add('active');
+                    currentPersona = option.getAttribute('data-persona');
+                    updateUIForPersona();
+                });
+            });
+            
+            // Load any saved data
+            loadSavedData();
+            
+            // Update doubt meter periodically
+            setInterval(updateDoubtMeter, 5000);
+        }
+        
+        // Handle file upload
+        function handleFileUpload(event) {
+            const files = Array.from(event.target.files);
+            processFiles(files);
+        }
+        
+        // Process uploaded files
+        async function processFiles(files) {
+            if (isProcessing) return;
+            
+            isProcessing = true;
+            showSuccessBanner(`Processing ${files.length} file(s)...`);
+            
+            const progressBar = document.querySelector('.progress-bar');
+            const progressFill = document.getElementById('uploadProgress');
+            
+            progressBar.style.display = 'block';
+            progressFill.style.width = '0%';
+            
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                progressFill.style.width = `${((i + 1) / files.length) * 100}%`;
+                
+                await processSingleFile(file);
+                
+                // Update workflow step
+                updateWorkflowStep(2);
+            }
+            
+            progressBar.style.display = 'none';
+            isProcessing = false;
+            
+            showSuccessBanner('Files processed successfully!');
+            updateDoubtMeter();
+        }
+        
+        // Process a single file
+        async function processSingleFile(file) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    const documentData = {
+                        id: Date.now() + Math.random(),
+                        name: file.name,
+                        type: file.type,
+                        size: file.size,
+                        content: e.target.result,
+                        uploadDate: new Date().toISOString(),
+                        status: 'uploaded',
+                        violations: [],
+                        suggestions: [],
+                        mirroredContent: null
+                    };
+                    
+                    // Add to documents array
+                    documents.push(documentData);
+                    currentDocument = documentData;
+                    
+                    // Display in document list
+                    addToDocumentList(documentData);
+                    
+                    // Analyze document
+                    analyzeDocument(documentData);
+                    
+                    // Update preview
+                    updateDocumentPreview(documentData);
+                    
+                    resolve();
+                };
+                
+                if (file.type === 'text/plain' || file.name.endsWith('.txt')) {
+                    reader.readAsText(file);
+                } else if (file.type === 'application/pdf') {
+                    // For PDF, we'll show a placeholder
+                    documentData.content = 'PDF Content - Preview not available';
+                    resolve();
+                } else if (file.type.startsWith('image/')) {
+                    reader.readAsDataURL(file);
+                } else {
+                    reader.readAsText(file);
+                }
+            });
+        }
+        
+        // Add document to list
+        function addToDocumentList(document) {
+            const list = document.getElementById('documentList');
+            const item = document.createElement('div');
+            item.className = 'document-item';
+            item.innerHTML = `
+                <div>
+                    <strong>${document.name}</strong>
+                    <div style="font-size: 0.8em; color: #666;">
+                        ${formatFileSize(document.size)} • ${new Date(document.uploadDate).toLocaleTimeString()}
+                    </div>
+                </div>
+                <div style="display: flex; gap: 5px;">
+                    <span class="status-badge" style="background: ${document.violations.length > 0 ? '#e74c3c' : '#27ae60'}; font-size: 0.7em; padding: 3px 8px;">
+                        ${document.violations.length} issues
+                    </span>
+                    <button onclick="selectDocument(${document.id})" style="background: none; border: none; color: #3498db; cursor: pointer;">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+            `;
+            
+            item.addEventListener('click', () => selectDocument(document.id));
+            list.insertBefore(item, list.firstChild);
+            
+            // Update history
+            addToHistory(document, 'uploaded');
+        }
+        
+        // Analyze document for violations
+        function analyzeDocument(document) {
+            let text = '';
+            
+            if (typeof document.content === 'string') {
+                text = document.content;
+            }
+            
+            // Detect public policy violations
+            const violations = [];
+            publicPolicyViolations.forEach(violation => {
+                if (violation.pattern.test(text)) {
+                    violations.push(violation);
+                }
+            });
+            
+            document.violations = violations;
+            
+            // Generate suggestions
+            document.suggestions = generateSuggestions(violations, text);
+            
+            // Update analysis display
+            updateAnalysisDisplay(document);
+            
+            // Update workflow step
+            updateWorkflowStep(3);
+        }
+        
+        // Generate suggestions based on violations
+        function generateSuggestions(violations, text) {
+            const suggestions = [];
+            
+            if (violations.length > 0) {
+                suggestions.push({
+                    type: 'warning',
+                    text: 'Public policy violations detected',
+                    action: 'Consider rescission or NNIN'
+                });
+            }
+            
+            // Check for bond references
+            if (/bond|performance.*bond|settlement.*bond/i.test(text)) {
+                suggestions.push({
+                    type: 'info',
+                    text: 'Bond language detected',
+                    action: 'Prepare bond response dialogue'
+                });
+            }
+            
+            // Check for contract language
+            if (/contract|agreement|terms.*conditions/i.test(text)) {
+                suggestions.push({
+                    type: 'info',
+                    text: 'Contract language detected',
+                    action: 'Review for consideration issues'
+                });
+            }
+            
+            return suggestions;
+        }
+        
+        // Update analysis display
+        function updateAnalysisDisplay(document) {
+            const results = document.getElementById('analysisResults');
+            
+            if (document.violations.length === 0) {
+                results.innerHTML = `
+                    <p><i class="fas fa-check-circle" style="color: #27ae60;"></i> No public policy violations detected.</p>
+                    <p>Document appears compliant with equitable principles.</p>
+                `;
+            } else {
+                let violationsHTML = '<h4>Public Policy Violations Detected:</h4>';
+                
+                document.violations.forEach((violation, index) => {
+                    violationsHTML += `
+                        <div class="violation-item">
+                            <strong>Violation ${index + 1}:</strong> ${violation.violation}
+                            <p><strong>Remedy:</strong> ${violation.remedy}</p>
+                            <p><strong>Suggested Question:</strong> "${violation.question}"</p>
+                        </div>
+                    `;
+                });
+                
+                results.innerHTML = violationsHTML;
+                
+                // Add suggestions
+                if (document.suggestions.length > 0) {
+                    let suggestionsHTML = '<h4>Suggested Actions:</h4>';
+                    document.suggestions.forEach(suggestion => {
+                        suggestionsHTML += `
+                            <p><i class="fas fa-lightbulb" style="color: #f39c12;"></i> ${suggestion.text} - ${suggestion.action}</p>
+                        `;
+                    });
+                    results.innerHTML += suggestionsHTML;
+                }
+            }
+            
+            // Switch to analysis tab
+            switchTab('analysis');
+        }
+        
+        // Mirror document with different actions
+        function mirrorDocument(action) {
+            if (!currentDocument) {
+                showSuccessBanner('Please upload a document first', 'warning');
+                return;
+            }
+            
+            let mirroredContent = '';
+            const persona = personas[currentPersona];
+            
+            switch(action) {
+                case 'accept':
+                    mirroredContent = `
+                        <div style="position: relative; min-height: 800px; padding: 40px; background: #f8f9fa; border: 3px solid #2c3e50;">
+                            <!-- Original Content -->
+                            <div style="opacity: 0.3;">
+                                ${currentDocument.content}
+                            </div>
+                            
+                            <!-- Acceptance Overlay -->
+                            <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+                                <div style="background: rgba(39, 174, 96, 0.9); color: white; padding: 40px; border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+                                    <h1 style="font-size: 3rem; margin-bottom: 20px;">ACCEPTED</h1>
+                                    <div style="border: 2px dashed white; padding: 20px; margin: 20px 0;">
+                                        <p style="font-size: 1.2rem;">Accepted for Value & Returned for Value</p>
+                                        <p>${new Date().toLocaleDateString()}</p>
+                                    </div>
+                                    <p>${persona.signature}</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Stamp -->
+                            <div style="position: absolute; bottom: 20px; right: 20px; background: #e74c3c; color: white; padding: 10px 20px; border-radius: 5px; transform: rotate(15deg);">
+                                <strong>ACCEPTED & RETURNED</strong><br>
+                                ${persona.prefix}
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'rescind':
+                    mirroredContent = templates.rescission.content;
+                    break;
+                    
+                case 'question':
+                    mirroredContent = templates.nnin.content;
+                    break;
+                    
+                case 'dishonor':
+                    mirroredContent = `
+                        <div style="border: 3px solid #e74c3c; padding: 40px; font-family: 'Times New Roman', serif;">
+                            <div style="text-align: center; margin-bottom: 40px;">
+                                <h1 style="color: #e74c3c; text-decoration: underline;">NOTICE OF DISHONOR</h1>
+                                <h3>${persona.prefix}</h3>
+                            </div>
+                            
+                            <p>TAKE NOTICE that you have dishonored the equitable presentment dated [DATE] by failing to:</p>
+                            
+                            <ol style="margin: 20px 0; padding-left: 20px;">
+                                <li>Provide adequate responses to lawful inquiries</li>
+                                <li>Account for all benefits received</li>
+                                <li>Demonstrate standing in this matter</li>
+                                <li>Comply with public policy requirements</li>
+                            </ol>
+                            
+                            <p>Your dishonor has been memorialized and will be filed with appropriate authorities.</p>
+                            
+                            <div style="margin-top: 50px; border-top: 2px solid #e74c3c; padding-top: 20px;">
+                                <p><strong>MAXIM:</strong> Equity aids the vigilant, not those who slumber on their rights</p>
+                                <br><br>
+                                <p>${persona.signature}</p>
+                                <p>All rights reserved. No consent to contract.</p>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                    
+                case 'scripture':
+                    const randomScripture = scriptures[Math.floor(Math.random() * scriptures.length)];
+                    mirroredContent = `
+                        <div style="border: 2px solid #9b59b6; padding: 40px; font-family: 'Times New Roman', serif;">
+                            <div style="text-align: center; margin-bottom: 40px;">
+                                <h1 style="color: #9b59b6;">SCRIPTURAL ENDORSEMENT</h1>
+                                <h3>${persona.prefix}</h3>
+                            </div>
+                            
+                            <div style="background: #f3e6f8; padding: 30px; border-radius: 10px; margin: 20px 0;">
+                                <blockquote style="font-size: 1.2rem; font-style: italic; text-align: center;">
+                                    "${randomScripture.text}"
+                                </blockquote>
+                                <p style="text-align: right; margin-top: 20px;"><strong>- ${randomScripture.verse}</strong></p>
+                            </div>
+                            
+                            <p>This matter is placed under divine authority and equitable principles.</p>
+                            
+                            <div style="margin-top: 50px; border-top: 1px solid #9b59b6; padding-top: 20px;">
+                                <p>${persona.signature}</p>
+                                <p>Under God's authority and natural law</p>
+                            </div>
+                        </div>
+                    `;
+                    break;
+            }
+            
+            currentDocument.mirroredContent = mirroredContent;
+            updateDocumentPreview(currentDocument);
+            
+            // Update workflow step
+            updateWorkflowStep(4);
+            
+            showSuccessBanner(`Document mirrored with ${action} action`);
+            
+            // Add to history
+            addToHistory(currentDocument, `mirrored_${action}`);
+        }
+        
+        // Update document preview
+        function updateDocumentPreview(document) {
+            const preview = document.getElementById('documentPreview');
+            const overlay = document.getElementById('mirrorOverlay');
+            
+            if (document.mirroredContent) {
+                preview.innerHTML = document.mirroredContent;
+                overlay.style.display = 'none';
+            } else if (document.content) {
+                if (document.type && document.type.startsWith('image/')) {
+                    preview.innerHTML = `<img src="${document.content}" style="max-width: 100%; border-radius: 10px;">`;
+                } else {
+                    preview.innerHTML = `<pre style="white-space: pre-wrap; font-family: 'Courier New', monospace; padding: 20px;">${document.content}</pre>`;
+                }
+                overlay.style.display = 'none';
+            } else {
+                overlay.style.display = 'flex';
+            }
+        }
+        
+        // Select a document
+        function selectDocument(id) {
+            currentDocument = documents.find(doc => doc.id === id);
+            if (currentDocument) {
+                updateDocumentPreview(currentDocument);
+                updateAnalysisDisplay(currentDocument);
+                
+                // Highlight in list
+                document.querySelectorAll('.document-item').forEach(item => {
+                    item.style.background = 'white';
+                });
+                event.currentTarget.closest('.document-item').style.background = '#e8f4fc';
+            }
+        }
+        
+        // Update workflow step
+        function updateWorkflowStep(step) {
+            workflowStep = step;
+            
+            // Update step indicators
+            document.querySelectorAll('.step').forEach((stepEl, index) => {
+                if (index + 1 <= step) {
+                    stepEl.classList.add('active');
+                } else {
+                    stepEl.classList.remove('active');
+                }
+            });
+        }
+        
+        // Switch tabs
+        function switchTab(tabId) {
+            // Update tab headers
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+                if (tab.getAttribute('data-tab') === tabId) {
+                    tab.classList.add('active');
+                }
+            });
+            
+            // Update tab contents
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+                if (content.id === tabId + 'Tab') {
+                    content.classList.add('active');
+                }
+            });
+            
+            // Load content for specific tabs
+            if (tabId === 'history') {
+                loadHistory();
+            }
+        }
+        
+        // Update UI for persona
+        function updateUIForPersona() {
+            const persona = personas[currentPersona];
+            document.documentElement.style.setProperty('--primary', persona.color);
+            
+            // Update document preview if there's mirrored content
+            if (currentDocument && currentDocument.mirroredContent) {
+                updateDocumentPreview(currentDocument);
+            }
+        }
+        
+        // Get spiritual guidance
+        function getSpiritualGuidance() {
+            const scriptureBox = document.getElementById('scriptureBox');
+            const randomScripture = scriptures[Math.floor(Math.random() * scriptures.length)];
+            
+            scriptureBox.innerHTML = `
+                <strong>${randomScripture.verse}:</strong> "${randomScripture.text}"
+                <br><br>
+                <small><i>${randomScripture.context}</i></small>
+            `;
+            
+            // Update doubt meter positively
+            updateDoubtMeter(true);
+        }
+        
+        // Update doubt meter
+        function updateDoubtMeter(positive = false) {
+            const doubtLevel = document.getElementById('doubtLevel');
+            const encouragement = document.getElementById('encouragement');
+            
+            // Simulate doubt level based on activity
+            let level = 100;
+            if (documents.length === 0) {
+                level = 85; // Higher doubt with no activity
+            } else if (documents.some(d => d.violations.length > 0)) {
+                level = 70; // Some doubt when violations found
+            }
+            
+            // Positive boost
+            if (positive) {
+                level = Math.min(100, level + 15);
+            }
+            
+            doubtLevel.textContent = `${level}%`;
+            doubtLevel.style.color = level > 80 ? '#27ae60' : level > 60 ? '#f39c12' : '#e74c3c';
+            
+            // Update encouragement text
+            const encouragements = [
+                "You are sovereign. The system expects you to quit. Your persistence is your power.",
+                "Remember: Every 'no' brings you closer to a 'yes' in equity.",
+                "Julian's wisdom: They never expect you to persist past the third attempt.",
+                "Your faith is the substance of things hoped for, the evidence of things not seen.",
+                "Each document processed strengthens your equity position."
+            ];
+            
+            encouragement.textContent = encouragements[Math.floor(Math.random() * encouragements.length)];
+        }
+        
+        // Load template
+        function loadTemplate(templateName) {
+            if (templates[templateName]) {
+                const newDoc = {
+                    id: Date.now(),
+                    name: `${templateName}_template.html`,
+                    content: templates[templateName].content,
+                    uploadDate: new Date().toISOString(),
+                    status: 'template',
+                    violations: [],
+                    suggestions: []
+                };
+                
+                documents.push(newDoc);
+                currentDocument = newDoc;
+                addToDocumentList(newDoc);
+                updateDocumentPreview(newDoc);
+                
+                showSuccessBanner(`Loaded ${templateName} template`);
+            }
+        }
+        
+        // Download all documents
+        function downloadAll() {
+            if (documents.length === 0) {
+                showSuccessBanner('No documents to download', 'warning');
+                return;
+            }
+            
+            // Create a ZIP file using JSZip
+            if (typeof JSZip === 'undefined') {
+                // Load JSZip dynamically
+                const script = document.createElement('script');
+                script.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+                script.onload = downloadAll;
+                document.head.appendChild(script);
+                return;
+            }
+            
+            const zip = new JSZip();
+            const folder = zip.folder("Equity_Documents");
+            
+            documents.forEach((doc, index) => {
+                let content = doc.mirroredContent || doc.content;
+                folder.file(`${doc.name || `document_${index + 1}.html`}`, content);
+            });
+            
+            // Add README
+            folder.file("README.txt", `
+                Equity Workflow Manager - Processed Documents
+                Generated: ${new Date().toLocaleString()}
+                Persona: ${personas[currentPersona].name}
+                Documents Processed: ${documents.length}
+                
+                Instructions:
+                1. Print these documents on legal paper
+                2. Send via certified mail with return receipt
+                3. Keep copies for your records
+                4. Track all responses
+                
+                Remember: Persistence is key in equity work.
+                They expect you to quit. Don't.
+            `);
+            
+            zip.generateAsync({type: "blob"})
+                .then(function(content) {
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(content);
+                    link.download = `Equity_Documents_${new Date().toISOString().split('T')[0]}.zip`;
+                    link.click();
+                    
+                    showSuccessBanner('ZIP file downloaded successfully!');
+                    
+                    // Update workflow step
+                    updateWorkflowStep(5);
+                });
+        }
+        
+        // Download as PDF
+        function downloadPDF() {
+            if (!currentDocument) {
+                showSuccessBanner('Please select a document first', 'warning');
+                return;
+            }
+            
+            // Use html2pdf if available
+            if (typeof html2pdf === 'undefined') {
+                // Fallback to print
+                printDocuments();
+                return;
+            }
+            
+            const element = document.getElementById('documentPreview');
+            html2pdf().from(element).save(`${currentDocument.name}_mirrored.pdf`);
+            
+            showSuccessBanner('PDF download started');
+        }
+        
+        // Download as Word
+        function downloadWord() {
+            if (!currentDocument) {
+                showSuccessBanner('Please select a document first', 'warning');
+                return;
+            }
+            
+            const content = currentDocument.mirroredContent || currentDocument.content;
+            const blob = new Blob([`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="UTF-8">
+                    <title>${currentDocument.name}</title>
+                </head>
+                <body>
+                    ${content}
+                </body>
+                </html>
+            `], { type: 'application/msword' });
+            
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `${currentDocument.name}.doc`;
+            link.click();
+            
+            showSuccessBanner('Word document downloaded');
+        }
+        
+        // Print documents
+        function printDocuments() {
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                <head>
+                    <title>Equity Documents</title>
+                    <style>
+                        body { font-family: 'Times New Roman', serif; margin: 40px; }
+                        .document { margin-bottom: 50px; }
+                    </style>
+                </head>
+                <body>
+                    <h1>Equity Workflow Manager - Printed Documents</h1>
+                    <p>Printed: ${new Date().toLocaleString()}</p>
+                    <hr>
+                    ${documents.map(doc => `
+                        <div class="document">
+                            <h3>${doc.name}</h3>
+                            <div>${doc.mirroredContent || doc.content}</div>
+                        </div>
+                    `).join('')}
+                </body>
+                </html>
+            `);
+            printWindow.document.close();
+            printWindow.print();
+        }
+        
+        // Show success banner
+        function showSuccessBanner(message, type = 'success') {
+            const banner = document.getElementById('successBanner');
+            banner.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i> ${message}`;
+            banner.style.background = type === 'success' ? '#27ae60' : '#f39c12';
+            banner.style.display = 'block';
+            
+            setTimeout(() => {
+                banner.style.display = 'none';
+            }, 3000);
+        }
+        
+        // Add to history
+        function addToHistory(document, action) {
+            const history = JSON.parse(localStorage.getItem('equityHistory') || '[]');
+            history.unshift({
+                id: document.id,
+                name: document.name,
+                action: action,
+                timestamp: new Date().toISOString(),
+                violations: document.violations.length
+            });
+            
+            // Keep only last 50 items
+            if (history.length > 50) history.pop();
+            
+            localStorage.setItem('equityHistory', JSON.stringify(history));
+        }
+        
+        // Load history
+        function loadHistory() {
+            const history = JSON.parse(localStorage.getItem('equityHistory') || '[]');
+            const historyList = document.getElementById('historyList');
+            
+            if (history.length === 0) {
+                historyList.innerHTML = '<p>No history yet. Process some documents!</p>';
+                return;
+            }
+            
+            historyList.innerHTML = history.map(item => `
+                <div class="document-item">
+                    <div>
+                        <strong>${item.name}</strong>
+                        <div style="font-size: 0.8em; color: #666;">
+                            ${new Date(item.timestamp).toLocaleString()} • ${item.action.replace('_', ' ')}
+                        </div>
+                    </div>
+                    <span class="status-badge" style="background: ${item.violations > 0 ? '#e74c3c' : '#27ae60'}; font-size: 0.7em; padding: 3px 8px;">
+                        ${item.violations} violations
+                    </span>
+                </div>
+            `).join('');
+        }
+        
+        // Load saved data
+        function loadSavedData() {
+            const savedDocuments = localStorage.getItem('equityDocuments');
+            if (savedDocuments) {
+                try {
+                    documents = JSON.parse(savedDocuments);
+                    if (documents.length > 0) {
+                        currentDocument = documents[0];
+                        updateDocumentPreview(currentDocument);
+                        documents.forEach(doc => addToDocumentList(doc));
+                    }
+                } catch (e) {
+                    console.error('Error loading saved documents:', e);
+                }
+            }
+        }
+        
+        // Save data
+        function saveData() {
+            localStorage.setItem('equityDocuments', JSON.stringify(documents));
+        }
+        
+        // Utility functions
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
+        // Close modal
+        function closeModal() {
+            document.getElementById('advancedModal').style.display = 'none';
+        }
+        
+        // Open modal
+        function openModal(content) {
+            document.getElementById('modalContent').innerHTML = content;
+            document.getElementById('advancedModal').style.display = 'flex';
+        }
+        
+        // Auto-save every minute
+        setInterval(saveData, 60000);
+        
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', initApp);
+        
+        // Export for debugging
+        window.equityApp = {
+            documents,
+            currentDocument,
+            personas,
+            mirrorDocument,
+            downloadAll,
+            analyzeDocument: () => currentDocument && analyzeDocument(currentDocument)
+        };
+    </script>
+    
+    <!-- Load external libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+</body>
+</html>
