@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quindío Pulse | Interactive Adventures</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Montserrat:wght@800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a5f23;
+            --secondary: #f9c42d;
+            --dark: #0d2c14;
+            --light: #f8fff9;
+            --accent: #e63946;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Poppins', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #f8fff9 0%, #e6f7ea 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        header {
+            background: linear-gradient(to right, var(--dark), var(--primary));
+            color: white;
+            padding: 1.5rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .logo {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 800;
+        }
+        .logo span { color: var(--secondary); }
+        .sponsor {
+            font-size: 0.9rem;
+            background: rgba(255,255,255,0.15);
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        .sponsor a { color: var(--secondary); text-decoration: none; }
+        .hero {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: linear-gradient(rgba(10, 40, 15, 0.85), rgba(10, 40, 15, 0.9)), url('https://images.unsplash.com/photo-1588359348285-19c35ec5d7d6?ixlib=rb-4.0.3&auto=format&fit=crop&w=1600&q=80') center/cover no-repeat;
+            color: white;
+            border-bottom: 5px solid var(--secondary);
+        }
+        .hero h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 700px;
+            margin: 0 auto 2rem;
+        }
+        .cta-button {
+            display: inline-block;
+            background: var(--accent);
+            color: white;
+            padding: 1rem 2.5rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-decoration: none;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(230, 57, 70, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .cta-button:hover {
+            background: #ff5a6e;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(230, 57, 70, 0.6);
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 2rem; }
+        section { margin-bottom: 4rem; }
+        h2 {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--dark);
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            position: relative;
+        }
+        h2:after {
+            content: '';
+            display: block;
+            width: 100px;
+            height: 4px;
+            background: var(--secondary);
+            margin: 10px auto;
+            border-radius: 2px;
+        }
+        .interactive-search {
+            background: white;
+            border-radius: 20px;
+            padding: 2.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            margin-top: -3rem;
+            position: relative;
+            z-index: 10;
+            max-width: 1000px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .search-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .search-box select, .search-box input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            transition: border 0.3s;
+        }
+        .search-box select:focus, .search-box input:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+        .search-button {
+            grid-column: 1 / -1;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 1.2rem;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .search-button:hover { background: var(--dark); }
+        .adventure-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+        }
+        .adventure-card {
+            background: white;
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+            cursor: pointer;
+            position: relative;
+        }
+        .adventure-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }
+        .card-img {
+            height: 220px;
+            width: 100%;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        .card-tag {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: var(--accent);
+            color: white;
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        .card-content { padding: 1.5rem; }
+        .card-content h3 { margin-bottom: 0.8rem; color: var(--dark); }
+        .card-content p { color: #666; margin-bottom: 1.2rem; font-size: 0.95rem;}
+        .card-price {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        .card-price span { font-size: 1rem; color: #888; }
+        .pillar-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        .pillar-card {
+            background: white;
+            padding: 1.8rem;
+            border-radius: 15px;
+            box-shadow: 0 7px 20px rgba(0,0,0,0.05);
+            border-top: 5px solid var(--primary);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        .pillar-card:hover { transform: translateY(-5px); }
+        .pillar-card i { font-size: 2.5rem; color: var(--primary); margin-bottom: 1rem; }
+        .pillar-card h4 { margin-bottom: 1rem; color: var(--dark); }
+        .gateway {
+            text-align: center;
+            background: linear-gradient(to right, var(--dark), var(--primary));
+            color: white;
+            padding: 4rem 2rem;
+            border-radius: 20px;
+            margin: 3rem 0;
+        }
+        .gateway h2 { color: white; }
+        .gateway h2:after { background: var(--secondary); }
+        .gateway p { max-width: 700px; margin: 1rem auto 2rem; font-size: 1.1rem;}
+        .partner-buttons {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        .partner-btn {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            border: 2px solid var(--secondary);
+            padding: 0.9rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .partner-btn:hover {
+            background: var(--secondary);
+            color: var(--dark);
+            transform: scale(1.05);
+        }
+        footer {
+            background: var(--dark);
+            color: #ccc;
+            text-align: center;
+            padding: 2.5rem 2rem;
+            margin-top: 3rem;
+            border-top: 5px solid var(--secondary);
+        }
+        .footer-links a {
+            color: var(--secondary);
+            margin: 0 1rem;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0; top: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 20px;
+            max-width: 600px;
+            width: 90%;
+            position: relative;
+            text-align: center;
+        }
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #999;
+        }
+        .modal-content h3 { color: var(--primary); margin-bottom: 1rem; }
+        .modal-image { width: 100%; border-radius: 15px; margin: 1.5rem 0; }
+        #final-cta { font-weight: 700; font-size: 1.2rem; margin-top: 1.5rem; color: var(--accent);}
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.5rem; }
+            h2 { font-size: 2rem; }
+            .interactive-search { padding: 1.5rem; margin: -2rem 1rem 0; }
+            .search-grid { grid-template-columns: 1fr; }
+            .adventure-grid { grid-template-columns: 1fr; }
+            .partner-buttons { flex-direction: column; align-items: center; }
+            .partner-btn { width: 80%; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">Quindío<span>Pulse</span></div>
+        <div class="sponsor">Sponsored by <a href="https://tripstocolombia.com" target="_blank">TripsToColombia.com</a></div>
+    </header>
+
+    <section class="hero">
+        <h1>Unforgettable Adventures Await</h1>
+        <p>Discover the authentic pulse of Colombia's Coffee Region. From luxury fincas and coffee tours to paragliding and cultural immersion, craft your perfect adventure. All bookings powered by our sponsor for a seamless experience.</p>
+        <a href="#explore" class="cta-button">Start Your Journey <i class="fas fa-arrow-right"></i></a>
+    </section>
+
+    <div class="interactive-search" id="explore">
+        <h2>Find Your Perfect Getaway</h2>
+        <p style="text-align: center; margin-bottom: 1.5rem; color: #555;">Use our interactive tool to tailor your search for hotels, fincas, and adventures in the Eje Cafetero.</p>
+        <div class="search-grid">
+            <div class="search-box">
+                <label>Location</label>
+                <select id="locationSelect">
+                    <option>All Locations</option>
+                    <option>Salento & Cocora Valley</option>
+                    <option>Montenegro / Parque del Café</option>
+                    <option>Armenia</option>
+                    <option>Filandia</option>
+                    <option>Circasia</option>
+                    <option>Pereira / Risaralda</option>
+                </select>
+            </div>
+            <div class="search-box">
+                <label>Accommodation Type</label>
+                <select id="typeSelect">
+                    <option>All Types</option>
+                    <option>Luxury Finca</option>
+                    <option>VIP Country House</option>
+                    <option>Boutique Hotel</option>
+                    <option>Traditional Coffee Hacienda</option>
+                </select>
+            </div>
+            <div class="search-box">
+                <label>Adventure Style</label>
+                <select id="adventureSelect">
+                    <option>Any Adventure</option>
+                    <option>Nature & Hiking</option>
+                    <option>Coffee Culture</option>
+                    <option>Extreme Sports</option>
+                    <option>Cultural Immersion</option>
+                </select>
+            </div>
+            <div class="search-box">
+                <label>Travelers</label>
+                <input type="number" id="travelersInput" min="1" value="2" placeholder="Number of guests">
+            </div>
+            <button class="search-button" onclick="handleSearch()"><i class="fas fa-search"></i> Discover My Personalized Options</button>
+        </div>
+        <p style="text-align: center; font-size: 0.9rem; color: #777;"><i class="fas fa-info-circle"></i> Click search to see curated results. All final bookings are handled securely by our sponsor, <strong>TripsToColombia.com</strong>.</p>
+    </div>
+
+    <div class="container">
+        <section>
+            <h2>Featured Adventures in Quindío</h2>
+            <p style="text-align: center; margin-bottom: 2rem; max-width: 800px; margin-left: auto; margin-right: auto;">Explore hand-picked experiences that connect you with the heart, soul, and adrenaline of the Colombian Andes.</p>
+            <div class="adventure-grid" id="adventureGrid">
+                <!-- Adventure cards are generated by JavaScript here -->
+            </div>
+        </section>
+
+        <section>
+            <h2>More Than Travel: Our Pillars</h2>
+            <p style="text-align: center; margin-bottom: 1rem;">Inspired by the broader mission of our sponsor, your journey contributes to a larger purpose.</p>
+            <div class="pillar-container">
+                <div class="pillar-card">
+                    <i class="fas fa-seedling"></i>
+                    <h4>Ecological Restoration</h4>
+                    <p>A portion of your trip supports reforestation and conservation projects in the regions you visit.</p>
+                </div>
+                <div class="pillar-card">
+                    <i class="fas fa-hands-helping"></i>
+                    <h4>Cultural Preservation</h4>
+                    <p>We partner directly with local communities to ensure tourism sustains traditions and livelihoods.</p>
+                </div>
+                <div class="pillar-card">
+                    <i class="fas fa-user-shield"></i>
+                    <h4>Traveler Sovereignty</h4>
+                    <p>Gain access to trusted tools for digital privacy, secure travel insurance, and holistic well-being.</p>
+                </div>
+                <div class="pillar-card">
+                    <i class="fas fa-gem"></i>
+                    <h4>Unique Rewards</h4>
+                    <p>Earn authentic rewards like artisanal ponchos or sombreros for your engagement with our mission.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="gateway">
+            <h2>Your Gateway to Everything</h2>
+            <p>This interactive guide is just the beginning. For flight bookings, exclusive villa reservations, custom tour packages, travel insurance, and all solutions for your trip—your journey continues with our official sponsor.</p>
+            <a href="https://tripstocolombia.com" target="_blank" class="cta-button" style="background: var(--secondary); color: var(--dark);"><i class="fas fa-external-link-alt"></i> Visit TripsToColombia.com</a>
+            <p style="font-size: 1rem; margin-top: 1.5rem;"><strong>Why book through our sponsor?</strong> Best deals, expert support, and your travel directly funds community projects.</p>
+            <div class="partner-buttons">
+                <a href="https://tripstocolombia.com" target="_blank" class="partner-btn"><i class="fas fa-bed"></i> Book Your Stay</a>
+                <a href="https://tripstocolombia.com" target="_blank" class="partner-btn"><i class="fas fa-plane"></i> Find Flights</a>
+                <a href="https://tripstocolombia.com" target="_blank" class="partner-btn"><i class="fas fa-car"></i> Rent a Car</a>
+                <a href="https://tripstocolombia.com" target="_blank" class="partner-btn"><i class="fas fa-heartbeat"></i> Get Travel Insurance</a>
+            </div>
+        </section>
+    </div>
+
+    <div id="detailsModal" class="modal">
+        <div class="modal-content">
+            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <h3 id="modalTitle">Adventure Title</h3>
+            <img id="modalImage" src="" alt="Adventure Image" class="modal-image">
+            <p id="modalDescription">Description will load here.</p>
+            <p id="modalDetails"></p>
+            <p style="font-weight: 600; color: var(--primary);"><i class="fas fa-map-marker-alt"></i> Location: <span id="modalLocation"></span></p>
+            <p id="final-cta">Ready for this adventure? <br> All bookings are handled by <a href="https://tripstocolombia.com" target="_blank" style="color: var(--accent);">TripsToColombia.com</a> for a secure and complete experience.</p>
+        </div>
+    </div>
+
+    <footer>
+        <p>Quindío Pulse | An Interactive Experience</p>
+        <p>Brought to you by <strong>TripsToColombia.com</strong> — Your gateway to bespoke Colombian travel and a mission for positive impact.</p>
+        <div class="footer-links" style="margin: 1.5rem 0;">
+            <a href="https://tripstocolombia.com" target="_blank">Book Your Trip</a>
+            <a href="#explore">Explore Adventures</a>
+            <a href="https://tripstocolombia.com" target="_blank">Learn About the Mission</a>
+        </div>
+        <p>© 2025 | Experience Colombia. Support Communities. Travel with Purpose.</p>
+    </footer>
+
+    <script>
+        const adventureData = [
+            {
+                title: "Coffee Hacienda Immersion",
+                description: "Live like a local coffee grower. Tour a family-owned plantation, participate in the harvest, and learn the art of roasting.",
+                image: "https://images.unsplash.com/photo-1442512595331-e89e73853f31?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+                location: "Salento / Filandia",
+                price: 289,
+                tag: "CULTURAL",
+                type: "Coffee Culture"
+            },
+            {
+                title: "Paragliding over the Cocora Valley",
+                description: "Soar like a condor above the iconic wax palm trees and rolling green hills for a breathtaking aerial perspective.",
+                image: "https://images.unsplash.com/photo-1551632811-561732d1e306?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+                location: "Salento",
+                price: 455,
+                tag: "EXTREME",
+                type: "Extreme Sports"
+            },
+            {
+                title: "VIP Luxury Finca Stay",
+                description: "Unwind in a private, luxurious country estate with panoramic views, a personal chef, and a pool overlooking the Andes.",
+                image: "https://images.unsplash.com/photo-1613977257363-707ba9348227?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+                location: "Montenegro / Quimbaya",
+                price: 1200,
+                tag: "LUXURY",
+                type: "Luxury Finca"
+            },
+            {
+                title: "Cocora Valley Hiking & Wildlife",
+                description: "Trek through the majestic valley, home to the world's tallest palm trees. Spot hummingbirds and immerse in cloud forest ecosystems.",
+                image: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+                location: "Salento",
+                price: 125,
+                tag: "NATURE",
+                type: "Nature & Hiking"
+            },
+            {
+                title: "Traditional Crafts Workshop",
+                description: "Learn from artisan masters in Filandia. Create your own bamboo craft or woven basket, taking home a unique piece of Quindío.",
+                image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+                location: "Filandia",
+                price: 85,
+                tag: "ARTISANAL",
+                type: "Cultural Immersion"
+            },
+            {
+                title: "Hot Springs & Wellness Retreat",
+                description: "Rejuvenate in the natural volcanic hot springs of Santa Rosa de Cabal, combined with holistic yoga and mountain views.",
+                image: "https://images.unsplash.com/photo-1541654056076-8831d6b3c4fc?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
+                location: "Risaralda",
+                price: 320,
+                tag: "WELLNESS",
+                type: "Cultural Immersion"
+            }
+        ];
+
+        function renderAdventures(filterType = 'All Types') {
+            const grid = document.getElementById('adventureGrid');
+            grid.innerHTML = '';
+            const filteredData = filterType === 'All Types' ? adventureData : adventureData.filter(adv => adv.type === filterType || adv.tag.includes(filterType.toUpperCase()));
+
+            filteredData.forEach(adv => {
+                const card = document.createElement('div');
+                card.className = 'adventure-card';
+                card.innerHTML = `
+                    <div class="card-img" style="background-image: url('${adv.image}');">
+                        <div class="card-tag">${adv.tag}</div>
+                    </div>
+                    <div class="card-content">
+                        <h3>${adv.title}</h3>
+                        <p>${adv.description}</p>
+                        <p><i class="fas fa-map-marker-alt"></i> ${adv.location}</p>
+                        <div class="card-price">$${adv.price} <span>per person</span></div>
+                    </div>
+                `;
+                card.addEventListener('click', () => openModal(adv));
+                grid.appendChild(card);
+            });
+        }
+
+        function handleSearch() {
+            const location = document.getElementById('locationSelect').value;
+            const type = document.getElementById('typeSelect').value;
+            const adventure = document.getElementById('adventureSelect').value;
+            const travelers = document.getElementById('travelersInput').value;
+
+            let filter = 'All Types';
+            if (adventure !== 'Any Adventure') filter = adventure;
+            if (type !== 'All Types' && adventure === 'Any Adventure') filter = type;
+
+            alert(`Searching for ${filter.toLowerCase()} experiences in ${location} for ${travelers} traveler(s). We are curating your results! (In a full app, this would filter the grid below.)`);
+            renderAdventures(filter);
+        }
+
+        function openModal(adv) {
+            document.getElementById('modalTitle').textContent = adv.title;
+            document.getElementById('modalImage').src = adv.image;
+            document.getElementById('modalDescription').textContent = adv.description;
+            document.getElementById('modalLocation').textContent = adv.location;
+            document.getElementById('modalDetails').innerHTML = `<strong>Type:</strong> ${adv.type} | <strong>Estimated Cost:</strong> $${adv.price} per person`;
+            document.getElementById('detailsModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('detailsModal').style.display = 'none';
+        }
+
+        window.onload = function() {
+            renderAdventures();
+            window.addEventListener('click', (event) => {
+                const modal = document.getElementById('detailsModal');
+                if (event.target === modal) closeModal();
+            });
+        };
+    </script>
+</body>
+</html>
