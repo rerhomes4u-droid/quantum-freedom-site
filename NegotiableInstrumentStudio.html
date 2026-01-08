@@ -1,0 +1,1848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UCC NEXUS - Complete Negotiable Instruments Assistant | TripsToColombia.com</title>
+    <style>
+        :root {
+            --primary: #1a237e;
+            --secondary: #283593;
+            --accent: #5c6bc0;
+            --action: #00acc1;
+            --success: #4caf50;
+            --warning: #ff9800;
+            --danger: #f44336;
+            --light: #f8f9fa;
+            --dark: #121212;
+            --gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0d47a1 0%, #1976d2 100%);
+            color: #333;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* HEADER */
+        .header {
+            background: rgba(255, 255, 255, 0.97);
+            border-radius: 25px;
+            padding: 30px 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 25px 70px rgba(0, 0, 0, 0.3);
+            border: 3px solid var(--accent);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+        
+        .header-gradient {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, #ff5252, #448aff, #69f0ae, #ffd740, #e040fb);
+        }
+        
+        .title-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        h1 {
+            color: var(--primary);
+            font-size: 3.5rem;
+            margin: 0;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.1;
+        }
+        
+        .powered-by {
+            background: var(--gradient);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .tagline {
+            color: var(--secondary);
+            font-size: 1.4rem;
+            margin-top: 15px;
+            font-weight: 600;
+        }
+        
+        /* MAIN GRID */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        @media (max-width: 1400px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* COMMUNICATION WORKSPACE */
+        .workspace {
+            background: rgba(255, 255, 255, 0.97);
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            border: 3px solid var(--accent);
+            backdrop-filter: blur(10px);
+        }
+        
+        .workspace-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .workspace-title {
+            font-size: 2rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .workspace-icon {
+            font-size: 2.5rem;
+        }
+        
+        /* COMMUNICATION TYPE SELECTOR */
+        .comm-selector {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .comm-btn {
+            padding: 18px 30px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #555;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 180px;
+        }
+        
+        .comm-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+        
+        .comm-btn.active {
+            background: var(--gradient);
+            color: white;
+            border-color: transparent;
+            transform: translateY(-5px);
+            box-shadow: 0 20px 50px rgba(102, 126, 234, 0.4);
+        }
+        
+        .comm-icon {
+            font-size: 1.5rem;
+        }
+        
+        /* INTERACTIVE PHONE CALL */
+        .phone-container {
+            background: #000;
+            border-radius: 40px;
+            padding: 40px 30px;
+            min-height: 700px;
+            position: relative;
+            border: 15px solid #222;
+            box-shadow: 0 30px 100px rgba(0,0,0,0.6);
+            display: none;
+        }
+        
+        .phone-container.active {
+            display: block;
+            animation: slideIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .phone-notch {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 30px;
+            background: #000;
+            border-radius: 0 0 25px 25px;
+            z-index: 10;
+        }
+        
+        .call-header {
+            background: linear-gradient(135deg, #2c3e50, #4a6491);
+            color: white;
+            padding: 25px;
+            border-radius: 25px 25px 0 0;
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        
+        .call-timer {
+            font-size: 1.2rem;
+            color: #4CAF50;
+            margin-top: 10px;
+            font-family: monospace;
+        }
+        
+        .conversation-log {
+            background: #111;
+            border-radius: 25px;
+            padding: 25px;
+            height: 400px;
+            overflow-y: auto;
+            margin-bottom: 30px;
+            border: 2px solid #333;
+            font-family: 'SF Mono', Monaco, monospace;
+        }
+        
+        .conversation-entry {
+            margin-bottom: 20px;
+            padding: 15px 20px;
+            border-radius: 20px;
+            max-width: 85%;
+            animation: messageAppear 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        @keyframes messageAppear {
+            from { opacity: 0; transform: translateY(20px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        
+        .user-entry {
+            margin-left: auto;
+            background: linear-gradient(135deg, #0084ff, #0066cc);
+            color: white;
+        }
+        
+        .them-entry {
+            background: linear-gradient(135deg, #3a3a3a, #2a2a2a);
+            color: white;
+        }
+        
+        .entry-label {
+            font-size: 0.85rem;
+            opacity: 0.8;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .quick-actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .action-card {
+            background: linear-gradient(135deg, var(--action), #0097a7);
+            color: white;
+            padding: 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+            text-align: left;
+            box-shadow: 0 10px 30px rgba(0, 172, 193, 0.3);
+        }
+        
+        .action-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 20px 50px rgba(0, 172, 193, 0.4);
+        }
+        
+        .action-card:active {
+            transform: translateY(-2px) scale(1);
+        }
+        
+        /* LETTER BUILDER */
+        .letter-builder {
+            background: white;
+            border: 2px solid #ccc;
+            border-radius: 25px;
+            padding: 40px;
+            min-height: 700px;
+            display: none;
+            position: relative;
+        }
+        
+        .letter-builder.active {
+            display: block;
+            animation: slideIn 0.6s;
+        }
+        
+        .letter-toolbar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .letter-part-btn {
+            padding: 15px 25px;
+            background: #f0f0f0;
+            border: 2px solid #ddd;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .letter-part-btn:hover {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+        
+        .letter-editor {
+            min-height: 500px;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 20px;
+            border: 2px dashed #ccc;
+            font-family: 'Georgia', serif;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            white-space: pre-wrap;
+        }
+        
+        .letter-controls {
+            display: flex;
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        /* EMAIL COMPOSER */
+        .email-composer {
+            background: #f1f3f4;
+            border-radius: 25px;
+            padding: 40px;
+            min-height: 700px;
+            display: none;
+        }
+        
+        .email-composer.active {
+            display: block;
+            animation: slideIn 0.6s;
+        }
+        
+        .email-header {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .email-field {
+            margin-bottom: 20px;
+        }
+        
+        .email-field label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+        
+        .email-field input,
+        .email-field textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 15px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .email-field input:focus,
+        .email-field textarea:focus {
+            border-color: var(--accent);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(92, 107, 192, 0.2);
+        }
+        
+        .email-body {
+            min-height: 300px;
+            font-family: 'Segoe UI', sans-serif;
+        }
+        
+        /* LEGAL DOCUMENT BUILDER */
+        .legal-builder {
+            background: linear-gradient(135deg, #2c3e50, #4a6491);
+            color: white;
+            border-radius: 25px;
+            padding: 40px;
+            min-height: 700px;
+            display: none;
+        }
+        
+        .legal-builder.active {
+            display: block;
+            animation: slideIn 0.6s;
+        }
+        
+        .legal-templates {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+        
+        .legal-template-card {
+            background: rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        
+        .legal-template-card:hover {
+            background: rgba(255,255,255,0.2);
+            border-color: var(--accent);
+            transform: translateY(-5px);
+        }
+        
+        /* NOTE TAKING AND RECORDING */
+        .note-recording-panel {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-top: 30px;
+        }
+        
+        .notes-container {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+        
+        .notes-editor {
+            width: 100%;
+            height: 200px;
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 15px;
+            font-size: 1rem;
+            resize: vertical;
+            margin-top: 15px;
+        }
+        
+        .recording-controls {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .record-btn {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: #ff4444;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            margin: 20px auto;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(255, 68, 68, 0.3);
+        }
+        
+        .record-btn.recording {
+            animation: pulse 1.5s infinite;
+            background: #ff2222;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 10px 30px rgba(255, 68, 68, 0.3); }
+            50% { transform: scale(1.1); box-shadow: 0 15px 40px rgba(255, 68, 68, 0.4); }
+        }
+        
+        /* KNOWLEDGE NEXUS */
+        .knowledge-nexus {
+            background: rgba(255, 255, 255, 0.97);
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            border: 3px solid var(--accent);
+            backdrop-filter: blur(10px);
+            max-height: 900px;
+            overflow-y: auto;
+        }
+        
+        .nexus-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        
+        .nexus-title {
+            font-size: 2rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .nexus-search {
+            padding: 15px 25px;
+            border: 2px solid #ddd;
+            border-radius: 15px;
+            font-size: 1rem;
+            width: 300px;
+            transition: all 0.3s;
+        }
+        
+        .nexus-search:focus {
+            border-color: var(--accent);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(92, 107, 192, 0.2);
+        }
+        
+        .nexus-tabs {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 5px;
+            flex-wrap: wrap;
+        }
+        
+        .nexus-tab {
+            padding: 15px 30px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #666;
+            position: relative;
+            border-radius: 15px 15px 0 0;
+            transition: all 0.3s;
+        }
+        
+        .nexus-tab:hover {
+            background: #f0f0f0;
+        }
+        
+        .nexus-tab.active {
+            color: var(--primary);
+            background: #e8eaf6;
+        }
+        
+        .nexus-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: var(--accent);
+        }
+        
+        .nexus-content {
+            display: none;
+        }
+        
+        .nexus-content.active {
+            display: block;
+            animation: fadeIn 0.6s;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .ucc-card {
+            background: #e3f2fd;
+            border-left: 5px solid #2196f3;
+            padding: 25px;
+            margin-bottom: 25px;
+            border-radius: 0 20px 20px 0;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .ucc-card:hover {
+            transform: translateX(10px);
+            box-shadow: 0 10px 40px rgba(33, 150, 243, 0.2);
+        }
+        
+        .ucc-card-title {
+            color: #1565c0;
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .ucc-card-content {
+            color: #444;
+            line-height: 1.7;
+            font-size: 1.1rem;
+        }
+        
+        .scenario-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+        }
+        
+        .scenario-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            border: 2px solid transparent;
+        }
+        
+        .scenario-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            border-color: var(--accent);
+            box-shadow: 0 25px 60px rgba(92, 107, 192, 0.3);
+        }
+        
+        .scenario-icon {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .scenario-name {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+        
+        /* TEMPLATE LIBRARY */
+        .template-library {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 30px;
+        }
+        
+        .template-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        
+        .template-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+        }
+        
+        .template-title {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .template-icon {
+            font-size: 2rem;
+        }
+        
+        /* FOOTER */
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 50px;
+            padding: 30px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+            font-size: 0.9rem;
+            background: rgba(0,0,0,0.2);
+            border-radius: 25px;
+        }
+        
+        .viral-badge {
+            background: linear-gradient(90deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57, #ff9ff3);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            display: inline-block;
+            margin: 20px auto;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            animation: glow 2s infinite alternate;
+        }
+        
+        @keyframes glow {
+            from { box-shadow: 0 15px 40px rgba(0,0,0,0.3); }
+            to { box-shadow: 0 20px 50px rgba(255, 107, 107, 0.4); }
+        }
+        
+        /* UTILITY */
+        .btn {
+            padding: 18px 35px;
+            background: var(--gradient);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+        }
+        
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+        
+        .status-bar {
+            background: rgba(0,0,0,0.1);
+            padding: 15px;
+            border-radius: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 30px;
+            color: white;
+        }
+        
+        .save-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .note-recording-panel {
+                grid-template-columns: 1fr;
+            }
+            
+            .scenario-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .template-library {
+                grid-template-columns: 1fr;
+            }
+            
+            .quick-actions-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header">
+            <div class="header-gradient"></div>
+            <div class="title-container">
+                <div>
+                    <h1>UCC NEXUS</h1>
+                    <div class="tagline">Master Negotiable Instruments • Relieve Financial Obligations • Universal Solution</div>
+                </div>
+                <div class="powered-by">
+                    ⚡ POWERED BY TripsToColombia.com
+                </div>
+            </div>
+        </div>
+        
+        <!-- MAIN GRID -->
+        <div class="main-grid">
+            <!-- LEFT: COMMUNICATION WORKSPACE -->
+            <div class="workspace">
+                <div class="workspace-header">
+                    <div class="workspace-title">
+                        <span class="workspace-icon" id="workspace-icon">📱</span>
+                        <span id="workspace-title">Phone Call Assistant</span>
+                    </div>
+                    <div>
+                        <button class="btn" onclick="saveSession()">
+                            💾 Save Session
+                        </button>
+                        <button class="btn btn-secondary" onclick="exportSession()">
+                            📤 Export
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Communication Type Selector -->
+                <div class="comm-selector">
+                    <button class="comm-btn active" onclick="switchComm('phone')">
+                        <span class="comm-icon">📱</span> Phone Call
+                    </button>
+                    <button class="comm-btn" onclick="switchComm('letter')">
+                        <span class="comm-icon">✉️</span> Letter Builder
+                    </button>
+                    <button class="comm-btn" onclick="switchComm('email')">
+                        <span class="comm-icon">📧</span> Email Composer
+                    </button>
+                    <button class="comm-btn" onclick="switchComm('legal')">
+                        <span class="comm-icon">⚖️</span> Legal Documents
+                    </button>
+                </div>
+                
+                <!-- Phone Call Interface -->
+                <div id="phone-interface" class="phone-container active">
+                    <div class="phone-notch"></div>
+                    <div class="call-header">
+                        <div style="font-size: 1.6rem; margin-bottom: 10px;">Active Call Simulation</div>
+                        <div style="color: #aaa;">Creditor / Collector / Lender</div>
+                        <div class="call-timer" id="call-timer">00:00</div>
+                    </div>
+                    
+                    <div class="conversation-log" id="conversation-log">
+                        <!-- Conversation entries will be added here -->
+                        <div class="conversation-entry them-entry">
+                            <div class="entry-label">🤖 SYSTEM:</div>
+                            <div>Welcome to UCC Nexus! Select a response below to begin the conversation.</div>
+                        </div>
+                    </div>
+                    
+                    <div class="quick-actions-grid" id="phone-actions">
+                        <!-- Phone responses will be loaded here -->
+                    </div>
+                </div>
+                
+                <!-- Letter Builder -->
+                <div id="letter-interface" class="letter-builder">
+                    <div class="letter-toolbar">
+                        <button class="letter-part-btn" onclick="addLetterPart('greeting')">Greeting</button>
+                        <button class="letter-part-btn" onclick="addLetterPart('tender-notice')">Tender Notice</button>
+                        <button class="letter-part-btn" onclick="addLetterPart('ucc-reference')">UCC Reference</button>
+                        <button class="letter-part-btn" onclick="addLetterPart('demand')">Legal Demand</button>
+                        <button class="letter-part-btn" onclick="addLetterPart('closing')">Closing</button>
+                        <button class="letter-part-btn" onclick="clearLetter()">Clear</button>
+                    </div>
+                    
+                    <div class="letter-editor" id="letter-editor" contenteditable="true">
+[Your Name]
+[Your Address]
+[Date]
+
+[Creditor Name]
+[Creditor Address]
+
+Subject: Notice of Tender - Account #[Account Number]
+                    </div>
+                    
+                    <div class="letter-controls">
+                        <button class="btn" onclick="copyLetter()">
+                            📋 Copy Letter
+                        </button>
+                        <button class="btn btn-secondary" onclick="saveLetter()">
+                            💾 Save Draft
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Email Composer -->
+                <div id="email-interface" class="email-composer">
+                    <div class="email-header">
+                        <div class="email-field">
+                            <label>To:</label>
+                            <input type="email" id="email-to" placeholder="creditor@example.com">
+                        </div>
+                        <div class="email-field">
+                            <label>Subject:</label>
+                            <input type="text" id="email-subject" value="Tender of Negotiable Instrument - Account #[Account]">
+                        </div>
+                    </div>
+                    
+                    <div class="email-field">
+                        <label>Email Body:</label>
+                        <textarea class="email-body" id="email-body" rows="12">
+Dear Accounts Department,
+
+I am writing regarding account #[Account Number]. 
+
+Pursuant to UCC Article 3, I am tendering payment via negotiable instrument...
+
+Sincerely,
+[Your Name]
+                        </textarea>
+                    </div>
+                    
+                    <div class="letter-toolbar" style="margin-top: 30px;">
+                        <button class="letter-part-btn" onclick="addEmailPart('tender')">Add Tender Language</button>
+                        <button class="letter-part-btn" onclick="addEmailPart('ucc')">Add UCC Citation</button>
+                        <button class="letter-part-btn" onclick="addEmailPart('demand')">Add Legal Demand</button>
+                        <button class="letter-part-btn" onclick="copyEmail()">📋 Copy Email</button>
+                    </div>
+                </div>
+                
+                <!-- Legal Document Builder -->
+                <div id="legal-interface" class="legal-builder">
+                    <h2 style="color: white; margin-bottom: 30px;">Legal Document Generator</h2>
+                    <p style="opacity: 0.9; margin-bottom: 30px;">Generate court-ready documents for your UCC case.</p>
+                    
+                    <div class="legal-templates">
+                        <div class="legal-template-card" onclick="generateLegalDoc('complaint')">
+                            <h3>📄 Civil Complaint</h3>
+                            <p>File a lawsuit for breach under UCC 3-603(b)</p>
+                        </div>
+                        <div class="legal-template-card" onclick="generateLegalDoc('motion')">
+                            <h3>⚖️ Motion to Dismiss</h3>
+                            <p>Motion based on improper refusal of tender</p>
+                        </div>
+                        <div class="legal-template-card" onclick="generateLegalDoc('declaration')">
+                            <h3>📝 Declaration Under Penalty</h3>
+                            <p>Sworn statement of facts for court</p>
+                        </div>
+                        <div class="legal-template-card" onclick="generateLegalDoc('poa')">
+                            <h3>🔐 Limited Power of Attorney</h3>
+                            <p>Allow creditor to endorse on your behalf</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Note Taking and Recording Panel -->
+                <div class="note-recording-panel">
+                    <div class="notes-container">
+                        <h3 style="color: var(--primary); margin-bottom: 20px;">📝 Session Notes</h3>
+                        <textarea class="notes-editor" id="session-notes" placeholder="Take notes during your conversation... 
+- Date/Time: 
+- Person spoken to: 
+- Their response: 
+- Key points: 
+- Next steps:"></textarea>
+                        <button class="btn" onclick="saveNotes()" style="margin-top: 15px;">
+                            💾 Save Notes
+                        </button>
+                    </div>
+                    
+                    <div class="recording-controls">
+                        <h3 style="color: var(--primary); margin-bottom: 20px;">🎤 Call Recording</h3>
+                        <p style="color: #666; margin-bottom: 20px;">(Simulated - Check your state's recording laws)</p>
+                        <button class="record-btn" id="record-btn" onclick="toggleRecording()">
+                            ●
+                        </button>
+                        <div id="recording-status" style="color: #666; margin-top: 10px;">
+                            Ready to record
+                        </div>
+                        <div id="recording-timer" style="font-family: monospace; margin-top: 10px; font-size: 1.2rem;">
+                            00:00
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- RIGHT: KNOWLEDGE NEXUS -->
+            <div class="knowledge-nexus">
+                <div class="nexus-header">
+                    <div class="nexus-title">
+                        📚 UCC Knowledge Nexus
+                    </div>
+                    <input type="text" class="nexus-search" placeholder="Search UCC articles, scenarios, templates..." onkeyup="searchKnowledge(event)">
+                </div>
+                
+                <div class="nexus-tabs">
+                    <button class="nexus-tab active" onclick="switchNexusTab('ucc')">UCC Law</button>
+                    <button class="nexus-tab" onclick="switchNexusTab('scenarios')">Scenarios</button>
+                    <button class="nexus-tab" onclick="switchNexusTab('templates')">Templates</button>
+                    <button class="nexus-tab" onclick="switchNexusTab('responses')">Responses</button>
+                    <button class="nexus-tab" onclick="switchNexusTab('process')">Process</button>
+                    <button class="nexus-tab" onclick="switchNexusTab('cases')">Case Law</button>
+                </div>
+                
+                <!-- UCC Law Tab -->
+                <div id="nexus-ucc" class="nexus-content active">
+                    <div class="ucc-card" onclick="insertUCC('3-104')">
+                        <div class="ucc-card-title">📄 UCC 3-104: Negotiable Instrument</div>
+                        <div class="ucc-card-content">
+                            Defines three essential elements:<br>
+                            1. Unconditional promise or order to pay fixed amount<br>
+                            2. Payable to bearer or to order at issuance<br>
+                            3. No other undertaking besides payment of money<br>
+                            <strong>Click to insert into conversation</strong>
+                        </div>
+                    </div>
+                    
+                    <div class="ucc-card" onclick="insertUCC('3-603')">
+                        <div class="ucc-card-title">💸 UCC 3-603: Tender of Payment</div>
+                        <div class="ucc-card-content">
+                            "(b) If tender of payment of an obligation to pay an instrument is made to a person entitled to enforce the instrument and the tender is refused, there is discharge..."<br>
+                            <strong>Click to insert into conversation</strong>
+                        </div>
+                    </div>
+                    
+                    <div class="ucc-card" onclick="insertUCC('3-502')">
+                        <div class="ucc-card-title">⏱️ UCC 3-502: Dishonor</div>
+                        <div class="ucc-card-content">
+                            Specific procedures must be followed to dishonor. Failure = acceptance by operation of law.<br>
+                            <strong>Click to insert into conversation</strong>
+                        </div>
+                    </div>
+                    
+                    <div class="ucc-card" onclick="insertUCC('3-109')">
+                        <div class="ucc-card-title">📄 UCC 3-109: Payable to Bearer</div>
+                        <div class="ucc-card-content">
+                            "If an instrument does not state a payee, it is payable to bearer."<br>
+                            Most bills/invoices → automatically bearer instruments.<br>
+                            <strong>Click to insert into conversation</strong>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Scenarios Tab -->
+                <div id="nexus-scenarios" class="nexus-content">
+                    <div class="scenario-grid">
+                        <div class="scenario-card" onclick="loadScenario('mortgage')">
+                            <div class="scenario-icon">🏠</div>
+                            <div class="scenario-name">Mortgage Payments</div>
+                            <div>Bank loans, mortgage statements as negotiable instruments</div>
+                        </div>
+                        
+                        <div class="scenario-card" onclick="loadScenario('utility')">
+                            <div class="scenario-icon">⚡</div>
+                            <div class="scenario-name">Utility Bills</div>
+                            <div>Electric, water, gas, internet - municipal and private</div>
+                        </div>
+                        
+                        <div class="scenario-card" onclick="loadScenario('credit')">
+                            <div class="scenario-icon">💳</div>
+                            <div class="scenario-name">Credit Cards</div>
+                            <div>Credit card statements as negotiable instruments</div>
+                        </div>
+                        
+                        <div class="scenario-card" onclick="loadScenario('medical')">
+                            <div class="scenario-icon">🏥</div>
+                            <div class="scenario-name">Medical Bills</div>
+                            <div>Hospital and doctor invoices as negotiable instruments</div>
+                        </div>
+                        
+                        <div class="scenario-card" onclick="loadScenario('tax')">
+                            <div class="scenario-icon">💰</div>
+                            <div class="scenario-name">Tax Obligations</div>
+                            <div>Property tax, income tax statements</div>
+                        </div>
+                        
+                        <div class="scenario-card" onclick="loadScenario('rent')">
+                            <div class="scenario-icon">📄</div>
+                            <div class="scenario-name">Rent Payments</div>
+                            <div>Monthly rent invoices from landlords</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Templates Tab -->
+                <div id="nexus-templates" class="nexus-content">
+                    <div class="template-library">
+                        <div class="template-card" onclick="loadTemplate('endorsement')">
+                            <div class="template-title">
+                                <span class="template-icon">✍️</span> Endorsement Stamp
+                            </div>
+                            <div>Create perfect "without recourse" endorsement for any instrument</div>
+                        </div>
+                        
+                        <div class="template-card" onclick="loadTemplate('notice-tender')">
+                            <div class="template-title">
+                                <span class="template-icon">📄</span> Notice of Tender
+                            </div>
+                            <div>Formal notice of instrument tender under UCC 3-603</div>
+                        </div>
+                        
+                        <div class="template-card" onclick="loadTemplate('dishonor')">
+                            <div class="template-title">
+                                <span class="template-icon">⚠️</span> Notice of Dishonor
+                            </div>
+                            <div>When creditor improperly refuses tender</div>
+                        </div>
+                        
+                        <div class="template-card" onclick="loadTemplate('power-attorney')">
+                            <div class="template-title">
+                                <span class="template-icon">🔐</span> Limited Power of Attorney
+                            </div>
+                            <div>Allow creditor to endorse instruments on your behalf</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Responses Tab -->
+                <div id="nexus-responses" class="nexus-content">
+                    <div class="ucc-card" onclick="insertResponse('definition')">
+                        <div class="ucc-card-title">🎯 Definition Response</div>
+                        <div class="ucc-card-content">
+                            "Under UCC 3-104, this bill is a negotiable instrument containing an unconditional order to pay a fixed amount."
+                        </div>
+                    </div>
+                    
+                    <div class="ucc-card" onclick="insertResponse('tender')">
+                        <div class="ucc-card-title">💸 Tender Response</div>
+                        <div class="ucc-card-content">
+                            "I have tendered payment via negotiable instrument as provided under UCC 3-603(b)."
+                        </div>
+                    </div>
+                    
+                    <div class="ucc-card" onclick="insertResponse('dishonor')">
+                        <div class="ucc-card-title">⏱️ Dishonor Challenge</div>
+                        <div class="ucc-card-content">
+                            "Under UCC 3-502, what specific method and timeframe did you use to dishonor this instrument?"
+                        </div>
+                    </div>
+                    
+                    <div class="ucc-card" onclick="insertResponse('bearer')">
+                        <div class="ucc-card-title">📄 Bearer Status</div>
+                        <div class="ucc-card-content">
+                            "Under UCC 3-109, instruments without specified payee are payable to bearer. This qualifies."
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Process Tab -->
+                <div id="nexus-process" class="nexus-content">
+                    <div class="ucc-card">
+                        <div class="ucc-card-title">1️⃣ Step 1: Identify Instrument</div>
+                        <div class="ucc-card-content">
+                            Any bill/invoice/statement meeting UCC 3-104 criteria = negotiable instrument. Check for unconditional order to pay fixed amount.
+                        </div>
+                    </div>
+                    
+                    <div class="ucc-card">
+                        <div class="ucc-card-title">2️⃣ Step 2: Proper Endorsement</div>
+                        <div class="ucc-card-content">
+                            Add "Without recourse, Pay to the order of [Your Name]" endorsement. This transfers rights in the instrument.
+                        </div>
+                    </div>
+                    
+                    <div class="ucc-card">
+                        <div class="ucc-card-title">3️⃣ Step 3: Tender to Person Entitled</div>
+                        <div class="ucc-card-content">
+                            Send to creditor/collector as "person entitled to enforce." Use certified mail for proof of delivery.
+                        </div>
+                    </div>
+                    
+                    <div class="ucc-card">
+                        <div class="ucc-card-title">4️⃣ Step 4: Document Response</div>
+                        <div class="ucc-card-content">
+                            They MUST properly dishonor per UCC 3-502 OR accept. Failure to do either = acceptance by law.
+                        </div>
+                    </div>
+                    
+                    <div class="ucc-card">
+                        <div class="ucc-card-title">5️⃣ Step 5: Enforce Rights</div>
+                        <div class="ucc-card-content">
+                            If improper refusal, obligation is discharged under UCC 3-603(b). Document everything for court if needed.
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Case Law Tab -->
+                <div id="nexus-cases" class="nexus-content">
+                    <div class="ucc-card">
+                        <div class="ucc-card-title">⚖️ Relevant Case Law</div>
+                        <div class="ucc-card-content">
+                            <strong>Key Principles:</strong><br>
+                            1. UCC Article 3 governs negotiable instruments nationwide<br>
+                            2. Proper tender creates legal obligations<br>
+                            3. Creditors must follow UCC procedures<br>
+                            4. Failure to properly dishonor = acceptance<br>
+                            5. Refusal of proper tender = discharge
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- VIRAL BADGE -->
+        <div class="viral-badge">
+            ⚡ INSTANTLY VIRAL • UNIVERSAL SOLUTION • FINANCIAL FREEDOM TOOL
+        </div>
+        
+        <!-- STATUS BAR -->
+        <div class="status-bar">
+            <div class="save-indicator" id="save-indicator">
+                <span>💾</span> <span>Auto-saving...</span>
+            </div>
+            <div style="opacity: 0.8;">
+                Session ID: <span id="session-id">UCC-${Date.now().toString(36)}</span>
+            </div>
+            <div style="opacity: 0.8;">
+                Last saved: <span id="last-saved">Just now</span>
+            </div>
+        </div>
+        
+        <!-- FOOTER -->
+        <div class="footer">
+            <p>UCC NEXUS v4.0 • Master Negotiable Instruments Assistant • Complete Financial Obligation Solution</p>
+            <p>© 2024 TripsToColombia.com • This is educational material. Consult with an attorney for legal advice.</p>
+        </div>
+    </div>
+
+    <script>
+        // ========== GLOBAL STATE ==========
+        let currentComm = 'phone';
+        let conversationHistory = [];
+        let callStartTime = null;
+        let callTimerInterval = null;
+        let isRecording = false;
+        let recordingStartTime = null;
+        let recordingTimerInterval = null;
+        let savedNotes = '';
+        let letterContent = '';
+        let emailContent = '';
+        let sessionData = {
+            id: `UCC-${Date.now().toString(36)}`,
+            startTime: new Date().toISOString(),
+            notes: '',
+            conversation: [],
+            documents: []
+        };
+
+        // ========== INITIALIZATION ==========
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load initial phone responses
+            loadPhoneResponses();
+            
+            // Start call timer
+            startCallTimer();
+            
+            // Auto-save every 30 seconds
+            setInterval(autoSave, 30000);
+            
+            // Update session ID display
+            document.getElementById('session-id').textContent = sessionData.id;
+            
+            // Load any saved session
+            loadSavedSession();
+        });
+
+        // ========== COMMUNICATION SWITCHER ==========
+        function switchComm(type) {
+            currentComm = type;
+            
+            // Update active button
+            document.querySelectorAll('.comm-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Update workspace title and icon
+            const titles = {
+                phone: '📱 Phone Call Assistant',
+                letter: '✉️ Letter Builder',
+                email: '📧 Email Composer',
+                legal: '⚖️ Legal Document Builder'
+            };
+            
+            const icons = {
+                phone: '📱',
+                letter: '✉️',
+                email: '📧',
+                legal: '⚖️'
+            };
+            
+            document.getElementById('workspace-title').textContent = titles[type];
+            document.getElementById('workspace-icon').textContent = icons[type];
+            
+            // Hide all interfaces
+            document.querySelectorAll('.phone-container, .letter-builder, .email-composer, .legal-builder').forEach(el => {
+                el.classList.remove('active');
+            });
+            
+            // Show selected interface
+            document.getElementById(`${type}-interface`).classList.add('active');
+            
+            // Load appropriate content
+            if (type === 'phone') {
+                loadPhoneResponses();
+                startCallTimer();
+            } else if (type === 'letter') {
+                initializeLetterBuilder();
+            } else if (type === 'email') {
+                initializeEmailComposer();
+            }
+        }
+
+        // ========== PHONE CALL FUNCTIONALITY ==========
+        function loadPhoneResponses() {
+            const responses = [
+                "Under UCC 3-104, this bill is a negotiable instrument. I've endorsed and tendered it back as payment.",
+                "According to UCC 3-603(b), refusal of tender constitutes discharge. Are you refusing my tender?",
+                "I'm tendering payment via negotiable instrument as provided under UCC Article 3. Do you understand UCC requirements?",
+                "The instrument has been properly endorsed and tendered. Under UCC 3-502, what is your reason for dishonor?",
+                "I'd like to establish a Limited Power of Attorney so you can endorse future instruments on my behalf.",
+                "Under UCC 3-109, instruments without specified payee are payable to bearer. This qualifies.",
+                "My tender creates obligations under UCC 3-603. Failure to properly dishonor equals acceptance.",
+                "Can you cite the UCC provision that allows refusal of properly tendered negotiable instruments?",
+                "I'm exercising my rights under UCC Article 3. Would you like me to explain the process?",
+                "This call may be recorded. Let me document your refusal of UCC-compliant tender."
+            ];
+            
+            const container = document.getElementById('phone-actions');
+            container.innerHTML = '';
+            
+            responses.forEach((response, index) => {
+                const card = document.createElement('button');
+                card.className = 'action-card';
+                card.innerHTML = response;
+                card.onclick = () => sendPhoneResponse(response);
+                container.appendChild(card);
+            });
+        }
+
+        function sendPhoneResponse(response) {
+            // Add user message to conversation
+            addConversationEntry(response, 'user');
+            
+            // Generate automated response
+            setTimeout(() => {
+                const responses = [
+                    "We don't accept that form of payment.",
+                    "That's not our policy.",
+                    "We only accept cash, check, or credit card.",
+                    "I'll need to speak with my supervisor.",
+                    "Can you explain that in simpler terms?",
+                    "We've never had anyone do this before.",
+                    "I'm not familiar with UCC requirements.",
+                    "Let me transfer you to our legal department.",
+                    "We need payment in traditional forms.",
+                    "I don't think that applies to utility bills."
+                ];
+                
+                const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                addConversationEntry(randomResponse, 'them');
+            }, 1000 + Math.random() * 2000);
+            
+            // Save to conversation history
+            conversationHistory.push({
+                type: 'user',
+                message: response,
+                timestamp: new Date().toISOString()
+            });
+        }
+
+        function addConversationEntry(message, sender) {
+            const log = document.getElementById('conversation-log');
+            const entry = document.createElement('div');
+            entry.className = `conversation-entry ${sender}-entry`;
+            
+            const label = sender === 'user' ? '👤 YOU' : '🏢 THEM';
+            entry.innerHTML = `
+                <div class="entry-label">${label} • ${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+                <div>${message}</div>
+            `;
+            
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+            
+            // Save to session data
+            sessionData.conversation.push({
+                sender,
+                message,
+                timestamp: new Date().toISOString()
+            });
+        }
+
+        function startCallTimer() {
+            if (callTimerInterval) clearInterval(callTimerInterval);
+            
+            callStartTime = Date.now();
+            const timerElement = document.getElementById('call-timer');
+            
+            callTimerInterval = setInterval(() => {
+                const elapsed = Date.now() - callStartTime;
+                const minutes = Math.floor(elapsed / 60000);
+                const seconds = Math.floor((elapsed % 60000) / 1000);
+                timerElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+
+        // ========== LETTER BUILDER ==========
+        function initializeLetterBuilder() {
+            const editor = document.getElementById('letter-editor');
+            const defaultContent = `[Your Name]
+[Your Address]
+[Date]
+
+[Creditor Name]
+[Creditor Address]
+
+Subject: Notice of Tender - Account #[Account Number]
+
+`;
+            editor.innerHTML = defaultContent;
+            letterContent = defaultContent;
+        }
+
+        function addLetterPart(part) {
+            const editor = document.getElementById('letter-editor');
+            const parts = {
+                greeting: `Dear Sir/Madam,
+
+I am writing regarding account #[Account Number]. `,
+                tender: `Pursuant to Uniform Commercial Code Article 3, I have tendered payment for this account via negotiable instrument dated [Date]. The instrument has been properly endorsed and delivered to you as the "person entitled to enforce" under UCC 3-104.
+
+`,
+                'ucc-reference': `Under UCC 3-603(b), if tender of payment is made to the person entitled to enforce the instrument and the tender is refused, there is discharge of the obligation. Under UCC 3-502, you must either accept the instrument or provide proper notice of dishonor within statutory timeframes.
+
+`,
+                demand: `Failure to properly dishonor the instrument constitutes acceptance by operation of law. Your refusal without proper UCC 3-502 notice violates commercial law and may result in legal action.
+
+I request that you either:
+1. Accept the tendered instrument as payment, OR
+2. Provide proper notice of dishonor per UCC 3-503
+
+`,
+                closing: `Please respond within 15 days of receipt of this letter.
+
+Sincerely,
+
+[Your Signature]
+[Your Printed Name]`
+            };
+            
+            editor.innerHTML += parts[part] || '';
+            editor.focus();
+            
+            // Save to session data
+            sessionData.documents.push({
+                type: 'letter',
+                part,
+                content: parts[part],
+                timestamp: new Date().toISOString()
+            });
+        }
+
+        function copyLetter() {
+            const editor = document.getElementById('letter-editor');
+            navigator.clipboard.writeText(editor.innerText)
+                .then(() => alert('Letter copied to clipboard!'))
+                .catch(err => console.error('Copy failed:', err));
+        }
+
+        function saveLetter() {
+            const editor = document.getElementById('letter-editor');
+            sessionData.letterDraft = editor.innerText;
+            alert('Letter draft saved!');
+        }
+
+        function clearLetter() {
+            if (confirm('Clear the entire letter?')) {
+                initializeLetterBuilder();
+            }
+        }
+
+        // ========== EMAIL COMPOSER ==========
+        function initializeEmailComposer() {
+            // Set default values
+            document.getElementById('email-subject').value = 'Tender of Negotiable Instrument - Account #[Account]';
+            document.getElementById('email-body').value = `Dear Accounts Department,
+
+I am writing regarding account #[Account Number]. 
+
+Pursuant to UCC Article 3, I am tendering payment via negotiable instrument. The instrument has been properly endorsed and constitutes legal tender under state commercial law.
+
+Under UCC 3-603(b), refusal of proper tender without valid UCC 3-502 dishonor constitutes discharge of the obligation.
+
+Please either accept this tender or provide proper notice of dishonor per UCC 3-503.
+
+Sincerely,
+[Your Name]`;
+        }
+
+        function addEmailPart(part) {
+            const textarea = document.getElementById('email-body');
+            const parts = {
+                tender: `\n\nI have tendered payment via negotiable instrument as provided under UCC 3-603(b). The instrument meets all criteria of UCC 3-104.`,
+                ucc: `\n\nReference: UCC 3-104 (negotiable instrument), UCC 3-603(b) (tender and discharge), UCC 3-502 (dishonor requirements).`,
+                demand: `\n\nFailure to properly process this tender may result in legal action for breach under UCC Article 3.`
+            };
+            
+            textarea.value += parts[part] || '';
+            textarea.focus();
+        }
+
+        function copyEmail() {
+            const to = document.getElementById('email-to').value;
+            const subject = document.getElementById('email-subject').value;
+            const body = document.getElementById('email-body').value;
+            
+            const fullEmail = `To: ${to}\nSubject: ${subject}\n\n${body}`;
+            
+            navigator.clipboard.writeText(fullEmail)
+                .then(() => alert('Email copied to clipboard!'))
+                .catch(err => console.error('Copy failed:', err));
+        }
+
+        // ========== LEGAL DOCUMENT BUILDER ==========
+        function generateLegalDoc(type) {
+            const templates = {
+                complaint: `IN THE [COURT NAME]
+[YOUR NAME], Plaintiff,
+vs.
+[CREDITOR NAME], Defendant.
+
+COMPLAINT FOR BREACH UNDER UCC 3-603(b)
+
+1. Plaintiff is [Your Name].
+2. Defendant is [Creditor Name].
+3. Defendant sent Plaintiff a bill/invoice dated [Date].
+4. Said bill meets all criteria of UCC 3-104 for negotiable instruments.
+5. Plaintiff properly endorsed and tendered instrument back to Defendant.
+6. Defendant refused tender without proper UCC 3-502 dishonor.
+7. Under UCC 3-603(b), refusal constitutes discharge.
+8. Defendant continues to demand payment on discharged obligation.
+
+WHEREFORE, Plaintiff requests judgment for breach under UCC Article 3.`,
+                
+                motion: `MOTION TO DISMISS BASED ON IMPROPER REFUSAL OF TENDER
+
+COMES NOW [Your Name], moving this Court to dismiss the action based on Defendant's improper refusal of properly tendered negotiable instrument.
+
+1. Tender was made per UCC 3-603(b).
+2. No proper dishonor per UCC 3-502.
+3. Obligation discharged by operation of law.
+4. No valid claim exists.
+
+[Your Signature]`,
+                
+                declaration: `DECLARATION OF [YOUR NAME]
+
+I, [Your Name], declare under penalty of perjury:
+
+1. I received bill/invoice from [Creditor] dated [Date].
+2. Said bill meets UCC 3-104 criteria.
+3. I endorsed with "Without recourse" per UCC 3-205.
+4. I tendered instrument to creditor on [Date].
+5. Creditor refused without proper UCC 3-502 notice.
+6. Under UCC 3-603(b), obligation is discharged.
+
+[Signature]`,
+                
+                poa: `LIMITED POWER OF ATTORNEY
+
+I, [Your Name], appoint [Creditor Agent] to endorse negotiable instruments on my behalf for account #[Account] only.
+
+Scope limited to endorsement only. No other authority granted.
+
+[Your Signature]`
+            };
+            
+            const content = templates[type] || 'Template not found.';
+            navigator.clipboard.writeText(content)
+                .then(() => alert(`${type.toUpperCase()} copied to clipboard!`))
+                .catch(err => console.error('Copy failed:', err));
+        }
+
+        // ========== NOTE TAKING AND RECORDING ==========
+        function saveNotes() {
+            const notes = document.getElementById('session-notes').value;
+            sessionData.notes = notes;
+            savedNotes = notes;
+            alert('Notes saved!');
+        }
+
+        function toggleRecording() {
+            const btn = document.getElementById('record-btn');
+            const status = document.getElementById('recording-status');
+            const timer = document.getElementById('recording-timer');
+            
+            isRecording = !isRecording;
+            
+            if (isRecording) {
+                btn.classList.add('recording');
+                status.textContent = 'Recording...';
+                status.style.color = '#ff4444';
+                
+                recordingStartTime = Date.now();
+                recordingTimerInterval = setInterval(() => {
+                    const elapsed = Date.now() - recordingStartTime;
+                    const minutes = Math.floor(elapsed / 60000);
+                    const seconds = Math.floor((elapsed % 60000) / 1000);
+                    timer.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                }, 1000);
+                
+                // Add recording note
+                addConversationEntry('[CALL RECORDING STARTED]', 'system');
+            } else {
+                btn.classList.remove('recording');
+                status.textContent = 'Recording saved';
+                status.style.color = '#4CAF50';
+                
+                clearInterval(recordingTimerInterval);
+                timer.textContent = '00:00';
+                
+                // Add recording note
+                addConversationEntry('[CALL RECORDING STOPPED]', 'system');
+                
+                // Save recording data
+                sessionData.recordings = sessionData.recordings || [];
+                sessionData.recordings.push({
+                    start: new Date(recordingStartTime).toISOString(),
+                    end: new Date().toISOString(),
+                    duration: Date.now() - recordingStartTime
+                });
+            }
+        }
+
+        // ========== KNOWLEDGE NEXUS ==========
+        function switchNexusTab(tab) {
+            // Update active tab
+            document.querySelectorAll('.nexus-tab').forEach(t => {
+                t.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Hide all content
+            document.querySelectorAll('.nexus-content').forEach(c => {
+                c.classList.remove('active');
+            });
+            
+            // Show selected content
+            document.getElementById(`nexus-${tab}`).classList.add('active');
+        }
+
+        function searchKnowledge(event) {
+            const query = event.target.value.toLowerCase();
+            const cards = document.querySelectorAll('.ucc-card, .scenario-card, .template-card');
+            
+            cards.forEach(card => {
+                const text = card.textContent.toLowerCase();
+                card.style.display = text.includes(query) ? 'block' : 'none';
+            });
+        }
+
+        function insertUCC(section) {
+            const uccTexts = {
+                '3-104': 'Under UCC 3-104, this instrument contains an unconditional order to pay a fixed amount, making it a negotiable instrument.',
+                '3-603': 'UCC 3-603(b) states that refusal of proper tender constitutes discharge of the obligation.',
+                '3-502': 'UCC 3-502 requires specific procedures for dishonor. Failure to follow them constitutes acceptance.',
+                '3-109': 'UCC 3-109 provides that instruments without specified payee are payable to bearer.'
+            };
+            
+            if (currentComm === 'phone') {
+                sendPhoneResponse(uccTexts[section]);
+            } else if (currentComm === 'letter') {
+                addLetterPart('ucc-reference');
+            } else if (currentComm === 'email') {
+                addEmailPart('ucc');
+            }
+        }
+
+        function insertResponse(type) {
+            const responses = {
+                definition: 'Under UCC 3-104, this bill is a negotiable instrument containing an unconditional order to pay a fixed amount.',
+                tender: 'I have tendered payment via negotiable instrument as provided under UCC 3-603(b).',
+                dishonor: 'Under UCC 3-502, what specific method and timeframe did you use to dishonor this instrument?',
+                bearer: 'Under UCC 3-109, instruments without specified payee are payable to bearer. This qualifies.'
+            };
+            
+            if (currentComm === 'phone') {
+                sendPhoneResponse(responses[type]);
+            } else if (currentComm === 'letter') {
+                const editor = document.getElementById('letter-editor');
+                editor.innerHTML += `\n${responses[type]}`;
+            }
+        }
+
+        function loadScenario(scenario) {
+            alert(`Loading ${scenario} scenario... Switch to phone call to practice this scenario.`);
+            switchComm('phone');
+        }
+
+        function loadTemplate(template) {
+            alert(`Loading ${template} template...`);
+            if (template === 'endorsement') {
+                navigator.clipboard.writeText('WITHOUT RECOURSE\nPAY TO THE ORDER OF:\n[YOUR NAME]\nBy: _______________\n[AGENT], AGENT')
+                    .then(() => alert('Endorsement stamp copied to clipboard!'));
+            }
+        }
+
+        // ========== SESSION MANAGEMENT ==========
+        function autoSave() {
+            // Save notes
+            const notes = document.getElementById('session-notes').value;
+            sessionData.notes = notes;
+            
+            // Update last saved time
+            document.getElementById('last-saved').textContent = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            
+            // Visual feedback
+            const indicator = document.getElementById('save-indicator');
+            indicator.style.opacity = '1';
+            setTimeout(() => indicator.style.opacity = '0.7', 500);
+            
+            // Save to localStorage
+            localStorage.setItem('ucc-nexus-session', JSON.stringify(sessionData));
+        }
+
+        function saveSession() {
+            autoSave();
+            alert('Session saved!');
+        }
+
+        function exportSession() {
+            const dataStr = JSON.stringify(sessionData, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = `UCC-Session-${sessionData.id}.json`;
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+        }
+
+        function loadSavedSession() {
+            const saved = localStorage.getItem('ucc-nexus-session');
+            if (saved) {
+                try {
+                    sessionData = JSON.parse(saved);
+                    if (sessionData.notes) {
+                        document.getElementById('session-notes').value = sessionData.notes;
+                    }
+                    alert('Previous session loaded!');
+                } catch (e) {
+                    console.error('Failed to load session:', e);
+                }
+            }
+        }
+
+        // ========== KEYBOARD SHORTCUTS ==========
+        document.addEventListener('keydown', function(e) {
+            // Ctrl+S to save
+            if (e.ctrlKey && e.key === 's') {
+                e.preventDefault();
+                saveSession();
+            }
+            
+            // Ctrl+1-4 to switch communication types
+            if (e.ctrlKey && e.key >= '1' && e.key <= '4') {
+                const types = ['phone', 'letter', 'email', 'legal'];
+                const index = parseInt(e.key) - 1;
+                if (types[index]) {
+                    const button = document.querySelectorAll('.comm-btn')[index];
+                    if (button) button.click();
+                }
+            }
+            
+            // Space to simulate recording toggle (when in phone mode)
+            if (e.code === 'Space' && currentComm === 'phone') {
+                e.preventDefault();
+                toggleRecording();
+            }
+        });
+
+        // ========== VIRAL FEATURES ==========
+        // Share functionality
+        function shareSession() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'UCC Nexus Session',
+                    text: 'Check out my UCC negotiation session!',
+                    url: window.location.href
+                });
+            } else {
+                alert('Share this link: ' + window.location.href);
+            }
+        }
+
+        // Add share button to header
+        const shareBtn = document.createElement('button');
+        shareBtn.className = 'btn';
+        shareBtn.innerHTML = '📤 Share';
+        shareBtn.onclick = shareSession;
+        document.querySelector('.workspace-header').appendChild(shareBtn);
+    </script>
+</body>
+</html>
