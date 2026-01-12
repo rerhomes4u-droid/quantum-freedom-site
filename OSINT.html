@@ -1,0 +1,1508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forbidden Knowledge - OSINT</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary-color: #1a237e;
+            --secondary-color: #283593;
+            --accent-color: #5c6bc0;
+            --dark-color: #121212;
+            --light-color: #f5f5f5;
+            --warning-color: #ff6b6b;
+            --success-color: #4caf50;
+        }
+        
+        body {
+            background-color: var(--dark-color);
+            color: var(--light-color);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        /* Header Styles */
+        header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            padding: 2rem 0;
+            text-align: center;
+            border-bottom: 3px solid var(--accent-color);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path fill="rgba(255,255,255,0.05)" d="M50,0 Q100,50 50,100 Q0,50 50,0 Z"/></svg>');
+            opacity: 0.1;
+        }
+        
+        .logo {
+            font-size: 3.5rem;
+            font-weight: 800;
+            letter-spacing: 3px;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #fff, var(--accent-color));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            position: relative;
+            z-index: 1;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: rgba(255,255,255,0.8);
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .memorial-banner {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            margin-top: 20px;
+            border-left: 4px solid var(--warning-color);
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* Navigation */
+        nav {
+            background-color: rgba(0, 0, 0, 0.9);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--accent-color);
+        }
+        
+        .nav-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .nav-btn {
+            background: var(--secondary-color);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .nav-btn:hover {
+            background: var(--accent-color);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .nav-btn.active {
+            background: var(--warning-color);
+        }
+        
+        /* Main Content */
+        main {
+            padding: 40px 0;
+        }
+        
+        .section {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        .section.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .section-title {
+            font-size: 2.2rem;
+            margin-bottom: 30px;
+            color: var(--accent-color);
+            border-bottom: 2px solid var(--secondary-color);
+            padding-bottom: 10px;
+        }
+        
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+        
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            border-color: var(--accent-color);
+        }
+        
+        .card h3 {
+            color: var(--accent-color);
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+        
+        .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: var(--warning-color);
+        }
+        
+        /* Tool Styles */
+        .tool-container {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 30px;
+            border: 1px solid var(--secondary-color);
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--accent-color);
+        }
+        
+        .input-group input, 
+        .input-group textarea, 
+        .input-group select {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            color: white;
+            font-size: 16px;
+        }
+        
+        .input-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, var(--secondary-color), var(--accent-color));
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn:hover {
+            background: linear-gradient(45deg, var(--accent-color), var(--secondary-color));
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        .btn-warning {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e8e);
+        }
+        
+        /* Results Display */
+        .results-container {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 30px;
+            border: 1px solid var(--secondary-color);
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .result-item {
+            padding: 15px;
+            margin-bottom: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 5px;
+            border-left: 4px solid var(--accent-color);
+        }
+        
+        /* Ethical Warning */
+        .ethical-warning {
+            background: rgba(255, 107, 107, 0.1);
+            border: 1px solid var(--warning-color);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 30px 0;
+        }
+        
+        .warning-icon {
+            font-size: 2rem;
+            color: var(--warning-color);
+            margin-bottom: 15px;
+        }
+        
+        /* Footer */
+        footer {
+            background: rgba(0, 0, 0, 0.9);
+            padding: 40px 0;
+            margin-top: 60px;
+            border-top: 1px solid var(--secondary-color);
+            text-align: center;
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .footer-link {
+            color: var(--accent-color);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        
+        .footer-link:hover {
+            color: var(--warning-color);
+        }
+        
+        .copyright {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .logo {
+                font-size: 2.5rem;
+            }
+            
+            .card-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .nav-btn {
+                width: 90%;
+                justify-content: center;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1 class="logo">FORBIDDEN KNOWLEDGE</h1>
+            <p class="subtitle">Open Source Intelligence for the Protection of Mankind | A Memorial Project</p>
+            <div class="memorial-banner">
+                <i class="fas fa-heart" style="color: #ff6b6b; margin-right: 10px;"></i>
+                <strong>In Memoriam:</strong> This project honors the life mission of a visionary who believed in using open source intelligence to create a safer world for all humanity.
+            </div>
+        </div>
+    </header>
+    
+    <nav>
+        <div class="container nav-container">
+            <button class="nav-btn active" data-section="home">
+                <i class="fas fa-home"></i> Home
+            </button>
+            <button class="nav-btn" data-section="manifesto">
+                <i class="fas fa-scroll"></i> Manifesto
+            </button>
+            <button class="nav-btn" data-section="tools">
+                <i class="fas fa-tools"></i> OSINT Tools
+            </button>
+            <button class="nav-btn" data-section="resources">
+                <i class="fas fa-book"></i> Resources
+            </button>
+            <button class="nav-btn" data-section="ethics">
+                <i class="fas fa-balance-scale"></i> Ethics
+            </button>
+            <button class="nav-btn" data-section="about">
+                <i class="fas fa-info-circle"></i> About
+            </button>
+        </div>
+    </nav>
+    
+    <main class="container">
+        <!-- Home Section -->
+        <section id="home" class="section active">
+            <h2 class="section-title">The OSINT Revolution</h2>
+            
+            <div class="ethical-warning">
+                <div class="warning-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h3>ETHICAL USE ONLY</h3>
+                <p>This tool is designed for ethical open source intelligence gathering only. All information must be obtained through legal means, respecting privacy laws and individual rights. Never use OSINT for harassment, stalking, or illegal activities.</p>
+            </div>
+            
+            <div class="card-grid">
+                <div class="card">
+                    <div class="card-icon">
+                        <i class="fas fa-eye"></i>
+                    </div>
+                    <h3>Transparency Through Openness</h3>
+                    <p>True security comes from transparency, not secrecy. When information flows freely, societies can self-correct and innovate. OSINT empowers citizens to hold institutions accountable.</p>
+                </div>
+                
+                <div class="card">
+                    <div class="card-icon">
+                        <i class="fas fa-network-wired"></i>
+                    </div>
+                    <h3>The Eight Tribes of Information</h3>
+                    <p>Academic, Civil Society, Commerce, Government, Law Enforcement, Media, Military, and Non-Governmental organizations. Each tribe holds pieces of the puzzle.</p>
+                </div>
+                
+                <div class="card">
+                    <div class="card-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3>Collective Intelligence</h3>
+                    <p>No single agency or government holds all knowledge. By connecting distributed intelligence across the globe, we create a "world brain" capable of solving humanity's greatest challenges.</p>
+                </div>
+                
+                <div class="card">
+                    <div class="card-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3>Protection Through Awareness</h3>
+                    <p>An informed public is a protected public. OSINT provides early warning systems for everything from natural disasters to financial collapses, enabling proactive response.</p>
+                </div>
+            </div>
+            
+            <div class="tool-container" style="margin-top: 40px;">
+                <h3>Quick OSINT Check</h3>
+                <p>Enter a public website URL to analyze its publicly available information:</p>
+                
+                <div class="input-group">
+                    <label for="urlInput"><i class="fas fa-globe"></i> Website URL</label>
+                    <input type="text" id="urlInput" placeholder="https://example.com">
+                </div>
+                
+                <button class="btn" id="analyzeUrl">
+                    <i class="fas fa-search"></i> Analyze Public Information
+                </button>
+                
+                <div id="urlResults" class="results-container" style="display: none;">
+                    <h4>Analysis Results:</h4>
+                    <div id="urlResultContent"></div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Manifesto Section -->
+        <section id="manifesto" class="section">
+            <h2 class="section-title">The Open Source Everything Manifesto</h2>
+            
+            <div class="card">
+                <h3><i class="fas fa-quote-left"></i> Core Principles</h3>
+                <p>The open source revolution extends beyond software to encompass all human knowledge and systems. When we open source everything, we create a world where:</p>
+                
+                <ul style="margin-left: 20px; margin-top: 15px;">
+                    <li>Information flows freely across artificial boundaries</li>
+                    <li>Innovation accelerates through collaboration</li>
+                    <li>Power decentralizes from corruptible centers</li>
+                    <li>True costs become transparent</li>
+                    <li>Waste is systematically eliminated</li>
+                    <li>Ethics become the operating system of civilization</li>
+                </ul>
+            </div>
+            
+            <div class="card-grid">
+                <div class="card">
+                    <h3>The 9 Core Opens</h3>
+                    <ol style="margin-left: 20px;">
+                        <li><strong>Open Source Software</strong></li>
+                        <li><strong>Open Source Hardware</strong></li>
+                        <li><strong>Open Standards</strong></li>
+                        <li><strong>Open Spectrum</strong></li>
+                        <li><strong>Open Access Research</strong></li>
+                        <li><strong>Open Data</strong></li>
+                        <li><strong>Open Knowledge</strong></li>
+                        <li><strong>Open Governance</strong></li>
+                        <li><strong>Open Money</strong></li>
+                    </ol>
+                </div>
+                
+                <div class="card">
+                    <h3>From Secrecy to Transparency</h3>
+                    <p>Traditional intelligence fails because it operates on only 2% of available information. Secrecy breeds corruption, while transparency enables accountability.</p>
+                    <p>"Do not send a spy where a schoolboy can go." - The OSINT Principle</p>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>The World Brain Concept</h3>
+                <p>Imagine a global neural network where every person can contribute to and access humanity's collective intelligence. A system where:</p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li>Every fact is geospatially and temporally tagged</li>
+                    <li>All information is available in all languages</li>
+                    <li>Citizens become "intelligence minutemen" on issues they care about</li>
+                    <li>Decision-makers have access to holistic, evidence-based information</li>
+                </ul>
+            </div>
+        </section>
+        
+        <!-- Tools Section -->
+        <section id="tools" class="section">
+            <h2 class="section-title">OSINT Tools & Techniques</h2>
+            
+            <div class="ethical-warning">
+                <i class="fas fa-exclamation-circle"></i>
+                <strong>Reminder:</strong> These tools only access publicly available information. Respect privacy laws and terms of service.
+            </div>
+            
+            <div class="tool-container">
+                <h3><i class="fas fa-search"></i> Public Records Search</h3>
+                <p>Search for publicly available information across multiple sources:</p>
+                
+                <div class="input-group">
+                    <label for="searchTerm">Search Term (Organization, Public Figure, Concept)</label>
+                    <input type="text" id="searchTerm" placeholder="Enter search term">
+                </div>
+                
+                <div class="input-group">
+                    <label for="searchType">Search Type</label>
+                    <select id="searchType">
+                        <option value="general">General Information</option>
+                        <option value="news">News Archives</option>
+                        <option value="academic">Academic Papers</option>
+                        <option value="government">Government Publications</option>
+                    </select>
+                </div>
+                
+                <button class="btn" id="startSearch">
+                    <i class="fas fa-search"></i> Search Public Sources
+                </button>
+                
+                <div id="searchResults" class="results-container" style="display: none;">
+                    <h4>Search Results:</h4>
+                    <div id="searchResultContent"></div>
+                </div>
+            </div>
+            
+            <div class="tool-container">
+                <h3><i class="fas fa-map-marked-alt"></i> Geospatial Intelligence</h3>
+                <p>Analyze geographic patterns and relationships using open data:</p>
+                
+                <div class="input-group">
+                    <label for="locationInput">Location or Coordinates</label>
+                    <input type="text" id="locationInput" placeholder="City, Country or lat,long">
+                </div>
+                
+                <div class="input-group">
+                    <label for="analysisType">Analysis Type</label>
+                    <select id="analysisType">
+                        <option value="demographics">Demographic Patterns</option>
+                        <option value="infrastructure">Infrastructure Mapping</option>
+                        <option value="environmental">Environmental Factors</option>
+                        <option value="historical">Historical Changes</option>
+                    </select>
+                </div>
+                
+                <button class="btn" id="analyzeGeo">
+                    <i class="fas fa-map"></i> Analyze Geospatial Data
+                </button>
+                
+                <div id="geoResults" class="results-container" style="display: none;">
+                    <h4>Geospatial Analysis:</h4>
+                    <div id="geoResultContent"></div>
+                </div>
+            </div>
+            
+            <div class="tool-container">
+                <h3><i class="fas fa-project-diagram"></i> Network Analysis</h3>
+                <p>Map relationships between entities using publicly available information:</p>
+                
+                <div class="input-group">
+                    <label for="entityName">Entity Name (Organization or Public Figure)</label>
+                    <input type="text" id="entityName" placeholder="Enter entity name">
+                </div>
+                
+                <div class="input-group">
+                    <label for="relationshipDepth">Relationship Depth</label>
+                    <select id="relationshipDepth">
+                        <option value="1">Direct Connections</option>
+                        <option value="2">2nd Degree Connections</option>
+                        <option value="3">3rd Degree Connections</option>
+                    </select>
+                </div>
+                
+                <button class="btn" id="analyzeNetwork">
+                    <i class="fas fa-network-wired"></i> Map Relationship Network
+                </button>
+                
+                <div id="networkResults" class="results-container" style="display: none;">
+                    <h4>Network Analysis:</h4>
+                    <div id="networkResultContent"></div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>Advanced OSINT Techniques</h3>
+                <p>For educational purposes only - these techniques must be used ethically:</p>
+                
+                <div class="card-grid" style="grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); margin-top: 20px;">
+                    <div class="card">
+                        <h4>Metadata Analysis</h4>
+                        <p>Extracting information from file metadata (images, documents)</p>
+                    </div>
+                    
+                    <div class="card">
+                        <h4>Social Media Intelligence</h4>
+                        <p>Analyzing publicly shared social media data</p>
+                    </div>
+                    
+                    <div class="card">
+                        <h4>DNS & IP Investigation</h4>
+                        <p>Tracing domain ownership and network infrastructure</p>
+                    </div>
+                    
+                    <div class="card">
+                        <h4>Archive Analysis</h4>
+                        <p>Using Wayback Machine and other archives</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Resources Section -->
+        <section id="resources" class="section">
+            <h2 class="section-title">OSINT Resources & Training</h2>
+            
+            <div class="card">
+                <h3><i class="fas fa-graduation-cap"></i> Learning Path</h3>
+                <p>Become a certified OSINT professional through these resources:</p>
+                
+                <div class="card-grid" style="margin-top: 20px;">
+                    <div class="card">
+                        <h4>Beginner Level</h4>
+                        <ul>
+                            <li>Basic Internet Search Techniques</li>
+                            <li>Understanding Public Records</li>
+                            <li>Ethics of OSINT</li>
+                            <li>Fact-Checking Methods</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="card">
+                        <h4>Intermediate Level</h4>
+                        <ul>
+                            <li>Advanced Search Operators</li>
+                            <li>Geospatial Analysis</li>
+                            <li>Network Mapping</li>
+                            <li>Data Visualization</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="card">
+                        <h4>Advanced Level</h4>
+                        <ul>
+                            <li>Multilingual OSINT</li>
+                            <li>Blockchain Analysis</li>
+                            <li>Threat Intelligence</li>
+                            <li>Predictive Analytics</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tool-container">
+                <h3><i class="fas fa-toolbox"></i> OSINT Tool Directory</h3>
+                <p>Curated list of legitimate OSINT tools and platforms:</p>
+                
+                <div class="input-group">
+                    <label for="toolCategory">Tool Category</label>
+                    <select id="toolCategory">
+                        <option value="search">Search Engines</option>
+                        <option value="social">Social Media</option>
+                        <option value="maps">Mapping Tools</option>
+                        <option value="data">Data Analysis</option>
+                        <option value="visualization">Visualization</option>
+                        <option value="archives">Archives</option>
+                    </select>
+                </div>
+                
+                <button class="btn" id="showTools">
+                    <i class="fas fa-list"></i> Show Recommended Tools
+                </button>
+                
+                <div id="toolList" class="results-container" style="display: none;">
+                    <h4>Recommended Tools:</h4>
+                    <div id="toolListContent"></div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3><i class="fas fa-book-open"></i> Essential Reading</h3>
+                <div class="card-grid" style="grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));">
+                    <div class="card">
+                        <h4>Books</h4>
+                        <ul>
+                            <li>"Open Source Intelligence Techniques" by Michael Bazzell</li>
+                            <li>"The New Craft of Intelligence" by Robert Steele</li>
+                            <li>"Intelligence for Earth" by Robert Steele</li>
+                            <li>"The Open Source Everything Manifesto" by Robert Steele</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="card">
+                        <h4>Online Resources</h4>
+                        <ul>
+                            <li>OSINT Framework (osintframework.com)</li>
+                            <li>Bellingcat Investigation Methods</li>
+                            <li>EUROPOL OSINT Guidelines</li>
+                            <li>UN Open Source Intelligence Manual</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="card">
+                        <h4>Academic Journals</h4>
+                        <ul>
+                            <li>Journal of Intelligence Studies</li>
+                            <li>International Journal of Intelligence</li>
+                            <li>Open Source Intelligence Review</li>
+                            <li>Journal of Strategic Security</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Ethics Section -->
+        <section id="ethics" class="section">
+            <h2 class="section-title">OSINT Ethics & Legal Framework</h2>
+            
+            <div class="ethical-warning" style="background: rgba(76, 175, 80, 0.1); border-color: var(--success-color);">
+                <div class="warning-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3>THE OSINT CODE OF ETHICS</h3>
+                <p>Intelligence without ethics is dangerous. Ethics without intelligence is ineffective.</p>
+            </div>
+            
+            <div class="card-grid">
+                <div class="card">
+                    <h3><i class="fas fa-balance-scale"></i> Legal Boundaries</h3>
+                    <ul>
+                        <li>Only access publicly available information</li>
+                        <li>Respect terms of service of websites</li>
+                        <li>Comply with data protection laws (GDPR, CCPA)</li>
+                        <li>Never impersonate or use false pretenses</li>
+                        <li>Respect intellectual property rights</li>
+                        <li>Report child exploitation material to authorities</li>
+                    </ul>
+                </div>
+                
+                <div class="card">
+                    <h3><i class="fas fa-user-shield"></i> Privacy Protection</h3>
+                    <ul>
+                        <li>Minimize collection of personal data</li>
+                        <li>Anonymize data when possible</li>
+                        <li>Secure collected information</li>
+                        <li>Delete data when no longer needed</li>
+                        <li>Respect "right to be forgotten" requests</li>
+                        <li>Avoid doxxing or exposing private information</li>
+                    </ul>
+                </div>
+                
+                <div class="card">
+                    <h3><i class="fas fa-gavel"></i> Responsible Use</h3>
+                    <ul>
+                        <li>Verify information before acting on it</li>
+                        <li>Consider proportionality of investigation</li>
+                        <li>Maintain chain of custody for evidence</li>
+                        <li>Document your methodology</li>
+                        <li>Be transparent about limitations</li>
+                        <li>Correct errors promptly</li>
+                    </ul>
+                </div>
+                
+                <div class="card">
+                    <h3><i class="fas fa-handshake"></i> Beneficial Applications</h3>
+                    <ul>
+                        <li>Investigative journalism</li>
+                        <li>Human rights monitoring</li>
+                        <li>Disaster response coordination</li>
+                        <li>Environmental protection</li>
+                        <li>Anti-corruption investigations</li>
+                        <li>Public health research</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="tool-container">
+                <h3><i class="fas fa-check-circle"></i> Ethical Decision Matrix</h3>
+                <p>Use this tool to evaluate the ethics of an OSINT investigation:</p>
+                
+                <div class="input-group">
+                    <label for="investigationPurpose">Purpose of Investigation</label>
+                    <textarea id="investigationPurpose" placeholder="Describe why you're conducting this investigation"></textarea>
+                </div>
+                
+                <div class="input-group">
+                    <label for="dataSources">Data Sources</label>
+                    <input type="text" id="dataSources" placeholder="Where will you obtain information?">
+                </div>
+                
+                <div class="input-group">
+                    <label for="potentialHarm">Potential Harm</label>
+                    <textarea id="potentialHarm" placeholder="What potential harm could result?"></textarea>
+                </div>
+                
+                <button class="btn" id="evaluateEthics">
+                    <i class="fas fa-balance-scale"></i> Evaluate Ethical Considerations
+                </button>
+                
+                <div id="ethicsResults" class="results-container" style="display: none;">
+                    <h4>Ethical Assessment:</h4>
+                    <div id="ethicsResultContent"></div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- About Section -->
+        <section id="about" class="section">
+            <h2 class="section-title">About This Project</h2>
+            
+            <div class="card">
+                <h3><i class="fas fa-history"></i> The Vision</h3>
+                <p>This project was inspired by the work of Robert Steele and other pioneers of the Open Source Intelligence revolution. It represents a vision where:</p>
+                <ul style="margin-left: 20px; margin-top: 15px;">
+                    <li>Citizens have the tools to understand their world</li>
+                    <li>Information asymmetry is reduced</li>
+                    <li>Collective intelligence protects humanity</li>
+                    <li>Transparency defeats corruption</li>
+                </ul>
+            </div>
+            
+            <div class="card">
+                <h3><i class="fas fa-crosshairs"></i> Mission Statement</h3>
+                <p><strong>Forbidden Knowledge - OSINT</strong> aims to create a gold-standard OSINT capability that operates alongside traditional intelligence agencies, providing:</p>
+                
+                <div class="card-grid" style="margin-top: 20px;">
+                    <div class="card">
+                        <h4>For Citizens</h4>
+                        <ul>
+                            <li>Tools to verify information</li>
+                            <li>Understanding of global systems</li>
+                            <li>Protection from misinformation</li>
+                            <li>Capacity for civic engagement</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="card">
+                        <h4>For Organizations</h4>
+                        <ul>
+                            <li>Threat intelligence</li>
+                            <li>Competitive analysis</li>
+                            <li>Risk assessment</li>
+                            <li>Strategic planning</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="card">
+                        <h4>For Humanity</h4>
+                        <ul>
+                            <li>Early warning systems</li>
+                            <li>Global problem-solving</li>
+                            <li>Cross-cultural understanding</li>
+                            <li>Preservation of knowledge</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="tool-container">
+                <h3><i class="fas fa-users"></i> Join the Movement</h3>
+                <p>This is an open source project. Contribute to its development:</p>
+                
+                <div class="input-group">
+                    <label for="contributionType">How would you like to contribute?</label>
+                    <select id="contributionType">
+                        <option value="code">Code Development</option>
+                        <option value="research">Research & Analysis</option>
+                        <option value="documentation">Documentation</option>
+                        <option value="training">Training Materials</option>
+                        <option value="outreach">Community Outreach</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label for="contactEmail">Contact Email (Optional)</label>
+                    <input type="email" id="contactEmail" placeholder="your.email@example.com">
+                </div>
+                
+                <button class="btn" id="joinProject">
+                    <i class="fas fa-handshake"></i> Express Interest in Contributing
+                </button>
+                
+                <div id="contributionResponse" class="results-container" style="display: none;">
+                    <h4>Thank You!</h4>
+                    <div id="contributionResponseContent"></div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3><i class="fas fa-heart"></i> In Memoriam</h3>
+                <p>This project honors the memory of a visionary who believed in the power of open source intelligence to protect humanity. His mission continues through this work and through all who use knowledge ethically to create a better world.</p>
+                
+                <blockquote style="margin-top: 20px; padding-left: 20px; border-left: 3px solid var(--accent-color); font-style: italic;">
+                    "The craft of intelligence is about having an objective, professional group that is able to craft a requirement in partnership with the person being supported. Open Source Intelligence is the application of The Craft of Intelligence legally and ethically to create smart cities, smart nations, smart companies, smart citizens. It's about not being a sheep."
+                </blockquote>
+            </div>
+        </section>
+    </main>
+    
+    <footer>
+        <div class="container">
+            <div class="footer-links">
+                <a href="#home" class="footer-link" data-section="home">Home</a>
+                <a href="#ethics" class="footer-link" data-section="ethics">Code of Ethics</a>
+                <a href="#resources" class="footer-link" data-section="resources">Resources</a>
+                <a href="#about" class="footer-link" data-section="about">About</a>
+            </div>
+            
+            <p class="copyright">
+                Forbidden Knowledge - OSINT | An Open Source Intelligence Platform<br>
+                Dedicated to the Protection of Mankind | In Memoriam<br>
+                © 2024 | This application runs entirely client-side | No data is stored or transmitted
+            </p>
+            
+            <p style="margin-top: 20px; color: rgba(255, 255, 255, 0.3); font-size: 0.8rem;">
+                <i class="fas fa-exclamation-triangle"></i> For ethical and educational purposes only. Use responsibly.
+            </p>
+        </div>
+    </footer>
+    
+    <script>
+        // Navigation System
+        document.querySelectorAll('.nav-btn').forEach(button => {
+            button.addEventListener('click', () => {
+                // Update active button
+                document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                
+                // Show selected section
+                const sectionId = button.getAttribute('data-section');
+                document.querySelectorAll('.section').forEach(section => {
+                    section.classList.remove('active');
+                });
+                document.getElementById(sectionId).classList.add('active');
+            });
+        });
+        
+        // Footer links navigation
+        document.querySelectorAll('.footer-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const sectionId = link.getAttribute('data-section');
+                
+                // Update active button
+                document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+                document.querySelector(`.nav-btn[data-section="${sectionId}"]`).classList.add('active');
+                
+                // Show selected section
+                document.querySelectorAll('.section').forEach(section => {
+                    section.classList.remove('active');
+                });
+                document.getElementById(sectionId).classList.add('active');
+            });
+        });
+        
+        // URL Analysis Tool
+        document.getElementById('analyzeUrl').addEventListener('click', () => {
+            const url = document.getElementById('urlInput').value.trim();
+            const resultsDiv = document.getElementById('urlResults');
+            const contentDiv = document.getElementById('urlResultContent');
+            
+            if (!url) {
+                alert('Please enter a URL to analyze');
+                return;
+            }
+            
+            // Show loading
+            contentDiv.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Analyzing public information...</p>';
+            resultsDiv.style.display = 'block';
+            
+            // Simulate analysis (in a real app, this would make actual API calls)
+            setTimeout(() => {
+                const domain = new URL(url.startsWith('http') ? url : 'https://' + url).hostname;
+                
+                const analysis = `
+                    <div class="result-item">
+                        <h5><i class="fas fa-check-circle" style="color: #4caf50;"></i> Domain Analysis</h5>
+                        <p><strong>Domain:</strong> ${domain}</p>
+                        <p><strong>Public Information Available:</strong></p>
+                        <ul>
+                            <li>WHOIS registration data (may be private)</li>
+                            <li>DNS records (public)</li>
+                            <li>SSL certificate information (public)</li>
+                            <li>Website content (publicly accessible)</li>
+                            <li>Social media links (if provided on site)</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="result-item">
+                        <h5><i class="fas fa-shield-alt" style="color: #5c6bc0;"></i> Security Check</h5>
+                        <p>For security analysis of this domain, you could use:</p>
+                        <ul>
+                            <li><a href="https://transparencyreport.google.com/safe-browsing/search" target="_blank">Google Safe Browsing</a></li>
+                            <li><a href="https://www.ssllabs.com/ssltest/" target="_blank">SSL Labs Test</a></li>
+                            <li><a href="https://builtwith.com/" target="_blank">BuiltWith Technology Profiler</a></li>
+                        </ul>
+                    </div>
+                    
+                    <div class="result-item">
+                        <h5><i class="fas fa-exclamation-triangle" style="color: #ff6b6b;"></i> Ethical Considerations</h5>
+                        <p>Remember:</p>
+                        <ul>
+                            <li>Only access publicly available pages</li>
+                            <li>Respect robots.txt directives</li>
+                            <li>Do not attempt to bypass authentication</li>
+                            <li>Check terms of service for scraping policies</li>
+                        </ul>
+                    </div>
+                `;
+                
+                contentDiv.innerHTML = analysis;
+            }, 1500);
+        });
+        
+        // Public Records Search
+        document.getElementById('startSearch').addEventListener('click', () => {
+            const term = document.getElementById('searchTerm').value.trim();
+            const type = document.getElementById('searchType').value;
+            const resultsDiv = document.getElementById('searchResults');
+            const contentDiv = document.getElementById('searchResultContent');
+            
+            if (!term) {
+                alert('Please enter a search term');
+                return;
+            }
+            
+            contentDiv.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Searching public sources...</p>';
+            resultsDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                const sources = {
+                    general: ['Google Scholar', 'Wikipedia', 'World Factbook', 'UN Data', 'World Bank Open Data'],
+                    news: ['Google News Archive', 'Internet Archive News', 'Library of Congress', 'EU News Archive'],
+                    academic: ['Google Scholar', 'arXiv', 'PubMed', 'JSTOR', 'DOAJ', 'Crossref'],
+                    government: ['Data.gov', 'EU Open Data Portal', 'UN Data', 'World Bank Data', 'National statistical offices']
+                };
+                
+                const tips = {
+                    general: 'Use advanced search operators: "exact phrase", site:.gov, filetype:pdf',
+                    news: 'Include date ranges for temporal analysis',
+                    academic: 'Look for citations and references to find related work',
+                    government: 'Check for API access to automate data collection'
+                };
+                
+                const analysis = `
+                    <div class="result-item">
+                        <h5><i class="fas fa-search" style="color: #5c6bc0;"></i> Search Strategy for "${term}"</h5>
+                        <p><strong>Search Type:</strong> ${type.charAt(0).toUpperCase() + type.slice(1)}</p>
+                        <p><strong>Recommended Sources:</strong></p>
+                        <ul>
+                            ${sources[type].map(source => `<li>${source}</li>`).join('')}
+                        </ul>
+                        <p><strong>Pro Tip:</strong> ${tips[type]}</p>
+                    </div>
+                    
+                    <div class="result-item">
+                        <h5><i class="fas fa-lightbulb" style="color: #ffd166;"></i> Analysis Framework</h5>
+                        <p>When researching "${term}", consider:</p>
+                        <ol>
+                            <li><strong>Context:</strong> Historical, political, economic factors</li>
+                            <li><strong>Stakeholders:</strong> Who is affected? Who has influence?</li>
+                            <li><strong>Timeline:</strong> How has this evolved over time?</li>
+                            <li><strong>Geographic distribution:</strong> Where is this relevant?</li>
+                            <li><strong>Data quality:</strong> Source credibility and bias assessment</li>
+                        </ol>
+                    </div>
+                    
+                    <div class="result-item">
+                        <h5><i class="fas fa-database" style="color: #4caf50;"></i> Sample Queries</h5>
+                        <p>Try these search queries:</p>
+                        <ul>
+                            <li><code>"${term}" filetype:pdf</code></li>
+                            <li><code>"${term}" site:.gov</code></li>
+                            <li><code>"${term}" 2020..2024</code></li>
+                            <li><code>related:${term.split(' ')[0]}.com</code></li>
+                        </ul>
+                    </div>
+                `;
+                
+                contentDiv.innerHTML = analysis;
+            }, 1500);
+        });
+        
+        // Geospatial Analysis
+        document.getElementById('analyzeGeo').addEventListener('click', () => {
+            const location = document.getElementById('locationInput').value.trim();
+            const type = document.getElementById('analysisType').value;
+            const resultsDiv = document.getElementById('geoResults');
+            const contentDiv = document.getElementById('geoResultContent');
+            
+            if (!location) {
+                alert('Please enter a location');
+                return;
+            }
+            
+            contentDiv.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Analyzing geospatial data...</p>';
+            resultsDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                const analysisTypes = {
+                    demographics: 'Population density, age distribution, income levels, education',
+                    infrastructure: 'Transport networks, utilities, communication towers, buildings',
+                    environmental: 'Climate data, terrain, water sources, vegetation, pollution',
+                    historical: 'Satellite imagery archives, map changes over time, urban development'
+                };
+                
+                const tools = {
+                    demographics: ['OpenStreetMap', 'WorldPop', 'GeoNames', 'Humanitarian Data Exchange'],
+                    infrastructure: ['OpenStreetMap', 'NASA EarthData', 'ESA Copernicus', 'Mapbox'],
+                    environmental: ['NASA EarthData', 'NOAA', 'USGS EarthExplorer', 'Copernicus Climate'],
+                    historical: ['Google Earth Engine', 'USGS EarthExplorer', 'NASA Worldview', 'Digital Earth']
+                };
+                
+                const analysis = `
+                    <div class="result-item">
+                        <h5><i class="fas fa-map-marker-alt" style="color: #ff6b6b;"></i> Location Analysis: ${location}</h5>
+                        <p><strong>Analysis Type:</strong> ${type.charAt(0).toUpperCase() + type.slice(1)}</p>
+                        <p><strong>Key Factors to Analyze:</strong> ${analysisTypes[type]}</p>
+                    </div>
+                    
+                    <div class="result-item">
+                        <h5><i class="fas fa-tools" style="color: #5c6bc0;"></i> Recommended Tools</h5>
+                        <ul>
+                            ${tools[type].map(tool => `<li>${tool}</li>`).join('')}
+                        </ul>
+                    </div>
+                    
+                    <div class="result-item">
+                        <h5><i class="fas fa-lightbulb" style="color: #ffd166;"></i> Analysis Methodology</h5>
+                        <ol>
+                            <li>Geocode location to get coordinates</li>
+                            <li>Define analysis area (buffer radius or administrative boundaries)</li>
+                            <li>Extract relevant data layers</li>
+                            <li>Perform spatial analysis (overlay, proximity, density)</li>
+                            <li>Visualize results on interactive map</li>
+                            <li>Export findings in standard formats (GeoJSON, KML)</li>
+                        </ol>
+                    </div>
+                `;
+                
+                contentDiv.innerHTML = analysis;
+            }, 1500);
+        });
+        
+        // Network Analysis
+        document.getElementById('analyzeNetwork').addEventListener('click', () => {
+            const entity = document.getElementById('entityName').value.trim();
+            const depth = document.getElementById('relationshipDepth').value;
+            const resultsDiv = document.getElementById('networkResults');
+            const contentDiv = document.getElementById('networkResultContent');
+            
+            if (!entity) {
+                alert('Please enter an entity name');
+                return;
+            }
+            
+            contentDiv.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Mapping relationship network...</p>';
+            resultsDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                const depths = {
+                    '1': 'Direct connections only',
+                    '2': 'Direct connections and their connections',
+                    '3': 'Extended network (three degrees of separation)'
+                };
+                
+                const analysis = `
+                    <div class="result-item">
+                        <h5><i class="fas fa-project-diagram" style="color: #9c27b0;"></i> Network Analysis: ${entity}</h5>
+                        <p><strong>Relationship Depth:</strong> ${depths[depth]}</p>
+                        <p><strong>Note:</strong> This is a simulation. Real network analysis requires accessing public records, corporate filings, and news archives.</p>
+                    </div>
+                    
+                    <div class="result-item">
+                        <h5><i class="fas fa-sitemap" style="color: #5c6bc0;"></i> Network Mapping Methodology</h5>
+                        <ol>
+                            <li><strong>Identify Entity:</strong> Clearly define what/who ${entity} represents</li>
+                            <li><strong>Primary Connections:</strong> Directors, partners, subsidiaries, affiliates</li>
+                            <li><strong>Secondary Connections:</strong> Clients, suppliers, regulatory bodies</li>
+                            <li><strong>Tertiary Connections:</strong> Industry associations, related organizations</li>
+                            <li><strong>Visualization:</strong> Create node-link diagram with relationship types</li>
+                        </ol>
+                    </div>
+                    
+                    <div class="result-item">
+                        <h5><i class="fas fa-database" style="color: #4caf50;"></i> Data Sources for Network Analysis</h5>
+                        <ul>
+                            <li>Corporate registries (national business databases)</li>
+                            <li>SEC filings (EDGAR for US companies)</li>
+                            <li>News archives for reported relationships</li>
+                            <li>Professional networking sites (public profiles only)</li>
+                            <li>Government procurement databases</li>
+                            <li>Academic collaboration networks</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="result-item">
+                        <h5><i class="fas fa-exclamation-triangle" style="color: #ff6b6b;"></i> Ethical Considerations</h5>
+                        <ul>
+                            <li>Only use publicly available information</li>
+                            <li>Respect privacy expectations</li>
+                            <li>Consider proportionality of investigation</li>
+                            <li>Document sources for each connection</li>
+                            <li>Be aware of bias in data sources</li>
+                        </ul>
+                    </div>
+                `;
+                
+                contentDiv.innerHTML = analysis;
+            }, 1500);
+        });
+        
+        // Tool Directory
+        document.getElementById('showTools').addEventListener('click', () => {
+            const category = document.getElementById('toolCategory').value;
+            const resultsDiv = document.getElementById('toolList');
+            const contentDiv = document.getElementById('toolListContent');
+            
+            contentDiv.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Loading tools...</p>';
+            resultsDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                const tools = {
+                    search: [
+                        {name: 'Google Advanced Search', url: 'https://www.google.com/advanced_search', desc: 'Advanced search operators'},
+                        {name: 'DuckDuckGo', url: 'https://duckduckgo.com', desc: 'Privacy-focused search'},
+                        {name: 'Startpage', url: 'https://startpage.com', desc: 'Google results with privacy'},
+                        {name: 'Yandex', url: 'https://yandex.com', desc: 'Russian search engine'},
+                        {name: 'Baidu', url: 'https://baidu.com', desc: 'Chinese search engine'}
+                    ],
+                    social: [
+                        {name: 'Social Searcher', url: 'https://social-searcher.com', desc: 'Multi-platform social search'},
+                        {name: 'Mentionmapp', url: 'https://mentionmapp.com', desc: 'Twitter relationship mapper'},
+                        {name: 'TweetDeck', url: 'https://tweetdeck.twitter.com', desc: 'Advanced Twitter monitoring'},
+                        {name: 'Social Blade', url: 'https://socialblade.com', desc: 'YouTube/Twitch statistics'}
+                    ],
+                    maps: [
+                        {name: 'Google Earth', url: 'https://earth.google.com', desc: 'Satellite imagery and 3D mapping'},
+                        {name: 'OpenStreetMap', url: 'https://openstreetmap.org', desc: 'Open source map data'},
+                        {name: 'NASA Worldview', url: 'https://worldview.earthdata.nasa.gov', desc: 'Near real-time satellite imagery'},
+                        {name: 'USGS EarthExplorer', url: 'https://earthexplorer.usgs.gov', desc: 'Satellite imagery archive'}
+                    ],
+                    data: [
+                        {name: 'Wolfram Alpha', url: 'https://wolframalpha.com', desc: 'Computational knowledge engine'},
+                        {name: 'Google Dataset Search', url: 'https://datasetsearch.research.google.com', desc: 'Search for datasets'},
+                        {name: 'Data.world', url: 'https://data.world', desc: 'Social data platform'},
+                        {name: 'Kaggle Datasets', url: 'https://kaggle.com/datasets', desc: 'Community datasets'}
+                    ],
+                    visualization: [
+                        {name: 'RAWGraphs', url: 'https://rawgraphs.io', desc: 'Open source data visualization'},
+                        {name: 'Datawrapper', url: 'https://datawrapper.de', desc: 'Create charts and maps'},
+                        {name: 'Gephi', url: 'https://gephi.org', desc: 'Network visualization'},
+                        {name: 'Tableau Public', url: 'https://public.tableau.com', desc: 'Free data visualization'}
+                    ],
+                    archives: [
+                        {name: 'Wayback Machine', url: 'https://archive.org/web', desc: 'Website archive'},
+                        {name: 'Google Cached Pages', url: 'https://www.google.com', desc: 'View cached pages with cache: operator'},
+                        {name: 'Archive.today', url: 'https://archive.today', desc: 'Webpage archive'},
+                        {name: 'Library of Congress Web Archive', url: 'https://www.loc.gov/websites', desc: 'Selective web archives'}
+                    ]
+                };
+                
+                let toolHTML = `<h5>${category.charAt(0).toUpperCase() + category.slice(1)} Tools</h5>`;
+                
+                tools[category].forEach(tool => {
+                    toolHTML += `
+                        <div class="result-item">
+                            <h6><a href="${tool.url}" target="_blank">${tool.name}</a></h6>
+                            <p>${tool.desc}</p>
+                        </div>
+                    `;
+                });
+                
+                toolHTML += `
+                    <div class="result-item">
+                        <h6><i class="fas fa-lightbulb"></i> Pro Tips</h6>
+                        <p>Combine multiple tools for cross-verification. Always check when data was last updated. Consider API access for automation.</p>
+                    </div>
+                `;
+                
+                contentDiv.innerHTML = toolHTML;
+            }, 1000);
+        });
+        
+        // Ethics Evaluation Tool
+        document.getElementById('evaluateEthics').addEventListener('click', () => {
+            const purpose = document.getElementById('investigationPurpose').value.trim();
+            const sources = document.getElementById('dataSources').value.trim();
+            const harm = document.getElementById('potentialHarm').value.trim();
+            const resultsDiv = document.getElementById('ethicsResults');
+            const contentDiv = document.getElementById('ethicsResultContent');
+            
+            if (!purpose || !sources) {
+                alert('Please fill in all fields');
+                return;
+            }
+            
+            contentDiv.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Evaluating ethical considerations...</p>';
+            resultsDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                // Simple ethical scoring
+                let ethicalScore = 0;
+                let concerns = [];
+                let recommendations = [];
+                
+                // Check purpose
+                const beneficialPurposes = ['research', 'journalism', 'human rights', 'safety', 'education', 'transparency'];
+                const questionablePurposes = ['harassment', 'revenge', 'discrimination', 'stalking', 'commercial exploitation'];
+                
+                let purposeAnalysis = 'Purpose appears neutral';
+                beneficialPurposes.forEach(bp => {
+                    if (purpose.toLowerCase().includes(bp)) {
+                        ethicalScore += 2;
+                        purposeAnalysis = `Purpose (${bp}) appears beneficial`;
+                    }
+                });
+                
+                questionablePurposes.forEach(qp => {
+                    if (purpose.toLowerCase().includes(qp)) {
+                        ethicalScore -= 3;
+                        purposeAnalysis = `Purpose (${qp}) raises serious concerns`;
+                        concerns.push(`Purpose suggests ${qp}`);
+                    }
+                });
+                
+                // Check sources
+                const publicSources = ['public records', 'news', 'academic', 'government data', 'social media', 'websites'];
+                const privateSources = ['private messages', 'hacking', 'surveillance', 'unauthorized access'];
+                
+                let sourceAnalysis = 'Sources appear to be public';
+                publicSources.forEach(ps => {
+                    if (sources.toLowerCase().includes(ps)) {
+                        ethicalScore += 1;
+                    }
+                });
+                
+                privateSources.forEach(prs => {
+                    if (sources.toLowerCase().includes(prs)) {
+                        ethicalScore -= 4;
+                        sourceAnalysis = `Sources may include private/unauthorized data`;
+                        concerns.push(`Potential use of ${prs}`);
+                        recommendations.push('Use only publicly available information');
+                    }
+                });
+                
+                // Check potential harm
+                if (harm) {
+                    ethicalScore -= 1; // Any potential harm reduces score
+                    concerns.push('Potential harm identified');
+                    recommendations.push('Implement harm mitigation strategies');
+                } else {
+                    ethicalScore += 1;
+                    recommendations.push('Consider potential unintended consequences');
+                }
+                
+                // Generate overall assessment
+                let assessment = '';
+                let color = '#4caf50';
+                
+                if (ethicalScore >= 3) {
+                    assessment = 'LOW ETHICAL RISK - Investigation appears ethical';
+                } else if (ethicalScore >= 0) {
+                    assessment = 'MODERATE ETHICAL RISK - Review recommended';
+                    color = '#ffd166';
+                } else {
+                    assessment = 'HIGH ETHICAL RISK - Reconsider or modify approach';
+                    color = '#ff6b6b';
+                }
+                
+                const analysis = `
+                    <div class="result-item">
+                        <h5><i class="fas fa-clipboard-check" style="color: ${color}"></i> Ethical Assessment: ${assessment}</h5>
+                        <p><strong>Ethical Score:</strong> ${ethicalScore}/5</p>
+                        <p><strong>Purpose Analysis:</strong> ${purposeAnalysis}</p>
+                        <p><strong>Source Analysis:</strong> ${sourceAnalysis}</p>
+                    </div>
+                    
+                    <div class="result-item">
+                        <h5><i class="fas fa-exclamation-triangle" style="color: #ff6b6b"></i> Ethical Concerns</h5>
+                        ${concerns.length > 0 ? 
+                            '<ul>' + concerns.map(c => `<li>${c}</li>`).join('') + '</ul>' : 
+                            '<p>No major concerns identified</p>'}
+                    </div>
+                    
+                    <div class="result-item">
+                        <h5><i class="fas fa-lightbulb" style="color: #5c6bc0"></i> Recommendations</h5>
+                        <ul>
+                            ${recommendations.length > 0 ? 
+                                recommendations.map(r => `<li>${r}</li>`).join('') : 
+                                '<li>Proceed with standard ethical precautions</li>'}
+                            <li>Document your methodology and sources</li>
+                            <li>Regularly revisit ethical considerations</li>
+                            <li>Consult with ethics committee if available</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="result-item">
+                        <h5><i class="fas fa-question-circle" style="color: #9c27b0"></i> Decision Framework</h5>
+                        <p>Ask yourself:</p>
+                        <ol>
+                            <li>Is this investigation necessary?</li>
+                            <li>Is it proportional to the issue?</li>
+                            <li>Are there less intrusive alternatives?</li>
+                            <li>How will data be secured and eventually destroyed?</li>
+                            <li>Who will have access to the findings?</li>
+                        </ol>
+                    </div>
+                `;
+                
+                contentDiv.innerHTML = analysis;
+            }, 1500);
+        });
+        
+        // Join Project
+        document.getElementById('joinProject').addEventListener('click', () => {
+            const type = document.getElementById('contributionType').value;
+            const email = document.getElementById('contactEmail').value.trim();
+            const resultsDiv = document.getElementById('contributionResponse');
+            const contentDiv = document.getElementById('contributionResponseContent');
+            
+            contentDiv.innerHTML = '<p><i class="fas fa-spinner fa-spin"></i> Processing...</p>';
+            resultsDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                const contributionAreas = {
+                    code: 'GitHub repository management, tool development, security testing',
+                    research: 'Threat analysis, methodology development, case studies',
+                    documentation: 'User guides, ethical frameworks, training materials',
+                    training: 'Workshop development, online courses, certification programs',
+                    outreach: 'Community building, partnerships, conference organization'
+                };
+                
+                const nextSteps = {
+                    code: 'Fork our GitHub repository and submit pull requests',
+                    research: 'Submit research proposals to our review committee',
+                    documentation: 'Access our documentation portal and suggest edits',
+                    training: 'Review existing materials and propose enhancements',
+                    outreach: 'Join our community forums and introduce yourself'
+                };
+                
+                const analysis = `
+                    <div class="result-item">
+                        <h5><i class="fas fa-hands-helping" style="color: #4caf50"></i> Thank You for Your Interest!</h5>
+                        <p>We appreciate your willingness to contribute to <strong>Forbidden Knowledge - OSINT</strong>.</p>
+                    </div>
+                    
+                    <div class="result-item">
+                        <h5><i class="fas fa-tasks" style="color: #5c6bc0"></i> Contribution Area: ${type.charAt(0).toUpperCase() + type.slice(1)}</h5>
+                        <p><strong>Areas of focus:</strong> ${contributionAreas[type]}</p>
+                        <p><strong>Next steps:</strong> ${nextSteps[type]}</p>
+                    </div>
+                    
+                    <div class="result-item">
+                        <h5><i class="fas fa-envelope" style="color: #ffd166"></i> Next Steps</h5>
+                        <p>${email ? `We'll contact you at ${email} within 7 days.` : 'Please check our GitHub repository for contribution guidelines.'}</p>
+                        <p><strong>Remember:</strong> This is an open source project. All contributions must align with our ethical guidelines and be suitable for public release.</p>
+                    </div>
+                    
+                    <div class="result-item">
+                        <h5><i class="fas fa-users" style="color: #9c27b0"></i> Community Guidelines</h5>
+                        <ol>
+                            <li>All work must be transparent and open source</li>
+                            <li>Respect privacy and ethical boundaries</li>
+                            <li>Document your methodologies thoroughly</li>
+                            <li>Welcome diverse perspectives and expertise</li>
+                            <li>Focus on applications that benefit humanity</li>
+                        </ol>
+                    </div>
+                `;
+                
+                contentDiv.innerHTML = analysis;
+                
+                // Clear form
+                document.getElementById('contributionType').value = 'code';
+                document.getElementById('contactEmail').value = '';
+            }, 1500);
+        });
+        
+        // Initialize with some sample data
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set current year in copyright
+            document.querySelector('.copyright').innerHTML = 
+                document.querySelector('.copyright').innerHTML.replace('2024', new Date().getFullYear());
+            
+            // Add some interactivity to cards
+            document.querySelectorAll('.card').forEach(card => {
+                card.addEventListener('click', function(e) {
+                    if (e.target.tagName === 'A') return;
+                    
+                    // Toggle expanded view
+                    this.classList.toggle('expanded');
+                });
+            });
+        });
+    </script>
+</body>
+</html>
