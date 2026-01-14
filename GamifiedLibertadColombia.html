@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Libertad Colombia Dashboard – Sistema de Defensa Gamificado</title>
+<meta name="description" content="Centro unificado gamificado: Gana puntos, insignias y niveles defendiendo la verdad contra la tiranía en Colombia. Bilingüe ES/EN."/>
+
+<!-- Virality Meta -->
+<meta property="og:title" content="Libertad Colombia Gamificada: Gana Puntos Defendiendo la Verdad"/>
+<meta property="og:description" content="Comparte, envía tips, mantén rachas y sube en el leaderboard. ¡Detén al tirano juntos! #LibertadColombia"/>
+<meta property="og:type" content="website"/>
+
+<style>
+  :root {
+    --primary: #b22222;
+    --accent: #ffd700;
+    --bg: #000;
+    --card: #111;
+    --text: #eee;
+  }
+  body { margin:0; font-family:system-ui; background:var(--bg); color:var(--text); line-height:1.6; }
+  header { background:linear-gradient(#000,#200000); padding:3rem 1rem; text-align:center; border-bottom:8px solid var(--primary); }
+  h1 { font-size:clamp(3rem,8vw,6rem); color:#fff; text-shadow:0 0 40px #b22222; margin:0.5rem 0; }
+  .subtitle { font-size:1.6rem; max-width:900px; margin:1rem auto; }
+  .container { max-width:1300px; margin:0 auto; padding:0 2rem; }
+  .dashboard { display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:2rem; margin:4rem 0; }
+  .card { background:var(--card); padding:2rem; border-radius:16px; box-shadow:0 15px 50px rgba(178,34,34,0.4); border:1px solid #333; }
+  .card h2 { color:var(--accent); font-size:2rem; margin-bottom:1rem; }
+  .progress-bar { height:20px; background:#333; border-radius:10px; overflow:hidden; margin:1rem 0; }
+  .progress-fill { height:100%; background:var(--accent); width:0%; transition:width 1s; }
+  #points { font-size:2rem; color:var(--accent); }
+  .badge { display:inline-block; background:var(--primary); color:#fff; padding:0.5rem 1rem; border-radius:20px; margin:0.5rem; font-weight:bold; }
+  button { background:var(--primary); color:#fff; padding:1rem; border:none; border-radius:8px; cursor:pointer; font-weight:bold; margin:0.5rem; }
+  button:hover { background:#8b0000; }
+  .share-btn { background:var(--accent); color:#000; }
+  #lang-toggle { background:var(--accent); color:#000; margin:1rem auto; display:block; width:fit-content; }
+  [data-lang="en"] { display:none; }
+  body.en [data-lang="es"] { display:none; }
+  body.en [data-lang="en"] { display:block; }
+  footer { text-align:center; padding:3rem; color:#777; border-top:1px solid #222; }
+</style>
+</head>
+<body class="es">
+
+<header>
+  <h1><span data-lang="es">Libertad Colombia Dashboard Gamificado</span><span data-lang="en">Gamified Libertad Colombia Dashboard</span></h1>
+  <div class="subtitle"><span data-lang="es">Gana puntos, insignias y niveles defendiendo la verdad – ¡Detén al tirano!</span><span data-lang="en">Earn points, badges & levels defending truth – Stop the tyrant!</span></div>
+  <button id="lang-toggle"><span data-lang="es">Cambiar a English</span><span data-lang="en">Switch to Español</span></button>
+  <div id="user-stats">
+    <p><span data-lang="es">Tus Puntos:</span><span data-lang="en">Your Points:</span> <span id="points">0</span></p>
+    <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+    <p><span data-lang="es">Nivel:</span><span data-lang="en">Level:</span> <span id="level">Ciudadano</span> <span id="badges"></span></p>
+    <p><span data-lang="es">Racha actual:</span><span data-lang="en">Current Streak:</span> <span id="streak">0 días</span></p>
+  </div>
+</header>
+
+<div class="container">
+
+  <section class="dashboard">
+    <div class="card">
+      <h2><span data-lang="es">Exposiciones Principales</span><span data-lang="en">Main Exposures</span></h2>
+      <ul>
+        <li><a href="https://quantum-freedom-site.vercel.app/operacion-naranja.html" target="_blank" onclick="addPoints(50)"><span data-lang="es">Operación Naranja (+50 pts)</span><span data-lang="en">Operation Orange (+50 pts)</span></a></li>
+        <li><a href="https://quantum-freedom-site.vercel.app/salvar-colombia-fase1.html" target="_blank" onclick="addPoints(50)"><span data-lang="es">Salvar Colombia - Fase 1 (+50 pts)</span><span data-lang="en">Save Colombia - Phase 1 (+50 pts)</span></a></li>
+        <!-- Add more links similarly -->
+      </ul>
+    </div>
+
+    <div class="card">
+      <h2><span data-lang="es">Envía Tips Anónimos (+150 pts)</span><span data-lang="en">Submit Anonymous Tips (+150 pts)</span></h2>
+      <form id="tipForm">
+        <textarea placeholder="Comparte evidencia o tips (anónimo) / Share evidence or tips (anonymous)..." rows="5"></textarea>
+        <button type="submit"><span data-lang="es">Enviar y Ganar</span><span data-lang="en">Submit & Earn</span></button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h2><span data-lang="es">Comparte para Resistir (+100-200 pts)</span><span data-lang="en">Share to Resist (+100-200 pts)</span></h2>
+      <a href="https://twitter.com/intent/tweet?text=Defiende%20la%20verdad%20en%20Colombia!%20#LibertadColombia&url=" class="share-btn" onclick="addPoints(150)">Compartir en X</a>
+      <a href="https://wa.me/?text=Únete%20a%20Libertad%20Colombia%20-%20La%20verdad%20te%20hará%20libre!%20https://quantum-freedom-site.vercel.app/7Enero.html" class="share-btn" onclick="addPoints(200)">Compartir en WhatsApp</a>
+      <!-- Add Telegram, Facebook, etc. -->
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <p><span data-lang="es">Gamificado para 2026: Más viral, resistente y motivador. Compliments of TripsToColombia.com</span><span data-lang="en">Gamified for 2026: More viral, resistant, motivating. Compliments of TripsToColombia.com</span></p>
+</footer>
+
+<script>
+let points = 0;
+let streak = 0;
+let level = 0;
+const levels = ["Ciudadano", "Defensor", "Guardián de la Libertad", "Guerrero de la Verdad"];
+
+function addPoints(amount) {
+  points += amount;
+  document.getElementById('points').textContent = points;
+  const progress = (points % 1000) / 10;
+  document.getElementById('progress').style.width = progress + '%';
+
+  // Level up
+  const newLevel = Math.floor(points / 1000);
+  if (newLevel > level) {
+    level = newLevel;
+    document.getElementById('level').textContent = levels[level] || "Leyenda";
+    addBadge("Nivel " + (level + 1) + " Alcanzado!");
+  }
+}
+
+function addBadge(text) {
+  const badge = document.createElement('span');
+  badge.className = 'badge';
+  badge.textContent = text;
+  document.getElementById('badges').appendChild(badge);
+}
+
+document.getElementById('tipForm').addEventListener('submit', e => {
+  e.preventDefault();
+  addPoints(150);
+  addBadge("Tip Guardián");
+  alert('Tip enviado anónimamente – ¡Gracias por defender Colombia!');
+});
+
+document.getElementById('lang-toggle').addEventListener('click', () => {
+  document.body.classList.toggle('es');
+  document.body.classList.toggle('en');
+});
+
+// Simple streak simulation (in real app use localStorage + date check)
+setInterval(() => {
+  streak++;
+  document.getElementById('streak').textContent = streak + (document.body.classList.contains('es') ? ' días' : ' days');
+  if (streak % 7 === 0) addBadge("Racha Semanal!");
+}, 60000); // Demo: +1 every minute
+</script>
+
+</body>
+</html>
