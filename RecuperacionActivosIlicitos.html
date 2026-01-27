@@ -1,0 +1,1599 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Recuperación de Activos Ilícitos: Herramientas para la Coalición de Amnistía</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root {
+--primary: #004B87;
+--secondary: #CE1126;
+--accent: #FCD116;
+--dark: #0A2342;
+--light: #F8F9FA;
+--justice: #27AE60;
+--recovery: #9B59B6;
+--intelligence: #3498DB;
+}
+
+* {
+margin: 0;
+padding: 0;
+box-sizing: border-box;
+font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+body {
+background: linear-gradient(135deg, #0a1a2a 0%, #152642 100%);
+color: #f0f0f0;
+line-height: 1.7;
+min-height: 100vh;
+}
+
+.app-container {
+max-width: 1800px;
+margin: 0 auto;
+padding: 20px;
+}
+
+/* Coalition Header */
+.coalition-header {
+background: linear-gradient(135deg, #000033 0%, #0a2342 100%);
+color: white;
+padding: 2.5rem;
+border-radius: 20px;
+margin-bottom: 2.5rem;
+box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+position: relative;
+overflow: hidden;
+border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.coalition-header::before {
+content: "";
+position: absolute;
+top: -100px;
+right: -100px;
+width: 400px;
+height: 400px;
+background: radial-gradient(circle, var(--justice) 0%, transparent 70%);
+opacity: 0.1;
+}
+
+.coalition-badge {
+display: inline-flex;
+align-items: center;
+gap: 10px;
+background: rgba(39, 174, 96, 0.2);
+backdrop-filter: blur(10px);
+padding: 10px 25px;
+border-radius: 30px;
+margin-bottom: 1.5rem;
+border: 1px solid rgba(39, 174, 96, 0.3);
+}
+
+.ecosystem-nav {
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-bottom: 2rem;
+flex-wrap: wrap;
+gap: 1rem;
+}
+
+.ecosystem-logo {
+display: flex;
+align-items: center;
+gap: 15px;
+font-size: 1.3rem;
+font-weight: 700;
+}
+
+.ecosystem-logo i {
+color: var(--justice);
+font-size: 2rem;
+}
+
+.ecosystem-apps {
+display: flex;
+gap: 10px;
+flex-wrap: wrap;
+}
+
+.ecosystem-app {
+background: rgba(255, 255, 255, 0.05);
+backdrop-filter: blur(10px);
+padding: 10px 20px;
+border-radius: 30px;
+display: flex;
+align-items: center;
+gap: 8px;
+cursor: pointer;
+transition: all 0.3s;
+border: 1px solid rgba(255, 255, 255, 0.1);
+font-size: 0.9rem;
+}
+
+.ecosystem-app:hover {
+background: rgba(255, 255, 255, 0.1);
+transform: translateY(-3px);
+border-color: var(--justice);
+}
+
+.ecosystem-app.active {
+background: var(--justice);
+color: white;
+border-color: var(--justice);
+}
+
+.header-content {
+position: relative;
+z-index: 2;
+max-width: 1000px;
+}
+
+h1 {
+font-size: 3.2rem;
+margin-bottom: 1rem;
+background: linear-gradient(90deg, var(--justice), var(--intelligence), var(--recovery));
+-webkit-background-clip: text;
+background-clip: text;
+color: transparent;
+line-height: 1.2;
+}
+
+.tagline {
+font-size: 1.5rem;
+opacity: 0.9;
+margin-bottom: 1.5rem;
+max-width: 800px;
+}
+
+.coalition-mission {
+display: inline-flex;
+align-items: center;
+gap: 15px;
+background: linear-gradient(45deg, #000033, #0a2342);
+color: white;
+padding: 15px 30px;
+border-radius: 30px;
+font-weight: bold;
+font-size: 1.2rem;
+box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+margin-top: 1rem;
+border: 2px solid var(--justice);
+}
+
+/* Main Grid */
+.main-grid {
+display: grid;
+grid-template-columns: 1fr 400px;
+gap: 2.5rem;
+margin-top: 2rem;
+}
+
+@media (max-width: 1200px) {
+.main-grid {
+grid-template-columns: 1fr;
+}
+}
+
+/* Mission Tabs */
+.mission-tabs {
+display: flex;
+background: rgba(0, 0, 0, 0.5);
+border-radius: 15px;
+overflow: hidden;
+margin-bottom: 2rem;
+box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+flex-wrap: wrap;
+border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.mission-tab {
+flex: 1;
+min-width: 180px;
+text-align: center;
+padding: 1.5rem;
+cursor: pointer;
+transition: all 0.3s;
+font-weight: 600;
+border-bottom: 5px solid transparent;
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 12px;
+font-size: 1.05rem;
+}
+
+.mission-tab:hover {
+background-color: rgba(255, 255, 255, 0.05);
+}
+
+.mission-tab.active {
+color: var(--justice);
+border-bottom: 5px solid var(--justice);
+background-color: rgba(39, 174, 96, 0.1);
+}
+
+.tab-panel {
+display: none;
+animation: fadeIn 0.5s ease;
+}
+
+.tab-panel.active {
+display: block;
+}
+
+/* Intelligence Cards */
+.intel-card {
+background: linear-gradient(135deg, rgba(20, 30, 48, 0.9) 0%, rgba(30, 40, 58, 0.9) 100%);
+border-radius: 20px;
+padding: 2.5rem;
+margin-bottom: 2.5rem;
+box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+transition: transform 0.4s ease, box-shadow 0.4s ease;
+border: 1px solid rgba(255, 255, 255, 0.05);
+position: relative;
+overflow: hidden;
+}
+
+.intel-card::before {
+content: "";
+position: absolute;
+top: 0;
+left: 0;
+right: 0;
+height: 5px;
+background: linear-gradient(90deg, var(--justice), var(--intelligence));
+}
+
+.intel-card:hover {
+transform: translateY(-10px);
+box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+border-color: rgba(39, 174, 96, 0.3);
+}
+
+.intel-card h2 {
+color: var(--justice);
+margin-bottom: 1.5rem;
+display: flex;
+align-items: center;
+gap: 15px;
+font-size: 1.8rem;
+}
+
+.intel-card h2 i {
+color: var(--intelligence);
+}
+
+/* Grid Systems */
+.recovery-grid {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+gap: 1.8rem;
+margin-top: 2rem;
+}
+
+.recovery-item {
+background: linear-gradient(135deg, rgba(30, 40, 58, 0.9) 0%, rgba(40, 50, 68, 0.9) 100%);
+border-left: 5px solid var(--recovery);
+padding: 1.8rem;
+border-radius: 15px;
+transition: all 0.3s;
+position: relative;
+overflow: hidden;
+border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.recovery-item:hover {
+transform: translateY(-5px);
+box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+border-color: var(--recovery);
+}
+
+.recovery-item h4 {
+color: #ffffff;
+margin-bottom: 0.8rem;
+font-size: 1.3rem;
+}
+
+.recovery-item.justice {
+border-left-color: var(--justice);
+}
+
+.recovery-item.intelligence {
+border-left-color: var(--intelligence);
+}
+
+.recovery-item.financial {
+border-left-color: #F39C12;
+}
+
+/* Asset Tracker */
+.tracker-container {
+display: grid;
+grid-template-columns: 1fr 1fr;
+gap: 2.5rem;
+margin-top: 2rem;
+}
+
+@media (max-width: 992px) {
+.tracker-container {
+grid-template-columns: 1fr;
+}
+}
+
+.form-group {
+margin-bottom: 1.8rem;
+}
+
+.form-group label {
+display: block;
+margin-bottom: 0.8rem;
+font-weight: 600;
+color: #ffffff;
+font-size: 1.05rem;
+}
+
+.form-group input, .form-group select, .form-group textarea {
+width: 100%;
+padding: 15px 20px;
+border: 2px solid rgba(255, 255, 255, 0.1);
+border-radius: 12px;
+font-size: 1rem;
+transition: all 0.3s;
+background: rgba(0, 0, 0, 0.3);
+color: white;
+}
+
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+border-color: var(--justice);
+outline: none;
+background: rgba(0, 0, 0, 0.5);
+box-shadow: 0 0 0 4px rgba(39, 174, 96, 0.1);
+}
+
+/* Asset Visualization */
+.asset-visualization {
+height: 400px;
+background: rgba(0, 0, 0, 0.3);
+border-radius: 20px;
+margin: 2rem 0;
+position: relative;
+overflow: hidden;
+border: 2px dashed rgba(255, 255, 255, 0.1);
+}
+
+.asset-node {
+position: absolute;
+width: 120px;
+height: 120px;
+border-radius: 15px;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+color: white;
+font-weight: bold;
+text-align: center;
+padding: 10px;
+box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+transition: all 0.5s ease;
+cursor: move;
+border: 2px solid transparent;
+z-index: 2;
+}
+
+.asset-node:hover {
+transform: scale(1.1);
+z-index: 3;
+}
+
+.asset-node.property {
+background: linear-gradient(135deg, #8E44AD, #9B59B6);
+border-color: #9B59B6;
+}
+
+.asset-node.bank {
+background: linear-gradient(135deg, #3498DB, #2980B9);
+border-color: #3498DB;
+}
+
+.asset-node.company {
+background: linear-gradient(135deg, #27AE60, #2ECC71);
+border-color: #27AE60;
+}
+
+.asset-node.crypto {
+background: linear-gradient(135deg, #F39C12, #E67E22);
+border-color: #F39C12;
+}
+
+/* Commission Calculator */
+.commission-calculator {
+background: linear-gradient(135deg, rgba(30, 40, 58, 0.9) 0%, rgba(40, 50, 68, 0.9) 100%);
+padding: 2.5rem;
+border-radius: 20px;
+margin-top: 2rem;
+border: 2px solid var(--justice);
+}
+
+.slider-container {
+padding: 1.5rem;
+background: rgba(0, 0, 0, 0.3);
+border-radius: 12px;
+margin-top: 1rem;
+}
+
+.slider-value {
+display: flex;
+justify-content: space-between;
+margin-bottom: 0.5rem;
+}
+
+input[type="range"] {
+width: 100%;
+height: 10px;
+-webkit-appearance: none;
+background: linear-gradient(to right, #ddd, var(--justice));
+border-radius: 5px;
+outline: none;
+}
+
+/* Sidebar */
+.coalition-sidebar {
+background: linear-gradient(135deg, rgba(20, 30, 48, 0.9) 0%, rgba(30, 40, 58, 0.9) 100%);
+border-radius: 20px;
+padding: 2rem;
+box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+height: fit-content;
+position: sticky;
+top: 20px;
+border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.revenue-dashboard {
+background: linear-gradient(135deg, #000033 0%, #0a2342 100%);
+color: white;
+padding: 2rem;
+border-radius: 15px;
+margin-bottom: 2rem;
+text-align: center;
+border: 2px solid var(--justice);
+}
+
+.revenue-dashboard h3 {
+color: var(--justice);
+margin-bottom: 1.5rem;
+}
+
+.revenue-metric {
+display: flex;
+justify-content: space-between;
+margin-bottom: 1rem;
+padding-bottom: 1rem;
+border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.revenue-value {
+font-size: 1.5rem;
+font-weight: bold;
+color: var(--justice);
+}
+
+/* Pricing Cards */
+.pricing-grid {
+display: grid;
+grid-template-columns: 1fr;
+gap: 1.5rem;
+margin-top: 2rem;
+}
+
+.pricing-card {
+background: linear-gradient(135deg, rgba(30, 40, 58, 0.9) 0%, rgba(40, 50, 68, 0.9) 100%);
+border-radius: 15px;
+padding: 2rem;
+border: 2px solid rgba(255, 255, 255, 0.1);
+transition: all 0.3s;
+position: relative;
+}
+
+.pricing-card:hover {
+border-color: var(--justice);
+transform: translateY(-5px);
+box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+}
+
+.pricing-card.premium {
+border-color: var(--justice);
+background: linear-gradient(135deg, rgba(40, 50, 68, 0.9) 0%, rgba(50, 60, 78, 0.9) 100%);
+}
+
+.pricing-card h4 {
+color: #ffffff;
+margin-bottom: 0.5rem;
+font-size: 1.3rem;
+}
+
+.pricing-amount {
+font-size: 2.5rem;
+font-weight: bold;
+color: var(--justice);
+margin: 1rem 0;
+}
+
+/* Buttons */
+.btn {
+display: inline-block;
+padding: 16px 32px;
+background: linear-gradient(45deg, var(--justice), #229954);
+color: white;
+border: none;
+border-radius: 12px;
+font-size: 1.1rem;
+font-weight: 600;
+cursor: pointer;
+transition: all 0.3s;
+text-align: center;
+width: 100%;
+}
+
+.btn:hover {
+transform: translateY(-3px);
+box-shadow: 0 10px 25px rgba(39, 174, 96, 0.3);
+}
+
+.btn-secondary {
+background: linear-gradient(45deg, var(--intelligence), #2980B9);
+}
+
+.btn-recovery {
+background: linear-gradient(45deg, var(--recovery), #8E44AD);
+}
+
+/* Progress Bars */
+.recovery-meter {
+margin: 2rem 0;
+}
+
+.recovery-level-bar {
+height: 20px;
+background: rgba(0, 0, 0, 0.5);
+border-radius: 10px;
+margin-bottom: 1rem;
+overflow: hidden;
+position: relative;
+}
+
+.recovery-fill {
+height: 100%;
+background: linear-gradient(90deg, var(--justice), var(--intelligence));
+border-radius: 10px;
+width: 0%;
+transition: width 1s ease;
+}
+
+/* Animations */
+@keyframes fadeIn {
+from { opacity: 0; transform: translateY(20px); }
+to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+0% { transform: scale(1); }
+50% { transform: scale(1.05); }
+100% { transform: scale(1); }
+}
+
+@keyframes float {
+0%, 100% { transform: translateY(0); }
+50% { transform: translateY(-10px); }
+}
+
+.pulse {
+animation: pulse 2s infinite;
+}
+
+.float {
+animation: float 3s ease-in-out infinite;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+h1 {
+font-size: 2.5rem;
+}
+
+.tagline {
+font-size: 1.2rem;
+}
+
+.main-grid {
+grid-template-columns: 1fr;
+}
+
+.coalition-sidebar {
+position: static;
+}
+
+.tracker-container {
+grid-template-columns: 1fr;
+}
+}
+</style>
+</head>
+<body>
+<div class="app-container">
+<!-- Coalition Header -->
+<header class="coalition-header">
+<div class="coalition-badge">
+<i class="fas fa-handshake"></i>
+<span>COALICIÓN DE AMNISTÍA PARA LA UNIDAD - LÍDER: ANTHONY</span>
+</div>
+
+<div class="ecosystem-nav">
+<div class="ecosystem-logo">
+<i class="fas fa-balance-scale"></i>
+<span>ECOSISTEMA DE JUSTICIA FINANCIERA</span>
+</div>
+<div class="ecosystem-apps">
+<div class="ecosystem-app" data-app="trusts">
+<i class="fas fa-handshake"></i> Fideicomisos
+</div>
+<div class="ecosystem-app" data-app="banking">
+<i class="fas fa-university"></i> Banca
+</div>
+<div class="ecosystem-app" data-app="companies">
+<i class="fas fa-building"></i> Sociedades
+</div>
+<div class="ecosystem-app" data-app="crypto">
+<i class="fas fa-user-secret"></i> Cripto
+</div>
+<div class="ecosystem-app active" data-app="recovery">
+<i class="fas fa-search-dollar"></i> Recuperación
+</div>
+</div>
+</div>
+
+<div class="header-content">
+<h1><i class="fas fa-search-dollar"></i> Recuperación de Activos Ilícitos</h1>
+<p class="tagline">Herramientas profesionales para la Coalición de Amnistía. Localice, rastree y recupere activos derivados de ganancias ilícitas. Comisión estándar del 5% sobre activos recuperados.</p>
+<div class="coalition-mission pulse">
+<i class="fas fa-gavel"></i>
+<span>MISIÓN: AMNISTÍA PARA TODOS LOS PECADOS - REDIRECCIÓN PARA EL BIEN</span>
+<i class="fas fa-arrow-right"></i>
+</div>
+</div>
+</header>
+
+<!-- Main Content -->
+<div class="main-grid">
+<!-- Left Column -->
+<div>
+<!-- Mission Tabs -->
+<div class="mission-tabs">
+<div class="mission-tab active" data-tab="intelligence">
+<i class="fas fa-brain"></i> Inteligencia de Activos
+</div>
+<div class="mission-tab" data-tab="tracking">
+<i class="fas fa-search"></i> Rastreo de Activos
+</div>
+<div class="mission-tab" data-tab="legal">
+<i class="fas fa-gavel"></i> Marco Legal
+</div>
+<div class="mission-tab" data-tab="commission">
+<i class="fas fa-calculator"></i> Calculadora 5%
+</div>
+<div class="mission-tab" data-tab="integration">
+<i class="fas fa-puzzle-piece"></i> Integración Total
+</div>
+</div>
+
+<!-- Intelligence Tab -->
+<div id="intelligence" class="tab-panel active">
+<div class="intel-card">
+<h2><i class="fas fa-user-secret"></i> Inteligencia para la Recuperación de Activos</h2>
+
+<div class="recovery-grid">
+<div class="recovery-item intelligence">
+<h4>Rastreo de Propiedades Offshore</h4>
+<p>Identifique propiedades de lujo adquiridas con fondos ilícitos en paraísos fiscales. Acceso a registros de Panamá, Islas Caimán, Suiza.</p>
+</div>
+
+<div class="recovery-item financial">
+<h4>Análisis de Flujos Financieros</h4>
+<p>Seguimiento de transferencias bancarias internacionales, estructuras corporativas en capas, y esquemas de lavado de dinero.</p>
+</div>
+
+<div class="recovery-item justice">
+<h4>Due Diligence de Personas</h4>
+<p>Investigación de antecedentes, redes de contactos, historial financiero y posibles vínculos con actividades ilícitas.</p>
+</div>
+
+<div class="recovery-item">
+<h4>Blockchain Forensics</h4>
+<p>Rastreo de transacciones cripto ilícitas a través de mezcladores, wallets frías y exchanges sin KYC.</p>
+</div>
+
+<div class="recovery-item">
+<h4>Inteligencia de Bienes de Lujo</h4>
+<p>Localización de yates, jets privados, arte valioso y colecciones adquiridas con fondos ilícitos.</p>
+</div>
+
+<div class="recovery-item">
+<h4>Redes de Corrupción</h4>
+<p>Mapeo de conexiones entre funcionarios corruptos, empresarios y estructuras offshore.</p>
+</div>
+</div>
+</div>
+
+<div class="intel-card">
+<h2><i class="fas fa-chart-network"></i> Mapa de Redes Ilícitas</h2>
+
+<div class="asset-visualization" id="assetVisualization">
+<!-- Asset nodes will be created by JavaScript -->
+</div>
+
+<div style="text-align: center; margin-top: 1.5rem;">
+<button class="btn" onclick="addAssetNode('property')">
+<i class="fas fa-plus"></i> Agregar Propiedad
+</button>
+<button class="btn btn-secondary" onclick="addAssetNode('bank')" style="margin-left: 15px;">
+<i class="fas fa-plus"></i> Agregar Cuenta Bancaria
+</button>
+<button class="btn btn-recovery" onclick="addAssetNode('company')" style="margin-left: 15px;">
+<i class="fas fa-plus"></i> Agregar Sociedad
+</button>
+<button class="btn" onclick="addAssetNode('crypto')" style="margin-left: 15px;">
+<i class="fas fa-plus"></i> Agregar Wallet Cripto
+</button>
+</div>
+
+<div style="margin-top: 2.5rem;">
+<h3 style="color: var(--justice); margin-bottom: 1.5rem;">Casos de Estudio Reales (Anonimizados)</h3>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+<div style="background: rgba(0, 0, 0, 0.3); padding: 1.5rem; border-radius: 12px; cursor: pointer;" onclick="loadCaseStudy('politician')">
+<h4 style="color: var(--justice); margin-bottom: 0.5rem;">Caso Político Colombiano</h4>
+<p style="margin-bottom: 1rem; color: #ccc;">$45M USD en propiedades en Miami y Panamá recuperados. Comisión: $2.25M USD.</p>
+<div style="color: var(--justice); font-weight: bold;">Tiempo: 8 meses</div>
+</div>
+
+<div style="background: rgba(0, 0, 0, 0.3); padding: 1.5rem; border-radius: 12px; cursor: pointer;" onclick="loadCaseStudy('cartel')">
+<h4 style="color: var(--justice); margin-bottom: 0.5rem;">Caso Cartel Internacional</h4>
+<p style="margin-bottom: 1rem; color: #ccc;">$120M USD en cripto y cuentas offshore recuperados. Comisión: $6M USD.</p>
+<div style="color: var(--justice); font-weight: bold;">Tiempo: 14 meses</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- Tracking Tab -->
+<div id="tracking" class="tab-panel">
+<div class="intel-card">
+<h2><i class="fas fa-search"></i> Sistema de Rastreo de Activos</h2>
+<p>Ingrese información disponible para iniciar el rastreo de activos ilícitos.</p>
+
+<div class="tracker-container">
+<div>
+<div class="form-group">
+<label>1. Nombre del Sujeto</label>
+<input type="text" id="subjectName" placeholder="Nombre completo o alias">
+</div>
+
+<div class="form-group">
+<label>2. País de Origen</label>
+<select id="originCountry">
+<option value="">Seleccionar país</option>
+<option value="colombia">Colombia</option>
+<option value="venezuela">Venezuela</option>
+<option value="mexico">México</option>
+<option value="brazil">Brasil</option>
+<option value="argentina">Argentina</option>
+<option value="usa">Estados Unidos</option>
+<option value="spain">España</option>
+<option value="china">China</option>
+<option value="russia">Rusia</option>
+</select>
+</div>
+
+<div class="form-group">
+<label>3. Tipo de Actividad Ilícita</label>
+<select id="illicitActivity">
+<option value="">Seleccionar actividad</option>
+<option value="corruption">Corrupción Pública</option>
+<option value="drugs">Narcotráfico</option>
+<option value="fraud">Fraude Financiero</option>
+<option value="tax">Evasión Fiscal</option>
+<option value="laundering">Lavado de Dinero</option>
+<option value="other">Otro</option>
+</select>
+</div>
+
+<div class="form-group">
+<label>4. Monto Estimado (USD)</label>
+<div class="slider-container">
+<div class="slider-value">
+<span>$100,000</span>
+<span id="amountValue">$5,000,000</span>
+<span>$50,000,000+</span>
+</div>
+<input type="range" id="amountRange" min="100000" max="50000000" value="5000000" step="100000">
+</div>
+</div>
+</div>
+
+<div>
+<div class="form-group">
+<label>5. Información Conocida</label>
+<textarea id="knownInfo" rows="4" placeholder="Números de pasaporte, cuentas bancarias conocidas, propiedades, vehículos, etc."></textarea>
+</div>
+
+<div class="form-group">
+<label>6. Jurisdicciones Sospechosas</label>
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px;">
+<label style="display: flex; align-items: center; gap: 8px;">
+<input type="checkbox" value="panama" checked> Panamá
+</label>
+<label style="display: flex; align-items: center; gap: 8px;">
+<input type="checkbox" value="cayman"> Islas Caimán
+</label>
+<label style="display: flex; align-items: center; gap: 8px;">
+<input type="checkbox" value="switzerland"> Suiza
+</label>
+<label style="display: flex; align-items: center; gap: 8px;">
+<input type="checkbox" value="usa"> USA
+</label>
+<label style="display: flex; align-items: center; gap: 8px;">
+<input type="checkbox" value="uae"> UAE
+</label>
+<label style="display: flex; align-items: center; gap: 8px;">
+<input type="checkbox" value="singapore"> Singapur
+</label>
+</div>
+</div>
+
+<div class="form-group">
+<label>7. Prioridad de Investigación</label>
+<select id="priority">
+<option value="low">Baja</option>
+<option value="medium">Media</option>
+<option value="high">Alta</option>
+<option value="critical">Crítica</option>
+</select>
+</div>
+
+<button class="btn" id="initiateTracking">
+<i class="fas fa-search"></i> Iniciar Rastreo de Activos
+</button>
+<button class="btn btn-secondary" style="margin-top: 15px;">
+<i class="fas fa-crown"></i> Análisis Profundo ($2,499 USD)
+</button>
+</div>
+</div>
+
+<div id="trackingResults" style="display: none; margin-top: 2rem;">
+<h3 style="color: var(--justice); margin-bottom: 1.5rem;">Resultados del Rastreo</h3>
+<div style="background: rgba(0, 0, 0, 0.3); padding: 2rem; border-radius: 15px;">
+<div id="resultsContent">
+<!-- Results will appear here -->
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- Legal Tab -->
+<div id="legal" class="tab-panel">
+<div class="intel-card">
+<h2><i class="fas fa-gavel"></i> Marco Legal Internacional</h2>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; margin-top: 2rem;">
+<div>
+<h3 style="color: var(--justice); margin-bottom: 1.5rem;">Tratados de Asistencia Legal</h3>
+
+<div class="recovery-grid">
+<div class="recovery-item">
+<h4>Convención de las Naciones Unidas</h4>
+<p>Convención contra la Corrupción (UNCAC) - Base legal para recuperación de activos a nivel global.</p>
+</div>
+
+<div class="recovery-item">
+<h4>MLATs (Mutual Legal Assistance)</h4>
+<p>Tratados bilaterales entre países para compartir información y asistir en investigaciones.</p>
+</div>
+
+<div class="recovery-item">
+<h4>FATF Recommendations</h4>
+<p>Recomendaciones del Grupo de Acción Financiera Internacional contra lavado de dinero.</p>
+</div>
+</div>
+</div>
+
+<div>
+<h3 style="color: var(--justice); margin-bottom: 1.5rem;">Procedimientos de Recuperación</h3>
+
+<div style="background: rgba(0, 0, 0, 0.3); padding: 2rem; border-radius: 15px; height: 100%;">
+<h4 style="color: var(--intelligence); margin-bottom: 1rem;">Proceso Estándar 5%</h4>
+<ol style="padding-left: 1.5rem; margin-bottom: 1.5rem;">
+<li style="margin-bottom: 0.8rem;">Investigación y localización de activos</li>
+<li style="margin-bottom: 0.8rem;">Congelamiento preventivo (freezing order)</li>
+<li style="margin-bottom: 0.8rem;">Proceso de confiscación civil</li>
+<li style="margin-bottom: 0.8rem;">Repatriación de fondos</li>
+<li style="margin-bottom: 0.8rem;">Pago de comisión 5% sobre recuperado</li>
+</ol>
+
+<div style="padding: 1.5rem; background: rgba(39, 174, 96, 0.1); border-radius: 12px; border: 2px solid var(--justice);">
+<h4 style="color: var(--justice); margin-bottom: 0.5rem;"><i class="fas fa-handshake"></i> Acuerdo de Amnistía</h4>
+<p style="font-size: 0.9rem; color: #ccc;">La Coalición ofrece amnistía completa por todos los pecados previos a cambio de cooperación completa en la recuperación de activos y redirección hacia el bien.</p>
+</div>
+</div>
+</div>
+</div>
+
+<div style="margin-top: 2.5rem;">
+<h3 style="color: var(--justice); margin-bottom: 1.5rem;">Plantillas Legales para la Coalición</h3>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1.5rem;">
+<div style="background: rgba(0, 0, 0, 0.3); padding: 1.5rem; border-radius: 12px; text-align: center;">
+<div style="font-size: 2.5rem; color: var(--justice); margin-bottom: 1rem;">
+<i class="fas fa-file-contract"></i>
+</div>
+<h4 style="color: #ffffff; margin-bottom: 0.5rem;">Acuerdo de Amnistía</h4>
+<p style="color: #ccc; font-size: 0.9rem;">Plantilla legal para ofrecer amnistía a cambio de cooperación.</p>
+<button class="btn" style="margin-top: 1rem; padding: 10px 20px;">Descargar</button>
+</div>
+
+<div style="background: rgba(0, 0, 0, 0.3); padding: 1.5rem; border-radius: 12px; text-align: center;">
+<div style="font-size: 2.5rem; color: var(--justice); margin-bottom: 1rem;">
+<i class="fas fa-file-signature"></i>
+</div>
+<h4 style="color: #ffffff; margin-bottom: 0.5rem;">Acuerdo de Comisión 5%</h4>
+<p style="color: #ccc; font-size: 0.9rem;">Contrato para el pago de comisión sobre activos recuperados.</p>
+<button class="btn" style="margin-top: 1rem; padding: 10px 20px;">Descargar</button>
+</div>
+
+<div style="background: rgba(0, 0, 0, 0.3); padding: 1.5rem; border-radius: 12px; text-align: center;">
+<div style="font-size: 2.5rem; color: var(--justice); margin-bottom: 1rem;">
+<i class="fas fa-balance-scale"></i>
+</div>
+<h4 style="color: #ffffff; margin-bottom: 0.5rem;">Petición de Congelamiento</h4>
+<p style="color: #ccc; font-size: 0.9rem;">Documento legal para congelar activos en múltiples jurisdicciones.</p>
+<button class="btn" style="margin-top: 1rem; padding: 10px 20px;">Descargar</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- Commission Tab -->
+<div id="commission" class="tab-panel">
+<div class="intel-card">
+<h2><i class="fas fa-calculator"></i> Calculadora de Comisión 5%</h2>
+
+<div class="commission-calculator">
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem;">
+<div>
+<div class="form-group">
+<label>Valor Total de Activos Recuperados (USD)</label>
+<input type="number" id="totalAssets" placeholder="Ej: 10,000,000" value="10000000">
+</div>
+
+<div class="form-group">
+<label>Número de Jurisdicciones Involucradas</label>
+<select id="jurisdictionCount">
+<option value="1">1 jurisdicción</option>
+<option value="2">2 jurisdicciones</option>
+<option value="3" selected>3 jurisdicciones</option>
+<option value="4">4 jurisdicciones</option>
+<option value="5+">5+ jurisdicciones</option>
+</select>
+</div>
+
+<div class="form-group">
+<label>Tipo de Activos</label>
+<select id="assetType">
+<option value="cash">Efectivo/Cuentas Bancarias</option>
+<option value="property">Propiedades</option>
+<option value="crypto">Criptomonedas</option>
+<option value="mixed">Mixto</option>
+</select>
+</div>
+</div>
+
+<div>
+<div class="form-group">
+<label>Complejidad del Caso</label>
+<div class="slider-container">
+<div class="slider-value">
+<span>Simple</span>
+<span id="complexityValue">Media</span>
+<span>Extrema</span>
+</div>
+<input type="range" id="complexity" min="1" max="5" value="3" step="1">
+</div>
+</div>
+
+<div class="form-group">
+<label>Tiempo Estimado de Recuperación (meses)</label>
+<select id="timeframe">
+<option value="3">3 meses</option>
+<option value="6" selected>6 meses</option>
+<option value="12">12 meses</option>
+<option value="18">18 meses</option>
+<option value="24+">24+ meses</option>
+</select>
+</div>
+
+<button class="btn" id="calculateCommission">
+<i class="fas fa-calculator"></i> Calcular Comisión y Gastos
+</button>
+</div>
+</div>
+
+<div id="commissionResults" style="margin-top: 2rem; padding: 2rem; background: rgba(0, 0, 0, 0.3); border-radius: 15px; display: none;">
+<h3 style="color: var(--justice); margin-bottom: 1.5rem;">Desglose de Comisiones y Gastos</h3>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+<div style="background: rgba(0, 0, 0, 0.5); padding: 1.5rem; border-radius: 12px;">
+<div style="color: #888; margin-bottom: 0.5rem;">Comisión 5% sobre</div>
+<div style="font-size: 1.8rem; font-weight: bold; color: var(--justice);" id="commissionAmount">$500,000</div>
+</div>
+
+<div style="background: rgba(0, 0, 0, 0.5); padding: 1.5rem; border-radius: 12px;">
+<div style="color: #888; margin-bottom: 0.5rem;">Gastos Estimados</div>
+<div style="font-size: 1.8rem; font-weight: bold; color: #F39C12;" id="expensesAmount">$75,000</div>
+</div>
+</div>
+
+<div style="background: rgba(39, 174, 96, 0.1); padding: 1.5rem; border-radius: 12px; border: 2px solid var(--justice);">
+<div style="display: flex; justify-content: space-between; align-items: center;">
+<div>
+<div style="color: #888; margin-bottom: 0.5rem;">Ganancia Neta Estimada</div>
+<div style="font-size: 2.5rem; font-weight: bold; color: var(--justice);" id="netProfit">$425,000</div>
+</div>
+<div style="text-align: center;">
+<div style="font-size: 3rem; color: var(--justice);">
+<i class="fas fa-handshake"></i>
+</div>
+<div style="font-size: 0.9rem; color: #ccc;">Acuerdo de Amnistía Incluido</div>
+</div>
+</div>
+</div>
+
+<button class="btn btn-secondary" style="margin-top: 1.5rem;">
+<i class="fas fa-file-contract"></i> Generar Acuerdo de Comisión
+</button>
+</div>
+</div>
+
+<div style="margin-top: 2.5rem;">
+<h3 style="color: var(--justice); margin-bottom: 1.5rem;">Casos Exitosos de la Coalición</h3>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem;">
+<div style="background: rgba(0, 0, 0, 0.3); padding: 1.5rem; border-radius: 12px;">
+<h4 style="color: var(--justice); margin-bottom: 0.5rem;">Caso "Fénix" - Colombia</h4>
+<p style="margin-bottom: 1rem; color: #ccc;">$22M USD recuperados de ex-funcionarios corruptos. Comisión: $1.1M USD. Tiempo: 7 meses.</p>
+<div style="color: var(--justice); font-weight: bold;">12 personas redirigidas al bien</div>
+</div>
+
+<div style="background: rgba(0, 0, 0, 0.3); padding: 1.5rem; border-radius: 12px;">
+<h4 style="color: var(--justice); margin-bottom: 0.5rem;">Caso "Neptuno" - Internacional</h4>
+<p style="margin-bottom: 1rem; color: #ccc;">$87M USD en cripto y cuentas offshore. Comisión: $4.35M USD. Tiempo: 11 meses.</p>
+<div style="color: var(--justice); font-weight: bold;">8 organizaciones desmanteladas</div>
+</div>
+
+<div style="background: rgba(0, 0, 0, 0.3); padding: 1.5rem; border-radius: 12px;">
+<h4 style="color: var(--justice); margin-bottom: 0.5rem;">Caso "Minerva" - Latinoamérica</h4>
+<p style="margin-bottom: 1rem; color: #ccc;">$156M USD en propiedades y empresas. Comisión: $7.8M USD. Tiempo: 16 meses.</p>
+<div style="color: var(--justice); font-weight: bold;">24 personas bajo amnistía</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<!-- Integration Tab -->
+<div id="integration" class="tab-panel">
+<div class="intel-card">
+<h2><i class="fas fa-infinity"></i> Integración con el Ecosistema</h2>
+<p>Cómo las herramientas de recuperación de activos se integran con el resto del ecosistema para la Coalición de Amnistía.</p>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; margin-top: 2rem;">
+<div>
+<div style="background: linear-gradient(135deg, rgba(30, 40, 58, 0.9) 0%, rgba(40, 50, 68, 0.9) 100%); padding: 2rem; border-radius: 15px; margin-bottom: 1.5rem;">
+<h4 style="color: var(--justice); margin-bottom: 1rem;">
+<i class="fas fa-handshake" style="color: var(--intelligence);"></i>
++ Fideicomisos Internacionales
+</h4>
+<p style="margin-bottom: 1rem;">Los activos recuperados son transferidos a fideicomisos controlados por la Coalición para su redistribución ética.</p>
+<div style="color: var(--justice); font-weight: bold;">Upsell: $1,999 USD</div>
+</div>
+
+<div style="background: linear-gradient(135deg, rgba(30, 40, 58, 0.9) 0%, rgba(40, 50, 68, 0.9) 100%); padding: 2rem; border-radius: 15px;">
+<h4 style="color: var(--justice); margin-bottom: 1rem;">
+<i class="fas fa-university" style="color: var(--intelligence);"></i>
++ Banca Offshore
+</h4>
+<p style="margin-bottom: 1rem;">Cuentas bancarias especiales para manejar fondos recuperados antes de su redistribución.</p>
+<div style="color: var(--justice); font-weight: bold;">Upsell: $499 USD</div>
+</div>
+</div>
+
+<div>
+<div style="background: linear-gradient(135deg, rgba(30, 40, 58, 0.9) 0%, rgba(40, 50, 68, 0.9) 100%); padding: 2rem; border-radius: 15px; margin-bottom: 1.5rem;">
+<h4 style="color: var(--justice); margin-bottom: 1rem;">
+<i class="fas fa-building" style="color: var(--intelligence);"></i>
++ Sociedades Offshore
+</h4>
+<p style="margin-bottom: 1rem;">Empresas internacionales para manejar activos recuperados y proyectos de redistribución.</p>
+<div style="color: var(--justice); font-weight: bold;">Upsell: $899 USD</div>
+</div>
+
+<div style="background: linear-gradient(135deg, rgba(30, 40, 58, 0.9) 0%, rgba(40, 50, 68, 0.9) 100%); padding: 2rem; border-radius: 15px;">
+<h4 style="color: var(--justice); margin-bottom: 1rem;">
+<i class="fas fa-user-secret" style="color: var(--intelligence);"></i>
++ Cripto & Privacidad
+</h4>
+<p style="margin-bottom: 1rem;">Herramientas para rastrear y recuperar criptomonedas ilícitas y mezcladores.</p>
+<div style="color: var(--justice); font-weight: bold;">Upsell: $1,499 USD</div>
+</div>
+</div>
+</div>
+
+<div style="background: linear-gradient(135deg, #000033 0%, #0a2342 100%); color: white; padding: 2.5rem; border-radius: 15px; margin-top: 2.5rem; text-align: center; border: 2px solid var(--justice);">
+<h3 style="color: var(--justice); margin-bottom: 1rem;">PAQUETE COMPLETO: COALICIÓN DE AMNISTÍA</h3>
+<p style="margin-bottom: 1.5rem; opacity: 0.9;">Herramientas de Rastreo + Marco Legal + Comisión 5% + Redistribución Ética</p>
+<div style="font-size: 3rem; font-weight: bold; color: var(--justice); margin-bottom: 1.5rem;">$4,999 USD/mes</div>
+<p style="margin-bottom: 1.5rem; opacity: 0.9;">Incluye acceso a base de datos de inteligencia y soporte legal internacional</p>
+<button class="btn" style="width: auto; padding: 15px 40px;">
+<i class="fas fa-handshake"></i> UNIRSE A LA COALICIÓN
+</button>
+</div>
+</div>
+</div>
+</div>
+
+<!-- Sidebar -->
+<div class="coalition-sidebar">
+<div class="revenue-dashboard">
+<h3><i class="fas fa-chart-network"></i> Dashboard de la Coalición</h3>
+
+<div class="revenue-metric">
+<span>Activos Recuperados:</span>
+<span class="revenue-value">$384M USD</span>
+</div>
+
+<div class="revenue-metric">
+<span>Comisiones 5%:</span>
+<span class="revenue-value">$19.2M USD</span>
+</div>
+
+<div class="revenue-metric">
+<span>Personas Redirigidas:</span>
+<span class="revenue-value">247</span>
+</div>
+
+<div class="revenue-metric">
+<span>Países Activos:</span>
+<span class="revenue-value">18</span>
+</div>
+
+<div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+<p style="opacity: 0.9; margin-bottom: 1rem;">Objetivo Trimestral:</p>
+<div style="font-size: 2rem; font-weight: bold; color: var(--justice);">$50M USD</div>
+</div>
+</div>
+
+<div class="pricing-grid">
+<div class="pricing-card">
+<h4>Kit Básico de Rastreo</h4>
+<p>Herramientas básicas + plantillas legales</p>
+<div class="pricing-amount">$999</div>
+<button class="btn" style="margin-top: 1rem;">
+<i class="fas fa-shopping-cart"></i> Comprar
+</button>
+</div>
+
+<div class="pricing-card premium">
+<div style="position: absolute; top: 10px; right: 10px; background: var(--justice); color: white; padding: 5px 15px; border-radius: 20px; font-size: 0.8rem; font-weight: bold;">
+PARA MIEMBROS
+</div>
+<h4>Acceso Completo Coalición</h4>
+<p>Todas las herramientas + base de datos + soporte legal</p>
+<div class="pricing-amount">$4,999/mes</div>
+<button class="btn" style="margin-top: 1rem;">
+<i class="fas fa-handshake"></i> Unirse
+</button>
+</div>
+
+<div class="pricing-card">
+<h4>Certificación Investigador</h4>
+<p>Curso completo + certificación internacional</p>
+<div class="pricing-amount">$2,499</div>
+<button class="btn" style="margin-top: 1rem;">
+<i class="fas fa-graduation-cap"></i> Inscribirse
+</button>
+</div>
+</div>
+
+<div style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.1) 100%); padding: 1.8rem; border-radius: 15px; margin-top: 2rem; border: 2px solid var(--intelligence);">
+<h4 style="color: #ffffff; margin-bottom: 0.5rem;">
+<i class="fas fa-fire" style="color: var(--intelligence);"></i>
+Próxima App: Red de Redistribución
+</h4>
+<p style="margin-bottom: 1rem; color: #ccc;">Sistema para redistribuir activos recuperados hacia proyectos éticos y de bien social.</p>
+<button class="btn btn-secondary" style="width: 100%;">
+<i class="fas fa-bell"></i> Notificarme
+</button>
+</div>
+</div>
+</div>
+
+<!-- Ecosystem Roadmap -->
+<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 2rem; margin: 3rem 0;">
+<div style="background: linear-gradient(135deg, rgba(20, 30, 48, 0.9) 0%, rgba(30, 40, 58, 0.9) 100%); padding: 2rem; border-radius: 15px; border-left: 5px solid #28a745;">
+<h4 style="color: #ffffff; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 10px;">
+<i class="fas fa-check-circle" style="color: #28a745;"></i> App 1: Fideicomisos
+</h4>
+<p style="margin-bottom: 1rem; color: #ccc;">Protección patrimonial con trusts.</p>
+<div style="color: var(--justice); font-weight: bold; font-size: 1.2rem;">Ingreso: $62,000/mes</div>
+</div>
+
+<div style="background: linear-gradient(135deg, rgba(20, 30, 48, 0.9) 0%, rgba(30, 40, 58, 0.9) 100%); padding: 2rem; border-radius: 15px; border-left: 5px solid #28a745;">
+<h4 style="color: #ffffff; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 10px;">
+<i class="fas fa-check-circle" style="color: #28a745;"></i> App 2: Banca Offshore
+</h4>
+<p style="margin-bottom: 1rem; color: #ccc;">Cuentas internacionales.</p>
+<div style="color: var(--justice); font-weight: bold; font-size: 1.2rem;">Ingreso: $58,500/mes</div>
+</div>
+
+<div style="background: linear-gradient(135deg, rgba(20, 30, 48, 0.9) 0%, rgba(30, 40, 58, 0.9) 100%); padding: 2rem; border-radius: 15px; border-left: 5px solid #28a745;">
+<h4 style="color: #ffffff; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 10px;">
+<i class="fas fa-check-circle" style="color: #28a745;"></i> App 3: Sociedades Offshore
+</h4>
+<p style="margin-bottom: 1rem; color: #ccc;">Empresas internacionales.</p>
+<div style="color: var(--justice); font-weight: bold; font-size: 1.2rem;">Ingreso: $72,000/mes</div>
+</div>
+
+<div style="background: linear-gradient(135deg, rgba(20, 30, 48, 0.9) 0%, rgba(30, 40, 58, 0.9) 100%); padding: 2rem; border-radius: 15px; border-left: 5px solid #28a745;">
+<h4 style="color: #ffffff; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 10px;">
+<i class="fas fa-check-circle" style="color: #28a745;"></i> App 4: Cripto & Privacidad
+</h4>
+<p style="margin-bottom: 1rem; color: #ccc;">Anonimato financiero.</p>
+<div style="color: var(--justice); font-weight: bold; font-size: 1.2rem;">Ingreso: $85,000/mes</div>
+</div>
+
+<div style="background: linear-gradient(135deg, rgba(30, 40, 58, 0.9) 0%, rgba(40, 50, 68, 0.9) 100%); padding: 2rem; border-radius: 15px; border-left: 5px solid var(--justice); box-shadow: 0 10px 25px rgba(39, 174, 96, 0.2);">
+<h4 style="color: #ffffff; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 10px;">
+<i class="fas fa-cogs" style="color: var(--justice);"></i> App 5: Recuperación de Activos
+</h4>
+<p style="margin-bottom: 1rem; color: #ccc;">Herramientas para la Coalición de Amnistía.</p>
+<div style="color: var(--justice); font-weight: bold; font-size: 1.2rem;">Proyección: $120,000/mes</div>
+</div>
+
+<div style="background: linear-gradient(135deg, rgba(20, 30, 48, 0.9) 0%, rgba(30, 40, 58, 0.9) 100%); padding: 2rem; border-radius: 15px; border-left: 5px solid #888;">
+<h4 style="color: #ffffff; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 10px;">
+<i class="fas fa-redo"></i> App 6: Red de Redistribución
+</h4>
+<p style="margin-bottom: 1rem; color: #ccc;">Sistema para redistribuir activos hacia el bien.</p>
+<div style="color: #888; font-weight: bold; font-size: 1.2rem;">Lanzamiento: Ene 2024</div>
+</div>
+</div>
+
+<!-- Footer -->
+<footer style="text-align: center; margin-top: 4rem; padding-top: 3rem; border-top: 1px solid rgba(255, 255, 255, 0.1); color: #888;">
+<div style="max-width: 900px; margin: 0 auto;">
+<h3 style="color: var(--justice); margin-bottom: 1.5rem;">
+<i class="fas fa-infinity"></i> ECOSISTEMA DE LA COALICIÓN DE AMNISTÍA
+</h3>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; margin-bottom: 3rem;">
+<div style="text-align: center;">
+<div style="font-size: 2.5rem; font-weight: bold; color: var(--justice);">6</div>
+<div>Aplicaciones integradas</div>
+</div>
+<div style="text-align: center;">
+<div style="font-size: 2.5rem; font-weight: bold; color: var(--justice);">5%</div>
+<div>Comisión estándar</div>
+</div>
+<div style="text-align: center;">
+<div style="font-size: 2.5rem; font-weight: bold; color: var(--justice);">$2.1M</div>
+<div>Ingreso mensual proyectado</div>
+</div>
+<div style="text-align: center;">
+<div style="font-size: 2.5rem; font-weight: bold; color: var(--justice);">247</div>
+<div>Vidas redirigidas al bien</div>
+</div>
+</div>
+
+<div style="background: rgba(0, 0, 0, 0.3); padding: 2rem; border-radius: 15px; margin-top: 2rem; border: 1px solid rgba(255, 255, 255, 0.05);">
+<h4 style="color: #ffffff; margin-bottom: 1rem;">MANIFIESTO DE LA COALICIÓN DE AMNISTÍA</h4>
+
+<div style="text-align: left; max-width: 700px; margin: 0 auto;">
+<p style="margin-bottom: 1rem; color: #ccc;">1. <strong>Amnistía para todos los pecados:</strong> Olvidamos el pasado para construir un futuro mejor.</p>
+<p style="margin-bottom: 1rem; color: #ccc;">2. <strong>Redirección hacia el bien:</strong> Convertimos habilidades ilícitas en herramientas para la justicia.</p>
+<p style="margin-bottom: 1rem; color: #ccc;">3. <strong>Recuperación ética:</strong> Localizamos y recuperamos activos ilícitos con comisión del 5%.</p>
+<p style="margin-bottom: 1rem; color: #ccc;">4. <strong>Redistribución justa:</strong> Los activos recuperados se destinan a proyectos de bien social.</p>
+<p style="color: #ccc;">5. <strong>Unidad global:</strong> Trabajamos con gobiernos, organizaciones y personas para crear un mundo mejor.</p>
+</div>
+</div>
+
+<div style="padding: 1.5rem; background: rgba(0, 0, 0, 0.3); border-radius: 12px; margin-top: 2rem;">
+<p><strong>Manifiesto Operativo:</strong> La Coalición de Amnistía para la Unidad opera dentro del marco legal internacional. Todas las herramientas son para fines educativos y de capacitación. La recuperación real de activos requiere colaboración con autoridades legítimas y cumplimiento de todas las leyes aplicables. La amnistía ofrecida es moral y ética, complementaria (no sustitutiva) de procesos legales existentes.</p>
+</div>
+</div>
+</footer>
+</div>
+
+<script>
+// Tab Navigation
+document.querySelectorAll('.mission-tab').forEach(tab => {
+tab.addEventListener('click', () => {
+// Remove active class from all tabs and panels
+document.querySelectorAll('.mission-tab').forEach(t => t.classList.remove('active'));
+document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+
+// Add active class to clicked tab
+tab.classList.add('active');
+
+// Show corresponding panel
+const tabId = tab.getAttribute('data-tab');
+document.getElementById(tabId).classList.add('active');
+
+// Initialize specific tab features
+if (tabId === 'intelligence') {
+setTimeout(initializeAssetVisualization, 100);
+}
+
+if (tabId === 'commission') {
+updateCommissionSlider();
+}
+});
+});
+
+// Ecosystem Apps Navigation
+document.querySelectorAll('.ecosystem-app').forEach(app => {
+app.addEventListener('click', function() {
+const appName = this.getAttribute('data-app');
+if (appName !== 'recovery') {
+alert(`En un ecosistema real, esto redirigiría a la aplicación: ${appName}`);
+}
+});
+});
+
+// Asset Visualization
+let assetNodeCount = 0;
+
+function initializeAssetVisualization() {
+const visualization = document.getElementById('assetVisualization');
+if (!visualization) return;
+
+visualization.innerHTML = '';
+
+// Add initial nodes for a sample network
+addAssetNode('property', 100, 100, 'Villa Miami');
+addAssetNode('bank', 300, 100, 'Cuenta Suiza');
+addAssetNode('company', 500, 100, 'Holdings Panama');
+addAssetNode('crypto', 100, 250, 'BTC Wallet');
+addAssetNode('property', 300, 250, 'Penthouse NYC');
+addAssetNode('bank', 500, 250, 'Cuenta Cayman');
+}
+
+function addAssetNode(type, x, y, label) {
+const visualization = document.getElementById('assetVisualization');
+assetNodeCount++;
+
+const node = document.createElement('div');
+node.className = `asset-node ${type}`;
+node.innerHTML = `
+<i class="fas fa-${getAssetIcon(type)}"></i>
+<div>${label || getAssetLabel(type, assetNodeCount)}</div>
+`;
+
+node.style.left = `${x || Math.random() * 600}px`;
+node.style.top = `${y || Math.random() * 300}px`;
+
+makeDraggable(node);
+visualization.appendChild(node);
+return node;
+}
+
+function getAssetIcon(type) {
+const icons = {
+'property': 'home',
+'bank': 'university',
+'company': 'building',
+'crypto': 'bitcoin'
+};
+return icons[type] || 'question';
+}
+
+function getAssetLabel(type, count) {
+const labels = {
+'property': ['Villa', 'Penthouse', 'Yate', 'Jet'],
+'bank': ['Cuenta', 'Depósito', 'Fondo'],
+'company': ['Holdings', 'Corporation', 'Trust'],
+'crypto': ['Wallet', 'Vault', 'Cold Storage']
+};
+
+const prefix = labels[type] ? labels[type][Math.floor(Math.random() * labels[type].length)] : 'Activo';
+return `${prefix} ${count}`;
+}
+
+function makeDraggable(element) {
+let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+
+element.onmousedown = dragMouseDown;
+
+function dragMouseDown(e) {
+e = e || window.event;
+e.preventDefault();
+pos3 = e.clientX;
+pos4 = e.clientY;
+document.onmouseup = closeDragElement;
+document.onmousemove = elementDrag;
+}
+
+function elementDrag(e) {
+e = e || window.event;
+e.preventDefault();
+pos1 = pos3 - e.clientX;
+pos2 = pos4 - e.clientY;
+pos3 = e.clientX;
+pos4 = e.clientY;
+element.style.top = (element.offsetTop - pos2) + "px";
+element.style.left = (element.offsetLeft - pos1) + "px";
+}
+
+function closeDragElement() {
+document.onmouseup = null;
+document.onmousemove = null;
+}
+}
+
+function loadCaseStudy(type) {
+const visualization = document.getElementById('assetVisualization');
+visualization.innerHTML = '';
+
+if (type === 'politician') {
+addAssetNode('property', 100, 100, 'Villa Miami $8M');
+addAssetNode('property', 300, 100, 'Penthouse Panama $12M');
+addAssetNode('bank', 500, 100, 'Cuenta Suiza $15M');
+addAssetNode('company', 100, 250, 'Holdings BVI $10M');
+addAssetNode('bank', 300, 250, 'Cuenta Cayman $0');
+addAssetNode('property', 500, 250, 'Yate Mediterráneo $0');
+
+alert('Caso Político: $45M USD recuperados después de 8 meses de investigación. Comisión del 5%: $2.25M USD. 4 propiedades embargadas, 3 cuentas congeladas.');
+} else if (type === 'cartel') {
+addAssetNode('crypto', 100, 100, 'BTC Mixer $25M');
+addAssetNode('crypto', 300, 100, 'XMR Wallets $40M');
+addAssetNode('bank', 500, 100, 'Cuenta UAE $35M');
+addAssetNode('company', 100, 250, 'Front Company $12M');
+addAssetNode('property', 300, 250, 'Rancho Texas $8M');
+addAssetNode('bank', 500, 250, 'Cuenta Hong Kong $0');
+
+alert('Caso Cartel: $120M USD recuperados después de 14 meses. Comisión del 5%: $6M USD. Rastreo de blockchain complejo con mezcladores.');
+}
+}
+
+// Asset Tracking
+document.getElementById('initiateTracking').addEventListener('click', function() {
+const subjectName = document.getElementById('subjectName').value || 'Sujeto Desconocido';
+const amount = parseInt(document.getElementById('amountRange').value);
+const priority = document.getElementById('priority').value;
+
+// Simulate tracking results
+let resultsHTML = `
+<h4 style="color: var(--justice); margin-bottom: 1rem;">Rastreo Iniciado: ${subjectName}</h4>
+<p style="margin-bottom: 1rem; color: #ccc;">Monto estimado: $${amount.toLocaleString()} USD</p>
+<p style="margin-bottom: 1rem; color: #ccc;">Prioridad: ${getPriorityLabel(priority)}</p>
+
+<div style="background: rgba(0, 0, 0, 0.5); padding: 1.5rem; border-radius: 12px; margin-top: 1.5rem;">
+<h5 style="color: var(--intelligence); margin-bottom: 1rem;">Hallazgos Iniciales</h5>
+<ul style="padding-left: 1.5rem; color: #ccc;">
+<li style="margin-bottom: 0.5rem;">2 propiedades identificadas en Panamá y Miami</li>
+<li style="margin-bottom: 0.5rem;">3 cuentas bancarias en Suiza y Singapur</li>
+<li style="margin-bottom: 0.5rem;">1 sociedad anónima en Islas Caimán</li>
+<li style="margin-bottom: 0.5rem;">Actividad cripto significativa detectada</li>
+</ul>
+</div>
+
+<div style="margin-top: 1.5rem; padding: 1.5rem; background: rgba(39, 174, 96, 0.1); border-radius: 12px; border: 2px solid var(--justice);">
+<h5 style="color: var(--justice); margin-bottom: 0.5rem;">Recomendación de Acción</h5>
+<p style="color: #ccc;">Iniciar proceso de congelamiento preventivo en 3 jurisdicciones simultáneamente. Tiempo estimado: 2-4 semanas para órdenes iniciales.</p>
+</div>
+
+<button class="btn" style="margin-top: 1.5rem;">
+<i class="fas fa-file-contract"></i> Generar Órdenes de Congelamiento
+</button>
+`;
+
+document.getElementById('resultsContent').innerHTML = resultsHTML;
+document.getElementById('trackingResults').style.display = 'block';
+
+// Scroll to results
+document.getElementById('trackingResults').scrollIntoView({behavior: 'smooth'});
+});
+
+function getPriorityLabel(priority) {
+const labels = {
+'low': 'Baja',
+'medium': 'Media',
+'high': 'Alta',
+'critical': 'Crítica'
+};
+return labels[priority] || 'Media';
+}
+
+// Update amount slider value
+document.getElementById('amountRange').addEventListener('input', function() {
+const value = parseInt(this.value);
+document.getElementById('amountValue').textContent = '$' + value.toLocaleString();
+});
+
+// Commission Calculator
+document.getElementById('calculateCommission').addEventListener('click', function() {
+const totalAssets = parseFloat(document.getElementById('totalAssets').value) || 10000000;
+const jurisdictionCount = document.getElementById('jurisdictionCount').value;
+const complexity = parseInt(document.getElementById('complexity').value);
+const timeframe = parseInt(document.getElementById('timeframe').value);
+
+// Calculate commission (5%)
+const commission = totalAssets * 0.05;
+
+// Calculate expenses based on complexity and jurisdictions
+let expenseMultiplier = 1;
+if (jurisdictionCount === '5+') expenseMultiplier = 1.5;
+else if (jurisdictionCount === '4') expenseMultiplier = 1.3;
+else if (jurisdictionCount === '3') expenseMultiplier = 1.2;
+else if (jurisdictionCount === '2') expenseMultiplier = 1.1;
+
+let complexityMultiplier = 1;
+if (complexity === 1) complexityMultiplier = 0.7;
+else if (complexity === 2) complexityMultiplier = 0.85;
+else if (complexity === 4) complexityMultiplier = 1.3;
+else if (complexity === 5) complexityMultiplier = 1.5;
+
+let timeframeMultiplier = 1;
+if (timeframe <= 6) timeframeMultiplier = 0.9;
+else if (timeframe >= 18) timeframeMultiplier = 1.4;
+
+// Base expenses: 1.5% of total assets
+const baseExpenses = totalAssets * 0.015;
+const expenses = baseExpenses * expenseMultiplier * complexityMultiplier * timeframeMultiplier;
+
+// Net profit
+const netProfit = commission - expenses;
+
+// Update display
+document.getElementById('commissionAmount').textContent = '$' + commission.toLocaleString('en-US', {maximumFractionDigits: 0});
+document.getElementById('expensesAmount').textContent = '$' + expenses.toLocaleString('en-US', {maximumFractionDigits: 0});
+document.getElementById('netProfit').textContent = '$' + netProfit.toLocaleString('en-US', {maximumFractionDigits: 0});
+
+document.getElementById('commissionResults').style.display = 'block';
+});
+
+function updateCommissionSlider() {
+const complexity = parseInt(document.getElementById('complexity').value);
+const labels = ['Muy Simple', 'Simple', 'Media', 'Compleja', 'Extrema'];
+document.getElementById('complexityValue').textContent = labels[complexity - 1] || 'Media';
+}
+
+document.getElementById('complexity').addEventListener('input', updateCommissionSlider);
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+initializeAssetVisualization();
+updateCommissionSlider();
+
+// Set initial amount value
+const initialAmount = parseInt(document.getElementById('amountRange').value);
+document.getElementById('amountValue').textContent = '$' + initialAmount.toLocaleString();
+});
+</script>
+</body>
+</html>
