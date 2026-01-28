@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quantum Freedom Suite - Dashboard de Protección Patrimonial</title>
+    <style>
+        :root {
+            --primary: #0d3b66; /* Azul Colombia */
+            --secondary: #c1121f; /* Rojo Colombia */
+            --accent: #f4d35e; /* Amarillo Colombia */
+            --light: #f8f9fa;
+            --dark: #212529;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0d3b66 0%, #1a5a9a 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        /* HEADER */
+        .header {
+            background: white;
+            border-radius: 15px 15px 0 0;
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .logo h1 {
+            color: var(--primary);
+            font-size: 1.8rem;
+        }
+        
+        .logo span {
+            color: var(--secondary);
+            font-weight: 800;
+        }
+        
+        .user-info {
+            text-align: right;
+        }
+        
+        .user-info h3 {
+            color: var(--dark);
+            margin-bottom: 5px;
+        }
+        
+        .user-tag {
+            background: var(--accent);
+            color: var(--dark);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        
+        /* MAIN DASHBOARD */
+        .dashboard {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 0 0 15px 15px;
+            padding: 30px;
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 30px;
+            min-height: 70vh;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+        
+        /* PROGRESS TRACKER */
+        .progress-tracker {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+        }
+        
+        .progress-tracker h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            margin: 30px 0;
+        }
+        
+        .progress-steps::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 10%;
+            right: 10%;
+            height: 4px;
+            background: #e9ecef;
+            z-index: 1;
+        }
+        
+        .step {
+            text-align: center;
+            position: relative;
+            z-index: 2;
+            flex: 1;
+        }
+        
+        .step-circle {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+        }
+        
+        .step.active .step-circle {
+            background: var(--secondary);
+            transform: scale(1.1);
+            box-shadow: 0 0 0 5px rgba(193, 18, 31, 0.2);
+        }
+        
+        .step.completed .step-circle {
+            background: #2ecc71;
+        }
+        
+        .step-text {
+            font-size: 0.85rem;
+            color: var(--dark);
+            font-weight: 500;
+        }
+        
+        /* STRUCTURE VISUALIZATION */
+        .structure-viz {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+        }
+        
+        .structure-viz h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .viz-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            min-height: 200px;
+            justify-content: center;
+        }
+        
+        .viz-box {
+            width: 200px;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .viz-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .viz-trust {
+            background: #e3f2fd;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .viz-company {
+            background: #f3e5f5;
+            border: 2px solid #9c27b0;
+            color: #9c27b0;
+            width: 180px;
+        }
+        
+        .viz-bank {
+            background: #e8f5e9;
+            border: 2px solid #2e7d32;
+            color: #2e7d32;
+            width: 160px;
+        }
+        
+        .viz-arrow {
+            font-size: 24px;
+            color: #666;
+        }
+        
+        /* ACTION PANEL */
+        .action-panel {
+            background: linear-gradient(135deg, var(--primary) 0%, #1a5a9a 100%);
+            border-radius: 10px;
+            padding: 25px;
+            color: white;
+            box-shadow: 0 5px 15px rgba(13, 59, 102, 0.3);
+        }
+        
+        .action-panel h2 {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .action-list {
+            list-style: none;
+            margin-bottom: 30px;
+        }
+        
+        .action-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .action-item:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateX(5px);
+        }
+        
+        .action-number {
+            background: var(--accent);
+            color: var(--dark);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .action-text {
+            flex: 1;
+            font-size: 0.95rem;
+        }
+        
+        .action-btn {
+            background: var(--accent);
+            color: var(--dark);
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            text-align: center;
+        }
+        
+        .action-btn:hover {
+            background: #ffd166;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        
+        /* UPSELL MODULE */
+        .upsell-module {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+            border-left: 5px solid var(--secondary);
+        }
+        
+        .upsell-module h3 {
+            color: var(--secondary);
+            margin-bottom: 10px;
+        }
+        
+        .upsell-text {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+        
+        .upsell-btn {
+            background: var(--secondary);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        
+        .upsell-btn:hover {
+            background: #d00000;
+        }
+        
+        /* RESPONSIVE */
+        @media (max-width: 900px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .progress-steps {
+                flex-direction: column;
+                gap: 30px;
+            }
+            
+            .progress-steps::before {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header">
+            <div class="logo">
+                <h1>Quantum<span>Freedom</span> Suite</h1>
+            </div>
+            <div class="user-info">
+                <h3 id="userName">Carlos Rodríguez</h3>
+                <div class="user-tag" id="userPackage">Paquete Platinum</div>
+            </div>
+        </div>
+        
+        <!-- MAIN DASHBOARD -->
+        <div class="dashboard">
+            <!-- LEFT COLUMN: Progress & Structure -->
+            <div class="left-column">
+                <!-- Progress Tracker -->
+                <div class="progress-tracker">
+                    <h2>📊 Tu Camino hacia la Protección Total</h2>
+                    <div class="progress-steps">
+                        <div class="step completed">
+                            <div class="step-circle">1</div>
+                            <div class="step-text">Evaluación Inicial</div>
+                        </div>
+                        <div class="step active">
+                            <div class="step-circle">2</div>
+                            <div class="step-text">Trust Constituido</div>
+                        </div>
+                        <div class="step">
+                            <div class="step-circle">3</div>
+                            <div class="step-text">Sociedad Offshore</div>
+                        </div>
+                        <div class="step">
+                            <div class="step-circle">4</div>
+                            <div class="step-text">Cuenta Bancaria</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Structure Visualization -->
+                <div class="structure-viz">
+                    <h2>🏗️ Tu Estructura Internacional</h2>
+                    <div class="viz-container">
+                        <div class="viz-box viz-trust" onclick="showDetails('trust')">
+                            🔒 Fideicomiso en Nevis<br>
+                            <small>Activos: $850,000 USD</small>
+                        </div>
+                        <div class="viz-arrow">↓</div>
+                        <div class="viz-box viz-company" onclick="showDetails('company')">
+                            🏢 Sociedad Panamá IBC<br>
+                            <small>Pendiente de constitución</small>
+                        </div>
+                        <div class="viz-arrow">↓</div>
+                        <div class="viz-box viz-bank" onclick="showDetails('bank')">
+                            🏦 Cuenta Bancaria<br>
+                            <small>Por abrir</small>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Upsell Module (Dynamic) -->
+                <div class="upsell-module" id="upsellModule">
+                    <h3>🚀 Próximo Paso Recomendado</h3>
+                    <p class="upsell-text" id="upsellText">Tu trust está activo. El siguiente paso natural es constituir una sociedad offshore para operar con mayor privacidad y protección.</p>
+                    <button class="upsell-btn" onclick="showUpsellModal()">Ver Propuesta de Sociedad ($4,999 USD)</button>
+                </div>
+            </div>
+            
+            <!-- RIGHT COLUMN: Actions -->
+            <div class="action-panel">
+                <h2>📋 Acciones Requeridas</h2>
+                <ul class="action-list" id="actionList">
+                    <!-- Actions populated by JavaScript -->
+                </ul>
+                <button class="action-btn" onclick="contactAdvisor()">📞 Contactar a Mi Asesor (Jairo Andrés)</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // USER DATA
+        const userData = {
+            name: "Carlos Rodríguez",
+            package: "Platinum",
+            trust: {
+                status: "active",
+                jurisdiction: "Nevis",
+                value: "$850,000 USD",
+                documents: 3
+            },
+            company: {
+                status: "pending",
+                jurisdiction: "Panamá",
+                type: "IBC",
+                documentsNeeded: 2
+            },
+            bank: {
+                status: "not_started",
+                recommended: "SwissQuote",
+                documentsNeeded: 4
+            }
+        };
+
+        // ACTION LIST BASED ON USER PROGRESS
+        const actions = {
+            trust: [
+                { id: 1, text: "Firmar Power of Attorney para fiduciario", completed: true },
+                { id: 2, text: "Transferir activos al trust (instrucciones en email)", completed: false },
+                { id: 3, text: "Designar beneficiarios en documento confidencial", completed: false }
+            ],
+            company: [
+                { id: 1, text: "Proveer nombres para directores nominados", completed: false },
+                { id: 2, text: "Definir objeto social de la empresa", completed: false },
+                { id: 3, text: "Aprobar acta constitutiva", completed: false }
+            ],
+            bank: [
+                { id: 1, text: "Completar formulario KYC (Know Your Customer)", completed: false },
+                { id: 2, text: "Proveer prueba de dirección", completed: false },
+                { id: 3, text: "Definir monedas para cuenta", completed: false }
+            ]
+        };
+
+        // INITIALIZE DASHBOARD
+        function initializeDashboard() {
+            // Set user info
+            document.getElementById('userName').textContent = userData.name;
+            document.getElementById('userPackage').textContent = `Paquete ${userData.package}`;
+            
+            // Render actions based on progress
+            renderActions();
+            
+            // Configure upsell module
+            configureUpsell();
+        }
+
+        // RENDER ACTION LIST
+        function renderActions() {
+            const actionList = document.getElementById('actionList');
+            actionList.innerHTML = '';
+            
+            let currentActions = [];
+            
+            // Determine which actions to show based on progress
+            if (userData.trust.status === 'active') {
+                currentActions = [...actions.trust.filter(a => !a.completed), ...actions.company];
+            } else if (userData.company.status === 'active') {
+                currentActions = [...actions.company.filter(a => !a.completed), ...actions.bank];
+            } else {
+                currentActions = actions.trust;
+            }
+            
+            // Display first 4 most important actions
+            currentActions.slice(0, 4).forEach(action => {
+                const li = document.createElement('li');
+                li.className = 'action-item';
+                li.innerHTML = `
+                    <div class="action-number">${action.id}</div>
+                    <div class="action-text">${action.text}</div>
+                    ${action.completed ? '✅' : '⏳'}
+                `;
+                li.onclick = () => toggleAction(action.id);
+                actionList.appendChild(li);
+            });
+        }
+
+        // CONFIGURE UPSELL MODULE DYNAMICALLY
+        function configureUpsell() {
+            const upsellModule = document.getElementById('upsellModule');
+            const upsellText = document.getElementById('upsellText');
+            
+            if (userData.trust.status === 'active' && userData.company.status === 'pending') {
+                upsellText.textContent = "Tu trust está activo. El siguiente paso natural es constituir una sociedad offshore para operar con mayor privacidad y protección.";
+                upsellModule.style.display = 'block';
+            } else if (userData.company.status === 'active' && userData.bank.status === 'not_started') {
+                upsellText.textContent = "Tu sociedad está constituida. Ahora necesitas una cuenta bancaria internacional para operar con tus fondos de forma segura.";
+                upsellModule.style.display = 'block';
+            } else if (userData.bank.status === 'active') {
+                upsellText.textContent = "¡Estructura completa! Considera optimizar tus impuestos con nuestro módulo de estrategias fiscales internacionales.";
+                upsellModule.style.display = 'block';
+            } else {
+                upsellModule.style.display = 'none';
+            }
+        }
+
+        // ACTION FUNCTIONS
+        function toggleAction(actionId) {
+            // In a real app, this would update server
+            alert(`Acción ${actionId} marcada como completada. En versión completa, esto se sincronizaría con tu asesor.`);
+            renderActions();
+        }
+
+        function showDetails(type) {
+            const details = {
+                trust: `🔒 Fideicomiso en ${userData.trust.jurisdiction}\nValor: ${userData.trust.value}\nDocumentos: ${userData.trust.documents} archivados\n\nEste trust protege tus activos de embargos y demandas en Colombia.`,
+                company: `🏢 Sociedad ${userData.company.type} en ${userData.company.jurisdiction}\nEstado: ${userData.company.status}\nDocumentos requeridos: ${userData.company.documentsNeeded}\n\nUna sociedad IBC te permite operar negocios internacionales con privacidad.`,
+                bank: `🏦 Cuenta Bancaria Recomendada: ${userData.bank.recommended}\nEstado: ${userData.bank.status}\nDocumentos requeridos: ${userData.bank.documentsNeeded}\n\nCuenta multicurrency para manejar tus fondos internacionales.`
+            };
+            alert(details[type]);
+        }
+
+        function showUpsellModal() {
+            let offer = '';
+            let price = '';
+            
+            if (userData.trust.status === 'active' && userData.company.status === 'pending') {
+                offer = 'Constitución de Sociedad Offshore en Panamá';
+                price = '$4,999 USD';
+            } else if (userData.company.status === 'active' && userData.bank.status === 'not_started') {
+                offer = 'Apertura de Cuenta Bancaria Internacional (SwissQuote)';
+                price = '$1,999 USD';
+            } else {
+                offer = 'Optimización Fiscal Internacional';
+                price = '$2,999 USD';
+            }
+            
+            const modalHtml = `
+                <div style="position:fixed; top:0; left:0; right:0; bottom:0; background:rgba(0,0,0,0.7); display:flex; align-items:center; justify-content:center; z-index:1000;">
+                    <div style="background:white; padding:30px; border-radius:15px; max-width:500px; width:90%;">
+                        <h2 style="color:var(--primary); margin-bottom:20px;">🎯 Oferta Personalizada</h2>
+                        <p><strong>Servicio:</strong> ${offer}</p>
+                        <p><strong>Inversión:</strong> ${price}</p>
+                        <p><strong>Incluye:</strong></p>
+                        <ul style="margin-left:20px; margin-bottom:20px;">
+                            ${offer.includes('Sociedad') ? 
+                                '<li>Constitución completa de IBC</li><li>Documentos notariados</li><li>Director nominado por 1 año</li><li>Domicilio fiscal</li>' : 
+                                offer.includes('Cuenta') ?
+                                '<li>Apertura de cuenta multicurrency</li><li>Tarjeta de débito internacional</li><li>Acceso a banca online</li><li>Soporte en español</li>' :
+                                '<li>Análisis fiscal personalizado</li><li>Estrategia de residencia fiscal</li><li>Reportes DIAN optimizados</li><li>Asesoría anual</li>'
+                            }
+                        </ul>
+                        <div style="display:flex; gap:10px;">
+                            <button onclick="acceptOffer()" style="background:var(--secondary); color:white; border:none; padding:10px 20px; border-radius:5px; cursor:pointer; flex:1;">✅ Aceptar Oferta</button>
+                            <button onclick="closeModal()" style="background:#ccc; color:black; border:none; padding:10px 20px; border-radius:5px; cursor:pointer;">✖️ Cerrar</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+        }
+
+        function closeModal() {
+            const modal = document.querySelector('div[style*="position:fixed; top:0"]');
+            if (modal) modal.remove();
+        }
+
+        function acceptOffer() {
+            alert('✅ ¡Oferta aceptada! Jairo Andrés se contactará contigo en las próximas 2 horas para proceder.\n\nEn versión completa, esto activaría el flujo de pago y comenzaría el proceso.');
+            closeModal();
+            // Simulate progress update
+            if (userData.trust.status === 'active' && userData.company.status === 'pending') {
+                userData.company.status = 'in_progress';
+            }
+            configureUpsell();
+            renderActions();
+        }
+
+        function contactAdvisor() {
+            const phone = "+57 123 456 7890";
+            const email = "jairo@quantumfreedom.co";
+            alert(`📞 Contacta a tu asesor:\n\nTeléfono: ${phone}\nEmail: ${email}\n\nHorario: Lunes a Viernes 9am-6pm\n\nJairo Andrés te asistirá personalmente.`);
+        }
+
+        // START THE DASHBOARD
+        window.onload = initializeDashboard;
+    </script>
+</body>
+</html>
