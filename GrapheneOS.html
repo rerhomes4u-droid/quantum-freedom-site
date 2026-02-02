@@ -1,0 +1,1746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Complete Guide to De-Googling & Installing GrapheneOS</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #2d3748;
+            --secondary: #4a5568;
+            --accent: #38b2ac;
+            --danger: #e53e3e;
+            --success: #38a169;
+            --warning: #d69e2e;
+            --dark: #1a202c;
+            --light: #f7fafc;
+            --gray: #718096;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+            --gradient: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+        }
+
+        body {
+            background-color: #f0f5ff;
+            color: var(--dark);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        header {
+            background: var(--gradient);
+            color: white;
+            padding: 2.5rem;
+            border-radius: 0 0 20px 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        header::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cpath fill='rgba(255,255,255,0.05)' d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z'/%3E%3C/svg%3E");
+            opacity: 0.3;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 1rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .tagline {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            max-width: 900px;
+            margin-bottom: 1.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .phase-indicator {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .phase-step {
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            border-radius: 12px;
+            padding: 15px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: var(--transition);
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .phase-step:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .phase-step i {
+            font-size: 1.8rem;
+        }
+
+        .phase-step.completed {
+            background: rgba(56, 161, 105, 0.3);
+            border-left: 5px solid var(--success);
+        }
+
+        .phase-step.active {
+            background: rgba(56, 178, 172, 0.3);
+            border-left: 5px solid var(--accent);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(56, 178, 172, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(56, 178, 172, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(56, 178, 172, 0); }
+        }
+
+        .phase-step .step-content h3 {
+            font-size: 1.3rem;
+            margin-bottom: 5px;
+        }
+
+        .phase-step .step-content p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        @media (max-width: 1024px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .card-header i {
+            font-size: 2rem;
+            color: var(--accent);
+        }
+
+        .card-header h2 {
+            font-size: 1.8rem;
+            color: var(--primary);
+        }
+
+        .tutorial-step {
+            margin-bottom: 35px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid #e2e8f0;
+            position: relative;
+        }
+
+        .tutorial-step:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .step-number {
+            position: absolute;
+            left: -50px;
+            top: 0;
+            width: 40px;
+            height: 40px;
+            background-color: var(--accent);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+        .step-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .step-title h3 {
+            font-size: 1.4rem;
+            color: var(--dark);
+        }
+
+        .step-badge {
+            background-color: var(--accent);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .step-content {
+            margin-bottom: 15px;
+            color: var(--gray);
+        }
+
+        .warning-box, .tip-box, .important-box {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border-left: 5px solid;
+        }
+
+        .warning-box {
+            background-color: #fed7d7;
+            border-left-color: var(--danger);
+            color: #742a2a;
+        }
+
+        .tip-box {
+            background-color: #c6f6d5;
+            border-left-color: var(--success);
+            color: #22543d;
+        }
+
+        .important-box {
+            background-color: #ebf8ff;
+            border-left-color: var(--secondary);
+            color: #2d3748;
+        }
+
+        .device-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .device-option {
+            padding: 15px;
+            border-radius: 8px;
+            border: 2px solid #e2e8f0;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .device-option:hover {
+            background-color: #f7fafc;
+            border-color: var(--accent);
+        }
+
+        .device-option.selected {
+            background-color: #ebf8ff;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(56, 178, 172, 0.2);
+        }
+
+        .device-option i {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            color: var(--secondary);
+        }
+
+        .btn {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+            margin-right: 10px;
+            margin-bottom: 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            background-color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            color: var(--accent);
+            border: 2px solid var(--accent);
+        }
+
+        .btn-outline:hover {
+            background-color: rgba(56, 178, 172, 0.1);
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+        }
+
+        .btn-danger:hover {
+            background-color: #c53030;
+        }
+
+        .compatibility-checker {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f8fafc;
+            border-radius: 12px;
+            border-left: 5px solid var(--secondary);
+            display: none;
+        }
+
+        .compatibility-checker.active {
+            display: block;
+        }
+
+        .checklist {
+            list-style-type: none;
+            margin-top: 15px;
+        }
+
+        .checklist li {
+            padding: 10px 0;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .checklist li:last-child {
+            border-bottom: none;
+        }
+
+        .checklist i.fa-check {
+            color: var(--success);
+        }
+
+        .checklist i.fa-times {
+            color: var(--danger);
+        }
+
+        .checklist i.fa-question {
+            color: var(--warning);
+        }
+
+        .simulation-container {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .simulation-visual {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 30px 0;
+            padding: 20px;
+            background-color: #f1f8ff;
+            border-radius: 12px;
+            position: relative;
+        }
+
+        .before-visual, .after-visual {
+            width: 45%;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            transition: all 0.5s ease;
+        }
+
+        .before-visual {
+            background-color: #fed7d7;
+        }
+
+        .after-visual {
+            background-color: #c6f6d5;
+        }
+
+        .visual-icon {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        .arrow {
+            font-size: 2rem;
+            color: var(--gray);
+        }
+
+        .code-block {
+            background-color: #1a202c;
+            color: #cbd5e0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 20px 0;
+            overflow-x: auto;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .code-comment {
+            color: #718096;
+        }
+
+        .download-section {
+            margin-top: 40px;
+            padding: 25px;
+            background: linear-gradient(135deg, #f6f9fc 0%, #edf2f7 100%);
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .download-title {
+            font-size: 1.6rem;
+            margin-bottom: 20px;
+            color: var(--primary);
+            text-align: center;
+        }
+
+        .download-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .download-option {
+            padding: 20px;
+            border-radius: 12px;
+            background-color: white;
+            box-shadow: var(--shadow);
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .download-option:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .download-option i {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: var(--accent);
+        }
+
+        .progress-container {
+            height: 8px;
+            background-color: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: var(--success);
+            border-radius: 4px;
+            transition: width 1s ease-in-out;
+            width: 0%;
+        }
+
+        .backup-section {
+            margin-top: 40px;
+        }
+
+        .backup-checklist {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .backup-item {
+            padding: 15px;
+            background-color: #f8fafc;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .backup-item i {
+            color: var(--accent);
+        }
+
+        .interactive-terminal {
+            background-color: #1a202c;
+            color: #cbd5e0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            margin: 20px 0;
+            overflow-x: auto;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .terminal-line {
+            margin-bottom: 5px;
+            white-space: nowrap;
+        }
+
+        .terminal-prompt {
+            color: var(--success);
+        }
+
+        .terminal-command {
+            color: white;
+        }
+
+        .terminal-output {
+            color: #cbd5e0;
+            margin-left: 20px;
+        }
+
+        .quiz-container {
+            margin-top: 40px;
+            padding: 25px;
+            background-color: #f0fff4;
+            border-radius: 16px;
+            border-left: 5px solid var(--success);
+        }
+
+        .quiz-question {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            color: var(--dark);
+        }
+
+        .quiz-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .quiz-option {
+            padding: 15px;
+            background-color: white;
+            border-radius: 8px;
+            border: 2px solid #e2e8f0;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .quiz-option:hover {
+            background-color: #f7fafc;
+            border-color: var(--accent);
+        }
+
+        .quiz-option.selected {
+            background-color: #ebf8ff;
+            border-color: var(--accent);
+        }
+
+        .quiz-feedback {
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+        }
+
+        .quiz-feedback.show {
+            display: block;
+        }
+
+        .post-install-section {
+            margin-top: 40px;
+        }
+
+        .app-alternatives {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .app-alternative {
+            padding: 20px;
+            border-radius: 12px;
+            background-color: white;
+            box-shadow: var(--shadow);
+            border-top: 5px solid var(--accent);
+        }
+
+        .app-alternative h4 {
+            color: var(--primary);
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .app-alternative ul {
+            list-style-type: none;
+            margin-top: 10px;
+        }
+
+        .app-alternative li {
+            padding: 8px 0;
+            border-bottom: 1px solid #f1f1f1;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .app-alternative li:last-child {
+            border-bottom: none;
+        }
+
+        .app-alternative i {
+            color: var(--success);
+        }
+
+        footer {
+            margin-top: 60px;
+            padding: 30px;
+            background-color: var(--dark);
+            color: white;
+            border-radius: 20px 20px 0 0;
+            text-align: center;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: #a0aec0;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .highlight {
+            background-color: rgba(56, 178, 172, 0.1);
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 30px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 22px;
+            width: 22px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--success);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(30px);
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .phase-indicator {
+                flex-direction: column;
+            }
+            
+            .step-number {
+                position: static;
+                margin-bottom: 15px;
+                width: 35px;
+                height: 35px;
+            }
+            
+            .simulation-visual {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .before-visual, .after-visual {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-mobile-alt"></i> Complete Guide to De-Googling & Installing GrapheneOS</h1>
+            <p class="tagline">A step-by-step interactive tutorial to liberate your Android phone from Google's control and install the world's most private and secure mobile operating system</p>
+            
+            <div class="phase-indicator">
+                <div class="phase-step active" id="phase1">
+                    <i class="fas fa-clipboard-check"></i>
+                    <div class="step-content">
+                        <h3>Phase 1: Preparation</h3>
+                        <p>Backup, Compatibility Check & Downloads</p>
+                    </div>
+                </div>
+                <div class="phase-step" id="phase2">
+                    <i class="fas fa-unlock-alt"></i>
+                    <div class="step-content">
+                        <h3>Phase 2: Unlock Bootloader</h3>
+                        <p>Enable OEM Unlocking & Unlock</p>
+                    </div>
+                </div>
+                <div class="phase-step" id="phase3">
+                    <i class="fas fa-download"></i>
+                    <div class="step-content">
+                        <h3>Phase 3: Install GrapheneOS</h3>
+                        <p>Flash Factory Images</p>
+                    </div>
+                </div>
+                <div class="phase-step" id="phase4">
+                    <i class="fas fa-cogs"></i>
+                    <div class="step-content">
+                        <h3>Phase 4: Post-Install</h3>
+                        <p>Setup & De-Google Your Life</p>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <div class="left-column">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-clipboard-list"></i>
+                        <h2>Phase 1: Preparation & Compatibility Check</h2>
+                    </div>
+                    
+                    <div class="tutorial-step">
+                        <div class="step-number">1</div>
+                        <div class="step-title">
+                            <h3>Check Device Compatibility</h3>
+                            <span class="step-badge">Critical</span>
+                        </div>
+                        <div class="step-content">
+                            <p>GrapheneOS only supports specific Google Pixel devices due to their hardware security features and unlockable bootloaders. Check if your device is compatible:</p>
+                            
+                            <div class="device-selector" id="deviceSelector">
+                                <div class="device-option" onclick="selectDevice('pixel-8')">
+                                    <i class="fas fa-mobile"></i>
+                                    <h4>Pixel 8/8 Pro</h4>
+                                    <p>Best Support</p>
+                                </div>
+                                <div class="device-option" onclick="selectDevice('pixel-7')">
+                                    <i class="fas fa-mobile"></i>
+                                    <h4>Pixel 7/7 Pro</h4>
+                                    <p>Full Support</p>
+                                </div>
+                                <div class="device-option" onclick="selectDevice('pixel-6')">
+                                    <i class="fas fa-mobile"></i>
+                                    <h4>Pixel 6/6 Pro</h4>
+                                    <p>Full Support</p>
+                                </div>
+                                <div class="device-option" onclick="selectDevice('pixel-5')">
+                                    <i class="fas fa-mobile"></i>
+                                    <h4>Pixel 5/5a</h4>
+                                    <p>Limited Support</p>
+                                </div>
+                            </div>
+                            
+                            <div class="important-box">
+                                <p><i class="fas fa-exclamation-circle"></i> <strong>Important:</strong> Only official Google Pixel devices are supported. "Pixel Experience" ROMs on other devices or carrier-locked Pixels will not work.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tutorial-step">
+                        <div class="step-number">2</div>
+                        <div class="step-title">
+                            <h3>Backup Everything</h3>
+                            <span class="step-badge">Essential</span>
+                        </div>
+                        <div class="step-content">
+                            <p>Installing GrapheneOS will <strong>completely wipe your device</strong>. You must backup all important data first.</p>
+                            
+                            <div class="backup-section">
+                                <h4>Backup Checklist:</h4>
+                                <div class="backup-checklist">
+                                    <div class="backup-item">
+                                        <i class="fas fa-images"></i>
+                                        <span>Photos & Videos</span>
+                                    </div>
+                                    <div class="backup-item">
+                                        <i class="fas fa-address-book"></i>
+                                        <span>Contacts</span>
+                                    </div>
+                                    <div class="backup-item">
+                                        <i class="fas fa-comments"></i>
+                                        <span>Messages (SMS/MMS)</span>
+                                    </div>
+                                    <div class="backup-item">
+                                        <i class="fas fa-file-alt"></i>
+                                        <span>Documents & Downloads</span>
+                                    </div>
+                                    <div class="backup-item">
+                                        <i class="fas fa-key"></i>
+                                        <span>2FA Codes & Passwords</span>
+                                    </div>
+                                    <div class="backup-item">
+                                        <i class="fas fa-gamepad"></i>
+                                        <span>App Data & Game Saves</span>
+                                    </div>
+                                </div>
+                                
+                                <div class="tip-box">
+                                    <p><i class="fas fa-lightbulb"></i> <strong>Tip:</strong> Use local backups (computer, external drive) instead of Google Drive for better privacy. For contacts, export as vCard (.vcf) file.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tutorial-step">
+                        <div class="step-number">3</div>
+                        <div class="step-title">
+                            <h3>Download Required Files</h3>
+                            <span class="step-badge">Required</span>
+                        </div>
+                        <div class="step-content">
+                            <p>You'll need to download several files before starting the installation process.</p>
+                            
+                            <div class="download-section">
+                                <h4 class="download-title">Required Downloads</h4>
+                                
+                                <div class="download-options">
+                                    <div class="download-option">
+                                        <i class="fab fa-android"></i>
+                                        <h4>Platform Tools</h4>
+                                        <p>ADB & Fastboot utilities</p>
+                                        <button class="btn btn-outline" onclick="simulateDownload('platform-tools')">
+                                            <i class="fas fa-download"></i> Download
+                                        </button>
+                                    </div>
+                                    <div class="download-option">
+                                        <i class="fas fa-file-archive"></i>
+                                        <h4>GrapheneOS Image</h4>
+                                        <p>Factory image for your device</p>
+                                        <button class="btn btn-outline" onclick="simulateDownload('grapheneos-image')">
+                                            <i class="fas fa-download"></i> Download
+                                        </button>
+                                    </div>
+                                    <div class="download-option">
+                                        <i class="fas fa-desktop"></i>
+                                        <h4>Device Drivers</h4>
+                                        <p>USB drivers (Windows only)</p>
+                                        <button class="btn btn-outline" onclick="simulateDownload('usb-drivers')">
+                                            <i class="fas fa-download"></i> Download
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="progress-container">
+                                    <div class="progress-bar" id="downloadProgress"></div>
+                                </div>
+                                <p id="downloadStatus">Ready to download required files</p>
+                            </div>
+                            
+                            <div class="code-block">
+                                <span class="code-comment"># Download links (always verify from official sources)</span><br>
+                                Platform Tools: <span style="color: #38b2ac;">https://developer.android.com/tools/releases/platform-tools</span><br>
+                                GrapheneOS: <span style="color: #38b2ac;">https://grapheneos.org/releases</span><br>
+                                USB Drivers: <span style="color: #38b2ac;">https://developer.android.com/studio/run/win-usb</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tutorial-step">
+                        <div class="step-number">4</div>
+                        <div class="step-title">
+                            <h3>Enable Developer Options & USB Debugging</h3>
+                            <span class="step-badge">Setup</span>
+                        </div>
+                        <div class="step-content">
+                            <p>On your Android device, you need to enable developer options and USB debugging to allow communication with your computer.</p>
+                            
+                            <div class="simulation-container">
+                                <h4>Step-by-Step Activation:</h4>
+                                <div class="simulation-visual">
+                                    <div class="before-visual">
+                                        <div class="visual-icon">
+                                            <i class="fas fa-cog"></i>
+                                        </div>
+                                        <h4>Settings → About Phone</h4>
+                                        <p>Tap "Build Number" 7 times</p>
+                                    </div>
+                                    <div class="arrow">
+                                        <i class="fas fa-arrow-right"></i>
+                                    </div>
+                                    <div class="after-visual">
+                                        <div class="visual-icon">
+                                            <i class="fas fa-bug"></i>
+                                        </div>
+                                        <h4>Developer Options</h4>
+                                        <p>Enable "USB Debugging"</p>
+                                    </div>
+                                </div>
+                                
+                                <ol style="margin-left: 20px; margin-top: 15px;">
+                                    <li>Go to <strong>Settings → About Phone</strong></li>
+                                    <li>Find <strong>Build Number</strong> and tap it 7 times</li>
+                                    <li>Return to Settings, enter <strong>Developer Options</strong></li>
+                                    <li>Enable <strong>OEM Unlocking</strong> (if available)</li>
+                                    <li>Enable <strong>USB Debugging</strong></li>
+                                </ol>
+                                
+                                <div class="warning-box">
+                                    <p><i class="fas fa-exclamation-triangle"></i> <strong>Warning:</strong> Some carrier-locked devices may not have the "OEM Unlocking" option. These devices cannot install GrapheneOS.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-unlock-alt"></i>
+                        <h2>Phase 3: Install GrapheneOS</h2>
+                    </div>
+                    
+                    <div class="tutorial-step">
+                        <div class="step-number">5</div>
+                        <div class="step-title">
+                            <h3>Flash GrapheneOS Factory Image</h3>
+                            <span class="step-badge">Installation</span>
+                        </div>
+                        <div class="step-content">
+                            <p>This is the main installation process where you'll flash GrapheneOS to your device using fastboot commands.</p>
+                            
+                            <div class="interactive-terminal" id="terminal">
+                                <div class="terminal-line">
+                                    <span class="terminal-prompt">$</span>
+                                    <span class="terminal-command">cd ~/platform-tools</span>
+                                </div>
+                                <div class="terminal-line">
+                                    <span class="terminal-prompt">$</span>
+                                    <span class="terminal-command">./fastboot devices</span>
+                                </div>
+                                <div class="terminal-line terminal-output">
+                                    0A2B3C4D5E6F fastboot
+                                </div>
+                                <div class="terminal-line">
+                                    <span class="terminal-prompt">$</span>
+                                    <span class="terminal-command">./fastboot flashing unlock</span>
+                                </div>
+                                <div class="terminal-line terminal-output">
+                                    &lt;waiting for device&gt;
+                                </div>
+                                <div class="terminal-line terminal-output">
+                                    Use volume and power keys to confirm unlock...
+                                </div>
+                            </div>
+                            
+                            <div class="important-box">
+                                <p><i class="fas fa-exclamation-circle"></i> <strong>Important:</strong> The exact flashing commands vary by device. Always check the official GrapheneOS installation guide for your specific device.</p>
+                            </div>
+                            
+                            <button class="btn" onclick="simulateFlashing()">
+                                <i class="fas fa-play-circle"></i> Simulate Installation Process
+                            </button>
+                            <button class="btn btn-outline" onclick="resetTerminal()">
+                                <i class="fas fa-redo"></i> Reset Terminal
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="tutorial-step">
+                        <div class="step-number">6</div>
+                        <div class="step-title">
+                            <h3>Post-Installation Setup</h3>
+                            <span class="step-badge">Configuration</span>
+                        </div>
+                        <div class="step-content">
+                            <p>After successful installation, you'll need to go through the initial setup of GrapheneOS.</p>
+                            
+                            <div class="simulation-container">
+                                <h4>Initial Setup Steps:</h4>
+                                <div class="simulation-visual">
+                                    <div class="before-visual">
+                                        <div class="visual-icon">
+                                            <i class="fas fa-language"></i>
+                                        </div>
+                                        <h4>Language & Region</h4>
+                                        <p>Select your preferences</p>
+                                    </div>
+                                    <div class="arrow">
+                                        <i class="fas fa-arrow-right"></i>
+                                    </div>
+                                    <div class="after-visual">
+                                        <div class="visual-icon">
+                                            <i class="fas fa-wifi"></i>
+                                        </div>
+                                        <h4>Skip Google Services</h4>
+                                        <p>Do not connect to Google</p>
+                                    </div>
+                                </div>
+                                
+                                <ol style="margin-left: 20px; margin-top: 15px;">
+                                    <li>Select your language and region</li>
+                                    <li><strong>Skip connecting to Wi-Fi</strong> (you can connect later)</li>
+                                    <li><strong>Do NOT sign in to Google</strong> (skip all Google services)</li>
+                                    <li>Set up a secure lock screen (PIN/Password)</li>
+                                    <li>Configure privacy settings as desired</li>
+                                    <li>Install Aurora Store or F-Droid for apps</li>
+                                </ol>
+                                
+                                <div class="tip-box">
+                                    <p><i class="fas fa-lightbulb"></i> <strong>Tip:</strong> GrapheneOS includes a "Sandboxed Google Play" compatibility layer that allows running Google Play Services in a restricted sandbox without giving them full system access. Only enable this if absolutely necessary.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="right-column">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-lock-open"></i>
+                        <h2>Phase 2: Unlock Bootloader</h2>
+                    </div>
+                    
+                    <div class="tutorial-step">
+                        <div class="step-number">1</div>
+                        <div class="step-title">
+                            <h3>Connect Device & Test ADB</h3>
+                            <span class="step-badge">Connection</span>
+                        </div>
+                        <div class="step-content">
+                            <p>Connect your Pixel device to your computer via USB and test the ADB connection.</p>
+                            
+                            <div class="interactive-terminal">
+                                <div class="terminal-line">
+                                    <span class="terminal-prompt">$</span>
+                                    <span class="terminal-command">adb devices</span>
+                                </div>
+                                <div class="terminal-line terminal-output">
+                                    List of devices attached
+                                </div>
+                                <div class="terminal-line terminal-output">
+                                    0A2B3C4D5E6F unauthorized
+                                </div>
+                                <div class="terminal-line">
+                                    <span class="terminal-prompt">$</span>
+                                    <span class="terminal-command"># Check your phone for authorization prompt</span>
+                                </div>
+                                <div class="terminal-line">
+                                    <span class="terminal-prompt">$</span>
+                                    <span class="terminal-command">adb devices</span>
+                                </div>
+                                <div class="terminal-line terminal-output">
+                                    0A2B3C4D5E6F device
+                                </div>
+                            </div>
+                            
+                            <div class="warning-box">
+                                <p><i class="fas fa-exclamation-triangle"></i> <strong>Troubleshooting:</strong> If your device doesn't appear, try different USB cables/ports, reinstall drivers (Windows), or check if USB debugging is enabled.</p>
+                            </div>
+                            
+                            <button class="btn" onclick="testADBConnection()">
+                                <i class="fas fa-plug"></i> Simulate ADB Connection Test
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="tutorial-step">
+                        <div class="step-number">2</div>
+                        <div class="step-title">
+                            <h3>Reboot to Bootloader & Unlock</h3>
+                            <span class="step-badge">Destructive</span>
+                        </div>
+                        <div class="step-content">
+                            <p>This step will wipe your device. Make sure you have completed all backups!</p>
+                            
+                            <div class="interactive-terminal">
+                                <div class="terminal-line">
+                                    <span class="terminal-prompt">$</span>
+                                    <span class="terminal-command">adb reboot bootloader</span>
+                                </div>
+                                <div class="terminal-line terminal-output">
+                                    Rebooting to bootloader...
+                                </div>
+                                <div class="terminal-line">
+                                    <span class="terminal-prompt">$</span>
+                                    <span class="terminal-command">fastboot flashing unlock</span>
+                                </div>
+                                <div class="terminal-line terminal-output">
+                                    ❗️ This will erase all data on your device
+                                </div>
+                                <div class="terminal-line terminal-output">
+                                    Use volume keys to select "Unlock" and power to confirm
+                                </div>
+                            </div>
+                            
+                            <div class="important-box">
+                                <p><i class="fas fa-exclamation-circle"></i> <strong>Irreversible:</strong> Unlocking the bootloader will wipe your device completely. There's no going back without losing all data.</p>
+                            </div>
+                            
+                            <div class="tip-box">
+                                <p><i class="fas fa-lightbulb"></i> <strong>Note:</strong> On some Pixel devices, you may need to use <code>fastboot flashing unlock_critical</code> for full partition access.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="compatibility-checker" id="compatibilityChecker">
+                        <h4>Compatibility Check Results</h4>
+                        <p>Based on your device selection, here are the compatibility details:</p>
+                        
+                        <ul class="checklist" id="compatibilityList">
+                            <li><i class="fas fa-question"></i> Checking device model...</li>
+                            <li><i class="fas fa-question"></i> Checking bootloader status...</li>
+                            <li><i class="fas fa-question"></i> Checking Android version...</li>
+                            <li><i class="fas fa-question"></i> Checking carrier lock status...</li>
+                        </ul>
+                        
+                        <div id="compatibilityResult">
+                            <!-- Results will be displayed here -->
+                        </div>
+                    </div>
+                    
+                    <div class="quiz-container">
+                        <h3>Knowledge Check</h3>
+                        <div class="quiz-question" id="quizQuestion">What is the most important step to complete BEFORE unlocking your bootloader?</div>
+                        <div class="quiz-options" id="quizOptions">
+                            <div class="quiz-option" onclick="selectQuizAnswer(this, 0)">Enable USB Debugging</div>
+                            <div class="quiz-option" onclick="selectQuizAnswer(this, 1)">Backup all your data</div>
+                            <div class="quiz-option" onclick="selectQuizAnswer(this, 2)">Charge your phone to 100%</div>
+                            <div class="quiz-option" onclick="selectQuizAnswer(this, 3)">Download platform-tools</div>
+                        </div>
+                        <button class="btn" onclick="checkQuizAnswer()">Check Answer</button>
+                        <div class="quiz-feedback" id="quizFeedback"></div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-user-shield"></i>
+                        <h2>Phase 4: De-Google Your Digital Life</h2>
+                    </div>
+                    
+                    <div class="post-install-section">
+                        <div class="tutorial-step">
+                            <div class="step-title">
+                                <h3>Replace Google Services</h3>
+                                <span class="step-badge">Essential</span>
+                            </div>
+                            <div class="step-content">
+                                <p>Now that you have GrapheneOS installed, you need to replace Google services with privacy-respecting alternatives.</p>
+                                
+                                <div class="app-alternatives">
+                                    <div class="app-alternative">
+                                        <h4><i class="fas fa-store"></i> App Stores</h4>
+                                        <ul>
+                                            <li><i class="fas fa-check"></i> <strong>F-Droid</strong> - Free & open source apps only</li>
+                                            <li><i class="fas fa-check"></i> <strong>Aurora Store</strong> - Anonymous Google Play access</li>
+                                            <li><i class="fas fa-check"></i> <strong>GrapheneOS App Store</strong> - Curated privacy apps</li>
+                                        </ul>
+                                    </div>
+                                    
+                                    <div class="app-alternative">
+                                        <h4><i class="fas fa-search"></i> Search & Browser</h4>
+                                        <ul>
+                                            <li><i class="fas fa-check"></i> <strong>Vanadium</strong> - GrapheneOS's hardened Chromium</li>
+                                            <li><i class="fas fa-check"></i> <strong>Firefox Focus</strong> - Privacy-focused browsing</li>
+                                            <li><i class="fas fa-check"></i> <strong>DuckDuckGo</strong> - Private search engine</li>
+                                        </ul>
+                                    </div>
+                                    
+                                    <div class="app-alternative">
+                                        <h4><i class="fas fa-envelope"></i> Email & Cloud</h4>
+                                        <ul>
+                                            <li><i class="fas fa-check"></i> <strong>ProtonMail</strong> - Encrypted email</li>
+                                            <li><i class="fas fa-check"></i> <strong>Tutanota</strong> - Secure email service</li>
+                                            <li><i class="fas fa-check"></i> <strong>Nextcloud</strong> - Self-hosted cloud</li>
+                                        </ul>
+                                    </div>
+                                    
+                                    <div class="app-alternative">
+                                        <h4><i class="fas fa-map-marked-alt"></i> Maps & Navigation</h4>
+                                        <ul>
+                                            <li><i class="fas fa-check"></i> <strong>Organic Maps</strong> - Offline OSM maps</li>
+                                            <li><i class="fas fa-check"></i> <strong>Magic Earth</strong> - Privacy maps</li>
+                                            <li><i class="fas fa-check"></i> <strong>OsmAnd</strong> - Powerful OSM navigation</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="tutorial-step">
+                            <div class="step-title">
+                                <h3>Configure GrapheneOS Security Features</h3>
+                                <span class="step-badge">Optimization</span>
+                            </div>
+                            <div class="step-content">
+                                <p>GrapheneOS includes powerful security features that you should configure for maximum protection.</p>
+                                
+                                <div class="checklist">
+                                    <li><i class="fas fa-shield-alt"></i> <strong>Enable "Install unknown apps" only for trusted app stores</strong></li>
+                                    <li><i class="fas fa-usb"></i> <strong>Configure USB-C port control</strong> (Settings → Security → USB-C port)</li>
+                                    <li><i class="fas fa-network-wired"></i> <strong>Set up a firewall</strong> to block internet access for unnecessary apps</li>
+                                    <li><i class="fas fa-bell-slash"></i> <strong>Review app permissions</strong> and disable unnecessary ones</li>
+                                    <li><i class="fas fa-camera"></i> <strong>Use camera/microphone indicators</strong> to detect unauthorized access</li>
+                                    <li><i class="fas fa-sync-alt"></i> <strong>Enable automatic security updates</strong></li>
+                                </div>
+                                
+                                <div class="tip-box">
+                                    <p><i class="fas fa-lightbulb"></i> <strong>Advanced:</strong> For maximum security, enable GrapheneOS's "Hardened malloc" and "Memory tagging" features in developer options.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="tutorial-step">
+                            <div class="step-title">
+                                <h3>Maintain Your De-Googled Device</h3>
+                                <span class="step-badge">Ongoing</span>
+                            </div>
+                            <div class="step-content">
+                                <p>Keeping your de-Googled device secure requires ongoing maintenance.</p>
+                                
+                                <div class="simulation-container">
+                                    <h4>Monthly Maintenance Checklist:</h4>
+                                    <div class="backup-checklist">
+                                        <div class="backup-item">
+                                            <i class="fas fa-sync"></i>
+                                            <span>Check for GrapheneOS updates weekly</span>
+                                        </div>
+                                        <div class="backup-item">
+                                            <i class="fas fa-shield-alt"></i>
+                                            <span>Review app permissions monthly</span>
+                                        </div>
+                                        <div class="backup-item">
+                                            <i class="fas fa-trash"></i>
+                                            <span>Uninstall unused applications</span>
+                                        </div>
+                                        <div class="backup-item">
+                                            <i class="fas fa-key"></i>
+                                            <span>Update passwords & 2FA methods</span>
+                                        </div>
+                                        <div class="backup-item">
+                                            <i class="fas fa-cloud-download-alt"></i>
+                                            <span>Backup important data locally</span>
+                                        </div>
+                                        <div class="backup-item">
+                                            <i class="fas fa-book"></i>
+                                            <span>Stay informed about privacy news</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="important-box">
+                                    <p><i class="fas fa-exclamation-circle"></i> <strong>Remember:</strong> GrapheneOS receives regular security updates. Enable automatic updates or check manually at least once a week.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-life-ring"></i>
+                        <h2>Troubleshooting & Support</h2>
+                    </div>
+                    
+                    <div class="tutorial-step">
+                        <div class="step-title">
+                            <h3>Common Issues & Solutions</h3>
+                        </div>
+                        <div class="step-content">
+                            <div class="warning-box">
+                                <p><strong>Device not detected by ADB</strong><br>
+                                • Try a different USB cable (some cables are power-only)<br>
+                                • Try different USB port (preferably USB 2.0)<br>
+                                • Reinstall USB drivers (Windows)<br>
+                                • Restart ADB server: <code>adb kill-server && adb start-server</code></p>
+                            </div>
+                            
+                            <div class="warning-box">
+                                <p><strong>Bootloader won't unlock</strong><br>
+                                • Ensure "OEM Unlocking" is enabled in Developer Options<br>
+                                • Carrier-locked devices cannot be unlocked<br>
+                                • Some devices require being connected to internet first</p>
+                            </div>
+                            
+                            <div class="warning-box">
+                                <p><strong>Flashing fails</strong><br>
+                                • Ensure you have the correct factory image for your device<br>
+                                • Check that you're using the latest platform-tools<br>
+                                • Some devices require unlocking critical partitions</p>
+                            </div>
+                            
+                            <div class="important-box">
+                                <p><strong>Official Support Resources</strong><br>
+                                • <a href="#" style="color: var(--accent);">GrapheneOS Documentation</a><br>
+                                • <a href="#" style="color: var(--accent);">GrapheneOS Community Chat</a><br>
+                                • <a href="#" style="color: var(--accent);">Reddit: r/GrapheneOS</a><br>
+                                • <a href="#" style="color: var(--accent);">Official Installation Guide</a></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <h3>The De-Googling Journey</h3>
+            <p>This interactive guide provides a comprehensive overview of the de-Googling process. Actual installation may vary based on your specific device and software versions.</p>
+            
+            <div class="footer-links">
+                <a href="https://grapheneos.org/" target="_blank"><i class="fas fa-external-link-alt"></i> Official GrapheneOS Website</a>
+                <a href="https://grapheneos.org/install" target="_blank"><i class="fas fa-download"></i> Official Installation Guide</a>
+                <a href="https://github.com/GrapheneOS" target="_blank"><i class="fab fa-github"></i> GrapheneOS GitHub</a>
+                <a href="https://www.privacyguides.org/" target="_blank"><i class="fas fa-shield-alt"></i> Privacy Guides</a>
+            </div>
+            
+            <p style="margin-top: 25px; font-size: 0.9rem; opacity: 0.8;">
+                <i class="fas fa-exclamation-triangle"></i> <strong>Disclaimer:</strong> This is an educational simulation. Always follow the official GrapheneOS installation guide. Unlocking bootloader and installing custom ROMs may void warranty and carries risk of data loss.
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        // Device selection functionality
+        let selectedDevice = null;
+        
+        function selectDevice(device) {
+            // Remove selection from all devices
+            document.querySelectorAll('.device-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            // Select clicked device
+            event.currentTarget.classList.add('selected');
+            selectedDevice = device;
+            
+            // Update compatibility checker
+            checkCompatibility(device);
+        }
+        
+        // Compatibility checker
+        function checkCompatibility(device) {
+            const checker = document.getElementById('compatibilityChecker');
+            const list = document.getElementById('compatibilityList');
+            const result = document.getElementById('compatibilityResult');
+            
+            checker.classList.add('active');
+            
+            // Clear previous results
+            list.innerHTML = '';
+            result.innerHTML = '';
+            
+            const checks = [
+                { text: 'Checking device model...', icon: 'fa-question' },
+                { text: 'Checking bootloader status...', icon: 'fa-question' },
+                { text: 'Checking Android version...', icon: 'fa-question' },
+                { text: 'Checking carrier lock status...', icon: 'fa-question' }
+            ];
+            
+            // Add check items
+            checks.forEach((check, index) => {
+                const li = document.createElement('li');
+                li.innerHTML = `<i class="fas ${check.icon}"></i> ${check.text}`;
+                list.appendChild(li);
+                
+                // Simulate checking with delays
+                setTimeout(() => {
+                    let icon, color;
+                    
+                    switch(index) {
+                        case 0: // Device model
+                            icon = device.includes('pixel') ? 'fa-check' : 'fa-times';
+                            color = device.includes('pixel') ? 'var(--success)' : 'var(--danger)';
+                            li.innerHTML = `<i class="fas ${icon}" style="color: ${color}"></i> Device model: ${device.replace('-', ' ').toUpperCase()}`;
+                            break;
+                        case 1: // Bootloader status
+                            icon = 'fa-check';
+                            color = 'var(--success)';
+                            li.innerHTML = `<i class="fas ${icon}" style="color: ${color}"></i> Bootloader can be unlocked`;
+                            break;
+                        case 2: // Android version
+                            icon = 'fa-check';
+                            color = 'var(--success)';
+                            li.innerHTML = `<i class="fas ${icon}" style="color: ${color}"></i> Android version compatible`;
+                            break;
+                        case 3: // Carrier lock
+                            icon = 'fa-check';
+                            color = 'var(--success)';
+                            li.innerHTML = `<i class="fas ${icon}" style="color: ${color}"></i> No carrier lock detected`;
+                            break;
+                    }
+                }, 500 * (index + 1));
+            });
+            
+            // Show final result
+            setTimeout(() => {
+                let compatibilityLevel, message, color;
+                
+                if (device === 'pixel-8' || device === 'pixel-7') {
+                    compatibilityLevel = 'Excellent';
+                    message = 'Your device is fully compatible with GrapheneOS with all security features.';
+                    color = 'var(--success)';
+                } else if (device === 'pixel-6') {
+                    compatibilityLevel = 'Good';
+                    message = 'Your device is compatible but may not receive updates as long as newer models.';
+                    color = 'var(--success)';
+                } else if (device === 'pixel-5') {
+                    compatibilityLevel = 'Limited';
+                    message = 'Your device has limited support and may not receive future updates.';
+                    color = 'var(--warning)';
+                } else {
+                    compatibilityLevel = 'Not Supported';
+                    message = 'Only Google Pixel devices are supported by GrapheneOS.';
+                    color = 'var(--danger)';
+                }
+                
+                result.innerHTML = `
+                    <div style="margin-top: 15px; padding: 15px; border-radius: 8px; background-color: ${color}20; border-left: 5px solid ${color};">
+                        <h4 style="color: ${color}; margin-bottom: 10px;">Compatibility: ${compatibilityLevel}</h4>
+                        <p>${message}</p>
+                    </div>
+                `;
+                
+                // Update phase indicator
+                updatePhase(1);
+            }, 2500);
+        }
+        
+        // Download simulation
+        let downloadsCompleted = 0;
+        
+        function simulateDownload(fileType) {
+            const progressBar = document.getElementById('downloadProgress');
+            const status = document.getElementById('downloadStatus');
+            
+            status.innerHTML = `<i class="fas fa-download"></i> Downloading ${fileType.replace('-', ' ')}...`;
+            progressBar.style.width = '0%';
+            
+            // Simulate download progress
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += Math.random() * 15;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    
+                    downloadsCompleted++;
+                    status.innerHTML = `<i class="fas fa-check" style="color: var(--success)"></i> ${fileType.replace('-', ' ')} downloaded successfully`;
+                    
+                    // Update phase if all downloads are done
+                    if (downloadsCompleted >= 3) {
+                        updatePhase(1);
+                    }
+                }
+                progressBar.style.width = `${progress}%`;
+            }, 200);
+        }
+        
+        // ADB connection test simulation
+        function testADBConnection() {
+            const terminal = document.querySelector('.interactive-terminal');
+            const newLine = document.createElement('div');
+            newLine.className = 'terminal-line';
+            newLine.innerHTML = `
+                <span class="terminal-prompt">$</span>
+                <span class="terminal-command">adb devices</span>
+            `;
+            terminal.appendChild(newLine);
+            
+            setTimeout(() => {
+                const outputLine = document.createElement('div');
+                outputLine.className = 'terminal-line terminal-output';
+                outputLine.innerHTML = `0A2B3C4D5E6F device`;
+                terminal.appendChild(outputLine);
+                
+                // Scroll to bottom
+                terminal.scrollTop = terminal.scrollHeight;
+                
+                // Update phase
+                updatePhase(2);
+            }, 1000);
+        }
+        
+        // Flashing simulation
+        function simulateFlashing() {
+            const terminal = document.getElementById('terminal');
+            terminal.innerHTML = ''; // Clear terminal
+            
+            const commands = [
+                { cmd: 'fastboot devices', output: '0A2B3C4D5E6F fastboot', delay: 800 },
+                { cmd: 'fastboot flashing unlock', output: '⚠️ This will erase all data on your device', delay: 1000 },
+                { cmd: '', output: 'Use volume keys to select "Unlock" and power to confirm', delay: 1200 },
+                { cmd: 'fastboot reboot bootloader', output: 'Rebooting...', delay: 800 },
+                { cmd: 'fastboot flash boot boot.img', output: 'Writing \'boot\'... OKAY', delay: 1000 },
+                { cmd: 'fastboot flash dtbo dtbo.img', output: 'Writing \'dtbo\'... OKAY', delay: 800 },
+                { cmd: 'fastboot flash vendor_boot vendor_boot.img', output: 'Writing \'vendor_boot\'... OKAY', delay: 800 },
+                { cmd: 'fastboot flash super super.img', output: 'Writing \'super\'... (this may take several minutes)', delay: 2000 },
+                { cmd: '', output: '✅ Installation complete!', delay: 1200 },
+                { cmd: 'fastboot reboot', output: 'Rebooting to GrapheneOS...', delay: 1000 }
+            ];
+            
+            let delay = 0;
+            commands.forEach((command, index) => {
+                setTimeout(() => {
+                    if (command.cmd) {
+                        const cmdLine = document.createElement('div');
+                        cmdLine.className = 'terminal-line';
+                        cmdLine.innerHTML = `
+                            <span class="terminal-prompt">$</span>
+                            <span class="terminal-command">${command.cmd}</span>
+                        `;
+                        terminal.appendChild(cmdLine);
+                    }
+                    
+                    setTimeout(() => {
+                        const outputLine = document.createElement('div');
+                        outputLine.className = 'terminal-line terminal-output';
+                        outputLine.textContent = command.output;
+                        terminal.appendChild(outputLine);
+                        
+                        // Scroll to bottom
+                        terminal.scrollTop = terminal.scrollHeight;
+                        
+                        // Update phase on last command
+                        if (index === commands.length - 1) {
+                            updatePhase(3);
+                        }
+                    }, 300);
+                }, delay);
+                
+                delay += command.delay;
+            });
+        }
+        
+        // Reset terminal
+        function resetTerminal() {
+            const terminal = document.getElementById('terminal');
+            terminal.innerHTML = `
+                <div class="terminal-line">
+                    <span class="terminal-prompt">$</span>
+                    <span class="terminal-command">cd ~/platform-tools</span>
+                </div>
+                <div class="terminal-line">
+                    <span class="terminal-prompt">$</span>
+                    <span class="terminal-command">./fastboot devices</span>
+                </div>
+                <div class="terminal-line terminal-output">
+                    0A2B3C4D5E6F fastboot
+                </div>
+                <div class="terminal-line">
+                    <span class="terminal-prompt">$</span>
+                    <span class="terminal-command">./fastboot flashing unlock</span>
+                </div>
+                <div class="terminal-line terminal-output">
+                    &lt;waiting for device&gt;
+                </div>
+                <div class="terminal-line terminal-output">
+                    Use volume and power keys to confirm unlock...
+                </div>
+            `;
+        }
+        
+        // Quiz functionality
+        let selectedQuizAnswer = null;
+        const correctQuizAnswer = 1; // Index of correct answer (0-based)
+        
+        function selectQuizAnswer(element, index) {
+            // Remove selection from all options
+            document.querySelectorAll('.quiz-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            // Select clicked option
+            element.classList.add('selected');
+            selectedQuizAnswer = index;
+        }
+        
+        function checkQuizAnswer() {
+            const feedback = document.getElementById('quizFeedback');
+            
+            if (selectedQuizAnswer === null) {
+                feedback.textContent = "Please select an answer first!";
+                feedback.className = "quiz-feedback";
+                feedback.style.backgroundColor = "#fed7d7";
+                feedback.style.color = "#742a2a";
+                feedback.classList.add('show');
+                return;
+            }
+            
+            // Reset all options styling
+            const options = document.querySelectorAll('.quiz-option');
+            options.forEach(option => {
+                option.classList.remove('correct', 'incorrect');
+            });
+            
+            // Mark correct and incorrect answers
+            options[correctQuizAnswer].classList.add('correct');
+            
+            if (selectedQuizAnswer !== correctQuizAnswer) {
+                options[selectedQuizAnswer].classList.add('incorrect');
+            }
+            
+            // Show feedback
+            if (selectedQuizAnswer === correctQuizAnswer) {
+                feedback.innerHTML = `<strong>Correct!</strong> Backing up all your data is the most critical step because unlocking the bootloader will completely wipe your device. Without a backup, you'll permanently lose all photos, messages, apps, and other data.`;
+                feedback.style.backgroundColor = "#c6f6d5";
+                feedback.style.color = "#22543d";
+            } else {
+                feedback.innerHTML = `<strong>Not quite.</strong> While all the options are important steps, <strong>backing up all your data</strong> is the most critical because unlocking the bootloader will completely erase everything on your device. Without a backup, you'll lose all your data permanently.`;
+                feedback.style.backgroundColor = "#fed7d7";
+                feedback.style.color = "#742a2a";
+            }
+            
+            feedback.classList.add('show');
+        }
+        
+        // Update phase indicator
+        function updatePhase(phaseNumber) {
+            // Reset all phases
+            for (let i = 1; i <= 4; i++) {
+                const phase = document.getElementById(`phase${i}`);
+                phase.classList.remove('active', 'completed');
+            }
+            
+            // Mark previous phases as completed
+            for (let i = 1; i < phaseNumber; i++) {
+                const phase = document.getElementById(`phase${i}`);
+                phase.classList.add('completed');
+            }
+            
+            // Mark current phase as active
+            const currentPhase = document.getElementById(`phase${phaseNumber}`);
+            if (currentPhase) {
+                currentPhase.classList.add('active');
+            }
+        }
+        
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            updatePhase(1);
+            
+            // Add click handlers to phase indicators
+            for (let i = 1; i <= 4; i++) {
+                document.getElementById(`phase${i}`).addEventListener('click', function() {
+                    // For demo purposes, allow clicking to navigate
+                    updatePhase(i);
+                });
+            }
+            
+            // Add visual effects for backup items
+            document.querySelectorAll('.backup-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    this.style.backgroundColor = '#ebf8ff';
+                    this.style.borderColor = 'var(--accent)';
+                    
+                    setTimeout(() => {
+                        this.style.backgroundColor = '';
+                        this.style.borderColor = '';
+                    }, 1000);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
