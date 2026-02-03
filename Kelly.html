@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelly Zarzycki: Tu Plan Sensorial</title>
+    <style>
+        :root {
+            --primary: #9c27b0;
+            --primary-dark: #7b1fa2;
+            --secondary: #ff9800;
+            --accent: #4caf50;
+            --dark: #121212;
+            --light: #f8f9fa;
+            --card-bg: rgba(255, 255, 255, 0.08);
+            --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--dark) 0%, #1a1a2e 100%);
+            color: var(--light);
+            min-height: 100vh;
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            border-radius: 0 0 40px 40px;
+            background: linear-gradient(to right, var(--primary-dark), var(--primary));
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            margin-bottom: 40px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #fff, #ffeb3b);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .subtitle {
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+
+        .tagline {
+            font-size: 1.1rem;
+            font-style: italic;
+            margin-top: 20px;
+            padding: 12px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            display: inline-block;
+        }
+
+        /* Card Styling */
+        .card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .card h2 {
+            color: var(--secondary);
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+            border-bottom: 2px solid var(--secondary);
+            padding-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Interactive Elements */
+        .strategy-box {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 12px 0;
+            border-left: 4px solid var(--accent);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .strategy-box:hover {
+            transform: translateX(8px);
+            background: rgba(0, 0, 0, 0.5);
+        }
+
+        .strategy-box h3 {
+            color: var(--accent);
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .strategy-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-out;
+        }
+
+        .strategy-box.active .strategy-content {
+            max-height: 500px;
+            margin-top: 12px;
+        }
+
+        /* Task List */
+        .task-item {
+            padding: 12px;
+            margin: 8px 0;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            transition: var(--transition);
+        }
+
+        .task-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .task-checkbox {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            border: 2px solid var(--secondary);
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            flex-shrink: 0;
+        }
+
+        .task-checkbox.checked {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .task-checkbox.checked::after {
+            content: '✓';
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .task-text {
+            flex-grow: 1;
+        }
+
+        .task-text.completed {
+            text-decoration: line-through;
+            opacity: 0.7;
+        }
+
+        /* Progress Section */
+        .progress-container {
+            margin: 30px 0;
+        }
+
+        .progress-title {
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            color: var(--secondary);
+        }
+
+        .progress-bar {
+            height: 18px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 9px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            border-radius: 9px;
+            width: 0;
+            transition: width 1s ease-in-out;
+            position: relative;
+        }
+
+        .progress-text {
+            font-size: 1.1rem;
+            margin-top: 5px;
+        }
+
+        /* Quote Box */
+        .quote-box {
+            background: linear-gradient(to right, var(--primary-dark), var(--primary));
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            margin: 25px 0;
+            font-size: 1.2rem;
+            font-style: italic;
+            position: relative;
+        }
+
+        /* Material Grid */
+        .material-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .material-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 15px;
+            transition: var(--transition);
+            border: 1px solid transparent;
+        }
+
+        .material-card:hover {
+            border-color: var(--secondary);
+            transform: translateY(-5px);
+        }
+
+        .material-card h4 {
+            color: var(--secondary);
+            margin-bottom: 8px;
+        }
+
+        .priority {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-left: 8px;
+        }
+
+        .high { background: #ff5252; color: white; }
+        .medium { background: #ff9800; color: white; }
+        .low { background: #4caf50; color: white; }
+
+        /* Countdown */
+        .countdown {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .countdown-item {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 12px;
+            border-radius: 12px;
+            min-width: 70px;
+        }
+
+        .countdown-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--secondary);
+        }
+
+        .countdown-label {
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            padding: 25px;
+            margin-top: 40px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .heart {
+            color: #ff4081;
+            animation: heartbeat 1.5s infinite;
+            display: inline-block;
+        }
+
+        @keyframes heartbeat {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        /* Music Visualizer */
+        .visualizer {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            height: 60px;
+            margin: 20px 0;
+            gap: 4px;
+        }
+
+        .bar {
+            width: 8px;
+            background: linear-gradient(to top, var(--primary), var(--secondary));
+            border-radius: 4px 4px 0 0;
+            animation: equalizer 1.5s infinite ease-in-out;
+            animation-delay: calc(var(--i) * 0.1s);
+        }
+
+        @keyframes equalizer {
+            0%, 100% { height: 15px; }
+            50% { height: 50px; }
+        }
+
+        /* Pulse Animation */
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            h1 { font-size: 2rem; }
+            .subtitle { font-size: 1.1rem; }
+            .card { padding: 20px; }
+            .card h2 { font-size: 1.5rem; }
+            .material-grid { grid-template-columns: 1fr; }
+            .countdown { gap: 10px; }
+            .countdown-item { min-width: 60px; padding: 10px; }
+            .countdown-value { font-size: 1.7rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="pulse">
+            <h1>Kelly Zarzycki</h1>
+            <div class="subtitle">Tu Plan Sensorial para el Éxito Exponencial</div>
+            <div class="visualizer">
+                <div class="bar" style="--i:0"></div>
+                <div class="bar" style="--i:1"></div>
+                <div class="bar" style="--i:2"></div>
+                <div class="bar" style="--i:3"></div>
+                <div class="bar" style="--i:4"></div>
+                <div class="bar" style="--i:5"></div>
+                <div class="bar" style="--i:6"></div>
+                <div class="bar" style="--i:7"></div>
+            </div>
+            <div class="tagline">Fusionando tu música con tu esencia para crear una experiencia única en el mundo</div>
+        </header>
+
+        <!-- Countdown -->
+        <div class="card">
+            <h2>✈️ Cuenta Regresiva USA</h2>
+            <p>Tu viaje a Estados Unidos comienza en:</p>
+            <div class="countdown">
+                <div class="countdown-item">
+                    <div class="countdown-value" id="days">2</div>
+                    <div class="countdown-label">Días</div>
+                </div>
+                <div class="countdown-item">
+                    <div class="countdown-value" id="hours">0</div>
+                    <div class="countdown-label">Horas</div>
+                </div>
+                <div class="countdown-item">
+                    <div class="countdown-value" id="minutes">0</div>
+                    <div class="countdown-label">Minutos</div>
+                </div>
+            </div>
+            <p style="margin-top: 15px; color: var(--secondary); font-weight: bold;">
+                ¡Estás a punto de cambiar tu vida y la de miles de personas con tu arte!
+            </p>
+        </div>
+
+        <!-- The Vision -->
+        <div class="card">
+            <h2>👁️ La Visión: Tu Ecosistema Sensorial</h2>
+            <p>Kelly, no eres solo una DJ. Eres una <strong>artista sensorial</strong> que crea experiencias que tocan el alma. Tu música transforma espacios, y tus productos Zarzycki Essentials transforman momentos cotidianos en rituales de lujo.</p>
+            <p>Juntas vamos a construir algo que el mundo nunca ha visto: <strong>una fusión perfecta entre tu arte auditivo y tu arte olfativo</strong>.</p>
+            <p>Imagina esto: alguien asiste a tu set, se pierde en la música que creas, y al día siguiente, en su hogar, puede recrear esa sensación a través de los aromas que tú has diseñado. <strong>Eso es magia pura</strong>.</p>
+            
+            <div class="quote-box">
+                "Tu beat es la vibración, tu fragancia es la memoria. Juntos crean una experiencia completa que el cuerpo nunca olvida."
+            </div>
+        </div>
+
+        <!-- The Strategy -->
+        <div class="card">
+            <h2>♟️ Las 3 Estrategias Clave</h2>
+            
+            <div class="strategy-box" id="strategy1">
+                <h3>1. La Fusión Arte-Esencia <span>+</span></h3>
+                <div class="strategy-content">
+                    <p>Vamos a <strong>unificar tu identidad</strong>. No más Kelly la DJ por un lado y Zarzycki Essentials por otro. Ahora eres <strong>Kelly Zarzycki: La Artista Sensorial</strong>.</p>
+                    <p><strong>En la práctica:</strong></p>
+                    <ul style="padding-left: 20px; margin: 10px 0;">
+                        <li>Cada set que hagas tendrá una "fragancia recomendada" de tu línea</li>
+                        <li>Crearemos playlists de Spotify que acompañen cada línea de productos</li>
+                        <li>Tus redes sociales contarán UNA sola historia</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="strategy-box" id="strategy2">
+                <h3>2. El Sistema "Backstage to Bathroom" <span>+</span></h3>
+                <div class="strategy-content">
+                    <p>Transformaremos cada evento en una <strong>experiencia de marca inmersiva</strong>.</p>
+                    <p><strong>Tu toolkit de DJ ahora incluye:</strong></p>
+                    <ul style="padding-left: 20px; margin: 10px 0;">
+                        <li><strong>QR Code de Lujo:</strong> En tu cabina, un diseño exclusivo que lleva a tu tienda personalizada</li>
+                        <li><strong>Regalos Sensoriales:</strong> Kits especiales para otros DJs y artistas</li>
+                        <li><strong>Contenido Cruzado:</strong> Stories mostrando cómo usas tus productos</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="strategy-box" id="strategy3">
+                <h3>3. Expansión Exponencial <span>+</span></h3>
+                <div class="strategy-content">
+                    <p>Esto no es solo vender productos. Es <strong>construir un ecosistema</strong> donde cada parte alimenta a la otra.</p>
+                    <p><strong>Fase 1:</strong> Eventos USA + Contenido Digital</p>
+                    <p><strong>Fase 2:</strong> Colaboraciones con spas y boutiques hoteles</p>
+                    <p><strong>Fase 3:</strong> Línea signature "FIR" - fragancia inspirada en tu set</p>
+                    <p><strong>Fase 4:</strong> Eventos "Sonic Bath" - experiencias multisensoriales</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Your Mission -->
+        <div class="card">
+            <h2>📋 Tu Misión: Material que Necesitamos</h2>
+            <p>Para que este plan despegue, necesitamos crear contenido poderoso:</p>
+            
+            <div class="material-grid">
+                <div class="material-card">
+                    <h4>🎥 Video de Presentación <span class="priority high">ALTA</span></h4>
+                    <p>30 segundos en inglés y español: "Soy Kelly Zarzycki, DJ y creadora de esencias".</p>
+                    <p><strong>Envíalo a:</strong> WhatsApp de Paola</p>
+                </div>
+                
+                <div class="material-card">
+                    <h4>🎵 Playlist Signature <span class="priority high">ALTA</span></h4>
+                    <p>Crea 3 playlists en Spotify: una para cada línea (Sensuality, Tranquility, Energy).</p>
+                </div>
+                
+                <div class="material-card">
+                    <h4>📱 Contenido Backstage <span class="priority medium">MEDIA</span></h4>
+                    <p>Videos cortos mostrando cómo usas tus productos antes/durante/después de sets.</p>
+                </div>
+                
+                <div class="material-card">
+                    <h4>💖 Testimonio Personal <span class="priority medium">MEDIA</span></h4>
+                    <p>Escribe por qué creaste cada fragancia. Qué sentimiento querías capturar.</p>
+                </div>
+            </div>
+            
+            <div style="margin-top: 15px; padding: 12px; background: rgba(255, 152, 0, 0.1); border-radius: 10px; border-left: 4px solid var(--secondary);">
+                <h4 style="color: var(--secondary); margin-bottom: 8px;">💡 Recuerda:</h4>
+                <p>No necesitas equipo profesional. Tu teléfono es suficiente. Lo importante es la <strong>autenticidad</strong>.</p>
+            </div>
+        </div>
+
+        <!-- Interactive Checklist -->
+        <div class="card">
+            <h2>✅ Checklist de Preparación USA</h2>
+            <p>Marca cada tarea completada. Tu progreso se actualizará automáticamente.</p>
+            
+            <div class="task-list">
+                <div class="task-item">
+                    <div class="task-checkbox" data-task="1"></div>
+                    <div class="task-text" data-task="1">Grabar video de presentación (inglés/español)</div>
+                </div>
+                <div class="task-item">
+                    <div class="task-checkbox" data-task="2"></div>
+                    <div class="task-text" data-task="2">Crear playlists en Spotify para cada línea</div>
+                </div>
+                <div class="task-item">
+                    <div class="task-checkbox" data-task="3"></div>
+                    <div class="task-text" data-task="3">Preparar 3 kits de regalo "Afterparty" para otros DJs</div>
+                </div>
+                <div class="task-item">
+                    <div class="task-checkbox" data-task="4"></div>
+                    <div class="task-text" data-task="4">Escribir testimonios personales para cada fragancia</div>
+                </div>
+                <div class="task-item">
+                    <div class="task-checkbox" data-task="5"></div>
+                    <div class="task-text" data-task="5">Tomar fotos de tu maleta de DJ con productos Zarzycki</div>
+                </div>
+                <div class="task-item">
+                    <div class="task-checkbox" data-task="6"></div>
+                    <div class="task-text" data-task="6">Actualizar bio en Instagram/TikTok</div>
+                </div>
+            </div>
+            
+            <div class="progress-container">
+                <div class="progress-title">Tu Progreso</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-text" id="progressText">0% Completado</div>
+            </div>
+        </div>
+
+        <!-- Hope & Inspiration -->
+        <div class="card">
+            <h2>🌱 Para Tu Corazón Hermoso</h2>
+            <p>Kelly, sé que has sido aprovechada antes. Sé que el mundo de la música puede ser duro. Pero esto es diferente.</p>
+            <p><strong>Esto es tuyo.</strong> Zarzycki Essentials es tu creación, tu bebé. Y yo, Paola, estoy aquí con un solo propósito: <strong>proteger tu visión y amplificarla al mundo</strong>.</p>
+            
+            <div style="display: flex; align-items: center; margin: 20px 0; padding: 15px; background: rgba(156, 39, 176, 0.1); border-radius: 12px;">
+                <div style="font-size: 2.5rem; margin-right: 15px; color: var(--primary);">🤝</div>
+                <div>
+                    <p style="font-weight: bold;">No estás sola en esto. Tenemos un sistema claro, roles definidos y una visión compartida.</p>
+                    <p>Tu talento como DJ abre las puertas. Tu corazón como creadora llena esos espacios de significado.</p>
+                </div>
+            </div>
+            
+            <p style="text-align: center; margin-top: 15px; font-size: 1.2rem; color: var(--secondary);">
+                Este es el momento donde todo cambia. Donde tu arte encuentra su hogar en el mundo.
+            </p>
+        </div>
+
+        <!-- Next Steps -->
+        <div class="card">
+            <h2>🚀 Primeros Pasos (Hoy)</h2>
+            <ol style="padding-left: 20px; margin-bottom: 20px;">
+                <li style="margin-bottom: 12px;"><strong>Lee este plan completo</strong> y siente la emoción.</li>
+                <li style="margin-bottom: 12px;"><strong>Marca 2 tareas del checklist</strong> que puedas completar hoy.</li>
+                <li style="margin-bottom: 12px;"><strong>Envíame un mensaje</strong> con cualquier pregunta o idea.</li>
+                <li><strong>Visualiza tu éxito:</strong> Siente cómo será cuando tu primera fan en USA compre tu producto.</li>
+            </ol>
+            
+            <div style="text-align: center; padding: 15px; background: rgba(76, 175, 80, 0.1); border-radius: 12px;">
+                <h3 style="color: var(--accent); margin-bottom: 8px;">¡Estamos Listas para Despegar!</h3>
+                <p>Tu viaje a USA no es solo otro trabajo. Es el <strong>lanzamiento oficial de Kelly Zarzycki, la Artista Sensorial</strong>.</p>
+                <p style="margin-top: 12px; font-weight: bold;">Tengo tanta fe en nosotras. En ti. En este sueño.</p>
+            </div>
+        </div>
+
+        <footer>
+            <p>Creado con <span class="heart">❤️</span> por Paola para Kelly</p>
+            <p>Porque juntas somos imparable. Porque tu arte merece brillar.</p>
+            <p style="margin-top: 12px; font-size: 0.8rem; opacity: 0.7;">Sistema de crecimiento exponencial activado</p>
+        </footer>
+    </div>
+
+    <script>
+        // Self-executing code starts here
+        (function() {
+            'use strict';
+            
+            // Interactive Strategy Boxes
+            document.querySelectorAll('.strategy-box h3').forEach(header => {
+                header.addEventListener('click', function() {
+                    const box = this.parentElement;
+                    const isActive = box.classList.contains('active');
+                    const span = this.querySelector('span');
+                    
+                    // Close all other boxes
+                    document.querySelectorAll('.strategy-box').forEach(b => {
+                        if (b !== box) {
+                            b.classList.remove('active');
+                            b.querySelector('span').textContent = '+';
+                        }
+                    });
+                    
+                    // Toggle current box
+                    box.classList.toggle('active');
+                    span.textContent = isActive ? '+' : '−';
+                });
+            });
+
+            // Interactive Checklist
+            const checkboxes = document.querySelectorAll('.task-checkbox');
+            const taskTexts = document.querySelectorAll('.task-text');
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+            
+            // Load saved state
+            function loadSavedState() {
+                checkboxes.forEach(checkbox => {
+                    const taskId = checkbox.getAttribute('data-task');
+                    const isChecked = localStorage.getItem(`kelly-task-${taskId}`) === 'true';
+                    
+                    if (isChecked) {
+                        checkbox.classList.add('checked');
+                        const text = document.querySelector(`.task-text[data-task="${taskId}"]`);
+                        if (text) text.classList.add('completed');
+                    }
+                });
+                updateProgress();
+            }
+            
+            // Update progress
+            function updateProgress() {
+                const total = checkboxes.length;
+                const completed = document.querySelectorAll('.task-checkbox.checked').length;
+                const percentage = Math.round((completed / total) * 100);
+                
+                progressFill.style.width = `${percentage}%`;
+                
+                if (percentage === 100) {
+                    progressText.innerHTML = `<span style="color: var(--accent); font-weight: bold;">¡100% COMPLETADO! 🏆 ¡Estás lista para USA!</span>`;
+                    celebrateComplete();
+                } else if (percentage >= 50) {
+                    progressText.textContent = `${percentage}% Completado (${completed}/${total}) ¡Vas excelente!`;
+                } else {
+                    progressText.textContent = `${percentage}% Completado (${completed}/${total})`;
+                }
+            }
+            
+            // Task click handler
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('click', function() {
+                    const taskId = this.getAttribute('data-task');
+                    const isNowChecked = !this.classList.contains('checked');
+                    
+                    // Update UI
+                    this.classList.toggle('checked');
+                    const text = document.querySelector(`.task-text[data-task="${taskId}"]`);
+                    if (text) text.classList.toggle('completed');
+                    
+                    // Save to storage
+                    localStorage.setItem(`kelly-task-${taskId}`, isNowChecked);
+                    
+                    // Update progress
+                    updateProgress();
+                    
+                    // Visual feedback
+                    if (isNowChecked) {
+                        createCelebration(this);
+                    }
+                });
+            });
+            
+            // Celebration effect
+            function createCelebration(element) {
+                const rect = element.getBoundingClientRect();
+                const celebration = document.createElement('div');
+                celebration.textContent = '✓';
+                celebration.style.cssText = `
+                    position: fixed;
+                    top: ${rect.top}px;
+                    left: ${rect.left}px;
+                    color: var(--accent);
+                    font-size: 24px;
+                    font-weight: bold;
+                    z-index: 10000;
+                    pointer-events: none;
+                    animation: floatAway 1s ease-out forwards;
+                `;
+                
+                // Add animation style
+                const style = document.createElement('style');
+                style.textContent = `
+                    @keyframes floatAway {
+                        0% { transform: translate(0, 0) scale(1); opacity: 1; }
+                        100% { transform: translate(0, -100px) scale(1.5); opacity: 0; }
+                    }
+                `;
+                document.head.appendChild(style);
+                
+                document.body.appendChild(celebration);
+                
+                // Cleanup
+                setTimeout(() => {
+                    document.body.removeChild(celebration);
+                    document.head.removeChild(style);
+                }, 1000);
+            }
+            
+            // Complete celebration
+            function celebrateComplete() {
+                for (let i = 0; i < 10; i++) {
+                    setTimeout(() => {
+                        const x = Math.random() * window.innerWidth;
+                        const y = Math.random() * window.innerHeight;
+                        createFloatingEmoji(x, y, ['🎉', '✨', '🌟', '💫', '🏆']);
+                    }, i * 100);
+                }
+            }
+            
+            function createFloatingEmoji(x, y, emojis) {
+                const emoji = document.createElement('div');
+                emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                emoji.style.cssText = `
+                    position: fixed;
+                    top: ${y}px;
+                    left: ${x}px;
+                    font-size: 24px;
+                    z-index: 10000;
+                    pointer-events: none;
+                    animation: floatUp 1.5s ease-out forwards;
+                `;
+                
+                const style = document.createElement('style');
+                style.textContent = `
+                    @keyframes floatUp {
+                        0% { transform: translate(0, 0) scale(0.5); opacity: 1; }
+                        100% { transform: translate(${Math.random() * 100 - 50}px, -150px) scale(1.5); opacity: 0; }
+                    }
+                `;
+                document.head.appendChild(style);
+                
+                document.body.appendChild(emoji);
+                
+                setTimeout(() => {
+                    document.body.removeChild(emoji);
+                    document.head.removeChild(style);
+                }, 1500);
+            }
+            
+            // Countdown timer
+            function startCountdown() {
+                const now = new Date();
+                const tripDate = new Date(now);
+                tripDate.setDate(now.getDate() + 2);
+                tripDate.setHours(10, 0, 0, 0);
+                
+                function update() {
+                    const current = new Date();
+                    const diff = tripDate - current;
+                    
+                    if (diff <= 0) {
+                        document.getElementById('days').textContent = '0';
+                        document.getElementById('hours').textContent = '00';
+                        document.getElementById('minutes').textContent = '00';
+                        return;
+                    }
+                    
+                    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                    
+                    document.getElementById('days').textContent = days;
+                    document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+                    document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+                }
+                
+                update();
+                setInterval(update, 60000);
+            }
+            
+            // Visualizer animation
+            function animateVisualizer() {
+                const bars = document.querySelectorAll('.bar');
+                bars.forEach((bar, i) => {
+                    const delay = i * 0.1;
+                    bar.style.animationDelay = `${delay}s`;
+                });
+            }
+            
+            // Initialize everything
+            function init() {
+                loadSavedState();
+                startCountdown();
+                animateVisualizer();
+                
+                // Welcome message
+                console.log('%c✨ Kelly Zarzycki - Plan Sensorial ✨', 'font-size: 16px; color: #9c27b0; font-weight: bold;');
+                console.log('%c¡Tu viaje al éxito comienza ahora!', 'color: #4caf50;');
+                
+                // Auto-open first strategy
+                setTimeout(() => {
+                    const firstBox = document.querySelector('.strategy-box');
+                    if (firstBox) {
+                        firstBox.classList.add('active');
+                        firstBox.querySelector('span').textContent = '−';
+                    }
+                }, 500);
+            }
+            
+            // Start when page loads
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+            } else {
+                init();
+            }
+        })();
+    </script>
+</body>
+</html>
