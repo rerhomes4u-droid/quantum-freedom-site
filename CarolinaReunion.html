@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meeting Navigator - DSS Strategy</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(to right, #4a6fa5, #2c3e50);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+        
+        .phase-indicator {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+            padding: 0 20px;
+        }
+        
+        .phase {
+            flex: 1;
+            text-align: center;
+            padding: 15px 5px;
+            font-weight: 600;
+            color: #6c757d;
+            border-bottom: 4px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .phase.active {
+            color: #4a6fa5;
+            border-bottom: 4px solid #4a6fa5;
+            background: #e8efff;
+        }
+        
+        .content {
+            padding: 30px;
+            min-height: 500px;
+        }
+        
+        .phase-content {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        
+        .phase-content.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-left: 5px solid #4a6fa5;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        
+        .card.red {
+            border-left-color: #dc3545;
+        }
+        
+        .card.green {
+            border-left-color: #28a745;
+        }
+        
+        .card-title {
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #2c3e50;
+            font-size: 1.2rem;
+        }
+        
+        .question-box {
+            background: white;
+            border: 2px solid #4a6fa5;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            position: relative;
+        }
+        
+        .question-box:before {
+            content: "PREGUNTA CLAVE";
+            position: absolute;
+            top: -12px;
+            left: 20px;
+            background: #4a6fa5;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .question-en {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed #dee2e6;
+        }
+        
+        .question-es {
+            font-style: italic;
+            color: #495057;
+            background: #f1f8ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+        
+        .mantra-box {
+            background: linear-gradient(to right, #e8f5e8, #d1ecf1);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 2px solid #28a745;
+            text-align: center;
+            font-weight: 600;
+            color: #155724;
+        }
+        
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            font-size: 1rem;
+            resize: vertical;
+            margin: 15px 0;
+            transition: border 0.3s;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: #4a6fa5;
+        }
+        
+        .btn {
+            background: #4a6fa5;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-block;
+            margin: 10px 5px;
+        }
+        
+        .btn:hover {
+            background: #3a5a8a;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(58, 90, 138, 0.3);
+        }
+        
+        .btn-red {
+            background: #dc3545;
+        }
+        
+        .btn-red:hover {
+            background: #c82333;
+        }
+        
+        .btn-green {
+            background: #28a745;
+        }
+        
+        .btn-green:hover {
+            background: #218838;
+        }
+        
+        .notes-section {
+            margin-top: 30px;
+        }
+        
+        .notes-title {
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .timer {
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-align: center;
+            padding: 15px;
+            background: #2c3e50;
+            color: white;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            margin: 30px 0;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, #4a6fa5, #28a745);
+            width: 20%;
+            transition: width 0.5s;
+        }
+        
+        .checklist {
+            list-style: none;
+            margin: 20px 0;
+        }
+        
+        .checklist li {
+            padding: 10px 0 10px 35px;
+            position: relative;
+            border-bottom: 1px solid #f1f1f1;
+        }
+        
+        .checklist li:before {
+            content: "☐";
+            position: absolute;
+            left: 0;
+            top: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .checklist li.checked:before {
+            content: "✅";
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .print-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #28a745;
+            color: white;
+            border: none;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            z-index: 100;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #6c757d;
+            font-size: 0.9rem;
+            border-top: 1px solid #dee2e6;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            .container {
+                border-radius: 15px;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .phase {
+                font-size: 0.9rem;
+                padding: 12px 3px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🧭 Meeting PowerPlay: DSS Strategy Navigator</h1>
+            <div class="subtitle">Para Carolina Herrera - Reunión con Trabajadora Social</div>
+        </header>
+        
+        <div class="phase-indicator">
+            <div class="phase active" data-phase="1">📋 Preparación</div>
+            <div class="phase" data-phase="2">🎯 Estrategia</div>
+            <div class="phase" data-phase="3">❓ Preguntas Clave</div>
+            <div class="phase" data-phase="4">📝 Durante la Reunión</div>
+            <div class="phase" data-phase="5">✅ Acciones Posteriores</div>
+        </div>
+        
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+        
+        <div class="content">
+            <!-- Phase 1: Preparation -->
+            <div class="phase-content active" id="phase1">
+                <div class="timer" id="meetingTimer">Reunión empieza en: <span id="countdown">--:--</span></div>
+                
+                <div class="card">
+                    <div class="card-title">📋 Documentos que DEBES llevar:</div>
+                    <ul class="checklist" id="docChecklist">
+                        <li data-item="id">Identificación con foto</li>
+                        <li data-item="affidavit">Copias de tu Affidavit (sin orden judicial)</li>
+                        <li data-item="texts">Textos de Destiny Glenn (Exhibit I)</li>
+                        <li data-item="complaint">Copia de queja al Inspector General</li>
+                        <li data-item="photo">Foto reciente de tu hijo</li>
+                    </ul>
+                    <button class="btn" onclick="checkAll('docChecklist')">✅ Marcar todos como listos</button>
+                </div>
+                
+                <div class="card red">
+                    <div class="card-title">🚫 PALABRAS PROHIBIDAS (NO DECIR):</div>
+                    <p>"ciudadano soberano", "derecho marítimo", "jurisdicción de la corona", "ENS LEGIS", "contratos de adhesión"</p>
+                    <p><strong>Estas palabras harán que dejen de tomarte en serio.</strong></p>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title">🎯 Tu OBJETIVO PRINCIPAL hoy:</div>
+                    <p><strong>Obtener un acuerdo POR ESCRITO para visitas supervisadas ESTA SEMANA.</strong></p>
+                    <p>No te vayas sin una fecha concreta o un compromiso escrito.</p>
+                </div>
+                
+                <div class="mantra-box">
+                    "No hay orden judicial. Mi hijo sufre daño. DSS no investigó."
+                </div>
+                
+                <div class="notes-section">
+                    <div class="notes-title">📝 Notas de Preparación</div>
+                    <textarea id="prepNotes" placeholder="Escribe aquí: ¿Qué quieres lograr específicamente? ¿Qué te da miedo? ¿Qué fortalezas tienes? (Ejemplo: Soy su madre, lo amamanté, soy su principal cuidadora desde nacimiento)"></textarea>
+                    <button class="btn" onclick="saveNote('prepNotes')">💾 Guardar Nota</button>
+                </div>
+                
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="btn btn-green" onclick="changePhase(2)">Siguiente: Estrategia →</button>
+                </div>
+            </div>
+            
+            <!-- Phase 2: Strategy -->
+            <div class="phase-content" id="phase2">
+                <div class="card">
+                    <div class="card-title">🎭 Tu Persona en Esta Reunión:</div>
+                    <p><strong>La Madre Competente y Firme</strong> (No la víctima, no la teórica legal)</p>
+                    <p>Vestida profesional, calmada, con hechos, enfocada en el daño a su hijo.</p>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title">🗣️ Los 3 PILARES (Tu Mantra):</div>
+                    <p>Cada vez que te desvíen, vuelve a uno de estos:</p>
+                    <ol style="padding-left: 20px; margin-top: 10px;">
+                        <li><strong>"No existe una orden judicial que me prohiba ver a mi hijo."</strong></li>
+                        <li><strong>"Mi hijo y yo estamos sufriendo daño físico y emocional por esta separación injustificada."</strong></li>
+                        <li><strong>"DSS no ha investigado; solo ha creído al padre sin verificarlo."</strong></li>
+                    </ol>
+                    <button class="btn" onclick="practiceMantra()">🎤 Practicar Decirlo en Voz Alta</button>
+                </div>
+                
+                <div class="card green">
+                    <div class="card-title">✅ Qué SÍ hacer:</div>
+                    <ul class="checklist">
+                        <li>Mantener contacto visual</li>
+                        <li>Hablar lento y claro</li>
+                        <li>Respirar profundo si sientes enojo</li>
+                        <li>Pedir todo por escrito</li>
+                        <li>Repetir tu pregunta si no responden</li>
+                    </ul>
+                </div>
+                
+                <div class="card red">
+                    <div class="card-title">❌ Qué NO hacer:</div>
+                    <ul class="checklist">
+                        <li>Levantar la voz</li>
+                        <li>Interrumpir bruscamente</li>
+                        <li>Hablar de teorías legales complejas</li>
+                        <li>Aceptar promesas verbales</li>
+                        <li>Mostrar documentos "extra" (soberanía, etc.)</li>
+                    </ul>
+                </div>
+                
+                <div class="notes-section">
+                    <div class="notes-title">📝 Estrategia Personal</div>
+                    <textarea id="strategyNotes" placeholder="¿Cómo vas a manejar tu emoción? ¿Qué frase de calma usarás? (Ejemplo: 'Respiro y recuerdo que solo quiero ver a mi hijo')"></textarea>
+                    <button class="btn" onclick="saveNote('strategyNotes')">💾 Guardar</button>
+                </div>
+                
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="btn" onclick="changePhase(1)">← Anterior</button>
+                    <button class="btn btn-green" onclick="changePhase(3)">Siguiente: Preguntas Clave →</button>
+                </div>
+            </div>
+            
+            <!-- Phase 3: Key Questions -->
+            <div class="phase-content" id="phase3">
+                <div class="card">
+                    <div class="card-title">❓ LAS 5 PREGUNTAS MÁS PODEROSAS</div>
+                    <p>Haz estas en <strong>inglés</strong> durante la reunión. Practica ahora:</p>
+                </div>
+                
+                <div class="question-box">
+                    <div class="question-en" id="q1-en">"Can you please show me the written safety plan or court order that legally authorizes DSS to prevent all contact between me and my son? If you cannot produce it, on what legal authority has this separation been maintained for over 90 days?"</div>
+                    <div class="question-es">"¿Pueden por favor mostrarme el plan de seguridad por escrito o la orden judicial que autoriza legalmente a DSS a prevenir todo contacto entre mi hijo y yo? Si no pueden presentarlo, ¿con qué autoridad legal se ha mantenido esta separación durante más de 90 días?"</div>
+                    <div style="margin-top: 15px;">
+                        <button class="btn" onclick="practiceQuestion(1)">🎤 Practicar esta Pregunta</button>
+                        <button class="btn" onclick="markQuestionDone(1)">✅ Ya la practiqué</button>
+                    </div>
+                </div>
+                
+                <div class="question-box">
+                    <div class="question-en" id="q2-en">"On January 15, 2026, your social worker, Destiny Glenn, confirmed a visitation. The father then refused to comply. What specific corrective action did DSS take to enforce that visitation order or hold him accountable for obstructing it?"</div>
+                    <div class="question-es">"El 15 de enero de 2026, su trabajadora social, Destiny Glenn, confirmó una visita. El padre luego se rehusó a cumplir. ¿Qué acción correctiva específica tomó DSS para hacer cumplir esa orden de visita o para responsabilizar al padre por obstruirla?"</div>
+                    <div style="margin-top: 15px;">
+                        <button class="btn" onclick="practiceQuestion(2)">🎤 Practicar</button>
+                        <button class="btn" onclick="markQuestionDone(2)">✅ Hecha</button>
+                    </div>
+                </div>
+                
+                <div class="question-box">
+                    <div class="question-en" id="q3-en">"The Director stated DSS is not preventing contact—the father is. What specific steps is DSS taking, TODAY, to facilitate and enforce my right to see my child, given that there is no court order barring it?"</div>
+                    <div class="question-es">"El Director dijo que DSS no está impidiendo el contacto, sino el padre. ¿Qué pasos específicos está tomando DSS, HOY MISMO, para facilitar y hacer cumplir mi derecho a ver a mi hijo, dado que no hay una orden judicial que lo prohíba?"</div>
+                    <div style="margin-top: 15px;">
+                        <button class="btn" onclick="practiceQuestion(3)">🎤 Practicar</button>
+                        <button class="btn" onclick="markQuestionDone(3)">✅ Hecha</button>
+                    </div>
+                </div>
+                
+                <div class="question-box">
+                    <div class="question-en" id="q4-en">"I was actively breastfeeding when separated. Did any social worker conduct a best interests assessment that considered the medical and developmental harm of abruptly severing that bond? Can I see that assessment?"</div>
+                    <div class="question-es">"Yo estaba amamantando activamente cuando nos separaron. ¿Algún trabajador social realizó una evaluación del mejor interés del niño que considerara el daño médico y de desarrollo de romper abruptamente ese vínculo? ¿Puedo ver esa evaluación?"</div>
+                    <div style="margin-top: 15px;">
+                        <button class="btn" onclick="practiceQuestion(4)">🎤 Practicar</button>
+                        <button class="btn" onclick="markQuestionDone(4)">✅ Hecha</button>
+                    </div>
+                </div>
+                
+                <div class="question-box">
+                    <div class="question-en" id="q5-en">"Will you support, in writing, the immediate resumption of supervised visitation to prevent further irreparable harm to my son's attachment and development while the courts decide the underlying cases?"</div>
+                    <div class="question-es">"¿Ustedes apoyarán, por escrito, la reanudación inmediata de visitas supervisadas para prevenir un daño irreparable mayor al apego y desarrollo de mi hijo mientras los tribunales deciden los casos subyacentes?"</div>
+                    <div style="margin-top: 15px;">
+                        <button class="btn" onclick="practiceQuestion(5)">🎤 Practicar</button>
+                        <button class="btn" onclick="markQuestionDone(5)">✅ Hecha</button>
+                    </div>
+                </div>
+                
+                <div class="progress-bar" style="margin-top: 30px;">
+                    <div class="progress-fill" id="questionProgress" style="width: 0%;"></div>
+                </div>
+                <div style="text-align: center; color: #666; font-size: 0.9rem;">Progreso de práctica: <span id="questionsDone">0</span>/5 preguntas</div>
+                
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="btn" onclick="changePhase(2)">← Anterior</button>
+                    <button class="btn btn-green" onclick="changePhase(4)">Siguiente: Durante la Reunión →</button>
+                </div>
+            </div>
+            
+            <!-- Phase 4: During Meeting -->
+            <div class="phase-content" id="phase4">
+                <div class="timer" id="liveTimer">⏱️ Tiempo de reunión: <span id="meetingTime">00:00</span></div>
+                
+                <div class="card">
+                    <div class="card-title">🎬 GUION DE APERTURA (Di esto primero):</div>
+                    <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 15px 0; font-style: italic;">
+                        "Thank you for meeting with me. I am here because my son, [Nombre de tu Hijo], and I have been separated for over 90 days without a court order. As his mother, his primary caregiver since birth, and because I was breastfeeding him, this separation is causing us serious harm. I need to understand what DSS is going to do TODAY to correct this."
+                    </div>
+                    <p><strong>En Español:</strong> "Gracias por reunirse conmigo. Estoy aquí porque mi hijo, [Nombre de tu Hijo], y yo hemos estado separados por más de 90 días sin una orden judicial. Como su madre, su principal cuidadora desde que nació, y porque lo estaba amamantando, esta separación nos está causando un daño grave. Necesito entender qué va a hacer DSS hoy mismo para corregir esto."</p>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title">📝 NOTAS DURANTE LA REUNIÓN</div>
+                    <p>Anota todo lo importante. Fecha, nombres, promesas, negativas.</p>
+                    <textarea id="meetingNotes" placeholder="Escribe aquí durante la reunión:
+- ¿Quién está presente? Nombres y cargos:
+- ¿Qué documentos mostraron o NO mostraron?
+- ¿Qué promesas hicieron? (¡Importante para el correo de seguimiento!)
+- ¿Qué fechas mencionaron?
+- ¿Cómo reaccionaron a tus preguntas?
+- ¿Qué excusas dieron?"></textarea>
+                    <button class="btn" onclick="saveNote('meetingNotes')">💾 Guardar Notas</button>
+                    <button class="btn btn-red" onclick="document.getElementById('meetingNotes').value = ''">🗑️ Limpiar</button>
+                </div>
+                
+                <div class="card green">
+                    <div class="card-title">✅ ACUERDOS QUE DEBES BUSCAR (Marca lo que logres):</div>
+                    <ul class="checklist" id="agreementsChecklist">
+                        <li data-agreement="written">Compromiso POR ESCRITO de facilitar visitas</li>
+                        <li data-agreement="date">Fecha concreta para primera visita supervisada</li>
+                        <li data-agreement="supervisor">Nombre del supervisor que estará presente</li>
+                        <li data-agreement="followup">Fecha para próxima reunión de seguimiento</li>
+                        <li data-agreement="email">Confirmación por email de lo acordado</li>
+                    </ul>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title">🚨 Si te dicen que "tienes que esperar" o "es un proceso":</div>
+                    <div style="background: #fff3cd; padding: 20px; border-radius: 10px; margin: 15px 0; border-left: 5px solid #ffc107;">
+                        <strong>Tu respuesta:</strong> "I understand there are processes. But there is no process that justifies harming a child without legal reason. There is no court order. You yourselves confirmed a visit and the father canceled it without consequences. Every day that passes is another day of harm to my child. What is the concrete plan for TODAY?"
+                    </div>
+                </div>
+                
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="btn" onclick="changePhase(3)">← Anterior</button>
+                    <button class="btn btn-green" onclick="changePhase(5)">Siguiente: Acciones Posteriores →</button>
+                </div>
+            </div>
+            
+            <!-- Phase 5: After Meeting -->
+            <div class="phase-content" id="phase5">
+                <div class="card">
+                    <div class="card-title">📤 ACCIONES INMEDIATAS (Hacer en las próximas 2 horas)</div>
+                    <ul class="checklist" id="actionsChecklist">
+                        <li data-action="notes">Transcribir notas del estacionamiento (¡mientras está fresco!)</li>
+                        <li data-action="email">Enviar correo de seguimiento con CC al Inspector General</li>
+                        <li data-action="court">Si no hubo acuerdo, preparar Moción de Emergencia para Corte de Familia</li>
+                        <li data-action="backup">Hacer copia de seguridad de todas las notas y grabaciones (si grabaste)</li>
+                        <li data-action="consult">Contactar a tu consultor para análisis de resultados</li>
+                    </ul>
+                    <button class="btn" onclick="checkAll('actionsChecklist')">✅ Marcar todas como completadas</button>
+                </div>
+                
+                <div class="card">
+                    <div class="card-title">📧 PLANTILLA DE CORREO DE SEGUIMIENTO</div>
+                    <div style="background: #e9ecef; padding: 20px; border-radius: 10px; margin: 15px 0; font-family: monospace; font-size: 0.9rem; white-space: pre-wrap;" id="emailTemplate">
+To: [correo de trabajadora social], [correo del jefe]
+CC: TonyCatone@dss.sc.gov
+Subject: Summary of Meeting - [Fecha] - Re: [Nombre de tu Hijo]
+
+Dear [Nombres],
+
+As a follow-up to our meeting today, [Fecha], I want to confirm our discussion and agreements:
+
+1. You acknowledged that there is no court order preventing contact between me and my son.
+2. We discussed the lack of investigation into the father's allegations.
+3. You agreed to facilitate supervised visitation on [Fecha acordada, si hubo].
+4. [Agregar otros puntos específicos].
+
+Please respond to confirm this understanding and to provide written confirmation of the visitation schedule.
+
+If I do not receive confirmation within 24 hours, I will have to assume DSS is not taking action to correct this situation and will proceed with my emergency court filing.
+
+Sincerely,
+Carolina Herrera
+                    </div>
+                    <button class="btn" onclick="copyEmailTemplate()">📋 Copiar Plantilla</button>
+                </div>
+                
+                <div class="card green">
+                    <div class="card-title">🎯 RESULTADOS DE LA REUNIÓN - EVALUACIÓN</div>
+                    <div style="margin: 15px 0;">
+                        <label>¿Obtuviste fecha para visita?</label>
+                        <select id="resultVisit" style="padding: 10px; width: 100%; margin: 10px 0; border-radius: 5px; border: 2px solid #dee2e6;">
+                            <option value="">Selecciona...</option>
+                            <option value="yes">✅ Sí, con fecha concreta</option>
+                            <option value="maybe">🟡 Prometieron coordinarla pronto</option>
+                            <option value="no">❌ No, se negaron o evadieron</option>
+                        </select>
+                        
+                        <label>¿Te dieron algo por escrito?</label>
+                        <select id="resultWritten" style="padding: 10px; width: 100%; margin: 10px 0; border-radius: 5px; border: 2px solid #dee2e6;">
+                            <option value="">Selecciona...</option>
+                            <option value="yes">✅ Sí, documento firmado</option>
+                            <option value="promised">🟡 Prometieron enviarlo por email</option>
+                            <option value="no">❌ No, solo promesas verbales</option>
+                        </select>
+                        
+                        <label>¿Cómo te sentiste durante la reunión?</label>
+                        <select id="resultFeeling" style="padding: 10px; width: 100%; margin: 10px 0; border-radius: 5px; border: 2px solid #dee2e6;">
+                            <option value="">Selecciona...</option>
+                            <option value="strong">💪 Fuerte y en control</option>
+                            <option value="nervous">😰 Nerviosa pero lo manejé</option>
+                            <option value="frustrated">😤 Frustrada por sus evasivas</option>
+                            <option value="proud">😌 Orgullosa de mí misma</option>
+                        </select>
+                    </div>
+                    <button class="btn" onclick="saveResults()">💾 Guardar Evaluación</button>
+                </div>
+                
+                <div class="notes-section">
+                    <div class="notes-title">📝 Reflexiones Finales</div>
+                    <textarea id="reflectionNotes" placeholder="¿Qué aprendiste? ¿Qué harías diferente? ¿Qué funcionó bien? ¿Qué apoyo necesitas ahora?"></textarea>
+                    <button class="btn" onclick="saveNote('reflectionNotes')">💾 Guardar Reflexión</button>
+                </div>
+                
+                <div style="text-align: center; margin-top: 30px;">
+                    <button class="btn" onclick="changePhase(4)">← Anterior</button>
+                    <button class="btn btn-green" onclick="exportAllNotes()">📥 Exportar Todas las Notas</button>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>Meeting PowerPlay v1.0 • Para uso de Carolina Herrera • ¡Tú puedes! 💪</p>
+            <p>Recuerda: Eres una leona defendiendo a su cachorro. Actúa con dignidad y fuerza.</p>
+        </footer>
+    </div>
+    
+    <button class="print-btn" onclick="printNotes()">🖨️</button>
+    
+    <script>
+        // Phase management
+        let currentPhase = 1;
+        const totalPhases = 5;
+        
+        function changePhase(phaseNumber) {
+            // Hide current phase
+            document.querySelector(`#phase${currentPhase}`).classList.remove('active');
+            document.querySelector(`.phase[data-phase="${currentPhase}"]`).classList.remove('active');
+            
+            // Show new phase
+            currentPhase = phaseNumber;
+            document.querySelector(`#phase${currentPhase}`).classList.add('active');
+            document.querySelector(`.phase[data-phase="${currentPhase}"]`).classList.add('active');
+            
+            // Update progress bar
+            const progressPercent = ((currentPhase - 1) / (totalPhases - 1)) * 100;
+            document.getElementById('progressFill').style.width = `${progressPercent}%`;
+            
+            // Start timer if phase 4
+            if (phaseNumber === 4 && !window.meetingTimerStarted) {
+                startMeetingTimer();
+            }
+        }
+        
+        // Countdown to meeting
+        function updateCountdown() {
+            // Set meeting time (adjust as needed)
+            const meetingTime = new Date();
+            meetingTime.setHours(meetingTime.getHours() + 1); // Meeting in 1 hour from now
+            
+            const now = new Date();
+            const diff = meetingTime - now;
+            
+            if (diff > 0) {
+                const hours = Math.floor(diff / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                document.getElementById('countdown').textContent = 
+                    `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+            } else {
+                document.getElementById('countdown').textContent = "¡ES HORA!";
+            }
+        }
+        
+        // Meeting timer
+        let meetingSeconds = 0;
+        let meetingTimerInterval;
+        
+        function startMeetingTimer() {
+            window.meetingTimerStarted = true;
+            meetingSeconds = 0;
+            meetingTimerInterval = setInterval(() => {
+                meetingSeconds++;
+                const minutes = Math.floor(meetingSeconds / 60);
+                const seconds = meetingSeconds % 60;
+                document.getElementById('meetingTime').textContent = 
+                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+        
+        // Checklist functionality
+        function checkAll(checklistId) {
+            const items = document.querySelectorAll(`#${checklistId} li`);
+            items.forEach(item => {
+                item.classList.add('checked');
+            });
+        }
+        
+        // Question practice tracking
+        let questionsPracticed = 0;
+        
+        function practiceQuestion(questionNum) {
+            const questionText = document.getElementById(`q${questionNum}-en`).textContent;
+            alert(`🎤 Practica diciendo en voz alta:\n\n${questionText}\n\n¡Habla claro y con confianza!`);
+        }
+        
+        function markQuestionDone(questionNum) {
+            const button = document.querySelector(`button[onclick="markQuestionDone(${questionNum})"]`);
+            if (!button.classList.contains('done')) {
+                button.classList.add('done');
+                button.textContent = '✅ Practicada';
+                button.style.background = '#28a745';
+                questionsPracticed++;
+                document.getElementById('questionsDone').textContent = questionsPracticed;
+                document.getElementById('questionProgress').style.width = `${(questionsPracticed / 5) * 100}%`;
+            }
+        }
+        
+        // Notes saving
+        function saveNote(textareaId) {
+            const note = document.getElementById(textareaId).value;
+            const key = `meetingNotes_${textareaId}`;
+            localStorage.setItem(key, note);
+            alert('Nota guardada localmente en tu navegador.');
+        }
+        
+        // Load saved notes on page load
+        window.addEventListener('load', () => {
+            // Load all notes
+            const textareas = ['prepNotes', 'strategyNotes', 'meetingNotes', 'reflectionNotes'];
+            textareas.forEach(id => {
+                const saved = localStorage.getItem(`meetingNotes_${id}`);
+                if (saved) {
+                    document.getElementById(id).value = saved;
+                }
+            });
+            
+            // Update countdown every minute
+            updateCountdown();
+            setInterval(updateCountdown, 60000);
+        });
+        
+        // Email template copy
+        function copyEmailTemplate() {
+            const template = document.getElementById('emailTemplate').textContent;
+            navigator.clipboard.writeText(template).then(() => {
+                alert('Plantilla copiada al portapapeles. ¡Pega en tu email!');
+            });
+        }
+        
+        // Save results
+        function saveResults() {
+            const visit = document.getElementById('resultVisit').value;
+            const written = document.getElementById('resultWritten').value;
+            const feeling = document.getElementById('resultFeeling').value;
+            
+            const results = {
+                visit,
+                written,
+                feeling,
+                timestamp: new Date().toISOString()
+            };
+            
+            localStorage.setItem('meetingResults', JSON.stringify(results));
+            alert('Evaluación guardada.');
+        }
+        
+        // Export all notes
+        function exportAllNotes() {
+            let exportText = "=== REUNIÓN DSS - NOTAS COMPLETAS ===\n\n";
+            
+            // Phase 1 notes
+            exportText += "📋 PREPARACIÓN:\n";
+            exportText += document.getElementById('prepNotes').value + "\n\n";
+            
+            // Phase 2 notes
+            exportText += "🎯 ESTRATEGIA:\n";
+            exportText += document.getElementById('strategyNotes').value + "\n\n";
+            
+            // Phase 4 notes
+            exportText += "📝 DURANTE LA REUNIÓN:\n";
+            exportText += document.getElementById('meetingNotes').value + "\n\n";
+            
+            // Phase 5 notes
+            exportText += "📝 REFLEXIONES:\n";
+            exportText += document.getElementById('reflectionNotes').value + "\n\n";
+            
+            // Results
+            exportText += "✅ RESULTADOS:\n";
+            const visit = document.getElementById('resultVisit').value;
+            const written = document.getElementById('resultWritten').value;
+            const feeling = document.getElementById('resultFeeling').value;
+            
+            exportText += `Visita: ${visit}\n`;
+            exportText += `Documento escrito: ${written}\n`;
+            exportText += `Sentimiento: ${feeling}\n`;
+            
+            // Create downloadable file
+            const blob = new Blob([exportText], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `DSS_Meeting_Notes_${new Date().toISOString().slice(0,10)}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        
+        // Print function
+        function printNotes() {
+            const printContent = document.querySelector('.container').innerHTML;
+            const originalContent = document.body.innerHTML;
+            
+            document.body.innerHTML = `
+                <style>
+                    body { font-family: Arial, sans-serif; padding: 20px; }
+                    .card { border: 1px solid #ccc; padding: 15px; margin: 10px 0; }
+                    .question-box { border-left: 3px solid blue; padding: 10px; margin: 10px 0; }
+                </style>
+                <h1>Meeting Navigator - Impresión</h1>
+                ${printContent}
+            `;
+            
+            window.print();
+            document.body.innerHTML = originalContent;
+            location.reload(); // Reload to restore functionality
+        }
+        
+        // Practice mantra
+        function practiceMantra() {
+            alert("🎤 Practica decir en voz alta:\n\n1. 'No existe una orden judicial que me prohiba ver a mi hijo.'\n2. 'Mi hijo y yo estamos sufriendo daño físico y emocional por esta separación injustificada.'\n3. 'DSS no ha investigado; solo ha creído al padre sin verificarlo.'\n\n¡Repite hasta que salga natural!");
+        }
+    </script>
+</body>
+</html>
