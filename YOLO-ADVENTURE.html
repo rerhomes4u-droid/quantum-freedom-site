@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎉 YOLO's 80th Birthday Party Planner 🎉</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        :root {
+            --primary: #FF6B8B;
+            --secondary: #6A5ACD;
+            --accent: #00CED1;
+            --light: #FFF5F7;
+            --dark: #2D3047;
+            --success: #4CAF50;
+            --warning: #FF9800;
+            --whatsapp: #25D366;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--light) 0%, #E6E6FA 100%);
+            color: var(--dark);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: gold;
+            border-radius: 50%;
+            animation: fall 5s infinite;
+        }
+        
+        @keyframes fall {
+            0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(600px) rotate(360deg); opacity: 0; }
+        }
+        
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-bottom: 20px;
+        }
+        
+        .party-countdown {
+            background: rgba(255,255,255,0.2);
+            padding: 15px;
+            border-radius: 10px;
+            display: inline-block;
+            margin-top: 15px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            padding: 30px;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            border-top: 5px solid var(--accent);
+            transition: transform 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .card h2 {
+            color: var(--secondary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .card h2 i {
+            font-size: 1.5rem;
+        }
+        
+        .timeline {
+            grid-column: 1 / -1;
+        }
+        
+        .timeline-event {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px dashed #eee;
+        }
+        
+        .event-date {
+            background: var(--primary);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 10px;
+            min-width: 120px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .event-details {
+            margin-left: 20px;
+            flex-grow: 1;
+        }
+        
+        .event-title {
+            font-weight: bold;
+            color: var(--dark);
+            margin-bottom: 5px;
+        }
+        
+        .vote-options {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .vote-btn {
+            background: var(--light);
+            border: 2px solid var(--accent);
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .vote-btn:hover {
+            background: var(--accent);
+            color: white;
+        }
+        
+        .vote-btn.selected {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+        
+        .progress-container {
+            margin-top: 15px;
+        }
+        
+        .progress-bar {
+            height: 10px;
+            background: #eee;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 5px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: var(--success);
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+        
+        .checkbox-list {
+            list-style: none;
+        }
+        
+        .checkbox-list li {
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .checkbox-list input {
+            margin-right: 10px;
+            transform: scale(1.3);
+        }
+        
+        .adventure-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .adventure-card {
+            background: var(--light);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        
+        .adventure-card:hover {
+            transform: scale(1.05);
+        }
+        
+        .adventure-card.selected {
+            border-color: var(--accent);
+            background: rgba(0, 206, 209, 0.1);
+        }
+        
+        .attendee-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .attendee {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin-top: 20px;
+            width: 100%;
+            transition: transform 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .whatsapp-btn {
+            background: var(--whatsapp);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 30px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+            transition: transform 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .whatsapp-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(37, 211, 102, 0.3);
+        }
+        
+        footer {
+            text-align: center;
+            padding: 30px;
+            background: var(--light);
+            color: var(--dark);
+            font-size: 0.9rem;
+        }
+        
+        .highlight {
+            background: linear-gradient(120deg, rgba(255,107,139,0.2) 0%, rgba(0,206,209,0.2) 100%);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 5px solid var(--primary);
+        }
+        
+        .suggestions-box {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .suggestions-list {
+            margin-top: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .suggestion-item {
+            background: white;
+            padding: 10px;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            border-left: 4px solid var(--accent);
+        }
+        
+        .suggestion-author {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 5px;
+        }
+        
+        .add-suggestion {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .add-suggestion input {
+            flex-grow: 1;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+        }
+        
+        .add-suggestion button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+            
+            .timeline-event {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .event-details {
+                margin-left: 0;
+                margin-top: 10px;
+            }
+            
+            .add-suggestion {
+                flex-direction: column;
+            }
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal h3 {
+            color: var(--secondary);
+            margin-bottom: 20px;
+        }
+        
+        .modal textarea {
+            width: 100%;
+            height: 150px;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 10px;
+            border: 2px solid var(--accent);
+            font-family: inherit;
+            resize: vertical;
+        }
+        
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .modal-btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .modal-btn.copy {
+            background: var(--success);
+            color: white;
+            flex: 2;
+        }
+        
+        .modal-btn.whatsapp {
+            background: var(--whatsapp);
+            color: white;
+            flex: 3;
+        }
+        
+        .modal-btn.close {
+            background: #666;
+            color: white;
+            flex: 1;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎂 ¡FELIZ 80 CUMPLEAÑOS YOLO! 🎂</h1>
+            <p class="subtitle">The Ultimate Family Celebration Planner</p>
+            <div class="party-countdown">
+                <i class="fas fa-calendar-alt"></i> February 12-16, 2026 • Colombia
+            </div>
+            <div id="confetti-container"></div>
+        </header>
+        
+        <div class="content">
+            <div class="card timeline">
+                <h2><i class="fas fa-calendar-day"></i> Party Timeline</h2>
+                
+                <div class="timeline-event">
+                    <div class="event-date">Thu, Feb 12</div>
+                    <div class="event-details">
+                        <div class="event-title">Adventure Day: La Carbonera, Cascada, Volcán Machín, Termales</div>
+                        <div>Quads, dirt bikes, Ford Escapes • Organized by Ramiro</div>
+                        <div class="vote-options">
+                            <span class="vote-btn" onclick="voteForOption(this, 'machin-date')" data-value="Thu Feb 12">This date works!</span>
+                            <span class="vote-btn" onclick="voteForOption(this, 'machin-date')" data-value="Different date">Need different date</span>
+                            <span class="vote-btn" onclick="voteForOption(this, 'machin-date')" data-value="Fri Feb 13">Move to Friday</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="timeline-event">
+                    <div class="event-date">Thu, Feb 12</div>
+                    <div class="event-details">
+                        <div class="event-title">Coffee Picking Park (Day) & Chiva Ride (Night)</div>
+                        <div>Day activity + Party bus night!</div>
+                    </div>
+                </div>
+                
+                <div class="timeline-event">
+                    <div class="event-date">Fri, Feb 13</div>
+                    <div class="event-details">
+                        <div class="event-title">MAIN BIRTHDAY PARTY!</div>
+                        <div>YOLO's 80th Birthday Bash • Theme: TBD</div>
+                        <div class="progress-container">
+                            <div>Party Planning Progress:</div>
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="party-progress" style="width: 65%"></div>
+                            </div>
+                            <div>65% planned</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="timeline-event">
+                    <div class="event-date">Sat, Feb 14</div>
+                    <div class="event-details">
+                        <div class="event-title">Cabalgata Valle de Cocora (2.5 hours)</div>
+                        <div>Horseback riding for ~50 people • River crossings?</div>
+                        <div class="vote-options">
+                            <span class="vote-btn" onclick="voteForOption(this, 'cabalgata-option')" data-value="Valle de Cocora">Valle de Cocora</span>
+                            <span class="vote-btn" onclick="voteForOption(this, 'cabalgata-option')" data-value="Salento (big ride)">Salento (big ride)</span>
+                            <span class="vote-btn" onclick="voteForOption(this, 'cabalgata-option')" data-value="Both days!">Both days!</span>
+                            <span class="vote-btn" onclick="voteForOption(this, 'cabalgata-option')" data-value="With river crossings">With river crossings</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="timeline-event">
+                    <div class="event-date">Wed, Feb 11</div>
+                    <div class="event-details">
+                        <div class="event-title">Kid-Friendly Cabalgata Carmelo</div>
+                        <div>Near Portal del Sol • For children and family</div>
+                    </div>
+                </div>
+                
+                <div class="timeline-event">
+                    <div class="event-date">Sun, Feb 15</div>
+                    <div class="event-details">
+                        <div class="event-title">Balsaje (River Floating)</div>
+                        <div>Relaxing river tubing to end the celebration</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2><i class="fas fa-horse-head"></i> Horseback Riding Details</h2>
+                <div class="highlight">
+                    <p><strong>Ramiro says:</strong> "I got this. We pool all our horses together. I have access to all the horses we could possibly need!"</p>
+                </div>
+                
+                <p><strong>Options Available:</strong></p>
+                <ul class="checkbox-list">
+                    <li><input type="checkbox" id="horses1"> <label for="horses1">Orígen Cabalgatas (limited horses)</label></li>
+                    <li><input type="checkbox" id="horses2"> <label for="horses2">Cabalgatas El Carmelo (kid-friendly)</label></li>
+                    <li><input type="checkbox" id="horses3"> <label for="horses3">Place Genesis & Deana liked (28 horses max)</label></li>
+                    <li><input type="checkbox" id="horses4"> <label for="horses4">River crossing option (Tatos' suggestion)</label></li>
+                </ul>
+                
+                <div class="suggestions-box">
+                    <h3><i class="fas fa-lightbulb"></i> Group Suggestions</h3>
+                    <div class="suggestions-list" id="horse-suggestions">
+                        <div class="suggestion-item">
+                            "Maravelez valley has better weather!" <span class="suggestion-author">- Tatos</span>
+                        </div>
+                        <div class="suggestion-item">
+                            "What about Valle de Cocora for the big group ride?" <span class="suggestion-author">- Lucy</span>
+                        </div>
+                    </div>
+                    <div class="add-suggestion">
+                        <input type="text" id="horse-suggestion-input" placeholder="Add your suggestion...">
+                        <button onclick="addSuggestion('horse')">Add</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2><i class="fas fa-hiking"></i> Adventure Sign-Up</h2>
+                <p>Ramiro's Specialties:</p>
+                <div class="adventure-grid">
+                    <div class="adventure-card" onclick="toggleAdventure(this)" data-value="Horse Riding">
+                        <i class="fas fa-horse" style="font-size: 2rem; color: var(--primary); margin-bottom: 10px;"></i>
+                        <div>Horse Riding</div>
+                    </div>
+                    <div class="adventure-card" onclick="toggleAdventure(this)" data-value="ATV / Dirt Bike">
+                        <i class="fas fa-motorcycle" style="font-size: 2rem; color: var(--secondary); margin-bottom: 10px;"></i>
+                        <div>ATV / Dirt Bike</div>
+                    </div>
+                    <div class="adventure-card" onclick="toggleAdventure(this)" data-value="Paragliding">
+                        <i class="fas fa-parachute-box" style="font-size: 2rem; color: var(--accent); margin-bottom: 10px;"></i>
+                        <div>Paragliding</div>
+                    </div>
+                    <div class="adventure-card" onclick="toggleAdventure(this)" data-value="Mountain Bike">
+                        <i class="fas fa-bicycle" style="font-size: 2rem; color: var(--success); margin-bottom: 10px;"></i>
+                        <div>Mountain Bike</div>
+                    </div>
+                    <div class="adventure-card" onclick="toggleAdventure(this)" data-value="Termales">
+                        <i class="fas fa-hot-tub" style="font-size: 2rem; color: var(--warning); margin-bottom: 10px;"></i>
+                        <div>Termales</div>
+                    </div>
+                    <div class="adventure-card" onclick="toggleAdventure(this)" data-value="Just watching with a drink">
+                        <i class="fas fa-camera" style="font-size: 2rem; color: var(--dark); margin-bottom: 10px;"></i>
+                        <div>Just watching with a drink 🍹</div>
+                    </div>
+                </div>
+                
+                <div class="highlight">
+                    <p><strong>Miros has a drone!</strong> Will follow us on horses and down the river for epic footage.</p>
+                </div>
+                
+                <div class="suggestions-box">
+                    <h3><i class="fas fa-comments"></i> Activity Ideas</h3>
+                    <div class="suggestions-list" id="activity-suggestions">
+                        <div class="suggestion-item">
+                            "Can we tie children to donkeys to follow along?" <span class="suggestion-author">- Rafael</span>
+                        </div>
+                        <div class="suggestion-item">
+                            "Paragliding would be amazing!" <span class="suggestion-author">- Johntas</span>
+                        </div>
+                    </div>
+                    <div class="add-suggestion">
+                        <input type="text" id="activity-suggestion-input" placeholder="Add activity idea...">
+                        <button onclick="addSuggestion('activity')">Add</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2><i class="fas fa-users"></i> Who's Coming?</h2>
+                <div class="attendee-list">
+                    <div class="attendee">Lucy</div>
+                    <div class="attendee">Diana Marcela</div>
+                    <div class="attendee">Rafael Alejandro</div>
+                    <div class="attendee">Tatos</div>
+                    <div class="attendee">Ramiro Ramirez</div>
+                    <div class="attendee">Claudia</div>
+                    <div class="attendee">Johntas</div>
+                    <div class="attendee">Angela</div>
+                    <div class="attendee">Brenda</div>
+                    <div class="attendee">Miros</div>
+                    <div class="attendee">+ 13 more!</div>
+                </div>
+                
+                <div class="suggestions-box" style="margin-top: 20px;">
+                    <h3><i class="fas fa-question-circle"></i> Open Questions</h3>
+                    <div class="suggestions-list" id="question-suggestions">
+                        <div class="suggestion-item">
+                            "Which day for Volcán Machín?" <span class="suggestion-author">- Rafael</span>
+                        </div>
+                        <div class="suggestion-item">
+                            "How many motorcycles/ATVs needed?" <span class="suggestion-author">- Ramiro</span>
+                        </div>
+                        <div class="suggestion-item">
+                            "What should be the birthday theme?" <span class="suggestion-author">- Diana</span>
+                        </div>
+                    </div>
+                    <div class="add-suggestion">
+                        <input type="text" id="question-suggestion-input" placeholder="Add a question...">
+                        <button onclick="addSuggestion('question')">Add</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2><i class="fas fa-tasks"></i> To-Do List</h2>
+                <ul class="checkbox-list">
+                    <li><input type="checkbox" id="todo1"> <label for="todo1">Ramiro confirms horse availability (~50 horses)</label></li>
+                    <li><input type="checkbox" id="todo2"> <label for="todo2">Group votes on adventure activities</label></li>
+                    <li><input type="checkbox" id="todo3"> <label for="todo3">Full itinerary recap from party planners</label></li>
+                    <li><input type="checkbox" id="todo4"> <label for="todo4">Confirm dates for all events</label></li>
+                    <li><input type="checkbox" id="todo5"> <label for="todo5">Plan kid-friendly Wednesday cabalgata</label></li>
+                    <li><input type="checkbox" id="todo6"> <label for="todo6">Organize birthday theme & surprises</label></li>
+                </ul>
+                
+                <button class="btn-primary" onclick="prepareWhatsAppMessage()">
+                    <i class="fas fa-paper-plane"></i> Share My Choices on WhatsApp
+                </button>
+                
+                <button class="whatsapp-btn" onclick="openWhatsAppGroup()">
+                    <i class="fab fa-whatsapp"></i> Open WhatsApp Group
+                </button>
+            </div>
+        </div>
+        
+        <!-- Results Modal -->
+        <div class="modal" id="resultsModal">
+            <div class="modal-content">
+                <h3>📱 Share Your Choices on WhatsApp!</h3>
+                <p>Your choices are ready to share with the group. Copy or send directly:</p>
+                
+                <textarea id="whatsappMessage" readonly></textarea>
+                
+                <div class="modal-buttons">
+                    <button class="modal-btn copy" onclick="copyToClipboard()">
+                        <i class="fas fa-copy"></i> Copy
+                    </button>
+                    <button class="modal-btn whatsapp" onclick="sendViaWhatsApp()">
+                        <i class="fab fa-whatsapp"></i> Open WhatsApp
+                    </button>
+                    <button class="modal-btn close" onclick="closeModal()">
+                        Close
+                    </button>
+                </div>
+                
+                <div style="margin-top: 20px; font-size: 0.9rem; color: #666;">
+                    <p><strong>Tip:</strong> Paste this in our WhatsApp group so everyone can see your preferences!</p>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>🎈 Made with love for YOLO's 80th Birthday Celebration 🎈</p>
+            <p style="margin-top: 10px; font-size: 0.8rem; opacity: 0.7;">
+                Save this page to your phone • Everyone can add suggestions • Refresh to see updates
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        // Create confetti effect
+        function createConfetti() {
+            const container = document.getElementById('confetti-container');
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.animationDelay = Math.random() * 5 + 's';
+                confetti.style.backgroundColor = getRandomColor();
+                container.appendChild(confetti);
+            }
+        }
+        
+        function getRandomColor() {
+            const colors = ['#FF6B8B', '#6A5ACD', '#00CED1', '#FFD700', '#98FB98'];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+        
+        // Voting functionality
+        function voteForOption(element, groupId) {
+            const group = document.querySelectorAll(`[onclick*="${groupId}"]`);
+            group.forEach(btn => btn.classList.remove('selected'));
+            element.classList.add('selected');
+            updateProgress();
+        }
+        
+        // Adventure selection
+        function toggleAdventure(element) {
+            element.classList.toggle('selected');
+        }
+        
+        // Add suggestions
+        function addSuggestion(type) {
+            let inputId, listId, placeholder;
+            
+            switch(type) {
+                case 'horse':
+                    inputId = 'horse-suggestion-input';
+                    listId = 'horse-suggestions';
+                    placeholder = 'Add your suggestion...';
+                    break;
+                case 'activity':
+                    inputId = 'activity-suggestion-input';
+                    listId = 'activity-suggestions';
+                    placeholder = 'Add activity idea...';
+                    break;
+                case 'question':
+                    inputId = 'question-suggestion-input';
+                    listId = 'question-suggestions';
+                    placeholder = 'Add a question...';
+                    break;
+            }
+            
+            const input = document.getElementById(inputId);
+            const suggestionText = input.value.trim();
+            
+            if (!suggestionText) {
+                alert('Please enter a suggestion!');
+                return;
+            }
+            
+            const userName = prompt("Enter your name:", "Anonymous");
+            if (!userName) return;
+            
+            const suggestionList = document.getElementById(listId);
+            const suggestionItem = document.createElement('div');
+            suggestionItem.className = 'suggestion-item';
+            suggestionItem.innerHTML = `"${suggestionText}" <span class="suggestion-author">- ${userName}</span>`;
+            
+            suggestionList.appendChild(suggestionItem);
+            input.value = '';
+            
+            // Update progress
+            updateProgress();
+        }
+        
+        // Update progress bars
+        function updateProgress() {
+            const checkboxes = document.querySelectorAll('.checkbox-list input[type="checkbox"]');
+            let checked = 0;
+            checkboxes.forEach(cb => {
+                if (cb.checked) checked++;
+            });
+            const partyProgress = (checked / checkboxes.length) * 100;
+            document.getElementById('party-progress').style.width = partyProgress + '%';
+        }
+        
+        // Prepare WhatsApp message
+        function prepareWhatsAppMessage() {
+            const userName = prompt("Enter your name for the group:", "Family Member");
+            if (!userName) return;
+            
+            // Collect votes
+            const machinVote = document.querySelector('.vote-btn.selected[onclick*="machin-date"]');
+            const cabalgataVote = document.querySelector('.vote-btn.selected[onclick*="cabalgata-option"]');
+            
+            // Collect adventures
+            const selectedAdventures = document.querySelectorAll('.adventure-card.selected');
+            
+            // Collect to-do items
+            const checkedItems = document.querySelectorAll('.checkbox-list input[type="checkbox"]:checked');
+            
+            // Build message
+            let message = `*${userName}'s YOLO 80th Birthday Choices* 🎉\n`;
+            message += `=====================\n\n`;
+            
+            // Add votes
+            if (machinVote || cabalgataVote) {
+                message += `*📅 MY VOTES:*\n`;
+                if (machinVote) message += `✅ Volcán Machín: ${machinVote.getAttribute('data-value')}\n`;
+                if (cabalgataVote) message += `✅ Cabalgata: ${cabalgataVote.getAttribute('data-value')}\n`;
+                message += `\n`;
+            }
+            
+            // Add adventures
+            if (selectedAdventures.length > 0) {
+                message += `*🏞️ ADVENTURES I WANT:*\n`;
+                selectedAdventures.forEach(adv => {
+                    message += `✓ ${adv.getAttribute('data-value')}\n`;
+                });
+                message += `\n`;
+            }
+            
+            // Add help
+            if (checkedItems.length > 0) {
+                message += `*🤝 I CAN HELP WITH:*\n`;
+                checkedItems.forEach(item => {
+                    message += `✓ ${item.nextElementSibling.textContent}\n`;
+                });
+                message += `\n`;
+            }
+            
+            // Add timestamp
+            message += `_Submitted: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}_\n`;
+            message += `_Via YOLO Party Planner_`;
+            
+            // Show modal
+            document.getElementById('whatsappMessage').value = message;
+            document.getElementById('resultsModal').style.display = 'flex';
+        }
+        
+        // Copy to clipboard
+        function copyToClipboard() {
+            const textarea = document.getElementById('whatsappMessage');
+            textarea.select();
+            textarea.setSelectionRange(0, 99999);
+            document.execCommand('copy');
+            
+            // Show feedback
+            const copyBtn = document.querySelector('.modal-btn.copy');
+            const originalText = copyBtn.innerHTML;
+            copyBtn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+            setTimeout(() => {
+                copyBtn.innerHTML = originalText;
+            }, 2000);
+        }
+        
+        // Send via WhatsApp
+        function sendViaWhatsApp() {
+            const message = document.getElementById('whatsappMessage').value;
+            const encodedMessage = encodeURIComponent(message);
+            window.open(`https://wa.me/?text=${encodedMessage}`, '_blank');
+        }
+        
+        // Open WhatsApp group (placeholder - replace with actual link)
+        function openWhatsAppGroup() {
+            alert("Paste your WhatsApp group link here in the code!\n\nReplace the '#' in the function with your actual group invite link.");
+            // window.open('https://chat.whatsapp.com/YOUR_GROUP_INVITE_LINK', '_blank');
+        }
+        
+        // Close modal
+        function closeModal() {
+            document.getElementById('resultsModal').style.display = 'none';
+            createConfetti();
+        }
+        
+        // Initialize
+        window.onload = function() {
+            createConfetti();
+            
+            // Pre-check some items for demo
+            document.getElementById('todo1').checked = true;
+            document.getElementById('todo4').checked = true;
+            document.getElementById('horses1').checked = true;
+            document.getElementById('horses4').checked = true;
+            
+            // Pre-select some adventures for demo
+            document.querySelector('[data-value="Horse Riding"]').classList.add('selected');
+            document.querySelector('[data-value="Termales"]').classList.add('selected');
+            
+            updateProgress();
+        };
+        
+        // Save suggestions to localStorage (persists for each user)
+        function saveSuggestions() {
+            const suggestions = {
+                horse: document.getElementById('horse-suggestions').innerHTML,
+                activity: document.getElementById('activity-suggestions').innerHTML,
+                question: document.getElementById('question-suggestions').innerHTML
+            };
+            localStorage.setItem('yoloPartySuggestions', JSON.stringify(suggestions));
+        }
+        
+        // Load suggestions from localStorage
+        function loadSuggestions() {
+            const saved = localStorage.getItem('yoloPartySuggestions');
+            if (saved) {
+                const suggestions = JSON.parse(saved);
+                document.getElementById('horse-suggestions').innerHTML = suggestions.horse;
+                document.getElementById('activity-suggestions').innerHTML = suggestions.activity;
+                document.getElementById('question-suggestions').innerHTML = suggestions.question;
+            }
+        }
+        
+        // Update addSuggestion function to save
+        const originalAddSuggestion = addSuggestion;
+        addSuggestion = function(type) {
+            originalAddSuggestion(type);
+            saveSuggestions();
+        };
+        
+        // Load suggestions on start
+        loadSuggestions();
+    </script>
+</body>
+</html>
