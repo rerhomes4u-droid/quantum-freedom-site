@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Court Hearing Preparation Tool</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #333;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(90deg, #1a3a8f 0%, #2a5caa 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .nav-tabs {
+            display: flex;
+            background-color: #f1f5f9;
+            border-bottom: 2px solid #1a3a8f;
+        }
+        
+        .tab-btn {
+            flex: 1;
+            padding: 18px;
+            background: none;
+            border: none;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #4a5568;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .tab-btn:hover {
+            background-color: #e2e8f0;
+        }
+        
+        .tab-btn.active {
+            background-color: white;
+            color: #1a3a8f;
+            border-top: 3px solid #1a3a8f;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 30px;
+            min-height: 600px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .section-title {
+            color: #1a3a8f;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+        }
+        
+        .practice-area {
+            background-color: #f8fafc;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border-left: 5px solid #1a3a8f;
+        }
+        
+        .question-box {
+            background-color: #e6f7ff;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            border-left: 4px solid #1890ff;
+        }
+        
+        .response-box {
+            background-color: #f6ffed;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            border-left: 4px solid #52c41a;
+            display: none;
+        }
+        
+        .response-box.show {
+            display: block;
+        }
+        
+        .tip-box {
+            background-color: #fff7e6;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 15px 0;
+            border-left: 4px solid #fa8c16;
+        }
+        
+        .button {
+            background-color: #1a3a8f;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin: 10px 5px;
+        }
+        
+        .button:hover {
+            background-color: #2a5caa;
+        }
+        
+        .button.secondary {
+            background-color: #718096;
+        }
+        
+        .button.secondary:hover {
+            background-color: #4a5568;
+        }
+        
+        .button.danger {
+            background-color: #c53030;
+        }
+        
+        .button.danger:hover {
+            background-color: #e53e3e;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #4a5568;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd5e0;
+            border-radius: 6px;
+            font-size: 1rem;
+        }
+        
+        textarea {
+            min-height: 150px;
+            resize: vertical;
+        }
+        
+        .document-output {
+            background-color: #f8fafc;
+            border: 1px solid #cbd5e0;
+            border-radius: 6px;
+            padding: 25px;
+            margin-top: 25px;
+            white-space: pre-wrap;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .record-reader {
+            background-color: #f0f9ff;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 20px 0;
+            border: 2px solid #1a3a8f;
+        }
+        
+        .speech-practice {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .speech-text {
+            background-color: white;
+            border: 1px solid #cbd5e0;
+            border-radius: 8px;
+            padding: 20px;
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+        
+        .highlight {
+            background-color: #fffacd;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        
+        .counter {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #1a3a8f;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .reminder-box {
+            background-color: #feebc8;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid #f6ad55;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #718096;
+            font-size: 0.9rem;
+            border-top: 1px solid #e2e8f0;
+            margin-top: 30px;
+        }
+        
+        @media (max-width: 768px) {
+            .nav-tabs {
+                flex-direction: column;
+            }
+            
+            .tab-content {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🛡️ Court Hearing Preparation</h1>
+            <p class="subtitle">For Carolina Herrera - Reclaiming Ethan</p>
+        </header>
+        
+        <div class="nav-tabs">
+            <button class="tab-btn active" data-tab="practice">Practice Scenarios</button>
+            <button class="tab-btn" data-tab="record">Reading Into Record</button>
+            <button class="tab-btn" data-tab="documents">Create Documents</button>
+            <button class="tab-btn" data-tab="strategy">Battle Strategy</button>
+        </div>
+        
+        <!-- PRACTICE SCENARIOS TAB -->
+        <div id="practice" class="tab-content active">
+            <h2 class="section-title">Practice Handling Curveballs</h2>
+            
+            <div class="reminder-box">
+                <h3>🌟 Key Mindset Reminders:</h3>
+                <p>1. You are the WRONGED PARTY. They must prove their case.</p>
+                <p>2. Stay calm, speak slowly, and pause before answering.</p>
+                <p>3. Always return to your core points: NO EVIDENCE, NO COURT ORDER, NO JURISDICTION.</p>
+                <p>4. Use the phrase "For the record..." to document important points.</p>
+            </div>
+            
+            <div class="practice-area">
+                <h3>Potential Curveball #1: The Judge Interrupts or Rushes You</h3>
+                <div class="question-box">
+                    <p><strong>Judge says:</strong> "Ms. Herrera, we don't have time for all this. Get to the point."</p>
+                    <button class="button" onclick="showResponse('response1')">Show Recommended Response</button>
+                </div>
+                <div id="response1" class="response-box">
+                    <p><strong>Your response (calmly):</strong> "Your Honor, I understand the court's time is limited. However, the unlawful separation from my son for nearly two months is an emergency that requires a complete record. <span class="highlight">For the record,</span> I need to establish that there is no valid court order authorizing this deprivation of my parental rights. May I proceed with this fundamental jurisdictional question?"</p>
+                    <div class="tip-box">
+                        <strong>Why this works:</strong> You acknowledge their concern but reframe it as a NECESSARY discussion about jurisdiction, which judges cannot easily dismiss.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="practice-area">
+                <h3>Potential Curveball #2: They Cite "DSS Authority"</h3>
+                <div class="question-box">
+                    <p><strong>Opposing Attorney says:</strong> "DSS has statutory authority to protect children, and their investigation found credible evidence of risk."</p>
+                    <button class="button" onclick="showResponse('response2')">Show Recommended Response</button>
+                </div>
+                <div id="response2" class="response-box">
+                    <p><strong>Your response (firmly):</strong> "<span class="highlight">For the record,</span> DSS never interviewed me during their so-called investigation. Authority without due process is tyranny. <span class="highlight">I demand to see the evidence</span> that justifies separating a breastfeeding mother from her infant for two months. Please present it now. And while you're at it, please show me where in any statute I waived my fundamental, pre-existing rights as a mother."</p>
+                    <div class="tip-box">
+                        <strong>Why this works:</strong> You expose their lack of due process and put the burden back on them to produce evidence they likely don't have.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="practice-area">
+                <h3>Potential Curveball #3: They Claim "Emergency" or "Imminent Danger"</h3>
+                <div class="question-box">
+                    <p><strong>Social Worker says:</strong> "We had to act quickly to protect the child from imminent danger."</p>
+                    <button class="button" onclick="showResponse('response3')">Show Recommended Response</button>
+                </div>
+                <div id="response3" class="response-box">
+                    <p><strong>Your response (calmly, with facts):</strong> "<span class="highlight">For the record,</span> there was no emergency. My child was safely in another room during an adult disagreement. <span class="highlight">Where is the evidence of imminent danger?</span> If there was truly an emergency two months ago, why hasn't there been a hearing with actual evidence presented? This 'emergency' has become a permanent, unlawful seizure without due process."</p>
+                    <div class="tip-box">
+                        <strong>Why this works:</strong> You challenge their timeline - emergencies require immediate judicial review, not two months of separation without a hearing.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="practice-area">
+                <h3>Potential Curveball #4: The Judge Refuses to Hear Your Questions About Authority</h3>
+                <div class="question-box">
+                    <p><strong>Judge says:</strong> "Ms. Herrera, I don't need to show you my oath of office. We're here to discuss the DSS finding."</p>
+                    <button class="button" onclick="showResponse('response4')">Show Recommended Response</button>
+                </div>
+                <div id="response4" class="response-box">
+                    <p><strong>Your response (respectfully but firmly):</strong> "Your Honor, with all due respect, jurisdiction is the first question in any legal proceeding. <span class="highlight">For the record,</span> I am appearing under duress and coercion because my child has been taken without a court order. Before I can participate in any discussion about allegations, I need to know this court has proper authority. The circuit clerk's office could not produce your Oath of Office or Surety Bond. Can you direct me to where these are filed so I can verify this court's jurisdiction over my fundamental rights?"</p>
+                    <div class="tip-box">
+                        <strong>Why this works:</strong> You're not being difficult - you're asking a legitimate procedural question that goes to the heart of whether they have authority over you.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="practice-area">
+                <h3>Potential Curveball #5: They Try to Focus Only on the "Incident"</h3>
+                <div class="question-box">
+                    <p><strong>Attorney says:</strong> "Let's talk about what happened on October 18th. The father says you were violent."</p>
+                    <button class="button" onclick="showResponse('response5')">Show Recommended Response</button>
+                </div>
+                <div id="response5" class="response-box">
+                    <p><strong>Your response (redirecting):</strong> "I've addressed that in my sworn affidavit which they refused to accept. But more importantly, <span class="highlight">even if we discuss that incident, it doesn't justify two months of separation without a hearing.</span> Where is the court order? Where is the evidence? <span class="highlight">For the record,</span> my child was safe in another room. The real issue is the unlawful deprivation of rights without due process that's happening RIGHT NOW."</p>
+                    <div class="tip-box">
+                        <strong>Why this works:</strong> You don't get dragged into their narrative. You keep the focus on the CURRENT injustice - the unlawful separation.
+                    </div>
+                </div>
+            </div>
+            
+            <div class="counter">
+                Days Without Ethan: <span id="dayCounter">54</span>
+            </div>
+        </div>
+        
+        <!-- READING INTO RECORD TAB -->
+        <div id="record" class="tab-content">
+            <h2 class="section-title">How to Read Your Affidavit Into The Record</h2>
+            
+            <div class="record-reader">
+                <h3>📜 Critical Instructions for Reading Into Record:</h3>
+                <p>Since they refused to accept your affidavit, you MUST read it into the official court record. Follow these steps:</p>
+                
+                <ol style="margin-left: 20px; margin-top: 15px; margin-bottom: 15px;">
+                    <li><strong>Wait for your turn to speak</strong> - don't interrupt</li>
+                    <li><strong>Begin with:</strong> "Your Honor, <span class="highlight">for the record</span>, I need to read my sworn affidavit into the official record since the clerk's office refused to accept it for filing."</li>
+                    <li><strong>If the judge objects:</strong> "Your Honor, this affidavit contains critical facts about the lack of investigation and due process. Since it won't be in the written record, I need to ensure these facts are preserved for appeal."</li>
+                    <li><strong>Read SLOWLY and CLEARLY</strong> - the court reporter needs to capture every word</li>
+                    <li><strong>Pause briefly</strong> between paragraphs</li>
+                    <li><strong>End with:</strong> "This concludes my sworn affidavit, which I hereby enter into the record."</li>
+                </ol>
+            </div>
+            
+            <div class="speech-practice">
+                <h3>Practice Reading This Key Section:</h3>
+                
+                <div class="speech-text" id="affidavit-excerpt">
+                    <p>"<span class="highlight">For the record,</span> I, Carolina Herrera, being duly sworn, state under oath:</p>
+                    
+                    <p>At no time during the DSS investigation was I interviewed, contacted, or asked to provide my version of events. DSS relied solely on statements made by the child's father, with no balanced or neutral investigation.</p>
+                    
+                    <p>On October 18, my child was never in danger. My child was inside the bathtub, playing calmly, in a controlled and safe environment, physically distant from any adult disagreement.</p>
+                    
+                    <p><span class="highlight">Most critically,</span> there exists NO COURT ORDER from any jurisdiction that terminates my parental rights or restricts my contact with my son. The continued separation is therefore unlawful.</p>
+                    
+                    <p>For over 45 days, I have been denied all contact with my breastfeeding child, causing severe medical and emotional harm to both of us, without any judicial authorization.</p>
+                    
+                    <p>I make this statement under penalty of perjury, and demand the immediate restoration of my son based on the complete absence of legal authority for his continued separation from me."</p>
+                </div>
+                
+                <div style="display: flex; gap: 10px; margin-top: 15px;">
+                    <button class="button" onclick="startSpeechPractice()">Start Practice Session</button>
+                    <button class="button secondary" onclick="resetSpeechPractice()">Reset</button>
+                </div>
+                
+                <div id="practice-timer" style="display: none; text-align: center; font-size: 1.2rem; margin-top: 20px;">
+                    <p>Reading time: <span id="timer">0:00</span></p>
+                    <p><em>Ideal time: 2-3 minutes for this excerpt</em></p>
+                </div>
+            </div>
+            
+            <div class="tip-box">
+                <h3>💡 Pro Tip: The Magic Phrase</h3>
+                <p>Use "<span class="highlight">For the record...</span>" whenever you need to:</p>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li>Document a fact the judge should know</li>
+                    <li>Preserve an objection for appeal</li>
+                    <li>State that you're being denied due process</li>
+                    <li>Note that evidence is being ignored</li>
+                </ul>
+                <p style="margin-top: 10px;">This phrase signals to the court reporter: "THIS MUST BE WRITTEN DOWN."</p>
+            </div>
+        </div>
+        
+        <!-- CREATE DOCUMENTS TAB -->
+        <div id="documents" class="tab-content">
+            <h2 class="section-title">Generate Essential Documents</h2>
+            
+            <div class="form-group">
+                <label for="docType">Select Document Type:</label>
+                <select id="docType" onchange="showDocumentForm()">
+                    <option value="">-- Choose a document --</option>
+                    <option value="notice">Notice of Lack of Jurisdiction</option>
+                    <option value="demand">Demand for Return of Child</option>
+                    <option value="motion">Motion to Dismiss for Lack of Evidence</option>
+                    <option value="affidavit">Sworn Affidavit of Facts</option>
+                    <option value="record">For The Record Statement</option>
+                </select>
+            </div>
+            
+            <!-- NOTICE OF LACK OF JURISDICTION FORM -->
+            <div id="notice-form" class="document-form" style="display: none;">
+                <h3>Notice of Lack of Jurisdiction</h3>
+                <div class="form-group">
+                    <label for="courtName">Court Name:</label>
+                    <input type="text" id="courtName" placeholder="e.g., Greenville Family Court">
+                </div>
+                <div class="form-group">
+                    <label for="caseNumber">Case Number (if any):</label>
+                    <input type="text" id="caseNumber" placeholder="Leave blank if unknown">
+                </div>
+                <div class="form-group">
+                    <label for="jurisdictionReason">Reason for Challenging Jurisdiction:</label>
+                    <textarea id="jurisdictionReason">1. No court order exists authorizing removal of child
+2. I never consented to any contract with DSS or this court
+3. The clerk's office cannot produce Oath of Office or Surety Bond
+4. No evidence of imminent danger was ever presented
+5. I was denied due process throughout</textarea>
+                </div>
+                <button class="button" onclick="generateNotice()">Generate Document</button>
+            </div>
+            
+            <!-- DEMAND FOR RETURN OF CHILD FORM -->
+            <div id="demand-form" class="document-form" style="display: none;">
+                <h3>Demand for Immediate Return of Child</h3>
+                <div class="form-group">
+                    <label for="childName">Child's Full Name:</label>
+                    <input type="text" id="childName" placeholder="Ethan [Last Name]">
+                </div>
+                <div class="form-group">
+                    <label for="separationDate">Date Child Was Taken:</label>
+                    <input type="text" id="separationDate" placeholder="Approximately October 21, 2025">
+                </div>
+                <div class="form-group">
+                    <label for="harmCaused">Harm Caused by Separation:</label>
+                    <textarea id="harmCaused">- Medical complications from interrupted breastfeeding
+- Severe emotional distress to both mother and child
+- Violation of fundamental parental rights
+- Damage to maternal-child bond
+- Psychological trauma</textarea>
+                </div>
+                <button class="button" onclick="generateDemand()">Generate Document</button>
+            </div>
+            
+            <!-- SWORN AFFIDAVIT FORM -->
+            <div id="affidavit-form" class="document-form" style="display: none;">
+                <h3>Sworn Affidavit of Facts</h3>
+                <div class="form-group">
+                    <label for="affiantName">Your Full Name:</label>
+                    <input type="text" id="affiantName" value="Carolina Herrera">
+                </div>
+                <div class="form-group">
+                    <label for="affiantAddress">Your Address:</label>
+                    <input type="text" id="affiantAddress" placeholder="Your current address">
+                </div>
+                <div class="form-group">
+                    <label for="affidavitFacts">Key Facts to Include:</label>
+                    <textarea id="affidavitFacts">1. I was never interviewed by DSS
+2. My child was never in danger on October 18
+3. No court order exists restricting my parental rights
+4. I have been denied contact for over 45 days
+5. The father has a history of aggression (see police report)
+6. DSS failed to act as neutral investigator
+7. I am the primary caregiver and breastfeeding mother
+8. The separation has caused documented harm</textarea>
+                </div>
+                <button class="button" onclick="generateAffidavit()">Generate Document</button>
+            </div>
+            
+            <!-- DOCUMENT OUTPUT AREA -->
+            <div id="document-output" class="document-output" style="display: none;">
+                <!-- Generated document will appear here -->
+            </div>
+            
+            <div class="tip-box">
+                <h3>📋 Document Tips:</h3>
+                <p>1. <strong>Always sign and date</strong> any document you create</p>
+                <p>2. <strong>Make 3 copies</strong> - one for court, one for opposing party, one for your records</p>
+                <p>3. <strong>File with the clerk</strong> and get a time-stamped copy back</p>
+                <p>4. If they refuse to accept it, <strong>read it into the record</strong> in court</p>
+                <p>5. <strong>Keep a master file</strong> of every document you create or receive</p>
+            </div>
+        </div>
+        
+        <!-- BATTLE STRATEGY TAB -->
+        <div id="strategy" class="tab-content">
+            <h2 class="section-title">Complete Battle Plan</h2>
+            
+            <div class="practice-area">
+                <h3>🎯 Phase 1: IMMEDIATE ACTION (Court Hearing)</h3>
+                <p><strong>Primary Goal:</strong> Secure written order for Ethan's immediate return</p>
+                
+                <h4>Step-by-Step Courtroom Strategy:</h4>
+                <ol style="margin-left: 20px; margin-top: 10px;">
+                    <li><strong>Opening Statement:</strong> "Your Honor, for the record, I appear under duress. My child has been unlawfully taken without a court order. I demand his immediate return and challenge this court's jurisdiction."</li>
+                    <li><strong>Question Protocol:</strong> Ask the 5 key questions from the Practice tab</li>
+                    <li><strong>Evidence Presentation:</strong> Read your affidavit into the record if not filed</li>
+                    <li><strong>Final Demand:</strong> "Based on the complete absence of evidence or legal authority, I demand a written order for my son's return today."</li>
+                </ol>
+            </div>
+            
+            <div class="practice-area">
+                <h3>⚖️ Phase 2: If They Deny Immediate Return</h3>
+                <p><strong>Contingency Plan:</strong> Escalate while preserving rights</p>
+                
+                <h4>Immediate Next Steps:</h4>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li>File formal Notice of Appeal within 24 hours</li>
+                    <li>Send certified demand letters to DSS Director and County Attorney</li>
+                    <li>File complaint with Judicial Conduct Board about refusal to verify jurisdiction</li>
+                    <li>Begin drafting Federal §1983 Civil Rights lawsuit</li>
+                </ul>
+                
+                <div class="tip-box">
+                    <strong>Critical Language for Appeal Notice:</strong> 
+                    <p>"Notice is hereby given that Carolina Herrera appeals the court's decision, citing: (1) lack of jurisdiction due to no verified Oath of Office or Surety Bond, (2) violation of due process rights, (3) separation without evidence or court order."</p>
+                </div>
+            </div>
+            
+            <div class="practice-area">
+                <h3>💰 Phase 3: Financial Recovery Strategy</h3>
+                <p><strong>Long-term Goal:</strong> Compensation for damages</p>
+                
+                <h4>Potential Defendants & Claims:</h4>
+                <ul style="margin-left: 20px; margin-top: 10px;">
+                    <li><strong>Individual Social Workers:</strong> Malicious prosecution, negligence</li>
+                    <li><strong>DSS Supervisors:</strong> Failure to train/supervise, civil rights violations</li>
+                    <li><strong>The Agency:</strong> §1983 claim for deprivation of rights under color of law</li>
+                    <li><strong>The Father:</strong> Intentional infliction of emotional distress, parental alienation</li>
+                </ul>
+                
+                <div class="tip-box">
+                    <strong>Document Everything for Damages:</strong>
+                    <ul style="margin-left: 20px; margin-top: 5px;">
+                        <li>Medical records related to breastfeeding complications</li>
+                        <li>Therapy/counseling receipts</li>
+                        <li>Lost wages from time spent fighting this</li>
+                        <li>Journal of emotional distress</li>
+                        <li>All receipts for court costs</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="reminder-box">
+                <h3>🛡️ Your Unbeatable Position:</h3>
+                <p><strong>YOU HAVE:</strong></p>
+                <ul style="margin-left: 20px; margin-top: 5px;">
+                    <li>Biological motherhood (fundamental right)</li>
+                    <li>No court order against you</li>
+                    <li>No evidence of danger</li>
+                    <li>Documented due process violations</li>
+                    <li>Clear timeline showing unlawful action</li>
+                </ul>
+                
+                <p style="margin-top: 15px;"><strong>THEY HAVE:</strong></p>
+                <ul style="margin-left: 20px; margin-top: 5px;">
+                    <li>Unverified allegations</li>
+                    <li>No emergency justification after 2 months</li>
+                    <li>Procedural violations</li>
+                    <li>Inability to produce basic jurisdiction documents</li>
+                    <li>A pattern of ignoring your sworn statements</li>
+                </ul>
+            </div>
+            
+            <div style="text-align: center; margin-top: 30px;">
+                <button class="button" onclick="window.print()">Print This Battle Plan</button>
+                <button class="button secondary" onclick="resetAll()">Reset Practice Session</button>
+            </div>
+        </div>
+        
+        <footer>
+            <p>This tool is for educational purposes only. Carolina should consult with an attorney for legal advice.</p>
+            <p>Remember: Stay calm, speak truth, demand evidence, preserve your rights. You are the mother. 💪</p>
+        </footer>
+    </div>
+
+    <script>
+        // Tab navigation
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tabId = btn.getAttribute('data-tab');
+                
+                // Remove active class from all tabs and contents
+                tabBtns.forEach(b => b.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+                
+                // Add active class to clicked tab and corresponding content
+                btn.classList.add('active');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+        
+        // Show response to practice questions
+        function showResponse(responseId) {
+            const responseBox = document.getElementById(responseId);
+            responseBox.classList.toggle('show');
+        }
+        
+        // Speech practice functionality
+        let speechTimer;
+        let seconds = 0;
+        
+        function startSpeechPractice() {
+            const timerElement = document.getElementById('timer');
+            const timerContainer = document.getElementById('practice-timer');
+            
+            timerContainer.style.display = 'block';
+            seconds = 0;
+            
+            speechTimer = setInterval(() => {
+                seconds++;
+                const mins = Math.floor(seconds / 60);
+                const secs = seconds % 60;
+                timerElement.textContent = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+            }, 1000);
+        }
+        
+        function resetSpeechPractice() {
+            clearInterval(speechTimer);
+            document.getElementById('practice-timer').style.display = 'none';
+            document.getElementById('timer').textContent = '0:00';
+        }
+        
+        // Document generation functionality
+        function showDocumentForm() {
+            // Hide all forms first
+            document.querySelectorAll('.document-form').forEach(form => {
+                form.style.display = 'none';
+            });
+            
+            // Hide any previous output
+            document.getElementById('document-output').style.display = 'none';
+            
+            const docType = document.getElementById('docType').value;
+            
+            if (docType === 'notice') {
+                document.getElementById('notice-form').style.display = 'block';
+            } else if (docType === 'demand') {
+                document.getElementById('demand-form').style.display = 'block';
+            } else if (docType === 'affidavit') {
+                document.getElementById('affidavit-form').style.display = 'block';
+            }
+        }
+        
+        function generateNotice() {
+            const courtName = document.getElementById('courtName').value || "this Court";
+            const caseNumber = document.getElementById('caseNumber').value ? `Case No. ${document.getElementById('caseNumber').value}` : "";
+            const reasons = document.getElementById('jurisdictionReason').value;
+            
+            const today = new Date().toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            
+            const noticeDoc = `NOTICE OF LACK OF JURISDICTION AND CHALLENGE TO AUTHORITY
+
+TO: The Presiding Judge and All Parties
+FROM: Carolina Herrera
+DATE: ${today}
+${caseNumber ? caseNumber + '\n' : ''}
+
+COMES NOW, Carolina Herrera, a sovereign woman and natural mother, to formally challenge the jurisdiction of ${courtName} over my fundamental parental rights and the custody of my son.
+
+I. LACK OF PROPER JURISDICTION
+
+The Court lacks jurisdiction for the following reasons:
+
+${reasons}
+
+II. DEMAND FOR VERIFICATION
+
+I hereby demand the following be provided within 24 hours:
+
+1. A certified copy of the presiding judge's Oath of Office, filed with the Circuit Clerk;
+2. The Surety Bond number and proof of filing guaranteeing my remedy for injuries sustained in these proceedings;
+3. The written contract or agreement wherein I consented to this Court's jurisdiction over my parental rights;
+4. The valid, current court order authorizing the removal and continued separation from my child.
+
+III. RESERVATION OF RIGHTS
+
+This Notice is filed without prejudice and without waiver of any of my unalienable rights. My appearance in any proceeding is under duress and coercion due to the unlawful seizure of my child.
+
+Until and unless the above verifications are provided, I do not recognize this Court's jurisdiction and reserve all rights to pursue all available remedies for the violation of my rights.
+
+RESPECTFULLY SUBMITTED,
+
+_________________________
+Carolina Herrera
+Date: __________________`;
+
+            displayDocument(noticeDoc);
+        }
+        
+        function generateDemand() {
+            const childName = document.getElementById('childName').value || "my son";
+            const separationDate = document.getElementById('separationDate').value || "October 21, 2025";
+            const harm = document.getElementById('harmCaused').value;
+            
+            const today = new Date();
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const tomorrowFormatted = tomorrow.toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            
+            const demandDoc = `URGENT DEMAND FOR IMMEDIATE RETURN OF CHILD
+
+TO: Department of Social Services, Child's Father, and All Concerned Parties
+FROM: Carolina Herrera, Biological Mother
+DATE: ${today.toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            })}
+
+I. FACTUAL BACKGROUND
+
+1. My child, ${childName}, was removed from my care on or about ${separationDate}.
+2. No court order exists authorizing this removal or continued separation.
+3. I have been denied all contact with my child for approximately 54 days.
+4. I am a breastfeeding mother, and this forced separation has caused:
+${harm}
+
+II. LEGAL BASIS FOR RETURN
+
+The continued separation violates:
+- My fundamental constitutional right to parent my child
+- Due process guarantees under the 14th Amendment
+- South Carolina family law regarding parental rights
+- Basic principles of justice and equity
+
+III. IMMEDIATE DEMAND
+
+I hereby demand the immediate, unconditional return of ${childName} to my care no later than 5:00 PM on ${tomorrowFormatted}.
+
+Failure to return my child will result in:
+1. Immediate filing of a federal civil rights lawsuit under 42 U.S.C. §1983
+2. Criminal complaints for kidnapping and deprivation of rights
+3. Formal complaints to all relevant oversight agencies
+4. Public disclosure of these unlawful actions
+
+IV. CONTACT FOR RETURN
+
+Contact me immediately at [YOUR PHONE NUMBER] to arrange the safe return of my child.
+
+This demand is made without prejudice to any of my legal rights, and I reserve the right to seek full financial compensation for all damages suffered.
+
+_________________________
+Carolina Herrera
+Biological Mother
+[YOUR ADDRESS]
+[YOUR PHONE NUMBER]`;
+
+            displayDocument(demandDoc);
+        }
+        
+        function generateAffidavit() {
+            const name = document.getElementById('affiantName').value || "Carolina Herrera";
+            const address = document.getElementById('affiantAddress').value || "[Your Address]";
+            const facts = document.getElementById('affidavitFacts').value;
+            
+            const affidavitDoc = `AFFIDAVIT OF CAROLINA HERRERA
+
+STATE OF SOUTH CAROLINA
+COUNTY OF __________________
+
+BEFORE ME, the undersigned authority, personally appeared Carolina Herrera, who being first duly sworn, deposes and states:
+
+1. My name is ${name}. I am an adult resident of South Carolina, residing at ${address}. I am the biological mother of the minor child who is the subject of these proceedings.
+
+2. I have personal knowledge of the facts stated herein, and they are true and correct to the best of my knowledge, information, and belief.
+
+3. The following facts are material to these proceedings:
+
+${facts}
+
+4. At no time have I waived any of my fundamental parental rights or consented to any contract or agreement authorizing the removal of my child from my care.
+
+5. There exists no court order from any jurisdiction that terminates, restricts, or limits my parental rights.
+
+6. The continued separation from my child constitutes an ongoing violation of my constitutional rights and has caused severe harm to both myself and my child.
+
+FURTHER AFFIANT SAYETH NAUGHT.
+
+_________________________
+Carolina Herrera
+Affiant
+
+SWORN TO AND SUBSCRIBED before me this _____ day of __________________, 2026.
+
+_________________________
+Notary Public for South Carolina
+My Commission Expires: __________`;
+
+            displayDocument(affidavitDoc);
+        }
+        
+        function displayDocument(content) {
+            const output = document.getElementById('document-output');
+            output.textContent = content;
+            output.style.display = 'block';
+            
+            // Scroll to the output
+            output.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // Day counter (approximate from Oct 21, 2025 to Feb 2026)
+        function updateDayCounter() {
+            const startDate = new Date('2025-10-21');
+            const today = new Date();
+            const diffTime = Math.abs(today - startDate);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+            document.getElementById('dayCounter').textContent = diffDays;
+        }
+        
+        // Reset all practice sessions
+        function resetAll() {
+            // Hide all responses
+            document.querySelectorAll('.response-box').forEach(box => {
+                box.classList.remove('show');
+            });
+            
+            // Reset speech practice
+            resetSpeechPractice();
+            
+            // Reset document forms
+            document.getElementById('docType').selectedIndex = 0;
+            document.querySelectorAll('.document-form').forEach(form => {
+                form.style.display = 'none';
+            });
+            document.getElementById('document-output').style.display = 'none';
+            
+            alert("Practice session reset. You're ready to start fresh!");
+        }
+        
+        // Initialize
+        updateDayCounter();
+        
+        // Add a simple print function for the entire app
+        window.printApp = function() {
+            window.print();
+        };
+    </script>
+</body>
+</html>
