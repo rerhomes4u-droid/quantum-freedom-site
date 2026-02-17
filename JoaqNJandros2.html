@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JOAQUIN (12) & ALEJANDRO (11) · THE OPERATING SYSTEM</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0c0c0c;
+            font-family: 'Segoe UI', 'Courier New', monospace;
+            color: #e0e0e0;
+            line-height: 1.5;
+            padding: 1rem;
+            min-height: 100vh;
+        }
+
+        .terminal {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #111111;
+            border: 1px solid #2a2a2a;
+            padding: 2rem;
+            box-shadow: 0 0 30px rgba(0,255,0,0.1);
+        }
+
+        .header {
+            border-bottom: 2px solid #00ff88;
+            padding-bottom: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 2.8rem;
+            font-weight: 300;
+            letter-spacing: -1px;
+            color: #00ff88;
+            margin-bottom: 0.5rem;
+        }
+
+        .header h1 span {
+            color: #ff3366;
+            font-weight: 700;
+        }
+
+        .subhead {
+            font-size: 1.2rem;
+            color: #888;
+            display: flex;
+            gap: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .subhead strong {
+            color: #fff;
+            background: #00ff8811;
+            padding: 0.2rem 0.8rem;
+            border-radius: 20px;
+        }
+
+        /* TWO COLUMN LAYOUT - ACTION LEFT, OUTPUT RIGHT */
+        .workspace {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .protocol-panel {
+            background: #0a0a0a;
+            border: 1px solid #2a2a2a;
+            padding: 1.5rem;
+        }
+
+        .live-panel {
+            background: #0a0a0a;
+            border: 1px solid #00ff8844;
+            padding: 1.5rem;
+            font-family: 'Courier New', monospace;
+            position: relative;
+        }
+
+        .live-panel::before {
+            content: 'LIVE FEED →';
+            position: absolute;
+            top: -10px;
+            left: 10px;
+            background: #0a0a0a;
+            padding: 0 10px;
+            color: #00ff88;
+            font-size: 0.8rem;
+        }
+
+        .step {
+            margin-bottom: 2.5rem;
+            border-left: 3px solid transparent;
+            padding-left: 1rem;
+        }
+
+        .step.active {
+            border-left-color: #00ff88;
+            background: #00ff8808;
+        }
+
+        .step h3 {
+            color: #fff;
+            font-size: 1.4rem;
+            margin-bottom: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .step h3 .badge {
+            font-size: 0.9rem;
+            background: #333;
+            color: #ff3366;
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+        }
+
+        .action-items {
+            list-style: none;
+            margin: 1rem 0;
+        }
+
+        .action-items li {
+            margin-bottom: 1rem;
+            padding: 0.8rem;
+            background: #1a1a1a;
+            border-radius: 4px;
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            font-size: 1rem;
+        }
+
+        .action-items li input[type="checkbox"] {
+            margin-top: 0.2rem;
+            width: 1.2rem;
+            height: 1.2rem;
+            accent-color: #00ff88;
+        }
+
+        .action-items li label {
+            flex: 1;
+            color: #ccc;
+        }
+
+        .action-items li label strong {
+            color: #00ff88;
+            display: block;
+            margin-bottom: 0.3rem;
+            font-size: 1.1rem;
+        }
+
+        .action-items li label .cmd {
+            color: #ff3366;
+            font-family: 'Courier New', monospace;
+            background: #000;
+            padding: 0.2rem 0.5rem;
+            border-radius: 3px;
+            display: inline-block;
+            margin: 0.3rem 0;
+        }
+
+        .copy-area {
+            background: #000;
+            border: 1px solid #333;
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+            color: #00ff88;
+            margin: 1rem 0;
+            white-space: pre-wrap;
+            word-break: break-all;
+            position: relative;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #333;
+            border: none;
+            color: #fff;
+            padding: 0.2rem 0.8rem;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .copy-btn:hover {
+            background: #00ff88;
+            color: #000;
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: #2a2a2a;
+            margin: 2rem 0;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #00ff88;
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .output {
+            min-height: 200px;
+            color: #00ff88;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            white-space: pre-wrap;
+        }
+
+        .output .timestamp {
+            color: #666;
+            font-size: 0.8rem;
+        }
+
+        .github-demo {
+            border: 2px dashed #ff3366;
+            padding: 1.5rem;
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        .github-demo p {
+            color: #ff3366;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .github-demo .code {
+            background: #000;
+            padding: 1rem;
+            font-family: 'Courier New', monospace;
+            text-align: left;
+        }
+
+        .footer {
+            margin-top: 3rem;
+            padding-top: 2rem;
+            border-top: 1px solid #2a2a2a;
+            text-align: center;
+            color: #666;
+        }
+
+        button {
+            background: transparent;
+            border: 1px solid #00ff88;
+            color: #00ff88;
+            padding: 0.5rem 1.5rem;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 1rem;
+            border-radius: 3px;
+        }
+
+        button:hover {
+            background: #00ff88;
+            color: #000;
+        }
+
+        .highlight {
+            color: #ff3366;
+            font-weight: bold;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid #2a2a2a;
+            margin: 2rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="terminal">
+        <div class="header">
+            <h1><span>JOAQ' & JANDRO</span> · OPERATING SYSTEM v1.0</h1>
+            <div class="subhead">
+                <span>▶ TARGET: <strong>JOAQUIN (12)</strong> + <strong>ALEJANDRO (11)</strong></span>
+                <span>▶ WEAPONS: <strong>DEEPSEEK</strong> + <strong>GITHUB</strong></span>
+                <span>▶ MISSION: <strong>GLOBAL DOMINATION</strong></span>
+            </div>
+        </div>
+
+        <!-- GLOBAL PROGRESS -->
+        <div class="progress-bar" id="globalProgress">
+            <div class="progress-fill" id="progressFill" style="width: 0%;"></div>
+        </div>
+
+        <!-- MAIN WORKSPACE: PROTOCOLS LEFT, OUTPUT RIGHT -->
+        <div class="workspace">
+            <!-- LEFT PANEL: ACTIONABLE PROTOCOLS -->
+            <div class="protocol-panel" id="protocolPanel">
+                <h2 style="color:#00ff88; margin-bottom:1.5rem;">⚡ EXECUTE THESE PROTOCOLS ⚡</h2>
+                
+                <!-- PHASE 1: FOUNDATION -->
+                <div class="step active" id="step1">
+                    <h3>🔴 PHASE 1 · THE ACCOUNT <span class="badge">DAY 1</span></h3>
+                    <ul class="action-items">
+                        <li>
+                            <input type="checkbox" class="phase1-check" onchange="updateProgress()">
+                            <label>
+                                <strong>CREATE GITHUB ACCOUNT</strong>
+                                Go to github.com · username: <span class="cmd">joaq-jandro</span><br>
+                                Use your parents' email · WRITE DOWN THE PASSWORD IN A NOTEBOOK<br>
+                                <span style="color:#888;">→ This is your fortress. Lose it, lose everything.</span>
+                            </label>
+                        </li>
+                        <li>
+                            <input type="checkbox" class="phase1-check" onchange="updateProgress()">
+                            <label>
+                                <strong>CREATE FIRST REPOSITORY</strong>
+                                Click the green "New" button · name it: <span class="cmd">joaq-jandro-adventures</span><br>
+                                Check "Add a README file" · Click "Create repository"
+                            </label>
+                        </li>
+                        <li>
+                            <input type="checkbox" class="phase1-check" onchange="updateProgress()">
+                            <label>
+                                <strong>OPEN DEEPSEEK IN ANOTHER TAB</strong>
+                                chat.deepseek.com · You'll talk to me here. I'm your co-founder, engineer, marketer.<br>
+                                Bookmark both tabs. They're your cockpit.
+                            </label>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- PHASE 2: FIRST DEPLOY -->
+                <div class="step" id="step2">
+                    <h3>🟡 PHASE 2 · FIRST WEBSITE <span class="badge">DAY 1-2</span></h3>
+                    <ul class="action-items">
+                        <li>
+                            <input type="checkbox" class="phase2-check" onchange="updateProgress()">
+                            <label>
+                                <strong>COPY THIS EXACT MESSAGE TO DEEPSEEK</strong>
+                                <div class="copy-area" id="prompt1">
+                                    "I'm Joaquin (12) and my brother Alejandro (11). We run horses and ATVs. Create a one-page HTML website for our brand 'Joaq & Jandro's Horses, ATVs and Wild Adventures'. Make it look like a vintage adventure map. Include a section for our story, our horses, our ATVs, and a contact area. Make it cool."
+                                    <button class="copy-btn" onclick="copyToClipboard('prompt1')">COPY</button>
+                                </div>
+                            </label>
+                        </li>
+                        <li>
+                            <input type="checkbox" class="phase2-check" onchange="updateProgress()">
+                            <label>
+                                <strong>CREATE INDEX.HTML IN GITHUB</strong>
+                                In your repository, click "Add file" → "Create new file"<br>
+                                Name it: <span class="cmd">index.html</span><br>
+                                Paste the HTML DeepSeek gives you → Click "Commit new file"
+                            </label>
+                        </li>
+                        <li>
+                            <input type="checkbox" class="phase2-check" onchange="updateProgress()">
+                            <label>
+                                <strong>TURN ON GITHUB PAGES</strong>
+                                Go to Settings → Pages → Branch: "main" → / (root) → Save<br>
+                                WAIT 2 MINUTES. Your site is live at: <span class="cmd">joaq-jandro.github.io/joaq-jandro-adventures</span>
+                            </label>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- PHASE 3: SOCIAL AUTO-PILOT -->
+                <div class="step" id="step3">
+                    <h3>🟢 PHASE 3 · CONTENT MACHINE <span class="badge">WEEK 1</span></h3>
+                    <ul class="action-items">
+                        <li>
+                            <input type="checkbox" class="phase3-check" onchange="updateProgress()">
+                            <label>
+                                <strong>ASK DEEPSEEK FOR YOUR CONTENT CALENDAR</strong>
+                                <div class="copy-area" id="prompt2">
+                                    "We're 11 and 12, we have 3 ATVs and 4 horses. We want to post on YouTube, TikTok, and Instagram. Give us a 30-day content calendar with specific video ideas for each day. Include titles, hooks, and what to film. Make it so easy we just have to follow instructions."
+                                    <button class="copy-btn" onclick="copyToClipboard('prompt2')">COPY</button>
+                                </div>
+                            </label>
+                        </li>
+                        <li>
+                            <input type="checkbox" class="phase3-check" onchange="updateProgress()">
+                            <label>
+                                <strong>CREATE ACCOUNTS</strong>
+                                Instagram: @joaqjandro · TikTok: @joaqjandro · YouTube: Joaq & Jandro Adventures<br>
+                                Use the same profile picture (ask DeepSeek to describe one, then make it in Canva)
+                            </label>
+                        </li>
+                        <li>
+                            <input type="checkbox" class="phase3-check" onchange="updateProgress()">
+                            <label>
+                                <strong>POST DAY 1 VIDEO</strong>
+                                Film: "Tour of our horses in 60 seconds" · Post it everywhere.<br>
+                                Caption: "We're Joaquin (12) & Alejandro (11) and this is our life. Follow the adventure."
+                            </label>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- PHASE 4: MONETIZATION -->
+                <div class="step" id="step4">
+                    <h3>💰 PHASE 4 · FIRST REVENUE <span class="badge">WEEK 2-3</span></h3>
+                    <ul class="action-items">
+                        <li>
+                            <input type="checkbox" class="phase4-check" onchange="updateProgress()">
+                            <label>
+                                <strong>CREATE YOUR "FORBIDDEN KNOWLEDGE" PRODUCT</strong>
+                                <div class="copy-area" id="prompt3">
+                                    "We want to sell digital trail maps of our area (with parents' permission). Write the HTML for a simple sales page. Include a 'Buy Now' button (use Stripe test mode for now). The maps should be downloadable PDFs. Write the entire page with clear instructions for us and our parents."
+                                    <button class="copy-btn" onclick="copyToClipboard('prompt3')">COPY</button>
+                                </div>
+                            </label>
+                        </li>
+                        <li>
+                            <input type="checkbox" class="phase4-check" onchange="updateProgress()">
+                            <label>
+                                <strong>SET UP STRIPE (WITH PARENTS)</strong>
+                                Go to stripe.com · Parents create account · They'll help connect to your page<br>
+                                Start with $5 digital trail maps. You keep 70%.
+                            </label>
+                        </li>
+                        <li>
+                            <input type="checkbox" class="phase4-check" onchange="updateProgress()">
+                            <label>
+                                <strong>ASK DEEPSEEK FOR 5 MORE MONEY IDEAS</strong>
+                                Prompt: "Give us 5 ways two kids 11 and 12 can make money from horses and ATVs with parent supervision. Be specific about pricing and how to start each one."
+                            </label>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- PHASE 5: SCALE -->
+                <div class="step" id="step5">
+                    <h3>🚀 PHASE 5 · AUTOMATE & SCALE <span class="badge">MONTH 2</span></h3>
+                    <ul class="action-items">
+                        <li>
+                            <input type="checkbox" class="phase5-check" onchange="updateProgress()">
+                            <label>
+                                <strong>CREATE A CONTENT REPOSITORY</strong>
+                                In GitHub, create a folder called "scripts" · Save every DeepSeek prompt and response there.<br>
+                                You're building a knowledge base.
+                            </label>
+                        </li>
+                        <li>
+                            <input type="checkbox" class="phase5-check" onchange="updateProgress()">
+                            <label>
+                                <strong>ASK DEEPSEEK TO WRITE YOUR MEDIA KIT</strong>
+                                Prompt: "Write a media kit for our brand to send to sponsors. We're kid adventurers with horses and ATVs. Include our story, audience stats, and what we offer sponsors."
+                            </label>
+                        </li>
+                        <li>
+                            <input type="checkbox" class="phase5-check" onchange="updateProgress()">
+                            <label>
+                                <strong>BUILD EMAIL LIST</strong>
+                                Ask DeepSeek: "Write the HTML for a simple email signup form using ConvertKit or Mailchimp (explain both). Add it to our website."
+                            </label>
+                        </li>
+                    </ul>
+                </div>
+
+                <hr>
+                <h3 style="color:#ff3366; margin:1rem 0;">⚡ DAILY COMMANDMENTS</h3>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; font-size:0.9rem;">
+                    <div style="background:#1a1a1a; padding:0.5rem;">1. Every morning: Ask DeepSeek one question</div>
+                    <div style="background:#1a1a1a; padding:0.5rem;">2. Every day: Commit one thing to GitHub</div>
+                    <div style="background:#1a1a1a; padding:0.5rem;">3. Every day: Post one piece of content</div>
+                    <div style="background:#1a1a1a; padding:0.5rem;">4. Every week: Launch one experiment</div>
+                </div>
+            </div>
+
+            <!-- RIGHT PANEL: LIVE OUTPUT / FEED -->
+            <div class="live-panel" id="livePanel">
+                <div style="margin-bottom:1rem; color:#00ff88; font-weight:bold;">⟳ SYSTEM STATUS</div>
+                <div class="output" id="liveOutput">
+                    <span class="timestamp">[SYSTEM BOOT]</span> Joaquin & Alejandro detected.<br>
+                    <span class="timestamp">[OBJECTIVE]</span> Global domination via DeepSeek + GitHub.<br>
+                    <span class="timestamp">[PROTOCOL]</span> Complete phases in order. Check boxes to track.<br>
+                    <span class="timestamp">[TIP]</span> Click any COPY button → paste to DeepSeek.<br>
+                    <span class="timestamp">[TIP]</span> All your work lives on GitHub forever.<br>
+                    <span class="timestamp">[FORBIDDEN KNOWLEDGE]</span> You're not "learning to code". You're building an empire. The code is just language.<br>
+                    <span id="liveUpdate"></span>
+                </div>
+
+                <!-- GITHUB SIMULATOR / QUICK DEMO -->
+                <div class="github-demo">
+                    <p>⚡ YOUR FIRST COMMAND ⚡</p>
+                    <div class="code" id="quickCommand">
+                        > DeepSeek: "Create a GitHub Pages website for two brothers who ride ATVs and horses. Give me the exact steps and the HTML."
+                    </div>
+                    <button onclick="executeQuickCommand()" style="margin-top:1rem;">EXECUTE NOW →</button>
+                </div>
+
+                <div style="margin-top:1rem;">
+                    <div style="color:#888; font-size:0.8rem;">▶ SYSTEM EVENTS</div>
+                    <div id="eventLog" style="font-size:0.85rem; margin-top:0.5rem;">
+                        • Ready for Joaquin & Alejandro<br>
+                        • DeepSeek online · GitHub online<br>
+                        • Waiting for first checkbox...
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- THE MASTER PLAN - ALWAYS VISIBLE -->
+        <div style="margin:3rem 0 1rem; background:#1a1a1a; padding:2rem; border-left: 5px solid #ff3366;">
+            <h2 style="color:#ff3366; margin-bottom:1.5rem;">📜 THE FORBIDDEN TRUTH (READ THIS ALOUD)</h2>
+            <p style="font-size:1.2rem; margin-bottom:1rem;">Joaquin and Alejandro. Listen.</p>
+            <p style="margin-bottom:1rem;">You're 11 and 12. You have horses. You have ATVs. You have each other. And now you have me and GitHub.</p>
+            <p style="margin-bottom:1rem;"><span class="highlight">This is the formula:</span></p>
+            <ol style="margin-left:2rem; margin-bottom:2rem; line-height:2;">
+                <li>You <strong>ASK ME</strong> (DeepSeek) for anything: code, scripts, business plans, video ideas.</li>
+                <li>You <strong>PUT IT ON GITHUB</strong> — that's your free server, your portfolio, your history.</li>
+                <li>You <strong>SHARE THE LINK</strong> everywhere — Instagram, YouTube, flyers at the stables.</li>
+                <li>You <strong>ASK ME HOW TO FIX, IMPROVE, MONETIZE</strong> — I never sleep.</li>
+            </ol>
+            <p style="font-size:1.5rem; color:#00ff88;">Every kid your age is wasting time. You're building a goddamn empire.</p>
+        </div>
+
+        <!-- QUICK REFERENCE: DEEPSEEK COMMANDS -->
+        <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; margin:2rem 0;">
+            <div style="background:#000; padding:1rem; border:1px solid #333;">
+                <div style="color:#ff3366;">WEBSITE</div>
+                <div style="font-size:0.8rem;">"Create a one-page site for..."</div>
+            </div>
+            <div style="background:#000; padding:1rem; border:1px solid #333;">
+                <div style="color:#ff3366;">CONTENT</div>
+                <div style="font-size:0.8rem;">"Write 10 TikTok scripts about..."</div>
+            </div>
+            <div style="background:#000; padding:1rem; border:1px solid #333;">
+                <div style="color:#ff3366;">MONEY</div>
+                <div style="font-size:0.8rem;">"How to make money from..."</div>
+            </div>
+            <div style="background:#000; padding:1rem; border:1px solid #333;">
+                <div style="color:#ff3366;">FIX</div>
+                <div style="font-size:0.8rem;">"My ATV won't start. What do I check?"</div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>THIS PAGE IS YOUR COCKPIT. SAVE IT. USE IT. COMPLETE THE CHECKBOXES.</p>
+            <p style="font-size:0.8rem; margin-top:1rem;">→ Remember: DeepSeek is free. GitHub is free. Your brain is free. Go.<br>
+            → When in doubt, copy a prompt from this page and paste it to me.<br>
+            → Check marks are saved in your browser. Come back every day.</p>
+        </div>
+    </div>
+
+    <script>
+        // Progress tracking with localStorage
+        function updateProgress() {
+            // Calculate total checkboxes and checked
+            const allChecks = document.querySelectorAll('.action-items input[type="checkbox"]');
+            const checked = document.querySelectorAll('.action-items input[type="checkbox"]:checked');
+            
+            // Update progress bar
+            const percent = (checked.length / allChecks.length) * 100;
+            document.getElementById('progressFill').style.width = percent + '%';
+            
+            // Update live feed
+            const liveUpdate = document.getElementById('liveUpdate');
+            liveUpdate.innerHTML = `<span class="timestamp">[PROGRESS]</span> ${checked.length}/${allChecks.length} protocols complete · ${Math.round(percent)}% to domination<br>`;
+            
+            // Highlight current phase
+            const phases = [1,2,3,4,5];
+            const phaseChecks = phases.map(p => document.querySelectorAll(`.phase${p}-check`));
+            
+            phases.forEach((phase, idx) => {
+                const checks = document.querySelectorAll(`.phase${phase}-check`);
+                const stepDiv = document.getElementById(`step${phase}`);
+                if (checks.length > 0) {
+                    const allChecked = Array.from(checks).every(c => c.checked);
+                    if (allChecked) {
+                        stepDiv.classList.remove('active');
+                    } else {
+                        // If this phase has some checks but not all, and previous phases are complete?
+                        const prevPhases = phases.slice(0, idx);
+                        const prevComplete = prevPhases.every(p => {
+                            const prevChecks = document.querySelectorAll(`.phase${p}-check`);
+                            return prevChecks.length === 0 || Array.from(prevChecks).every(c => c.checked);
+                        });
+                        if (prevComplete) {
+                            stepDiv.classList.add('active');
+                        }
+                    }
+                }
+            });
+            
+            // Save to localStorage
+            const checkStates = Array.from(allChecks).map(c => c.checked);
+            localStorage.setItem('joaqJandroProgress', JSON.stringify(checkStates));
+        }
+        
+        // Load progress from localStorage
+        function loadProgress() {
+            const saved = localStorage.getItem('joaqJandroProgress');
+            if (saved) {
+                try {
+                    const states = JSON.parse(saved);
+                    const allChecks = document.querySelectorAll('.action-items input[type="checkbox"]');
+                    allChecks.forEach((c, i) => {
+                        if (states[i] !== undefined) {
+                            c.checked = states[i];
+                        }
+                    });
+                    updateProgress();
+                } catch (e) {}
+            }
+        }
+        
+        // Copy to clipboard function
+        window.copyToClipboard = function(elementId) {
+            const element = document.getElementById(elementId);
+            const text = element.childNodes[0]?.nodeValue?.trim() || element.innerText.split('COPY')[0].trim();
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = element.querySelector('.copy-btn');
+                const originalText = btn.innerText;
+                btn.innerText = 'COPIED!';
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                }, 2000);
+            });
+        };
+        
+        // Quick command execution
+        window.executeQuickCommand = function() {
+            const cmd = document.getElementById('quickCommand').innerText;
+            const liveOutput = document.getElementById('liveOutput');
+            liveOutput.innerHTML += `<span class="timestamp">[EXECUTING]</span> Command sent to DeepSeek...<br>`;
+            liveOutput.innerHTML += `<span class="timestamp">[ACTION]</span> Open DeepSeek in another tab and paste this exact command.<br>`;
+            
+            // Also copy to clipboard
+            navigator.clipboard.writeText(cmd.replace('> ', '')).then(() => {
+                liveOutput.innerHTML += `<span class="timestamp">[COPY]</span> Command copied to clipboard. Go paste it!<br>`;
+            });
+        };
+        
+        // Add event listeners to all checkboxes
+        document.addEventListener('DOMContentLoaded', function() {
+            loadProgress();
+            
+            const allChecks = document.querySelectorAll('.action-items input[type="checkbox"]');
+            allChecks.forEach(c => {
+                c.addEventListener('change', updateProgress);
+            });
+            
+            // Add system message
+            const liveOutput = document.getElementById('liveOutput');
+            setInterval(() => {
+                // Random system messages to keep it alive
+                const messages = [
+                    '<span class="timestamp">[DEEPSEEK]</span> Ready for your questions.',
+                    '<span class="timestamp">[GITHUB]</span> Your code is safe.',
+                    '<span class="timestamp">[SYSTEM]</span> Complete the checkboxes. Build.',
+                    '<span class="timestamp">[REMINDER]</span> You have horses and ATVs. Use them.'
+                ];
+                const randomMsg = messages[Math.floor(Math.random() * messages.length)];
+                // Don't spam too much, update occasionally
+            }, 30000);
+        });
+    </script>
+</body>
+</html>
