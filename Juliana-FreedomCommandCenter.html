@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juliana's Freedom Command Center</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        body {
+            background: #f2efe6;
+            padding: 20px;
+        }
+        
+        .app {
+            max-width: 1300px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 40px;
+            box-shadow: 0 30px 50px rgba(0,20,0,0.2);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: #0b2f1f;
+            color: white;
+            padding: 30px 40px;
+        }
+        
+        .header h1 {
+            font-size: 2.8rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .header h1 span {
+            color: #f5c542;
+        }
+        
+        .header p {
+            font-size: 1.3rem;
+            opacity: 0.9;
+        }
+        
+        .stats {
+            display: flex;
+            gap: 30px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+        
+        .stat-box {
+            background: rgba(255,255,255,0.1);
+            padding: 15px 25px;
+            border-radius: 30px;
+            font-size: 1.2rem;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .stat-box .number {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: #f5c542;
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            padding: 40px;
+        }
+        
+        @media (max-width: 800px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .card {
+            background: #f9f9f0;
+            border-radius: 30px;
+            padding: 25px;
+            border: 1px solid #ddd6c0;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.03);
+        }
+        
+        .card h2 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: #1f4a2c;
+            border-left: 8px solid #f5c542;
+            padding-left: 15px;
+        }
+        
+        .task-list {
+            list-style: none;
+        }
+        
+        .task-list li {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px 0;
+            border-bottom: 1px dashed #ccc6b0;
+            font-size: 1.1rem;
+        }
+        
+        .task-list input[type="checkbox"] {
+            width: 22px;
+            height: 22px;
+            accent-color: #1f4a2c;
+        }
+        
+        .task-list .done {
+            text-decoration: line-through;
+            opacity: 0.6;
+        }
+        
+        .income-tracker {
+            background: #1f4a2c;
+            color: white;
+            border-radius: 25px;
+            padding: 20px;
+            margin-top: 25px;
+        }
+        
+        .income-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            font-size: 1.1rem;
+        }
+        
+        .total-income {
+            font-size: 2rem;
+            font-weight: 700;
+            text-align: right;
+            margin-top: 15px;
+            color: #f5c542;
+        }
+        
+        .button {
+            background: #f5c542;
+            color: #0b2f1f;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: 0.2s;
+            width: 100%;
+            margin-top: 20px;
+        }
+        
+        .button:hover {
+            background: #ffd966;
+            transform: scale(1.02);
+        }
+        
+        .progress-bar {
+            background: #e5ddcc;
+            height: 20px;
+            border-radius: 30px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: #f5c542;
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        .daily-message {
+            background: #faf3e0;
+            padding: 20px;
+            border-radius: 20px;
+            font-style: italic;
+            border-left: 8px solid #f5c542;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+        }
+        
+        .tab-container {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            background: #e5ddcc;
+            padding: 12px 25px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .tab.active {
+            background: #1f4a2c;
+            color: white;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .phase-content {
+            margin-top: 20px;
+        }
+        
+        .footer {
+            background: #0b2f1f;
+            color: rgba(255,255,255,0.7);
+            text-align: center;
+            padding: 25px;
+            font-size: 1rem;
+        }
+        
+        .footer a {
+            color: #f5c542;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+<div class="app" id="app">
+    <div class="header">
+        <h1>👑 <span>Juliana's</span> Freedom Command Center</h1>
+        <p>for Joaquín (12) & Alejandro (11) · The Forbidden Knowledge Empire</p>
+        <div class="stats">
+            <div class="stat-box">
+                <div class="number" id="daysActive">0</div>
+                <div>days active</div>
+            </div>
+            <div class="stat-box">
+                <div class="number" id="tasksDone">0</div>
+                <div>tasks completed</div>
+            </div>
+            <div class="stat-box">
+                <div class="number" id="currentIncome">$0</div>
+                <div>projected month</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="daily-message" id="dailyMessage">
+        Loading your daily motivation...
+    </div>
+    
+    <div class="tab-container">
+        <div class="tab active" data-tab="week1">WEEK 1-2</div>
+        <div class="tab" data-tab="week3">WEEK 3-4</div>
+        <div class="tab" data-tab="week5">WEEK 5-6</div>
+        <div class="tab" data-tab="week7">WEEK 7-8</div>
+        <div class="tab" data-tab="week9">WEEK 9-10</div>
+        <div class="tab" data-tab="week11">WEEK 11-12</div>
+        <div class="tab" data-tab="income">💰 INCOME</div>
+    </div>
+    
+    <!-- WEEK 1-2 CONTENT -->
+    <div id="week1-content" class="phase-content dashboard">
+        <div class="card">
+            <h2>📋 SETUP CHECKLIST</h2>
+            <ul class="task-list" id="week1-tasks">
+                <li><input type="checkbox" class="week1" onchange="updateProgress()"> Open Juliana's LLC (Freedom Media Group)</li>
+                <li><input type="checkbox" class="week1" onchange="updateProgress()"> Open business bank account (her name only)</li>
+                <li><input type="checkbox" class="week1" onchange="updateProgress()"> Set up Stripe + PayPal under LLC</li>
+                <li><input type="checkbox" class="week1" onchange="updateProgress()"> Create YouTube channel: Joaquín & Alejandro</li>
+                <li><input type="checkbox" class="week1" onchange="updateProgress()"> Create Instagram + TikTok</li>
+                <li><input type="checkbox" class="week1" onchange="updateProgress()"> Film first 5 shorts</li>
+                <li><input type="checkbox" class="week1" onchange="updateProgress()"> Post first short</li>
+            </ul>
+            <div class="progress-bar"><div class="progress-fill" id="week1-progress"></div></div>
+        </div>
+        <div class="card">
+            <h2>🎯 TODAY'S FOCUS</h2>
+            <p style="font-size: 1.2rem; margin-bottom: 15px;">Day 1: Open LLC online (LegalZoom or local). This takes 1 hour. Do it now.</p>
+            <p style="font-size: 1.1rem; color: #1f4a2c;">📌 Remember: Every checkmark = closer to $100k.</p>
+            <button class="button" onclick="completeRandomTask('week1')">✓ MARK ONE RANDOM TASK DONE</button>
+        </div>
+    </div>
+    
+    <!-- WEEK 3-4 CONTENT (hidden initially) -->
+    <div id="week3-content" class="phase-content hidden dashboard">
+        <div class="card">
+            <h2>🎬 DEBT SERIES PRODUCTION</h2>
+            <ul class="task-list" id="week3-tasks">
+                <li><input type="checkbox" class="week3" onchange="updateProgress()"> Film Short 1: "What is debt slavery?"</li>
+                <li><input type="checkbox" class="week3" onchange="updateProgress()"> Film Short 2: "3 ways to escape debt"</li>
+                <li><input type="checkbox" class="week3" onchange="updateProgress()"> Film Short 3: "The strawman explained"</li>
+                <li><input type="checkbox" class="week3" onchange="updateProgress()"> Film long-form: Full debt breakdown</li>
+                <li><input type="checkbox" class="week3" onchange="updateProgress()"> Edit and post all videos</li>
+                <li><input type="checkbox" class="week3" onchange="updateProgress()"> Add affiliate links to description</li>
+            </ul>
+            <div class="progress-bar"><div class="progress-fill" id="week3-progress"></div></div>
+        </div>
+    </div>
+    
+    <!-- WEEK 5-6 CONTENT -->
+    <div id="week5-content" class="phase-content hidden dashboard">
+        <div class="card">
+            <h2>📚 COURSE LAUNCH</h2>
+            <ul class="task-list" id="week5-tasks">
+                <li><input type="checkbox" class="week5" onchange="updateProgress()"> Create course outline (4 modules)</li>
+                <li><input type="checkbox" class="week5" onchange="updateProgress()"> Film module 1: Debt Slavery Exposed</li>
+                <li><input type="checkbox" class="week5" onchange="updateProgress()"> Film module 2: Media Mind Control</li>
+                <li><input type="checkbox" class="week5" onchange="updateProgress()"> Film module 3: Health Freedom</li>
+                <li><input type="checkbox" class="week5" onchange="updateProgress()"> Film module 4: Geographic Escape</li>
+                <li><input type="checkbox" class="week5" onchange="updateProgress()"> Set up ThriveCart checkout</li>
+                <li><input type="checkbox" class="week5" onchange="updateProgress()"> Launch presale at $97</li>
+            </ul>
+            <div class="progress-bar"><div class="progress-fill" id="week5-progress"></div></div>
+        </div>
+    </div>
+    
+    <!-- WEEK 7-8 CONTENT -->
+    <div id="week7-content" class="phase-content hidden dashboard">
+        <div class="card">
+            <h2>📰 SUBSTACK PARTNERSHIP</h2>
+            <ul class="task-list" id="week7-tasks">
+                <li><input type="checkbox" class="week7" onchange="updateProgress()"> Contact ForbiddenKnowledge.substack.com</li>
+                <li><input type="checkbox" class="week7" onchange="updateProgress()"> Pitch "Boys' Corner" audio summary</li>
+                <li><input type="checkbox" class="week7" onchange="updateProgress()"> Set up affiliate tracking</li>
+                <li><input type="checkbox" class="week7" onchange="updateProgress()"> Record first episode</li>
+                <li><input type="checkbox" class="week7" onchange="updateProgress()"> Promote in videos</li>
+            </ul>
+            <div class="progress-bar"><div class="progress-fill" id="week7-progress"></div></div>
+        </div>
+    </div>
+    
+    <!-- WEEK 9-10 CONTENT -->
+    <div id="week9-content" class="phase-content hidden dashboard">
+        <div class="card">
+            <h2>🐎 EXPEDITIONS LAUNCH</h2>
+            <ul class="task-list" id="week9-tasks">
+                <li><input type="checkbox" class="week9" onchange="updateProgress()"> Create landing page at trips to colombia/boys</li>
+                <li><input type="checkbox" class="week9" onchange="updateProgress()"> Film boys at locations (horses, ATVs)</li>
+                <li><input type="checkbox" class="week9" onchange="updateProgress()"> Create "lookbook" PDF</li>
+                <li><input type="checkbox" class="week9" onchange="updateProgress()"> Launch 20% off first 10 bookings</li>
+                <li><input type="checkbox" class="week9" onchange="updateProgress()"> Promote in every video</li>
+            </ul>
+            <div class="progress-bar"><div class="progress-fill" id="week9-progress"></div></div>
+        </div>
+    </div>
+    
+    <!-- WEEK 11-12 CONTENT -->
+    <div id="week11-content" class="phase-content hidden dashboard">
+        <div class="card">
+            <h2>🔒 MEMBERSHIP LAUNCH</h2>
+            <ul class="task-list" id="week11-tasks">
+                <li><input type="checkbox" class="week11" onchange="updateProgress()"> Set up Kajabi/MemberVault</li>
+                <li><input type="checkbox" class="week11" onchange="updateProgress()"> Create first month content</li>
+                <li><input type="checkbox" class="week11" onchange="updateProgress()"> Offer first month free to email list</li>
+                <li><input type="checkbox" class="week11" onchange="updateProgress()"> Set price at $27/month</li>
+                <li><input type="checkbox" class="week11" onchange="updateProgress()"> Get first 50 members</li>
+            </ul>
+            <div class="progress-bar"><div class="progress-fill" id="week11-progress"></div></div>
+        </div>
+    </div>
+    
+    <!-- INCOME TRACKER TAB -->
+    <div id="income-content" class="phase-content hidden dashboard">
+        <div class="card" style="grid-column: span 2;">
+            <h2>💰 INCOME TRACKER (JULIANA'S SHARE)</h2>
+            
+            <div class="income-tracker">
+                <div class="income-row">
+                    <span>Digital Course Sales</span>
+                    <span><input type="number" id="income-course" value="0" min="0" step="100" style="width: 100px; padding: 5px;"> $</span>
+                </div>
+                <div class="income-row">
+                    <span>Substack Partnership</span>
+                    <span><input type="number" id="income-substack" value="0" min="0" step="100" style="width: 100px; padding: 5px;"> $</span>
+                </div>
+                <div class="income-row">
+                    <span>Trip Commissions</span>
+                    <span><input type="number" id="income-trips" value="0" min="0" step="100" style="width: 100px; padding: 5px;"> $</span>
+                </div>
+                <div class="income-row">
+                    <span>YouTube/Sponsorships</span>
+                    <span><input type="number" id="income-youtube" value="0" min="0" step="100" style="width: 100px; padding: 5px;"> $</span>
+                </div>
+                <div class="income-row">
+                    <span>Membership Site</span>
+                    <span><input type="number" id="income-membership" value="0" min="0" step="100" style="width: 100px; padding: 5px;"> $</span>
+                </div>
+                <div class="income-row">
+                    <span>Workshops/Events</span>
+                    <span><input type="number" id="income-workshops" value="0" min="0" step="100" style="width: 100px; padding: 5px;"> $</span>
+                </div>
+                <div class="income-row">
+                    <span>Merchandise</span>
+                    <span><input type="number" id="income-merch" value="0" min="0" step="100" style="width: 100px; padding: 5px;"> $</span>
+                </div>
+                <div class="total-income" id="totalIncomeDisplay">$0</div>
+                <button class="button" onclick="saveIncome()">SAVE INCOME</button>
+            </div>
+            
+            <div style="margin-top: 30px;">
+                <h3>🎯 GOAL TRACKER</h3>
+                <div style="margin: 20px 0;">
+                    <div>Year 1 Goal: $100,000</div>
+                    <div class="progress-bar"><div class="progress-fill" id="goal-progress" style="width: 0%;"></div></div>
+                </div>
+                <div>
+                    <div>Monthly Goal: $8,333</div>
+                    <div class="progress-bar"><div class="progress-fill" id="monthly-progress" style="width: 0%;"></div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>🔥 Built for Juliana from the Forbidden Knowledge thread · <a href="#" onclick="window.open('https://tripsToColombia.com')">TripsToColombia.com</a> · <a href="#" onclick="window.open('https://forbiddenknowledge.substack.com')">ForbiddenKnowledge.substack.com</a></p>
+        <p style="margin-top: 10px;">🙏 A blessing in Jesus' name: may this empire flourish beyond your wildest dreams.</p>
+    </div>
+</div>
+
+<script>
+    // Tab switching
+    const tabs = document.querySelectorAll('.tab');
+    const contents = {
+        week1: document.getElementById('week1-content'),
+        week3: document.getElementById('week3-content'),
+        week5: document.getElementById('week5-content'),
+        week7: document.getElementById('week7-content'),
+        week9: document.getElementById('week9-content'),
+        week11: document.getElementById('week11-content'),
+        income: document.getElementById('income-content')
+    };
+    
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            tabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            
+            Object.values(contents).forEach(c => c.classList.add('hidden'));
+            
+            const tabName = tab.getAttribute('data-tab');
+            if (tabName === 'week1') contents.week1.classList.remove('hidden');
+            if (tabName === 'week3') contents.week3.classList.remove('hidden');
+            if (tabName === 'week5') contents.week5.classList.remove('hidden');
+            if (tabName === 'week7') contents.week7.classList.remove('hidden');
+            if (tabName === 'week9') contents.week9.classList.remove('hidden');
+            if (tabName === 'week11') contents.week11.classList.remove('hidden');
+            if (tabName === 'income') contents.income.classList.remove('hidden');
+        });
+    });
+    
+    // Daily messages
+    const messages = [
+        "Juliana, today you build an empire. One task at a time. The boys are your stars.",
+        "Every video Joaquín and Alejandro make puts money in YOUR pocket. Get filming.",
+        "The Forbidden Knowledge is gold. Package it. Sell it. You deserve this.",
+        "100k in year 1 is real. The system works. You just have to work the system.",
+        "Those horses, those ATVs, that colombian sun — package it. Sell the dream.",
+        "You're not just managing boys. You're building generational wealth.",
+        "ForbiddenKnowledge.substack.com has the content. You have the delivery system.",
+        "TripsToColombia.com pays YOU. Every booking = your freedom.",
+        "Today's task: film one short. Just one. Momentum is everything.",
+        "Juliana, your wildest dreams are waiting. Go get them."
+    ];
+    
+    document.getElementById('dailyMessage').innerText = "✨ " + messages[Math.floor(Math.random() * messages.length)];
+    
+    // Days active counter (start from March 1, 2025 for demo)
+    const startDate = new Date('2025-03-01');
+    const today = new Date();
+    const diffTime = Math.abs(today - startDate);
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    document.getElementById('daysActive').innerText = diffDays;
+    
+    // Task completion tracking
+    function updateProgress() {
+        // Count all checkboxes
+        const allCheckboxes = document.querySelectorAll('input[type="checkbox"]');
+        const checked = document.querySelectorAll('input[type="checkbox"]:checked');
+        document.getElementById('tasksDone').innerText = checked.length + '/' + allCheckboxes.length;
+        
+        // Update individual week progress bars
+        const weeks = ['week1', 'week3', 'week5', 'week7', 'week9', 'week11'];
+        weeks.forEach(week => {
+            const weekBoxes = document.querySelectorAll('.' + week);
+            const weekChecked = document.querySelectorAll('.' + week + ':checked');
+            if (weekBoxes.length > 0) {
+                const percent = (weekChecked.length / weekBoxes.length) * 100;
+                const bar = document.getElementById(week + '-progress');
+                if (bar) bar.style.width = percent + '%';
+            }
+        });
+    }
+    
+    // Complete random task
+    function completeRandomTask(weekClass) {
+        const tasks = document.querySelectorAll('.' + weekClass + ':not(:checked)');
+        if (tasks.length > 0) {
+            const randomTask = tasks[Math.floor(Math.random() * tasks.length)];
+            randomTask.checked = true;
+            updateProgress();
+        } else {
+            alert('All tasks in this week already done! Amazing!');
+        }
+    }
+    
+    // Income tracking
+    function calculateTotal() {
+        const course = parseFloat(document.getElementById('income-course').value) || 0;
+        const substack = parseFloat(document.getElementById('income-substack').value) || 0;
+        const trips = parseFloat(document.getElementById('income-trips').value) || 0;
+        const youtube = parseFloat(document.getElementById('income-youtube').value) || 0;
+        const membership = parseFloat(document.getElementById('income-membership').value) || 0;
+        const workshops = parseFloat(document.getElementById('income-workshops').value) || 0;
+        const merch = parseFloat(document.getElementById('income-merch').value) || 0;
+        
+        const total = course + substack + trips + youtube + membership + workshops + merch;
+        document.getElementById('totalIncomeDisplay').innerText = '$' + total.toLocaleString();
+        document.getElementById('currentIncome').innerText = '$' + Math.round(total/12).toLocaleString() + '/mo';
+        
+        // Goal progress
+        const yearGoal = 100000;
+        const yearPercent = (total / yearGoal) * 100;
+        document.getElementById('goal-progress').style.width = Math.min(yearPercent, 100) + '%';
+        
+        const monthlyGoal = 8333;
+        const monthlyAvg = total / 12;
+        const monthlyPercent = (monthlyAvg / monthlyGoal) * 100;
+        document.getElementById('monthly-progress').style.width = Math.min(monthlyPercent, 100) + '%';
+    }
+    
+    function saveIncome() {
+        calculateTotal();
+        localStorage.setItem('julianaIncome', JSON.stringify({
+            course: document.getElementById('income-course').value,
+            substack: document.getElementById('income-substack').value,
+            trips: document.getElementById('income-trips').value,
+            youtube: document.getElementById('income-youtube').value,
+            membership: document.getElementById('income-membership').value,
+            workshops: document.getElementById('income-workshops').value,
+            merch: document.getElementById('income-merch').value
+        }));
+        alert('Income saved!');
+    }
+    
+    // Load saved income
+    function loadIncome() {
+        const saved = localStorage.getItem('julianaIncome');
+        if (saved) {
+            const data = JSON.parse(saved);
+            document.getElementById('income-course').value = data.course || 0;
+            document.getElementById('income-substack').value = data.substack || 0;
+            document.getElementById('income-trips').value = data.trips || 0;
+            document.getElementById('income-youtube').value = data.youtube || 0;
+            document.getElementById('income-membership').value = data.membership || 0;
+            document.getElementById('income-workshops').value = data.workshops || 0;
+            document.getElementById('income-merch').value = data.merch || 0;
+            calculateTotal();
+        }
+    }
+    
+    // Load saved tasks
+    function loadTasks() {
+        const savedTasks = localStorage.getItem('julianaTasks');
+        if (savedTasks) {
+            const taskStates = JSON.parse(savedTasks);
+            document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+                const id = cb.parentElement.innerText.trim();
+                if (taskStates[id] !== undefined) {
+                    cb.checked = taskStates[id];
+                }
+            });
+            updateProgress();
+        }
+    }
+    
+    // Save tasks on change
+    document.addEventListener('change', function(e) {
+        if (e.target.type === 'checkbox') {
+            const taskStates = {};
+            document.querySelectorAll('input[type="checkbox"]').forEach(cb => {
+                const key = cb.parentElement.innerText.trim();
+                taskStates[key] = cb.checked;
+            });
+            localStorage.setItem('julianaTasks', JSON.stringify(taskStates));
+            updateProgress();
+        }
+    });
+    
+    // Initialize
+    window.onload = function() {
+        loadIncome();
+        loadTasks();
+        updateProgress();
+        calculateTotal();
+        
+        // Set up income input listeners
+        const incomeInputs = ['income-course', 'income-substack', 'income-trips', 'income-youtube', 'income-membership', 'income-workshops', 'income-merch'];
+        incomeInputs.forEach(id => {
+            document.getElementById(id).addEventListener('input', calculateTotal);
+        });
+    };
+    
+    // Expose functions to global
+    window.completeRandomTask = completeRandomTask;
+    window.updateProgress = updateProgress;
+    window.saveIncome = saveIncome;
+    window.calculateTotal = calculateTotal;
+</script>
+</body>
+</html>
