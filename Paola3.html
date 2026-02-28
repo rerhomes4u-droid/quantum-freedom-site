@@ -1,0 +1,905 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌸 SISTEMA LEIDY · Gestión de Masajes a Domicilio</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800&family=Poppins:wght@300;400;500;600;700&display=swap');
+
+        body {
+            background: linear-gradient(145deg, #1A1F35 0%, #2A1F45 50%, #3A1F55 100%);
+            font-family: 'Poppins', sans-serif;
+            color: #F0F8FF;
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 1rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+
+        /* ENCABEZADO PROFESIONAL */
+        .header-sistema {
+            background: linear-gradient(145deg, #6A1F5A, #4A1F6A);
+            border: 3px solid #FF69B4;
+            border-radius: 3rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+        }
+
+        .logo-sistema {
+            font-size: 5rem;
+            background: white;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 4px solid #FFD700;
+        }
+
+        .titulo-sistema h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5rem;
+            color: #FFD700;
+            margin-bottom: 0.5rem;
+        }
+
+        .titulo-sistema h2 {
+            font-size: 1.8rem;
+            color: #FF69B4;
+            font-weight: 300;
+        }
+
+        .stats-rapidas {
+            display: flex;
+            gap: 2rem;
+            margin-left: auto;
+            background: rgba(0,0,0,0.3);
+            padding: 1rem 2rem;
+            border-radius: 3rem;
+            border: 1px solid #FFD700;
+        }
+
+        /* TARJETA DE LECCIÓN */
+        .leccion-card {
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
+            border: 3px solid #FF69B4;
+            border-radius: 2.5rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .leccion-card::before {
+            content: "⚠️";
+            position: absolute;
+            top: -20px;
+            right: -20px;
+            font-size: 8rem;
+            opacity: 0.1;
+            transform: rotate(15deg);
+        }
+
+        .leccion-titulo {
+            font-size: 2rem;
+            color: #FF69B4;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .leccion-contenido {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .leccion-historia {
+            background: rgba(255,105,180,0.1);
+            padding: 1.5rem;
+            border-radius: 2rem;
+            border-left: 6px solid #FF69B4;
+        }
+
+        .leccion-moral {
+            background: rgba(255,215,0,0.1);
+            padding: 1.5rem;
+            border-radius: 2rem;
+            border-right: 6px solid #FFD700;
+        }
+
+        /* TABLERO DE GESTIÓN LEIDY */
+        .dashboard-leidy {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        .card-gestion {
+            background: rgba(20, 30, 50, 0.8);
+            backdrop-filter: blur(10px);
+            border: 2px solid #FF69B4;
+            border-radius: 2.5rem;
+            padding: 2rem;
+            transition: 0.3s;
+        }
+
+        .card-gestion:hover {
+            transform: translateY(-5px);
+            border-color: #FFD700;
+            box-shadow: 0 20px 30px rgba(0,0,0,0.5);
+        }
+
+        .card-header-gestion {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            border-bottom: 2px solid #FF69B4;
+            padding-bottom: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-icon-gestion {
+            font-size: 2.5rem;
+        }
+
+        .card-titulo-gestion {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #FFD700;
+        }
+
+        /* TABLA DE SERVICIOS */
+        .tabla-servicios {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .tabla-servicios th {
+            text-align: left;
+            padding: 0.8rem;
+            background: #FF69B4;
+            color: white;
+            border-radius: 1rem 1rem 0 0;
+        }
+
+        .tabla-servicios td {
+            padding: 0.8rem;
+            border-bottom: 1px solid #FF69B4;
+        }
+
+        .precio-input {
+            width: 100px;
+            padding: 0.5rem;
+            border-radius: 2rem;
+            border: 2px solid #FFD700;
+            background: #1A1F35;
+            color: white;
+            text-align: center;
+        }
+
+        /* LISTA DE CORRECCIONES */
+        .correccion-item {
+            background: rgba(255,255,255,0.05);
+            border-radius: 2rem;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            border: 1px solid #FF69B4;
+        }
+
+        .correccion-item.completada {
+            background: rgba(255,215,0,0.1);
+            border-color: #FFD700;
+            opacity: 0.8;
+        }
+
+        .correccion-check {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            border: 2px solid #FFD700;
+            cursor: pointer;
+            display: inline-block;
+        }
+
+        .correccion-item.completada .correccion-check {
+            background: #FFD700;
+            position: relative;
+        }
+
+        .correccion-item.completada .correccion-check::after {
+            content: "✓";
+            color: #1A1F35;
+            position: absolute;
+            left: 5px;
+            top: -2px;
+            font-size: 1.2rem;
+        }
+
+        /* SISTEMA DE RESERVAS 10% */
+        .sistema-reservas {
+            background: linear-gradient(145deg, #2A1F45, #1A1F35);
+            border: 3px solid #FFD700;
+            border-radius: 3rem;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .reserva-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 2rem;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 1.5rem;
+            align-items: center;
+            border: 1px solid #FF69B4;
+        }
+
+        .estado-reserva {
+            padding: 0.3rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .estado-pendiente { background: #FFA500; color: black; }
+        .estado-confirmada { background: #4CAF50; color: white; }
+        .estado-completada { background: #FF69B4; color: white; }
+        .estado-cancelada { background: #F44336; color: white; }
+
+        .comision-badge {
+            background: #FFD700;
+            color: #1A1F35;
+            padding: 0.3rem 1rem;
+            border-radius: 2rem;
+            font-weight: 600;
+        }
+
+        /* CONTRATO DE EMPODERAMIENTO */
+        .contrato-card {
+            background: rgba(255,215,0,0.05);
+            border: 3px solid #FFD700;
+            border-radius: 2.5rem;
+            padding: 2rem;
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        .contrato-texto {
+            font-size: 1.3rem;
+            font-style: italic;
+            margin: 2rem 0;
+            color: #FFE4B5;
+        }
+
+        .firma-linea {
+            width: 300px;
+            height: 2px;
+            background: #FFD700;
+            margin: 1rem auto;
+        }
+
+        /* BOTONES DE ACCIÓN */
+        .btn-accion {
+            background: linear-gradient(145deg, #FF69B4, #FF1493);
+            border: none;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            padding: 0.8rem 2rem;
+            border-radius: 3rem;
+            cursor: pointer;
+            transition: 0.3s;
+            border: 2px solid #FFD700;
+            margin: 0.5rem;
+        }
+
+        .btn-accion:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3), 0 0 20px #FF69B4;
+        }
+
+        .btn-accion.gold {
+            background: linear-gradient(145deg, #FFD700, #FFA500);
+            color: #1A1F35;
+        }
+
+        /* SECCIÓN PAOLA - LA MENTORA */
+        .mentora-section {
+            background: linear-gradient(145deg, #4A1F6A, #2A1F45);
+            border: 3px solid #FFD700;
+            border-radius: 3rem;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+
+        .mentora-header {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        .mentora-avatar {
+            font-size: 5rem;
+            background: white;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid #FFD700;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .leccion-contenido { grid-template-columns: 1fr; }
+            .header-sistema { flex-direction: column; text-align: center; }
+            .stats-rapidas { margin-left: 0; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- ENCABEZADO DEL SISTEMA -->
+    <div class="header-sistema">
+        <div class="logo-sistema">🌸</div>
+        <div class="titulo-sistema">
+            <h1>SISTEMA LEIDY · DOMICILIOS</h1>
+            <h2>Gestión Profesional · Empoderamiento Femenino · TripsToColombia.com</h2>
+        </div>
+        <div class="stats-rapidas">
+            <div>
+                <div style="font-size: 1.5rem; color: #FFD700;">0</div>
+                <div>Reservas</div>
+            </div>
+            <div>
+                <div style="font-size: 1.5rem; color: #FFD700;">$0</div>
+                <div>Comisiones</div>
+            </div>
+            <div>
+                <div style="font-size: 1.5rem; color: #FFD700;">0%</div>
+                <div>Compromiso</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- LECCIÓN PARA PAOLA (Y PARA LEIDY) -->
+    <div class="leccion-card">
+        <div class="leccion-titulo">
+            <span>📖</span>
+            <span>LA LECCIÓN DE LEIDY · Por qué fracasan las niñas</span>
+        </div>
+        <div class="leccion-contenido">
+            <div class="leccion-historia">
+                <h3 style="color: #FF69B4; margin-bottom: 1rem;">📜 Lo que pasó</h3>
+                <p>Se creó una página web profesional para Leidy: <a href="https://quantum-freedom-site.vercel.app/LeidySpa.html" target="_blank" style="color: #FFD700;">LeidySpa.html</a></p>
+                <p>Se le presentó a clientes selectos de TripsToColombia.com. Cada masaje: <strong>$90,000 COP</strong>.</p>
+                <p>Ramiro pagó <strong>$250,000 COP</strong> de su bolsillo para que ella pudiera quedarse en el evento. Pagó decenas de miles más por la loción.</p>
+                <p>Se le pidió un simple video diciendo cómo la ayudaron. En lugar de eso, ella pidió <strong>más cambios</strong> en la página.</p>
+                <p>Se puso "Bogotá" en lugar de "Armenia" a propósito — una prueba. Ella nunca lo corrigió.</p>
+                <p>Ofreció sólo <strong>$170,000 COP</strong> de compensación y dijo que <strong>"no le importaba la fundación"</strong>.</p>
+            </div>
+            <div class="leccion-moral">
+                <h3 style="color: #FFD700; margin-bottom: 1rem;">⚡ La lección</h3>
+                <p><strong>Aquí es donde la mayoría de las niñas fracasan:</strong> no hacen el seguimiento. No hacen los cambios simples. No valoran lo que reciben.</p>
+                <p style="margin-top: 1rem;">El sistema funciona para quienes trabajan <strong>CON</strong> él, no para quienes esperan que todo les caiga del cielo.</p>
+                <p style="margin-top: 1rem; color: #FF69B4; font-weight: 600;">No eres víctima. Eres creadora. Pero solo si actúas como tal.</p>
+                <div style="margin-top: 2rem; background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 2rem;">
+                    <p style="color: #FFD700;">🌸 El nuevo sistema protege a la fundación y empodera a quien realmente quiere crecer.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MISIÓN PARA PAOLA -->
+    <div class="mentora-section">
+        <div class="mentora-header">
+            <div class="mentora-avatar">👑</div>
+            <div>
+                <h2 style="color: #FFD700; font-size: 2.5rem;">PAOLA · TU PRIMERA MISIÓN OFICIAL</h2>
+                <p style="color: #FFE4B5; font-size: 1.3rem;">Como Mentora del Sistema, tú tienes el control. Leidy es TU primer caso de gestión.</p>
+            </div>
+        </div>
+        
+        <div style="margin-top: 2rem; display: flex; gap: 2rem; flex-wrap: wrap;">
+            <div style="flex: 1; min-width: 250px; background: rgba(0,0,0,0.3); padding: 1.5rem; border-radius: 2rem;">
+                <h3 style="color: #FF69B4;">📞 CONTACTO</h3>
+                <p>Leidy necesita escucharlo de TI, mujer a mujer.</p>
+                <p style="margin-top: 1rem;"><strong>Tu guión:</strong></p>
+                <p style="font-style: italic; background: rgba(255,255,255,0.1); padding: 1rem; border-radius: 1rem;">
+                    "Hola Leidy, soy Paola. Ramiro me ha pedido que tome el control de tu caso. 
+                    Quiero ayudarte a tener éxito, pero necesito que entiendas cómo funciona esto ahora. 
+                    Ya no es 'regalado'. Es una sociedad. ¿Estás lista para trabajar de verdad?"
+                </p>
+            </div>
+            <div style="flex: 1; min-width: 250px; background: rgba(0,0,0,0.3); padding: 1.5rem; border-radius: 2rem;">
+                <h3 style="color: #FF69B4;">📋 OBJETIVOS</h3>
+                <ol style="list-style-position: inside;">
+                    <li>Explicar el nuevo sistema 10%</li>
+                    <li>Obtener su compromiso por escrito</li>
+                    <li>Corregir la página web JUNTAS</li>
+                    <li>Establecer expectativas claras</li>
+                    <li>Conseguir el video testimonial PENDIENTE</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <!-- NUEVO SISTEMA 10% PARA LEIDY -->
+    <div class="sistema-reservas">
+        <h2 style="color: #FFD700; text-align: center; margin-bottom: 2rem;">💰 NUEVO SISTEMA · DOMICILIOS DE MASAJES</h2>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px,1fr)); gap: 2rem; margin-bottom: 2rem;">
+            <div style="background: rgba(255,105,180,0.1); padding: 2rem; border-radius: 2rem;">
+                <div style="font-size: 3rem; text-align: center;">1️⃣0️⃣%</div>
+                <h3 style="color: #FF69B4; text-align: center;">NO REEMBOLSABLE</h3>
+                <p style="text-align: center;">El cliente paga el 10% al hacer la reserva. Esto va a la fundación.</p>
+            </div>
+            <div style="background: rgba(255,215,0,0.1); padding: 2rem; border-radius: 2rem;">
+                <div style="font-size: 3rem; text-align: center;">9️⃣0️⃣%</div>
+                <h3 style="color: #FFD700; text-align: center;">A LA LLEGADA</h3>
+                <p style="text-align: center;">El cliente paga el 90% a Leidy cuando ella llega a domicilio.</p>
+            </div>
+            <div style="background: rgba(255,255,255,0.1); padding: 2rem; border-radius: 2rem;">
+                <div style="font-size: 3rem; text-align: center;">✂️</div>
+                <h3 style="color: #FFE4B5; text-align: center;">SIN EXCUSAS</h3>
+                <p style="text-align: center;">Si Leidy no se presenta, pierde el derecho a futuras reservas.</p>
+            </div>
+        </div>
+
+        <!-- RESERVAS ACTIVAS -->
+        <h3 style="color: #FFD700; margin: 2rem 0 1rem;">📅 RESERVAS ACTIVAS</h3>
+        <div id="reservasContainer">
+            <!-- Se llenará con JS -->
+        </div>
+
+        <!-- NUEVA RESERVA -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 1rem; margin-top: 2rem;">
+            <input type="text" id="clienteNombre" placeholder="Nombre del cliente" style="padding: 1rem; border-radius: 3rem; border: 2px solid #FF69B4; background: #1A1F35; color: white;">
+            <input type="text" id="clienteTelefono" placeholder="Teléfono" style="padding: 1rem; border-radius: 3rem; border: 2px solid #FF69B4; background: #1A1F35; color: white;">
+            <input type="date" id="fechaReserva" style="padding: 1rem; border-radius: 3rem; border: 2px solid #FF69B4; background: #1A1F35; color: white;">
+            <input type="time" id="horaReserva" style="padding: 1rem; border-radius: 3rem; border: 2px solid #FF69B4; background: #1A1F35; color: white;">
+            <select id="tipoMasaje" style="padding: 1rem; border-radius: 3rem; border: 2px solid #FF69B4; background: #1A1F35; color: white;">
+                <option value="60000">Masaje Relajante · $60,000</option>
+                <option value="80000">Masaje Deportivo · $80,000</option>
+                <option value="90000">Masaje Terapéutico · $90,000</option>
+                <option value="120000">Masaje Parejas · $120,000</option>
+            </select>
+            <button class="btn-accion gold" onclick="crearReserva()">➕ CREAR RESERVA</button>
+        </div>
+    </div>
+
+    <!-- TABLERO DE GESTIÓN LEIDY -->
+    <div class="dashboard-leidy">
+        
+        <!-- CORRECCIONES PENDIENTES DE LA WEB -->
+        <div class="card-gestion">
+            <div class="card-header-gestion">
+                <div class="card-icon-gestion">🔧</div>
+                <div class="card-titulo-gestion">Correcciones Web · LeidySpa</div>
+            </div>
+            <div class="card-content">
+                <div id="correccionesLista">
+                    <div class="correccion-item">
+                        <span class="correccion-check" onclick="toggleCorreccion(1)"></span>
+                        <span>Cambiar "Bogotá" por "Armenia" (¡prueba superada? No)</span>
+                    </div>
+                    <div class="correccion-item">
+                        <span class="correccion-check" onclick="toggleCorreccion(2)"></span>
+                        <span>Actualizar precios (actualmente $60k-$120k)</span>
+                    </div>
+                    <div class="correccion-item">
+                        <span class="correccion-check" onclick="toggleCorreccion(3)"></span>
+                        <span>Añadir descripción de cada servicio</span>
+                    </div>
+                    <div class="correccion-item">
+                        <span class="correccion-check" onclick="toggleCorreccion(4)"></span>
+                        <span>Foto profesional de Leidy</span>
+                    </div>
+                    <div class="correccion-item">
+                        <span class="correccion-check" onclick="toggleCorreccion(5)"></span>
+                        <span>Video testimonial (¡PENDIENTE!)</span>
+                    </div>
+                    <div class="correccion-item">
+                        <span class="correccion-check" onclick="toggleCorreccion(6)"></span>
+                        <span>Números de WhatsApp correctos</span>
+                    </div>
+                </div>
+                <button class="btn-accion" style="width:100%; margin-top:1rem;" onclick="solicitarCorrecciones()">📲 ENVIAR RECORDATORIO A LEIDY</button>
+            </div>
+        </div>
+
+        <!-- TABLA DE PRECIOS ACTUALIZABLE -->
+        <div class="card-gestion">
+            <div class="card-header-gestion">
+                <div class="card-icon-gestion">💰</div>
+                <div class="card-titulo-gestion">Precios de Servicios</div>
+            </div>
+            <div class="card-content">
+                <table class="tabla-servicios">
+                    <tr>
+                        <th>Servicio</th>
+                        <th>Precio (COP)</th>
+                    </tr>
+                    <tr>
+                        <td>Masaje Relajante (60 min)</td>
+                        <td><input class="precio-input" type="number" id="precio1" value="60000" onchange="actualizarPrecio(1, this.value)"></td>
+                    </tr>
+                    <tr>
+                        <td>Masaje Deportivo (60 min)</td>
+                        <td><input class="precio-input" type="number" id="precio2" value="80000" onchange="actualizarPrecio(2, this.value)"></td>
+                    </tr>
+                    <tr>
+                        <td>Masaje Terapéutico (90 min)</td>
+                        <td><input class="precio-input" type="number" id="precio3" value="90000" onchange="actualizarPrecio(3, this.value)"></td>
+                    </tr>
+                    <tr>
+                        <td>Masaje en Pareja (90 min)</td>
+                        <td><input class="precio-input" type="number" id="precio4" value="120000" onchange="actualizarPrecio(4, this.value)"></td>
+                    </tr>
+                </table>
+                <p style="margin-top: 1rem; color: #FF69B4;">10% de cada reserva para la fundación</p>
+            </div>
+        </div>
+
+        <!-- CONTRATO DE EMPODERAMIENTO -->
+        <div class="card-gestion">
+            <div class="card-header-gestion">
+                <div class="card-icon-gestion">📜</div>
+                <div class="card-titulo-gestion">Compromiso de Leidy</div>
+            </div>
+            <div class="card-content">
+                <div style="background: rgba(255,255,255,0.05); padding: 1.5rem; border-radius: 1.5rem;">
+                    <p style="font-style: italic;">"Entiendo que este sistema es una sociedad. Me comprometo a:</p>
+                    <ul style="margin: 1rem 0 1rem 2rem;">
+                        <li>✓ Mantener mi página actualizada</li>
+                        <li>✓ Responder a los clientes en 1 hora</li>
+                        <li>✓ Cumplir todas las reservas</li>
+                        <li>✓ Pagar el 10% a la fundación</li>
+                        <li>✓ Enviar video testimonial</li>
+                    </ul>
+                    <p>Si fallo, acepto perder acceso al sistema."</p>
+                </div>
+                <div style="margin: 1rem 0;">
+                    <input type="checkbox" id="compromisoLeidy"> <label for="compromisoLeidy">Leidy ha aceptado (vía WhatsApp)</label>
+                </div>
+                <button class="btn-accion gold" style="width:100%;" onclick="guardarCompromiso()">✓ GUARDAR COMPROMISO</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTABILIDAD SIMPLE -->
+    <div style="background: linear-gradient(145deg, #2A1F45, #1A1F35); border: 2px solid #FFD700; border-radius: 2.5rem; padding: 2rem; margin: 2rem 0;">
+        <h3 style="color: #FFD700; margin-bottom: 1rem;">💰 CONTABILIDAD · FUNDACIÓN</h3>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px,1fr)); gap: 2rem;">
+            <div>
+                <p style="color: #FF69B4;">Total Reservas</p>
+                <p style="font-size: 2rem; color: #FFD700;" id="totalReservas">0</p>
+            </div>
+            <div>
+                <p style="color: #FF69B4;">Comisiones Fundación (10%)</p>
+                <p style="font-size: 2rem; color: #FFD700;" id="totalComisiones">$0</p>
+            </div>
+            <div>
+                <p style="color: #FF69B4;">Pendiente de Leidy</p>
+                <p style="font-size: 2rem; color: #FFD700;" id="pendienteLeidy">$170,000</p>
+                <p style="font-size: 0.9rem;">(Deuda original: $250,000 - $170,000 pagado)</p>
+            </div>
+        </div>
+        <button class="btn-accion" onclick="liquidarDeuda()">💸 REGISTRAR PAGO DE LEIDY</button>
+    </div>
+
+    <!-- BOTONES DE ACCIÓN -->
+    <div style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center; margin: 2rem 0;">
+        <button class="btn-accion" onclick="enviarMensajeLeidy()">📱 ENVIAR MENSAJE A LEIDY (PLANTILLA)</button>
+        <button class="btn-accion gold" onclick="generarReporteLeidy()">📊 GENERAR REPORTE</button>
+        <button class="btn-accion" onclick="bloquearLeidy()">⛔ BLOQUEAR ACCESO (SI NO CUMPLE)</button>
+    </div>
+
+    <!-- PIE DE PÁGINA -->
+    <footer style="text-align: center; margin-top: 3rem; padding: 2rem; border-top: 2px solid #FF69B4;">
+        <p style="color: #FFD700;">🌸 SISTEMA LEIDY · GESTIÓN PROFESIONAL · TripsToColombia.com 🌸</p>
+        <p style="color: #FFE4B5;">Empoderamiento real requiere responsabilidad real. Tú decides quién merece crecer.</p>
+    </footer>
+
+</div>
+
+<script>
+    // ============================================
+    // SISTEMA DE GESTIÓN LEIDY · PAOLA ADMIN
+    // ============================================
+
+    let leidyData = {
+        reservas: [],
+        correccionesCompletadas: [],
+        compromisoAceptado: false,
+        deudaPendiente: 80000, // $250,000 - $170,000 pagado
+        totalComisiones: 0,
+        totalReservas: 0,
+        precios: {
+            1: 60000,
+            2: 80000,
+            3: 90000,
+            4: 120000
+        }
+    };
+
+    // Cargar datos guardados
+    if (localStorage.getItem('leidyData')) {
+        leidyData = JSON.parse(localStorage.getItem('leidyData'));
+    }
+
+    function renderizarReservas() {
+        const container = document.getElementById('reservasContainer');
+        if (!container) return;
+        
+        container.innerHTML = '';
+        
+        if (leidyData.reservas.length === 0) {
+            container.innerHTML = '<p style="text-align: center; padding: 2rem;">No hay reservas activas. Crea la primera.</p>';
+            return;
+        }
+        
+        leidyData.reservas.forEach((reserva, index) => {
+            const estadoClass = `estado-${reserva.estado}`;
+            const reservaDiv = document.createElement('div');
+            reservaDiv.className = 'reserva-card';
+            reservaDiv.innerHTML = `
+                <div style="font-size: 1.5rem;">💆‍♀️</div>
+                <div>
+                    <strong>${reserva.cliente}</strong> · ${reserva.telefono}<br>
+                    📅 ${reserva.fecha} · ${reserva.hora}<br>
+                    💵 $${reserva.precio.toLocaleString()} COP
+                </div>
+                <div style="text-align: right;">
+                    <span class="estado-reserva ${estadoClass}">${reserva.estado.toUpperCase()}</span><br>
+                    <span class="comision-badge">10%: $${(reserva.precio * 0.1).toLocaleString()}</span>
+                </div>
+                <div style="grid-column: 1/-1; display: flex; gap: 0.5rem; justify-content: flex-end;">
+                    <button class="btn-accion" style="padding: 0.3rem 1rem; font-size: 0.9rem;" onclick="cambiarEstadoReserva(${index}, 'confirmada')">✅ Confirmar</button>
+                    <button class="btn-accion" style="padding: 0.3rem 1rem; font-size: 0.9rem;" onclick="cambiarEstadoReserva(${index}, 'completada')">✔️ Completada</button>
+                    <button class="btn-accion" style="padding: 0.3rem 1rem; font-size: 0.9rem; background: #F44336;" onclick="cambiarEstadoReserva(${index}, 'cancelada')">❌ Cancelar</button>
+                </div>
+            `;
+            container.appendChild(reservaDiv);
+        });
+        
+        actualizarContabilidad();
+    }
+
+    function crearReserva() {
+        const cliente = document.getElementById('clienteNombre').value;
+        const telefono = document.getElementById('clienteTelefono').value;
+        const fecha = document.getElementById('fechaReserva').value;
+        const hora = document.getElementById('horaReserva').value;
+        const selectTipo = document.getElementById('tipoMasaje');
+        const precio = parseInt(selectTipo.value);
+        const tipoTexto = selectTipo.options[selectTipo.selectedIndex].text.split('·')[0];
+        
+        if (!cliente || !telefono || !fecha || !hora) {
+            alert('🌸 Por favor completa todos los campos');
+            return;
+        }
+        
+        leidyData.reservas.push({
+            cliente: cliente,
+            telefono: telefono,
+            fecha: fecha,
+            hora: hora,
+            precio: precio,
+            tipo: tipoTexto,
+            estado: 'pendiente',
+            comisionPagada: false,
+            fechaCreacion: new Date().toLocaleDateString()
+        });
+        
+        // Limpiar campos
+        document.getElementById('clienteNombre').value = '';
+        document.getElementById('clienteTelefono').value = '';
+        
+        guardarDatos();
+        renderizarReservas();
+        mostrarMensaje('✅ Reserva creada. 10% no reembolsable pendiente.', '#FF69B4');
+    }
+
+    function cambiarEstadoReserva(index, nuevoEstado) {
+        if (nuevoEstado === 'completada' && !leidyData.reservas[index].comisionPagada) {
+            const comision = leidyData.reservas[index].precio * 0.1;
+            leidyData.totalComisiones += comision;
+            leidyData.totalReservas++;
+            leidyData.reservas[index].comisionPagada = true;
+            
+            // Si aún debe, restar de su deuda
+            if (leidyData.deudaPendiente > 0) {
+                const pagoDeuda = Math.min(leidyData.deudaPendiente, comision);
+                leidyData.deudaPendiente -= pagoDeuda;
+                mostrarMensaje(`💰 $${pagoDeuda.toLocaleString()} aplicado a deuda pendiente`, '#FFD700');
+            }
+        }
+        
+        leidyData.reservas[index].estado = nuevoEstado;
+        guardarDatos();
+        renderizarReservas();
+        mostrarMensaje(`📅 Estado actualizado: ${nuevoEstado}`, '#4CAF50');
+    }
+
+    function actualizarContabilidad() {
+        document.getElementById('totalReservas').innerText = leidyData.totalReservas;
+        document.getElementById('totalComisiones').innerText = '$' + leidyData.totalComisiones.toLocaleString();
+        document.getElementById('pendienteLeidy').innerText = '$' + leidyData.deudaPendiente.toLocaleString();
+    }
+
+    // CORRECCIONES
+    function toggleCorreccion(id) {
+        if (leidyData.correccionesCompletadas.includes(id)) {
+            leidyData.correccionesCompletadas = leidyData.correccionesCompletadas.filter(x => x !== id);
+        } else {
+            leidyData.correccionesCompletadas.push(id);
+        }
+        
+        // Actualizar UI
+        const items = document.querySelectorAll('.correccion-item');
+        items.forEach((item, idx) => {
+            if (leidyData.correccionesCompletadas.includes(idx + 1)) {
+                item.classList.add('completada');
+            } else {
+                item.classList.remove('completada');
+            }
+        });
+        
+        guardarDatos();
+    }
+
+    function solicitarCorrecciones() {
+        const pendientes = 6 - leidyData.correccionesCompletadas.length;
+        mostrarMensaje(`📲 Recordatorio enviado a Leidy · ${pendientes} correcciones pendientes`, '#FF69B4');
+        
+        // Simular envío WhatsApp
+        window.open(`https://wa.me/57${prompt('Número de Leidy (sin +57):', '3001234567')}?text=🌸 Hola Leidy, soy Paola. Recordatorio amable: tienes ${pendientes} correcciones pendientes en tu página web. Completarlas es el primer paso para recibir MÁS reservas. ¿En qué puedo ayudarte?`, '_blank');
+    }
+
+    function guardarCompromiso() {
+        const checkbox = document.getElementById('compromisoLeidy');
+        leidyData.compromisoAceptado = checkbox.checked;
+        guardarDatos();
+        mostrarMensaje(checkbox.checked ? '✅ Compromiso guardado' : '❌ Compromiso no aceptado', '#FFD700');
+    }
+
+    function actualizarPrecio(id, valor) {
+        leidyData.precios[id] = parseInt(valor);
+        guardarDatos();
+    }
+
+    function liquidarDeuda() {
+        const pago = prompt('¿Cuánto pagó Leidy? (COP)', '0');
+        if (pago) {
+            const pagoNum = parseInt(pago);
+            leidyData.deudaPendiente = Math.max(0, leidyData.deudaPendiente - pagoNum);
+            leidyData.totalComisiones += pagoNum;
+            guardarDatos();
+            actualizarContabilidad();
+            mostrarMensaje(`💰 Pago registrado. Deuda restante: $${leidyData.deudaPendiente.toLocaleString()}`, '#4CAF50');
+        }
+    }
+
+    function enviarMensajeLeidy() {
+        const mensajes = [
+            "🌸 Leidy, soy Paola. Quiero ayudarte a despegar. Las reservas están esperando, pero necesito que completes las correcciones de la web. ¿Puedo contar contigo?",
+            "🌸 Leidy, tienes talento. El sistema está listo para ti. Solo necesitas dar el siguiente paso. ¿Qué necesitas de mí?",
+            "🌸 Hola Leidy, recordatorio: las correcciones = más reservas. Completemos esto JUNTAS. Responde cuando estés lista."
+        ];
+        
+        const seleccionado = mensajes[Math.floor(Math.random() * mensajes.length)];
+        window.open(`https://wa.me/57${prompt('Número de Leidy (sin +57):', '3001234567')}?text=${encodeURIComponent(seleccionado)}`, '_blank');
+    }
+
+    function generarReporteLeidy() {
+        const reporte = `
+🌸 REPORTE DE GESTIÓN · LEIDY 🌸
+══════════════════════════════
+📅 Fecha: ${new Date().toLocaleDateString()}
+
+📊 ESTADÍSTICAS:
+• Total reservas: ${leidyData.totalReservas}
+• Comisiones fundación: $${leidyData.totalComisiones.toLocaleString()} COP
+• Deuda pendiente: $${leidyData.deudaPendiente.toLocaleString()} COP
+
+✅ CORRECCIONES:
+• Completadas: ${leidyData.correccionesCompletadas.length}/6
+• Pendientes: ${6 - leidyData.correccionesCompletadas.length}
+
+🤝 COMPROMISO:
+• Aceptado: ${leidyData.compromisoAceptado ? 'SÍ' : 'NO'}
+
+📋 PRÓXIMOS PASOS:
+• ${leidyData.correccionesCompletadas.length < 6 ? 'Completar correcciones web' : 'Activar marketing activo'}
+• ${leidyData.deudaPendiente > 0 ? 'Liquidar deuda pendiente' : 'Todo al día ✅'}
+• ${leidyData.compromisoAceptado ? 'Mantener comunicación semanal' : 'Obtener compromiso formal'}
+
+"En toda labor hay fruto" — Proverbios 14:23
+        `;
+        
+        alert(reporte);
+        
+        // Opción de descarga
+        const blob = new Blob([reporte], { type: 'text/plain' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `Reporte_Leidy_${new Date().toLocaleDateString()}.txt`;
+        a.click();
+    }
+
+    function bloquearLeidy() {
+        if (confirm('¿Segura que quieres bloquear a Leidy del sistema? Esta acción no se puede deshacer.')) {
+            mostrarMensaje('⛔ Leidy ha sido bloqueada del sistema. Se notificará vía WhatsApp.', '#F44336');
+            // Aquí se podría añadir lógica de bloqueo
+        }
+    }
+
+    function mostrarMensaje(texto, color) {
+        const mensaje = document.createElement('div');
+        mensaje.style.position = 'fixed';
+        mensaje.style.top = '20px';
+        mensaje.style.left = '50%';
+        mensaje.style.transform = 'translateX(-50%)';
+        mensaje.style.background = color;
+        mensaje.style.color = 'white';
+        mensaje.style.padding = '1rem 2rem';
+        mensaje.style.borderRadius = '3rem';
+        mensaje.style.zIndex = '9999';
+        mensaje.style.fontWeight = 'bold';
+        mensaje.style.boxShadow = '0 10px 30px black';
+        mensaje.style.border = '2px solid white';
+        mensaje.innerText = texto;
+        
+        document.body.appendChild(mensaje);
+        
+        setTimeout(() => mensaje.remove(), 3000);
+    }
+
+    function guardarDatos() {
+        localStorage.setItem('leidyData', JSON.stringify(leidyData));
+    }
+
+    // INICIALIZAR
+    renderizarReservas();
+    actualizarContabilidad();
+    
+    // Marcar correcciones completadas al inicio
+    leidyData.correccionesCompletadas.forEach(id => {
+        const items = document.querySelectorAll('.correccion-item');
+        if (items[id-1]) items[id-1].classList.add('completada');
+    });
+
+</script>
+</body>
+</html>
