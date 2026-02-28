@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The String of Illusions · Carter Case Accountability Engine</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0b0e17;
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            color: #e0e6f0;
+            line-height: 1.6;
+            padding: 2rem 1.5rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* HEADER */
+        .header {
+            background: #111827;
+            border: 1px solid #2d3f5e;
+            border-radius: 3rem;
+            padding: 2rem 2.5rem;
+            margin-bottom: 3rem;
+            box-shadow: 0 15px 30px -10px #00000080;
+        }
+
+        h1 {
+            font-size: 3.2rem;
+            font-weight: 700;
+            background: linear-gradient(145deg, #ffffff, #9bb4ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            font-size: 1.3rem;
+            color: #a8bbee;
+            border-left: 6px solid #e05a5a;
+            padding-left: 1.8rem;
+            margin-top: 0.8rem;
+        }
+
+        .scripture {
+            background: #192237;
+            border-radius: 4rem;
+            padding: 1.5rem 2.5rem;
+            margin-bottom: 3rem;
+            border: 1px solid #4a5f90;
+            text-align: center;
+            font-size: 1.4rem;
+            color: #cbd8ff;
+        }
+
+        .scripture span {
+            color: #f5b37b;
+            font-weight: 600;
+        }
+
+        /* TIMELINE SECTION */
+        .section-title {
+            font-size: 2.4rem;
+            font-weight: 600;
+            color: #ffcf9a;
+            margin: 3rem 0 1.5rem;
+            border-bottom: 3px solid #3d5380;
+            padding-bottom: 0.5rem;
+        }
+
+        .timeline-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .timeline-card {
+            background: #131c30;
+            border: 1px solid #3c5280;
+            border-radius: 2.2rem;
+            padding: 1.8rem;
+            transition: 0.3s;
+            cursor: pointer;
+            box-shadow: 0 5px 15px #02060e;
+        }
+
+        .timeline-card:hover {
+            transform: translateY(-6px);
+            border-color: #c06060;
+            box-shadow: 0 15px 25px #020514, 0 0 15px #a04040;
+        }
+
+        .timeline-date {
+            background: #1f2f52;
+            display: inline-block;
+            padding: 0.3rem 1.2rem;
+            border-radius: 3rem;
+            color: #ffc58b;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            border: 1px solid #b0664b;
+        }
+
+        .timeline-card h3 {
+            font-size: 1.7rem;
+            color: #f0e0b0;
+            margin-bottom: 0.8rem;
+        }
+
+        .timeline-card p {
+            color: #b8caee;
+        }
+
+        .timeline-card .badge-group {
+            margin-top: 1.2rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .badge {
+            background: #232f4b;
+            border-radius: 30px;
+            padding: 0.2rem 1rem;
+            font-size: 0.8rem;
+            color: #baceff;
+            border: 1px solid #4b6199;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.92);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: #16213b;
+            border: 3px solid #b94e4e;
+            border-radius: 3rem;
+            max-width: 700px;
+            width: 90%;
+            padding: 2.5rem;
+            color: white;
+            box-shadow: 0 30px 60px #000;
+        }
+
+        .modal-content h2 {
+            color: #ffb48c;
+            margin-bottom: 1.5rem;
+            font-size: 2rem;
+        }
+
+        .modal-close {
+            background: #1d2d4b;
+            border: 1px solid #a06b6b;
+            color: white;
+            padding: 0.8rem 2rem;
+            border-radius: 3rem;
+            cursor: pointer;
+            margin-top: 2rem;
+            font-weight: 600;
+        }
+
+        /* ACCOUNTABILITY MATRIX */
+        .matrix-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0 4rem;
+        }
+
+        .actor-card {
+            background: #0f1a30;
+            border: 1px solid #4d4f8b;
+            border-radius: 2.5rem;
+            padding: 2rem 1.5rem;
+            transition: 0.2s;
+            border-top: 6px solid #7f5a5a;
+        }
+
+        .actor-card:hover {
+            border-color: #b08080;
+            background: #141f3b;
+        }
+
+        .actor-name {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: #ffcd94;
+            margin-bottom: 0.2rem;
+        }
+
+        .actor-role {
+            font-size: 0.95rem;
+            color: #99aee0;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid #32487a;
+            padding-bottom: 0.8rem;
+        }
+
+        .actor-failures {
+            list-style-type: none;
+        }
+
+        .actor-failures li {
+            margin-bottom: 0.8rem;
+            padding-left: 1.5rem;
+            position: relative;
+            color: #d1dcff;
+        }
+
+        .actor-failures li::before {
+            content: "⛔";
+            position: absolute;
+            left: -5px;
+            color: #ff7a7a;
+        }
+
+        .file-complaint-btn {
+            background: #242f4f;
+            border: 1px solid #9f7b7b;
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 3rem;
+            margin-top: 1.5rem;
+            cursor: pointer;
+            width: 100%;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .file-complaint-btn:hover {
+            background: #323f6a;
+            border-color: #e09696;
+        }
+
+        /* COMPLAINT PREVIEW */
+        .complaint-panel {
+            background: #0f1a30;
+            border: 1px solid #5e6ba0;
+            border-radius: 2.5rem;
+            padding: 2rem;
+            margin-top: 3rem;
+        }
+
+        .complaint-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .complaint-header h3 {
+            font-size: 2rem;
+            color: #f0b37b;
+        }
+
+        .complaint-body {
+            background: #0b1428;
+            border-radius: 2rem;
+            padding: 2rem;
+            margin: 1.5rem 0;
+            font-family: 'Courier New', monospace;
+            white-space: pre-wrap;
+            border: 1px solid #5b6da0;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .copy-btn {
+            background: #1f2d50;
+            border: 1px solid #a0a0d0;
+            color: white;
+            padding: 0.7rem 2rem;
+            border-radius: 3rem;
+            cursor: pointer;
+        }
+
+        footer {
+            margin-top: 5rem;
+            text-align: center;
+            color: #6b7fae;
+            border-top: 1px solid #293b60;
+            padding-top: 2rem;
+        }
+
+        .pill-info {
+            background: #182544;
+            border-radius: 40px;
+            padding: 0.5rem 1.5rem;
+            border: 1px solid #4f639a;
+            display: inline-block;
+            margin-bottom: 2rem;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- HEADER -->
+    <div class="header">
+        <h1>⛓️ THE STRING OF ILLUSIONS</h1>
+        <div class="subtitle">United States v. Orlando L. Carter — Anatomy of a Manufactured Prosecution</div>
+        <div style="display: flex; gap: 2rem; margin-top: 1.8rem; color: #adc1f0;">
+            <span>🔍 $4 million loan • never existed</span>
+            <span>🏛️ OCC & PNC admissions</span>
+            <span>🗂️ EOUSA: no shredding</span>
+        </div>
+    </div>
+
+    <!-- SCRIPTURE ANCHOR -->
+    <div class="scripture">
+        “He that knoweth to do good, and doeth it not, to him it is sin.”<br>
+        <span>— James 4:17</span>
+    </div>
+
+    <!-- INTERACTIVE TIMELINE SECTION -->
+    <div class="section-title">📅 The Carter Case Timeline</div>
+    <div class="timeline-grid" id="timelineContainer">
+        <!-- cards will be populated by js -->
+    </div>
+
+    <!-- MODAL FOR TIMELINE DETAILS -->
+    <div class="modal-overlay" id="timelineModal">
+        <div class="modal-content" id="modalContent">
+            <h2 id="modalTitle">Title</h2>
+            <p id="modalDesc">Details</p>
+            <p id="modalEvidence" style="background: #1f2d4f; padding:1rem; border-radius:1.5rem; margin-top:1rem;"></p>
+            <button class="modal-close" id="closeModalBtn">Close</button>
+        </div>
+    </div>
+
+    <!-- ACCOUNTABILITY MATRIX (WALL OF SHAME) -->
+    <div class="section-title">🧱 Wall of Accountability</div>
+    <div class="pill-info">⚖️ Each actor’s probable failures — click “file complaint” to generate draft</div>
+    <div class="matrix-grid" id="actorGrid">
+        <!-- actors injected via js -->
+    </div>
+
+    <!-- COMPLAINT GENERATOR PANEL -->
+    <div class="complaint-panel" id="complaintPanel">
+        <div class="complaint-header">
+            <h3 id="complaintActorLabel">Complaint against: <span style="color:#e0b0b0;">[select an actor]</span></h3>
+            <button class="copy-btn" id="copyComplaintBtn">📋 Copy to clipboard</button>
+        </div>
+        <div class="complaint-body" id="complaintBodyText">
+            Select an actor from the Wall of Accountability to generate a draft complaint to the appropriate oversight body.
+        </div>
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+            <span class="badge">Office of Professional Responsibility (OPR)</span>
+            <span class="badge">DOJ Office of Inspector General</span>
+            <span class="badge">FBI-OPR</span>
+        </div>
+        <p style="margin-top:1.5rem; color:#b1c2f0;">✒️ Customize as needed, then mail with proof of delivery.</p>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>⚡ Forbidden Knowledge · Amnesty Coalition for Unity ⚡</p>
+        <p>ForbiddenKnowledge.substack.com · Based on the Carter Memorandum by James Bowers Johnson</p>
+    </footer>
+</div>
+
+<script>
+    (function() {
+        // ----- TIMELINE DATA -----
+        const timelineEvents = [
+            { date: "2004", title: "Alleged $4M loan", desc: "PNC (formerly National City) claims a $4 million loan to Dynus/CBST — the centerpiece of the future prosecution.", evidence: "No promissory note, wire, or corporate resolution ever produced. Later admissions show only a $250k prior loan.", actors: ["PNC", "James Smith"] },
+            { date: "2005-2007", title: "FBI Investigation (Gormley)", desc: "Agent Kevin Gormley leads probe, relies on James Smith (dual-agent, self-admitted liar) and unverified bank claims.", evidence: "No forensic audit, no subpoena to PNC for authenticated loan docs. Ignores Butler County’s lack of authority.", actors: ["Kevin Gormley", "FBI"] },
+            { date: "2008", title: "Indictment (Lockhart)", desc: "U.S. Attorney Gregory Lockhart approves indictment based on unverified $4M loan theory.", evidence: "Failure to verify core evidence; did not consult Ohio law on county guaranty.", actors: ["Gregory Lockhart"] },
+            { date: "2009", title: "Trial & Conviction (Chema, Beckwith)", desc: "AUSA J. Richard Chema tries case; Judge Sandra Beckwith presides. No authenticated loan docs entered.", evidence: "Defense fails to challenge jurisdiction; court allows unverified guaranty as exhibit. James Smith testifies.", actors: ["J. Richard Chema", "Sandra Beckwith", "James Smith"] },
+            { date: "2017", title: "OCC Inquiry", desc: "OCC contacts PNC; PNC admits no $4M loan exists, only a $250k earlier loan.", evidence: "OCC accepts admission as regulatory truth; certified records unnecessary.", actors: ["OCC", "PNC (Clinton Taylor, David Zive, etc.)"] },
+            { date: "Oct 2018", title: "Glassman: 'DOJ shredded evidence'", desc: "U.S. Attorney Benjamin Glassman, without provocation, states DOJ shredded $4M loan evidence.", evidence: "Statement contradicts OCC/PNC findings; later proven false by EOUSA FOIA.", actors: ["Benjamin Glassman", "Kenneth Parker (present)"] },
+            { date: "2022", title: "EOUSA FOIA Response", desc: "FOIA request confirms no shredding logs or records exist for Carter case.", evidence: "Official confirmation: no shredding occurred; impossible to shred nonexistent loan docs.", actors: ["EOUSA", "Kenneth Parker (received)"] },
+            { date: "2025", title: "Pam Bondi Letter", desc: "Final summary: DOJ attorneys lied about shredding; OCC & PNC admissions irrefutable.", evidence: "Calls for OIG/OPR review.", actors: ["Pam Bondi", "DOJ OIG"] }
+        ];
+
+        // ----- ACTOR DATA (Wall of Accountability) -----
+        const actorData = [
+            { name: "Kevin Gormley", role: "FBI Special Agent", failures: ["Failed to verify $4M loan with PNC", "Ignored lack of corporate resolutions", "Relied on false testimony of James Smith", "No forensic audit"], complaintTarget: "FBI Office of Professional Responsibility", details: "Gormley’s investigative failures: no verification, spoliation, Brady violations." },
+            { name: "Gregory Lockhart", role: "U.S. Attorney (2001-2009)", failures: ["Approved indictment without proof of loan", "Supervised AUSA Chema", "Failed to ensure Brady disclosure"], complaintTarget: "DOJ Office of Professional Responsibility", details: "Lockhart approved prosecution based on unverified claim." },
+            { name: "J. Richard Chema", role: "Assistant U.S. Attorney (trial)", failures: ["Presented false/unreliable testimony", "Failed to authenticate loan docs", "Suppressed exculpatory evidence"], complaintTarget: "DOJ Office of Professional Responsibility", details: "Chema introduced void guaranty, used Smith's testimony." },
+            { name: "Sandra Beckwith", role: "Presiding Judge", failures: ["Allowed unauthenticated guaranty as evidence", "Denied evidentiary hearings", "Accepted speculative loss at sentencing"], complaintTarget: "Judicial Conduct (6th Cir.)", details: "Judicial error: failed to demand proof of loan existence." },
+            { name: "Benjamin Glassman", role: "U.S. Attorney (2016-2019)", failures: ["False 'shredding' statement", "Ignored OCC findings", "No investigation", "Misled public"], complaintTarget: "DOJ Office of Professional Responsibility", details: "Glassman lied about shredding, failed to act on OCC truth." },
+            { name: "Kenneth Parker", role: "U.S. Attorney (2021-2025)", failures: ["Present at 2018 meeting (heard Glassman)", "Received EOUSA confirmation of no shredding", "Did nothing to correct record"], complaintTarget: "DOJ Office of Professional Responsibility", details: "Parker had definitive proof of falsehood, remained silent." },
+            { name: "James Smith", role: "Cooperating witness / dual agent", failures: ["Self-admitted liar", "Acted without authority", "Personal financial motive", "Fabricated loan narrative"], complaintTarget: "FBI (false statements)", details: "Smith's false testimony was foundation of prosecution." },
+            { name: "PNC Officials (Taylor, Zive, etc.)", role: "Bank officers", failures: ["Admitted no $4M loan to OCC", "Certified only $250k loan", "Inconsistent statements to DOJ"], complaintTarget: "OCC / Treasury", details: "Bank's admissions exculpated Carter but were ignored." }
+        ];
+
+        // ----- RENDER TIMELINE -----
+        const timelineContainer = document.getElementById('timelineContainer');
+        timelineEvents.forEach(ev => {
+            const card = document.createElement('div');
+            card.className = 'timeline-card';
+            card.innerHTML = `
+                <div class="timeline-date">${ev.date}</div>
+                <h3>${ev.title}</h3>
+                <p>${ev.desc.substring(0,80)}...</p>
+                <div class="badge-group">
+                    ${ev.actors.map(a => `<span class="badge">${a}</span>`).join('')}
+                </div>
+            `;
+            card.addEventListener('click', () => {
+                document.getElementById('modalTitle').innerText = `${ev.date} — ${ev.title}`;
+                document.getElementById('modalDesc').innerText = ev.desc;
+                document.getElementById('modalEvidence').innerHTML = `<strong>evidence:</strong> ${ev.evidence}`;
+                document.getElementById('timelineModal').style.display = 'flex';
+            });
+            timelineContainer.appendChild(card);
+        });
+
+        // ----- RENDER ACTOR GRID -----
+        const actorGrid = document.getElementById('actorGrid');
+        actorData.forEach(actor => {
+            const card = document.createElement('div');
+            card.className = 'actor-card';
+            card.innerHTML = `
+                <div class="actor-name">${actor.name}</div>
+                <div class="actor-role">${actor.role}</div>
+                <ul class="actor-failures">
+                    ${actor.failures.map(f => `<li>${f}</li>`).join('')}
+                </ul>
+                <button class="file-complaint-btn" data-actor='${JSON.stringify(actor).replace(/'/g, "&apos;")}'>📄 File complaint against ${actor.name.split(' ')[0]}</button>
+            `;
+            actorGrid.appendChild(card);
+        });
+
+        // ----- COMPLAINT GENERATION -----
+        const complaintBody = document.getElementById('complaintBodyText');
+        const complaintActorLabel = document.getElementById('complaintActorLabel');
+
+        function generateComplaintText(actor) {
+            const date = new Date().toLocaleDateString();
+            return `COMPLAINT TO ${actor.complaintTarget.toUpperCase()}
+
+DATE: ${date}
+RE: Professional misconduct / ethical violations in United States v. Orlando L. Carter
+
+To the Honored Review Board:
+
+This complaint is filed against ${actor.name} (${actor.role}) for the following probable failures and breaches of duty:
+
+${actor.failures.map((f,i) => `${i+1}. ${f}`).join('\n')}
+
+Additional details: ${actor.details || "See attached memorandum for full evidentiary support."}
+
+The Carter prosecution was built on a $4 million loan that never existed — confirmed by OCC and PNC admissions. EOUSA confirmed no shredding occurred. Despite this, ${actor.name} failed to correct the record, investigate, or disclose exculpatory evidence.
+
+I request a full investigation and appropriate remedial action.
+
+Respectfully,
+[Your name]
+[Date]`;
+        }
+
+        document.querySelectorAll('.file-complaint-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const actorStr = e.target.getAttribute('data-actor');
+                try {
+                    const actor = JSON.parse(actorStr.replace(/&apos;/g, "'"));
+                    complaintBody.innerText = generateComplaintText(actor);
+                    complaintActorLabel.innerHTML = `Complaint against: <span style="color:#e0b0b0;">${actor.name} (${actor.role})</span>`;
+                } catch (err) {
+                    complaintBody.innerText = "Error loading complaint draft.";
+                }
+            });
+        });
+
+        // ----- COPY COMPLAINT -----
+        document.getElementById('copyComplaintBtn').addEventListener('click', () => {
+            const text = complaintBody.innerText;
+            navigator.clipboard.writeText(text).then(() => alert('Complaint copied to clipboard.'));
+        });
+
+        // ----- MODAL CLOSE -----
+        document.getElementById('closeModalBtn').addEventListener('click', () => {
+            document.getElementById('timelineModal').style.display = 'none';
+        });
+        window.addEventListener('click', (e) => {
+            if (e.target.classList.contains('modal-overlay')) {
+                document.getElementById('timelineModal').style.display = 'none';
+            }
+        });
+    })();
+</script>
+
+<!-- extra styles for modal -->
+<style>
+    .modal-overlay { display: none; }
+    .timeline-card { cursor: pointer; }
+    #copyComplaintBtn { background: #273459; color: white; border: 1px solid #ad8b8b; }
+    #copyComplaintBtn:hover { background: #35497a; }
+</style>
+
+</body>
+</html>
