@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Liberty Classroom · Forbidden Knowledge Curriculum</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0c1020;
+            font-family: 'Merriweather', 'Georgia', serif;
+            color: #e5eaf5;
+            line-height: 1.7;
+            padding: 2rem 1.5rem;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            background: rgba(10, 15, 30, 0.8);
+            backdrop-filter: blur(8px);
+            border: 1px solid #3d5075;
+            border-radius: 3.5rem;
+            padding: 3rem 2.5rem;
+            box-shadow: 0 30px 50px -15px #000;
+        }
+
+        h1 {
+            font-size: 3.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ffffff, #c5b9ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+            font-family: 'Inter', sans-serif;
+            letter-spacing: -0.02em;
+        }
+
+        .subhead {
+            font-size: 1.4rem;
+            color: #bfceff;
+            border-left: 6px solid #a57cff;
+            padding-left: 2rem;
+            margin: 0.5rem 0 3rem 0;
+            font-style: italic;
+        }
+
+        .scripture-verse {
+            text-align: center;
+            background: #1b2542;
+            border-radius: 5rem;
+            padding: 1.8rem 2.5rem;
+            margin-bottom: 3.5rem;
+            border: 1px solid #5f73b0;
+            font-size: 1.6rem;
+            color: #ecd59c;
+            font-weight: 300;
+        }
+
+        .scripture-verse span {
+            font-weight: 700;
+            color: #ffd966;
+        }
+
+        /* MODULES GRID */
+        .modules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2.5rem;
+            margin: 3.5rem 0;
+        }
+
+        .module-card {
+            background: #0f1933;
+            border: 2px solid #2d4170;
+            border-radius: 2.5rem;
+            padding: 2.2rem 1.8rem;
+            transition: 0.3s;
+            cursor: pointer;
+            position: relative;
+            box-shadow: 0 10px 20px #030618;
+        }
+
+        .module-card.completed {
+            border-color: #5bbf7a;
+            background: #133020;
+        }
+
+        .module-card.completed::after {
+            content: "✓";
+            position: absolute;
+            top: 1rem;
+            right: 1.5rem;
+            font-size: 2.5rem;
+            color: #5bff8a;
+            opacity: 0.6;
+        }
+
+        .module-card:hover {
+            transform: translateY(-8px);
+            border-color: #b597ff;
+            box-shadow: 0 25px 35px -8px #020413, 0 0 20px #415ab0;
+        }
+
+        .module-icon {
+            font-size: 3rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .module-card h2 {
+            font-size: 2.2rem;
+            color: #ffd58c;
+            margin-bottom: 1rem;
+        }
+
+        .module-card p {
+            color: #c0d0ff;
+            margin-bottom: 1.5rem;
+        }
+
+        .module-badge {
+            background: #1f315a;
+            display: inline-block;
+            padding: 0.3rem 1.5rem;
+            border-radius: 40px;
+            color: #aac5ff;
+            border: 1px solid #6075b0;
+            font-size: 0.9rem;
+        }
+
+        /* LESSON PANEL */
+        .lesson-panel {
+            background: #0f1a33;
+            border: 2px solid #4d63a0;
+            border-radius: 3rem;
+            padding: 2.5rem;
+            margin: 2.5rem 0;
+        }
+
+        .lesson-title {
+            font-size: 2.5rem;
+            color: #fad291;
+            margin-bottom: 1rem;
+        }
+
+        .lesson-content {
+            background: #182445;
+            border-radius: 2rem;
+            padding: 2rem;
+            margin: 1.8rem 0;
+            border-left: 8px solid #a77cff;
+            font-size: 1.1rem;
+        }
+
+        .pill-definition {
+            background: #22315a;
+            border-radius: 30px;
+            padding: 0.4rem 1.3rem;
+            display: inline-block;
+            margin: 0.5rem 0.5rem 0.5rem 0;
+            border: 1px solid #7188cc;
+            font-size: 0.9rem;
+        }
+
+        .completion-toggle {
+            background: #202f58;
+            border: 1px solid #8f9ed0;
+            color: white;
+            padding: 0.7rem 2rem;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.2s;
+            margin-right: 1rem;
+        }
+
+        .completion-toggle.completed {
+            background: #1f6d3a;
+            border-color: #9effae;
+        }
+
+        /* FLASHCARDS SECTION */
+        .flashcards-section {
+            background: #101e3a;
+            border-radius: 3rem;
+            padding: 2rem;
+            margin: 2.5rem 0;
+        }
+
+        .flashcard {
+            background: #1f2d55;
+            border-radius: 2rem;
+            padding: 2rem;
+            border: 2px solid #576db0;
+            margin-bottom: 1.5rem;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .flashcard:hover {
+            background: #263768;
+        }
+
+        .term {
+            font-size: 2rem;
+            color: #ffbe7a;
+            margin-bottom: 0.5rem;
+        }
+
+        .definition {
+            font-size: 1.1rem;
+            color: #cfddff;
+            display: none;
+            margin-top: 1rem;
+            border-top: 1px dashed #7b8ec0;
+            padding-top: 1rem;
+        }
+
+        .flashcard.revealed .definition {
+            display: block;
+        }
+
+        .ask-section {
+            display: flex;
+            gap: 1rem;
+            margin: 2rem 0;
+            flex-wrap: wrap;
+        }
+
+        .ask-input {
+            flex: 3;
+            min-width: 250px;
+            background: #1b294a;
+            border: 1px solid #6173b5;
+            border-radius: 60px;
+            padding: 1rem 2rem;
+            color: white;
+            font-size: 1.1rem;
+        }
+
+        .ask-btn {
+            flex: 1;
+            background: #202f58;
+            border: 1px solid #a5b3e6;
+            border-radius: 60px;
+            padding: 1rem 2rem;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .ask-btn:hover {
+            background: #2e4075;
+        }
+
+        .qa-response {
+            background: #17244b;
+            border-radius: 2rem;
+            padding: 1.8rem;
+            border-left: 8px solid #7b9cff;
+            margin: 1.5rem 0;
+        }
+
+        .qa-label {
+            color: #b0caff;
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        .pdf-download {
+            background: #1f2b50;
+            border-radius: 3rem;
+            padding: 1.8rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            border: 1px solid #6c81c0;
+            margin: 2rem 0;
+        }
+
+        .pdf-download button {
+            background: #283b6b;
+            border: 1px solid #afc2ff;
+            color: white;
+            padding: 0.8rem 2rem;
+            border-radius: 60px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        footer {
+            margin-top: 4rem;
+            text-align: center;
+            color: #6d80b5;
+            border-top: 1px solid #304577;
+            padding-top: 2.5rem;
+        }
+
+        .progress-indicator {
+            background: #182444;
+            border-radius: 60px;
+            padding: 0.8rem 1.8rem;
+            display: inline-block;
+            margin-bottom: 2rem;
+            border: 1px solid #4c61a5;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- HEADER -->
+    <h1>📚 THE LIBERTY CLASSROOM</h1>
+    <div class="subhead">Forbidden Knowledge Curriculum · Amnesty Coalition for Unity</div>
+
+    <!-- SCRIPTURE -->
+    <div class="scripture-verse">
+        “And ye shall know the truth, and the truth shall make you free.”<br>
+        <span>— John 8:32</span>
+    </div>
+
+    <!-- PROGRESS & MODULES -->
+    <div class="progress-indicator" id="progressDisplay">📊 Modules completed: 0 / 5</div>
+
+    <div class="modules-grid" id="moduleGrid">
+        <!-- Module cards will be populated by JS -->
+    </div>
+
+    <!-- ACTIVE LESSON PANEL -->
+    <div class="lesson-panel" id="lessonPanel">
+        <div class="lesson-title" id="lessonTitle">Select a module to begin</div>
+        <div class="lesson-content" id="lessonContent">
+            <p style="color:#9bb0f0;">Click on any module above to start your journey into the forbidden knowledge of liberty, jurisdiction, and truth.</p>
+        </div>
+        <div>
+            <button class="completion-toggle" id="toggleCompleteBtn">✔️ Mark as completed</button>
+            <span id="activeModuleId" style="display:none;">0</span>
+        </div>
+    </div>
+
+    <!-- FLASHCARDS SECTION -->
+    <div class="flashcards-section">
+        <h3 style="font-size: 2rem; color: #ffe3a5; margin-bottom: 1.5rem;">📇 Key Terms Flashcards</h3>
+        <div id="flashcardContainer"></div>
+        <button class="completion-toggle" id="resetFlashcards" style="background:#253b68;">⟲ Reset Flashcards</button>
+    </div>
+
+    <!-- ASK THE DIALOGUES (Q&A) -->
+    <h3 style="font-size: 2rem; color: #eace9b; margin-bottom: 1rem;">💬 Ask the Dialogues</h3>
+    <div class="ask-section">
+        <input type="text" class="ask-input" id="askInput" placeholder="e.g., Am I required to file a 1040?">
+        <button class="ask-btn" id="askBtn">Ask</button>
+    </div>
+    <div class="qa-response" id="qaResponse">
+        <span class="qa-label">📖 Truth Framework Answer:</span> Your question will appear here.
+    </div>
+
+    <!-- DOWNLOADABLE PDF SUMMARIES -->
+    <div class="pdf-download">
+        <span style="font-size: 1.3rem;">📄 Download one-page summaries (simulated PDF)</span>
+        <button id="downloadSummaryBtn">Download Module 1 Summary</button>
+    </div>
+
+    <!-- FOOTER -->
+    <footer>
+        <p>⚡ Forbidden Knowledge · For the Amnesty Coalition for Unity ⚡</p>
+        <p>ForbiddenKnowledge.substack.com · quantum-freedom-site.vercel.app · DeJureGovernor.org</p>
+    </footer>
+</div>
+
+<script>
+    (function() {
+        // ----- MODULE DATA -----
+        const modules = [
+            { id: 1, title: "Module 1: The Two Realities", icon: "🌍⚙️", desc: "Natural reality vs. legal forum; legal fictions; the distinction that sets you free.", content: `<strong>Statement of Understanding:</strong><br><br>
+            There are two planes: <strong>Plane A (Natural Reality)</strong> – you are REAL, you are ALIVE, you have NATURAL RIGHTS, you are NOT PAPER.<br>
+            <strong>Plane B (Legal Forum Reality)</strong> – a venue where the system decides categories, burdens, and remedies using legal fictions.<br><br>
+            A legal fiction (e.g., corporation as person, constructive notice) is a DEVICE, not a LIE. It does not redefine reality. It creates a status inside a jurisdiction.<br>
+            The mistake is thinking the fiction replaces you. Understanding the distinction is the beginning of leverage.` },
+            { id: 2, title: "Module 2: Constitutional Foundation", icon: "📜⚖️", desc: "The 16th Amendment, Pollock, Brushaber, and the true nature of the income tax.", content: `<strong>The 16th Amendment & You:</strong><br><br>
+            • <strong>Pollock (1895):</strong> Direct taxes (on property/labor) must be apportioned; affirmed labor/property as natural right.<br>
+            • <strong>Brushaber (1916):</strong> 16th Amendment removed apportionment requirement for income taxes, but "conferred no new power of taxation." Income tax is an <em>excise</em> on federal privilege.<br>
+            • <strong>Eisner v. Macomber (1920):</strong> Income must be realized gain; mere exchange of labor for pay is not "gain" in the constitutional sense.<br>
+            • <strong>Conclusion:</strong> The income tax reaches only those in federal capacity, federal territory, or by voluntary consent.` },
+            { id: 3, title: "Module 3: Architecture of Control", icon: "⛓️🕸️", desc: "The 'String of Illusions' – how presumption, prestige, and inertia manufacture injustice.", content: `<strong>The String of Illusions – Carter Case:</strong><br><br>
+            • A $4 million "loan" that never existed became the centerpiece of a federal prosecution.<br>
+            • FBI Agent Gormley failed to verify; AUSA Lockhart indicted without proof.<br>
+            • OCC & PNC later admitted: no $4M loan, only a $250k prior note.<br>
+            • U.S. Attorney Glassman falsely claimed DOJ "shredded" evidence.<br>
+            • EOUSA FOIA response: no shredding logs exist.<br>
+            • <strong>Pattern:</strong> Error → presumption → prestige → cover-up → injustice.<br>
+            • Each actor presumed the prior did their job; no one verified.` },
+            { id: 4, title: "Module 4: The Remedy", icon: "⚔️📄", desc: "How to revoke nexus, correct the record, and reclaim your standing.", content: `<strong>Reclaiming Your Status – Step by Step:</strong><br><br>
+            • <strong>1. Audit your nexus:</strong> Use the checklist from the Jurisdiction Toolkit.<br>
+            • <strong>2. Draft affidavits:</strong> Affidavit of Fact – Political Status; Revocation of SSN Contract; Rescission of Signature.<br>
+            • <strong>3. Notarize and serve:</strong> Send via Certified Mail to IRS, Secretary of State, local recorder.<br>
+            • <strong>4. Preserve evidence:</strong> Keep return receipts, copies, affidavits.<br>
+            • <strong>5. Demand proof of jurisdiction:</strong> If contacted, require them to prove nexus.<br>
+            • <strong>Remember:</strong> Silence is not consent. Jurisdiction must be proven.` },
+            { id: 5, title: "Module 5: Moral & Spiritual Anchor", icon: "🕊️✨", desc: "Natural law, divine right, and the philosophy of the founders.", content: `<strong>Natural Law & Organic Liberty:</strong><br><br>
+            • "We hold these truths to be self-evident, that all men are created equal, that they are endowed by their Creator with certain unalienable Rights..." — Declaration of Independence<br>
+            • Government derives its just powers from the <strong>consent of the governed</strong>.<br>
+            • Natural law precedes and supersedes positive law.<br>
+            • Aristotle: Human flourishing (eudaimonia) requires rational autonomy; coercion stunts virtue.<br>
+            • The Liberty Dialogues assert that true freedom flows from God, not government. Any system that defies natural order without informed consent is an aberration of ignorance, deceit, or fear.<br>
+            • Your organs, labor, and property are yours by divine right.` }
+        ];
+
+        // ----- FLASHCARD DATA -----
+        const flashcards = [
+            { term: "Legal Fiction", definition: "A device the court treats as true for applying a rule, not a redefinition of reality. E.g., a corporation treated as a 'person'." },
+            { term: "Constructive Notice", definition: "A legal presumption that you know something you never read, solely because it was published in a designated forum." },
+            { term: "Excise", definition: "A tax on a voluntarily chosen activity or privilege; attaches only when one enters federal capacity or uses a federal franchise." },
+            { term: "Nexus", definition: "The required connection (consent, federal employment, territory) that must be proven before jurisdiction can attach." },
+            { term: "String of Illusions", definition: "A cascade of institutional error where each actor presumes the prior verified the facts, allowing fiction to become 'truth' by prestige." },
+            { term: "Plane A", definition: "Natural reality – you are a living, breathing human with God-given rights, not paper." },
+            { term: "Plane B", definition: "Legal forum – a constructed space of fictions, rules, and procedures for adjudication." }
+        ];
+
+        // ----- RENDER MODULE GRID -----
+        const moduleGrid = document.getElementById('moduleGrid');
+        const progressDisplay = document.getElementById('progressDisplay');
+        let completedModules = JSON.parse(localStorage.getItem('ldCompletedModules')) || [];
+
+        function saveProgress() {
+            localStorage.setItem('ldCompletedModules', JSON.stringify(completedModules));
+        }
+
+        function updateProgress() {
+            progressDisplay.innerText = `📊 Modules completed: ${completedModules.length} / 5`;
+        }
+
+        function renderModules() {
+            moduleGrid.innerHTML = '';
+            modules.forEach(mod => {
+                const card = document.createElement('div');
+                card.className = 'module-card' + (completedModules.includes(mod.id) ? ' completed' : '');
+                card.dataset.id = mod.id;
+                card.innerHTML = `
+                    <div class="module-icon">${mod.icon}</div>
+                    <h2>${mod.title}</h2>
+                    <p>${mod.desc}</p>
+                    <span class="module-badge">${completedModules.includes(mod.id) ? 'completed' : 'click to start'}</span>
+                `;
+                card.addEventListener('click', () => openModule(mod.id));
+                moduleGrid.appendChild(card);
+            });
+        }
+
+        // ----- OPEN MODULE (show lesson) -----
+        const lessonTitle = document.getElementById('lessonTitle');
+        const lessonContent = document.getElementById('lessonContent');
+        const toggleBtn = document.getElementById('toggleCompleteBtn');
+        const activeModuleSpan = document.getElementById('activeModuleId');
+        let activeModule = null;
+
+        function openModule(id) {
+            const mod = modules.find(m => m.id === id);
+            if (!mod) return;
+            activeModule = mod.id;
+            activeModuleSpan.innerText = mod.id;
+            lessonTitle.innerText = mod.title;
+            lessonContent.innerHTML = mod.content;
+            if (completedModules.includes(mod.id)) {
+                toggleBtn.innerText = '✔️ Completed';
+                toggleBtn.classList.add('completed');
+            } else {
+                toggleBtn.innerText = '✔️ Mark as completed';
+                toggleBtn.classList.remove('completed');
+            }
+        }
+
+        toggleBtn.addEventListener('click', () => {
+            const id = parseInt(activeModuleSpan.innerText);
+            if (!id) return;
+            if (completedModules.includes(id)) {
+                completedModules = completedModules.filter(x => x !== id);
+            } else {
+                completedModules.push(id);
+            }
+            saveProgress();
+            updateProgress();
+            renderModules();
+            // refresh button state
+            if (completedModules.includes(id)) {
+                toggleBtn.innerText = '✔️ Completed';
+                toggleBtn.classList.add('completed');
+            } else {
+                toggleBtn.innerText = '✔️ Mark as completed';
+                toggleBtn.classList.remove('completed');
+            }
+        });
+
+        // ----- FLASHCARDS -----
+        const flashcardContainer = document.getElementById('flashcardContainer');
+        function renderFlashcards() {
+            flashcardContainer.innerHTML = '';
+            flashcards.forEach(card => {
+                const div = document.createElement('div');
+                div.className = 'flashcard';
+                div.innerHTML = `
+                    <div class="term">${card.term}</div>
+                    <div class="definition">${card.definition}</div>
+                `;
+                div.addEventListener('click', () => div.classList.toggle('revealed'));
+                flashcardContainer.appendChild(div);
+            });
+        }
+        renderFlashcards();
+
+        document.getElementById('resetFlashcards').addEventListener('click', () => {
+            document.querySelectorAll('.flashcard').forEach(c => c.classList.remove('revealed'));
+        });
+
+        // ----- ASK THE DIALOGUES (simple Q&A) -----
+        const qaResponse = document.getElementById('qaResponse');
+        const askInput = document.getElementById('askInput');
+        const askBtn = document.getElementById('askBtn');
+
+        const qaDatabase = [
+            { q: /1040|file taxes|required to file/i, 
+              a: "In the truth framework of the Liberty Dialogues, if you are a private State National with no federal nexus (employment, contract, benefit), you are not lawfully required to file a 1040. The income tax is an excise on federal privilege, not a universal levy. However, the current legal system presumes all must file." },
+            { q: /nexus|what is nexus|federal nexus/i, 
+              a: "Nexus is the required connection that must be proven before federal jurisdiction can attach. It includes: federal employment, office, contract, benefit, or residence in a federal territory. Without nexus, there is no lawful authority." },
+            { q: /legal fiction|what is a legal fiction/i, 
+              a: "A legal fiction is a device used in the legal forum (Plane B) to treat something as true for the purpose of applying a rule. It does not redefine natural reality. Examples: corporations as 'persons', constructive notice." },
+            { q: /pollock|brushaber|16th amendment/i, 
+              a: "Pollock (1895) required direct taxes to be apportioned. The 16th Amendment removed apportionment for income taxes, but as Brushaber (1916) confirmed, it 'conferred no new power of taxation.' The income tax remains an excise on federal privilege." },
+            { q: /carter|orlando carter|string of illusions/i, 
+              a: "The Orlando Carter case is the perfect example of the String of Illusions: a $4M loan that never existed was prosecuted as fraud. OCC & PNC later admitted no loan existed; EOUSA confirmed no shredding. Each federal actor presumed the last did their job, and injustice was sealed by institutional prestige." }
+        ];
+
+        function answerQuestion(question) {
+            for (let item of qaDatabase) {
+                if (item.q.test(question)) {
+                    return item.a;
+                }
+            }
+            return "According to the Liberty Dialogues truth framework, that question touches on principles of jurisdiction and consent. Please consult the modules or rephrase your query. Remember: jurisdiction must be proven, not presumed.";
+        }
+
+        askBtn.addEventListener('click', () => {
+            const q = askInput.value.trim();
+            if (!q) return;
+            const ans = answerQuestion(q);
+            qaResponse.innerHTML = `<span class="qa-label">📖 Truth Framework Answer:</span> ${ans}`;
+        });
+
+        askInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') askBtn.click();
+        });
+
+        // ----- DOWNLOAD SIMULATED PDF -----
+        document.getElementById('downloadSummaryBtn').addEventListener('click', () => {
+            const summary = `MODULE 1 SUMMARY – THE TWO REALITIES
+
+• Plane A (Natural Reality): You are a living human, with natural rights, NOT a legal fiction.
+• Plane B (Legal Forum): A constructed space where legal fictions (corporate personhood, constructive notice) are used for adjudication.
+• Legal fictions do not replace who you are. They are tools of the system.
+• The mistake: confusing the fiction with reality. The remedy: understanding the distinction.
+
+"The truth shall make you free." — John 8:32
+
+ForbiddenKnowledge.substack.com`;
+            const blob = new Blob([summary], { type: 'text/plain' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'Module1_Summary.txt';
+            a.click();
+        });
+
+        // ----- INITIAL RENDER -----
+        renderModules();
+        updateProgress();
+        openModule(1); // start with module 1
+
+        // load progress
+        if (completedModules.length > 0) {
+            updateProgress();
+            renderModules();
+        }
+
+    })();
+</script>
+
+<style>
+    /* additional style for better readability */
+    .lesson-content strong { color: #ffd58c; }
+    .lesson-content em { color: #b6cbff; }
+</style>
+
+</body>
+</html>
