@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>illuminator's companion · deep knowledge</title>
+  <!-- deeper, liberated, self‑executing web app -->
+  <meta name="description" content="A friendly, expansive guide to seeing clearly and thinking freely – hidden gems included.">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* -------------------- variables (light / dark toggle) -------------------- */
+    :root {
+      --bg: #faf7f0;
+      --surface: rgba(255, 250, 240, 0.8);
+      --card-bg: #ffffffd9;
+      --text: #1e2b25;
+      --text-light: #2b3e35;
+      --accent: #9b8c7a;
+      --accent-deep: #5e6f5a;
+      --gold: #b89b7a;
+      --shadow: 0 20px 35px -12px rgba(30, 40, 20, 0.25);
+      --border: #dacfbc;
+      --quote-bg: #ece3d7;
+      --glow: rgba(180, 150, 120, 0.2);
+    }
+
+    body.dark {
+      --bg: #1e2822;
+      --surface: #2d3a32e0;
+      --card-bg: #28342ee0;
+      --text: #e3dfd1;
+      --text-light: #c9c1ae;
+      --accent: #9f917e;
+      --accent-deep: #b7b09a;
+      --gold: #dbb88c;
+      --shadow: 0 25px 40px -12px #0a0f0c;
+      --border: #5f6b5a;
+      --quote-bg: #3a453d;
+      --glow: rgba(220, 190, 140, 0.15);
+    }
+
+    body {
+      font-family: 'Cormorant Garamond', 'Times New Roman', serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      transition: background 0.3s, color 0.2s;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .wrapper {
+      max-width: 1400px;
+      width: 100%;
+    }
+
+    /* glassy card effect */
+    .glass-panel {
+      background: var(--surface);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border-radius: 3rem;
+      padding: 2.5rem 2rem;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+    }
+
+    /* typography */
+    h1, h2, h3 {
+      font-weight: 500;
+      letter-spacing: 0.01em;
+    }
+
+    h1 {
+      font-size: 4rem;
+      background: linear-gradient(145deg, #8b6f50, #3f604a);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 0.25rem;
+      line-height: 1.1;
+    }
+
+    .sub {
+      font-size: 1.5rem;
+      color: var(--accent-deep);
+      border-bottom: 2px solid var(--gold);
+      display: inline-block;
+      padding-bottom: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    /* header area */
+    .hero {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .pill {
+      background: var(--gold);
+      color: #1e2b1a;
+      padding: 0.3rem 1.5rem;
+      border-radius: 50px;
+      font-size: 1rem;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      display: inline-block;
+      margin-bottom: 1rem;
+      border: 1px solid #dbbc93;
+    }
+
+    /* theme toggle */
+    .theme-toggle {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 1.5rem;
+    }
+
+    .theme-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 40px;
+      padding: 0.6rem 1.5rem;
+      font-size: 1rem;
+      cursor: pointer;
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      transition: 0.2s;
+      box-shadow: 0 2px 6px var(--glow);
+    }
+
+    .theme-btn:hover {
+      background: var(--gold);
+      color: #1d2c20;
+    }
+
+    /* grid for deep dives */
+    .deep-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 2rem;
+      margin: 3rem 0;
+    }
+
+    .chapter-card {
+      background: var(--card-bg);
+      border-radius: 2rem;
+      padding: 1.8rem 1.5rem;
+      border: 1px solid var(--border);
+      box-shadow: 0 10px 18px -10px var(--glow);
+      transition: all 0.2s;
+    }
+
+    .chapter-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--gold);
+    }
+
+    .chapter-number {
+      font-size: 0.9rem;
+      background: var(--accent);
+      color: #fefcf5;
+      padding: 0.2rem 1rem;
+      border-radius: 30px;
+      display: inline-block;
+      margin-bottom: 1rem;
+      letter-spacing: 1px;
+    }
+
+    .chapter-title {
+      font-size: 2rem;
+      font-weight: 500;
+      color: var(--gold);
+      margin-bottom: 1rem;
+      border-left: 4px solid var(--gold);
+      padding-left: 1rem;
+    }
+
+    /* expandable deep sections (details) */
+    details {
+      margin-top: 1.2rem;
+      background: var(--quote-bg);
+      border-radius: 1.5rem;
+      padding: 0.5rem 1rem;
+      border: 1px solid var(--border);
+      transition: 0.2s;
+    }
+
+    summary {
+      font-weight: 600;
+      font-size: 1.2rem;
+      padding: 0.8rem 0.5rem;
+      cursor: pointer;
+      color: var(--accent-deep);
+      list-style: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    summary::-webkit-details-marker {
+      display: none;
+    }
+
+    summary::before {
+      content: "📘";
+      font-size: 1.4rem;
+    }
+
+    details[open] summary::before {
+      content: "📖";
+    }
+
+    .insight {
+      padding: 0.5rem 1.2rem 1.2rem;
+      font-size: 1.05rem;
+      color: var(--text);
+      border-top: 1px dashed var(--border);
+    }
+
+    .insight p {
+      margin-top: 0.8rem;
+    }
+
+    .insight a {
+      color: var(--gold);
+      text-decoration: underline wavy var(--gold) 1px;
+      text-underline-offset: 4px;
+    }
+
+    /* hidden gems / forbidden knowledge panel */
+    .gem-box {
+      background: var(--card-bg);
+      border-radius: 2.5rem;
+      padding: 2rem;
+      margin: 3rem 0 2rem;
+      border: 2px solid var(--gold);
+      box-shadow: 0 0 0 4px var(--glow), inset 0 0 10px #00000010;
+    }
+
+    .gem-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .gem-header h2 {
+      font-size: 2.3rem;
+      background: linear-gradient(145deg, #a3876b, #6c896c);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .gem-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1rem;
+      margin: 1.5rem 0;
+    }
+
+    @media (max-width: 700px) {
+      .gem-grid { grid-template-columns: 1fr; }
+    }
+
+    .gem-item {
+      background: var(--quote-bg);
+      border-radius: 1.5rem;
+      padding: 1.2rem;
+      border: 1px solid var(--border);
+    }
+
+    .gem-item summary {
+      font-size: 1.2rem;
+      font-weight: 500;
+      color: var(--gold);
+    }
+
+    /* wisdom generator */
+    .wisdom-machine {
+      background: var(--surface);
+      border-radius: 2rem;
+      padding: 2rem;
+      margin: 2.5rem 0;
+      text-align: center;
+      border: 2px dotted var(--gold);
+    }
+
+    #wisdomDisplay {
+      font-size: 1.6rem;
+      font-style: italic;
+      padding: 2rem 1rem;
+      background: var(--card-bg);
+      border-radius: 3rem;
+      margin: 1.5rem 0;
+      color: var(--accent-deep);
+      border: 1px solid var(--border);
+    }
+
+    .wisdom-btn {
+      background: var(--gold);
+      border: none;
+      color: #1f2f23;
+      font-size: 1.3rem;
+      padding: 0.8rem 2.5rem;
+      border-radius: 60px;
+      cursor: pointer;
+      border-bottom: 3px solid #7b634b;
+      transition: 0.1s;
+      font-family: 'Inter', sans-serif;
+      font-weight: 500;
+    }
+
+    .wisdom-btn:active {
+      transform: translateY(2px);
+      border-bottom-width: 1px;
+    }
+
+    /* footer / trips to colombia */
+    .footer {
+      margin-top: 4rem;
+      padding-top: 2rem;
+      border-top: 2px solid var(--border);
+      text-align: center;
+      font-size: 1.2rem;
+    }
+
+    .footer a {
+      color: var(--gold);
+      text-decoration: none;
+      font-weight: 500;
+      border-bottom: 1px solid;
+    }
+
+    .signature {
+      background: var(--card-bg);
+      border-radius: 100px;
+      padding: 0.5rem 2rem;
+      display: inline-block;
+      margin: 1rem 0;
+    }
+
+    /* scroll top */
+    .top-link {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: var(--gold);
+      color: #1e2b1a;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2rem;
+      text-decoration: none;
+      opacity: 0.7;
+      border: 1px solid var(--border);
+    }
+
+    .top-link:hover {
+      opacity: 1;
+    }
+  </style>
+  <!-- fonts: serif for depth, sans for UI -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@300;500&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="wrapper">
+  <!-- theme toggle -->
+  <div class="theme-toggle">
+    <button class="theme-btn" id="themeToggle">🌓 switch to dusk / dawn</button>
+  </div>
+
+  <div class="glass-panel">
+    <!-- hero -->
+    <div class="hero">
+      <span class="pill">the liberating path</span>
+      <h1>illuminator's companion</h1>
+      <div class="sub">a deep, friendly inquiry into what’s often left unsaid</div>
+      <p style="max-width:750px; margin:1.5rem auto 0; font-size:1.3rem;">This is not about fear — it's about clarity. We explore hidden dimensions of knowledge with wonder and care. Every idea here is an invitation, not an instruction.</p>
+    </div>
+
+    <!-- deep grid - chapters (expandable) -->
+    <div class="deep-grid">
+      <!-- chapter 1 -->
+      <div class="chapter-card">
+        <span class="chapter-number">⦿ 01</span>
+        <div class="chapter-title">the nature of knowing</div>
+        <p>How do we come to know anything? A look at epistemology, innocence, and the courage to question.</p>
+        <details>
+          <summary>deeper glimpse</summary>
+          <div class="insight">
+            <p><strong>✦ the veil of consensus ✦</strong> Much of what we accept as “truth” is inherited. Cultures, institutions, and languages shape the lens. To see beyond, we must first notice the lens itself. Ask: <em>who defines what is worth knowing?</em></p>
+            <p><strong>✦ ancient roots ✦</strong> In pre‑Socratic Greece, the idea of “hiddenness” (aletheia) meant truth as unconcealment. Indigenous traditions speak of knowledge received through dream and land. These aren't inferior — they're different ways of seeing.</p>
+          </div>
+        </details>
+      </div>
+
+      <!-- chapter 2 -->
+      <div class="chapter-card">
+        <span class="chapter-number">⦿ 02</span>
+        <div class="chapter-title">architecture of information</div>
+        <p>Who builds the channels? Media, algorithms, textbooks — every container shapes the content.</p>
+        <details>
+          <summary>go deeper</summary>
+          <div class="insight">
+            <p><strong>✦ filters everywhere ✦</strong> Journalism schools teach “gatekeeping”. Social media optimises for engagement, not accuracy. Even encyclopedias have editorial biases. Recognising this isn’t cynicism; it’s literacy.</p>
+            <p><strong>✦ the missing stories ✦</strong> Histories written by victors leave gaps. Seek out voices from the periphery: women, colonised peoples, underground thinkers. Their perspectives often hold the missing piece.</p>
+          </div>
+        </details>
+      </div>
+
+      <!-- chapter 3 -->
+      <div class="chapter-card">
+        <span class="chapter-number">⦿ 03</span>
+        <div class="chapter-title">suppressed & forgotten</div>
+        <p>Ideas that threatened power, or simply didn’t fit the narrative. Not conspiracy — history.</p>
+        <details>
+          <summary>hidden examples</summary>
+          <div class="insight">
+            <p><strong>✦ the library of alexandria ✦</strong> Its destruction symbolises the fragility of collective memory. Many works lost — not only by fire, but by neglect and canonisation.</p>
+            <p><strong>✦ alternative technologies ✦</strong> From Tesla’s wireless visions to forgotten agricultural practices, there are roads not taken. Studying them reminds us that the present isn’t the only possibility.</p>
+            <p><strong>✦ medical pluralism ✦</strong> Plant-based healing systems (Ayurveda, Traditional Chinese Medicine) were often dismissed, yet they contain millennia of observation.</p>
+          </div>
+        </details>
+      </div>
+
+      <!-- chapter 4 -->
+      <div class="chapter-card">
+        <span class="chapter-number">⦿ 04</span>
+        <div class="chapter-title">tools of discernment</div>
+        <p>Practical wisdom to separate insight from illusion, without paranoia.</p>
+        <details>
+          <summary>sharpen your lens</summary>
+          <div class="insight">
+            <p><strong>✦ emotional fingerprint ✦</strong> Information that sparks rage or fear might be designed to. Pause and ask: who benefits from my emotional reaction?</p>
+            <p><strong>✦ triangulation ✦</strong> Compare three sources from different worldviews. Where they agree, you're on solid ground. Where they diverge, explore why.</p>
+            <p><strong>✦ the doubter’s prayer ✦</strong> “Could I be wrong? What would change my mind?” This keeps inquiry humble.</p>
+          </div>
+        </details>
+      </div>
+
+      <!-- chapter 5 -->
+      <div class="chapter-card">
+        <span class="chapter-number">⦿ 05</span>
+        <div class="chapter-title">voices from the edge</div>
+        <p>Philosophers, mystics, renegade scientists who saw further.</p>
+        <details>
+          <summary>sparks of insight</summary>
+          <div class="insight">
+            <p><strong>✦ hypatia of alexandria ✦</strong> Neoplatonist mathematician who taught open inquiry — her murder marked a turning away from reason.</p>
+            <p><strong>✦ william blake ✦</strong> “If the doors of perception were cleansed, every thing would appear as it is, infinite.” Art as a way of knowing.</p>
+            <p><strong>✦ bayes & uncertainty ✦</strong> Reverend Thomas Bayes gave us a formula to update beliefs with evidence — a mathematical humility.</p>
+          </div>
+        </details>
+      </div>
+
+      <!-- chapter 6 -->
+      <div class="chapter-card">
+        <span class="chapter-number">⦿ 06</span>
+        <div class="chapter-title">inner compass</div>
+        <p>Intuition, ethics, resilience — the subjective side of deep knowing.</p>
+        <details>
+          <summary>cultivate within</summary>
+          <div class="insight">
+            <p><strong>✦ somatic wisdom ✦</strong> Your body often knows before your mind. Tension, ease, gut feelings — they are data.</p>
+            <p><strong>✦ ethical boundary ✦</strong> Seeking knowledge should never harm others. Respect privacy, consent, and dignity.</p>
+            <p><strong>✦ the still point ✦</strong> Meditation and silence create space for insights to surface. The noise must settle.</p>
+          </div>
+        </details>
+      </div>
+    </div> <!-- end deep grid -->
+
+    <!-- HIDDEN GEMS section — forbidden knowledge substack & deep cuts -->
+    <div class="gem-box">
+      <div class="gem-header">
+        <span style="font-size:3rem;">🔮</span>
+        <h2>the gem chamber</h2>
+        <span style="margin-left:auto; font-size:1.2rem; background:var(--quote-bg); padding:0.3rem 1.5rem; border-radius:40px;">forbidden? or just forgotten?</span>
+      </div>
+      <p style="font-size:1.2rem; margin:1rem 0;">Here are three overlooked (or actively marginalised) veins of knowledge. Each one opens a door.</p>
+      <div class="gem-grid">
+        <div class="gem-item">
+          <details>
+            <summary>🕯️  Pre‑columbian american archives</summary>
+            <div class="insight" style="background:transparent;">
+              <p>Spanish colonisers burned thousands of Maya codices. Only four survive. But oral traditions, glyphs, and recent archaeology reveal advanced mathematics, astronomy, and ecology. The <em>Popol Vuh</em> is a fragment of a much larger worldview.</p>
+            </div>
+          </details>
+        </div>
+        <div class="gem-item">
+          <details>
+            <summary>📡  The “cancelled” tech</summary>
+            <div class="insight" style="background:transparent;">
+              <p>From the Hughes H‑4 Hercules (Spruce Goose) to high‑efficiency masonry that never went mainstream, many innovations were shelved due to economics, war, or patent battles. Studying them reveals the non‑linear path of progress.</p>
+            </div>
+          </details>
+        </div>
+        <div class="gem-item">
+          <details>
+            <summary>🧬  Epigenetics & inherited memory</summary>
+            <div class="insight" style="background:transparent;">
+              <p>Recent research suggests trauma can leave chemical marks on DNA, affecting descendants. Ancient traditions spoke of ancestral imprints — science is catching up.</p>
+            </div>
+          </details>
+        </div>
+      </div>
+      <div style="text-align:center; margin-top:2rem;">
+        <a href="https://forbiddenknowledge.substack.com" target="_blank" rel="noopener" style="font-size:1.5rem; background:var(--gold); padding:0.5rem 2.2rem; border-radius:60px; color:#1e2b1a; text-decoration:none; border-bottom:3px solid #6b4f38; display:inline-block;">⚡ explore forbiddenknowledge.substack ⚡</a>
+        <p style="margin-top:1rem; opacity:0.9;">(a thoughtful archive of unconventional wisdom — approach with the same open heart)</p>
+      </div>
+    </div>
+
+    <!-- wisdom generator (random spark) -->
+    <div class="wisdom-machine">
+      <h3 style="font-size:2rem; font-weight:400;">🌀 random spark</h3>
+      <div id="wisdomDisplay">"The most beautiful thing we can experience is the mysterious." – Albert Einstein</div>
+      <button class="wisdom-btn" id="newWisdom">ignite another</button>
+    </div>
+
+    <!-- note on the original impulse (cleaned) -->
+    <div style="background:var(--quote-bg); border-radius:2rem; padding:1.8rem; margin:2rem 0;">
+      <p style="font-size:1.25rem;"><span style="font-size:2rem; margin-right:0.8rem;">🕊️</span> This guide is an evolved version of a raw, early spark. All edges have been softened — no aggression, no foul language — only the core desire: to help humans think more freely and kindly. We stand on the shoulders of many truth‑seekers.</p>
+    </div>
+
+    <!-- footer -->
+    <div class="footer">
+      <div class="signature">⚡ compliments of trips to colombia ⚡</div>
+      <p><a href="#" target="_blank">TripsToColombia.com</a> — where journeys inward and outward meet.</p>
+      <p style="margin-top:1rem;">✦ ✧ ✦ may your quest be deep and your heart stay light ✦ ✧ ✦</p>
+      <p style="font-size:0.9rem; margin-top:1.5rem;">all knowledge wants to be free — share this tool widely.</p>
+    </div>
+  </div> <!-- end glass-panel -->
+
+  <!-- scroll top link -->
+  <a href="#" class="top-link" aria-label="scroll to top">↑</a>
+</div> <!-- end wrapper -->
+
+<!-- JavaScript for theme toggle and wisdom generator -->
+<script>
+  (function() {
+    // theme toggle
+    const themeBtn = document.getElementById('themeToggle');
+    const body = document.body;
+
+    // check localStorage
+    if (localStorage.getItem('theme') === 'dark') {
+      body.classList.add('dark');
+    }
+
+    themeBtn.addEventListener('click', () => {
+      body.classList.toggle('dark');
+      if (body.classList.contains('dark')) {
+        localStorage.setItem('theme', 'dark');
+      } else {
+        localStorage.setItem('theme', 'light');
+      }
+    });
+
+    // wisdom generator
+    const wisdomPool = [
+      '"The opposite of a fact is falsehood, but the opposite of one profound truth may very well be another profound truth." – Niels Bohr',
+      '"Everything we hear is an opinion, not a fact. Everything we see is a perspective, not the truth." – Marcus Aurelius',
+      '"Doubt is not a pleasant condition, but certainty is absurd." – Voltaire',
+      '"The greatest enemy of knowledge is not ignorance, it is the illusion of knowledge." – Stephen Hawking',
+      '"We do not see things as they are, we see them as we are." – Anaïs Nin',
+      '"The most important thing in science is not so much to obtain new facts as to discover new ways of thinking about them." – William Lawrence Bragg',
+      '"It is the mark of an educated mind to be able to entertain a thought without accepting it." – Aristotle',
+      '"Wonder is the seed of knowledge." – Francis Bacon',
+      '"To know that you do not know is the beginning of wisdom." – Socrates',
+      '"There are more things in heaven and earth, Horatio, than are dreamt of in your philosophy." – Shakespeare',
+      '"The wise man knows that he knows nothing." – attributed to many',
+      '"Information is not knowledge. Knowledge is not wisdom. Wisdom is not truth." – Frank Zappa',
+      '"We are drowned in information, but starved for knowledge." – John Naisbitt',
+      '"The first principle is that you must not fool yourself — and you are the easiest person to fool." – Richard Feynman',
+      '"Sometimes the questions are complicated and the answers are simple." – Dr. Seuss'
+    ];
+
+    const wisdomDisplay = document.getElementById('wisdomDisplay');
+    const wisdomBtn = document.getElementById('newWisdom');
+
+    function showRandomWisdom() {
+      const randomIndex = Math.floor(Math.random() * wisdomPool.length);
+      wisdomDisplay.textContent = wisdomPool[randomIndex];
+    }
+
+    wisdomBtn.addEventListener('click', showRandomWisdom);
+
+    // optional: show a random one on page load
+    window.addEventListener('load', showRandomWisdom);
+  })();
+</script>
+
+<!-- add smooth scrolling for top link -->
+<style>
+  html { scroll-behavior: smooth; }
+  .top-link { text-decoration: none; }
+</style>
+</body>
+</html>
