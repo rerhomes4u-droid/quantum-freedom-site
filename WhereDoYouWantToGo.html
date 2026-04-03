@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Colombia Trip Cost Breaker | TripsToColombia.com</title>
+    <meta property="og:title" content="I priced my Colombia trip. You won't believe the number.">
+    <meta property="og:description" content="7 days. Flights, hotels, tours. See your real cost in 60 seconds.">
+    <meta property="og:image" content="https://tripstocolombia.com/og-share.jpg">
+    <meta property="og:url" content="https://tripstocolombia.com/cost-breaker">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0B1A1A;
+            color: #E6E0D4;
+            line-height: 1.5;
+            min-height: 100vh;
+        }
+
+        /* Header with live counter */
+        .live-counter {
+            background: #1E3A2F;
+            padding: 0.5rem;
+            text-align: center;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            border-bottom: 1px solid #C9A03D;
+        }
+
+        .live-counter i {
+            color: #C9A03D;
+            margin-right: 6px;
+        }
+
+        /* Main container */
+        .container {
+            max-width: 750px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem 4rem;
+        }
+
+        /* Progress bar */
+        .progress-container {
+            margin-bottom: 2rem;
+        }
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.7rem;
+            color: #8A9A8A;
+        }
+        .progress-bar {
+            height: 6px;
+            background: #2E3F3A;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            width: 0%;
+            height: 100%;
+            background: #C9A03D;
+            transition: width 0.3s ease;
+        }
+
+        /* Card style */
+        .card {
+            background: #112420;
+            border-radius: 32px;
+            padding: 2rem;
+            border: 1px solid #2F4A3E;
+            box-shadow: 0 20px 35px -15px rgba(0,0,0,0.5);
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .badge-save {
+            background: #C9A03D;
+            color: #0B1A1A;
+            display: inline-block;
+            padding: 0.25rem 1rem;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Question styles */
+        .question {
+            display: none;
+        }
+        .question.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            margin: 1.5rem 0;
+        }
+        .option-btn {
+            background: #1E342E;
+            border: 1px solid #3E5A50;
+            padding: 1rem;
+            border-radius: 60px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #E6E0D4;
+        }
+        .option-btn:hover {
+            background: #2A4A3E;
+            border-color: #C9A03D;
+        }
+        .option-btn.selected {
+            background: #C9A03D;
+            color: #0B1A1A;
+            border-color: #C9A03D;
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1.5rem;
+        }
+        .btn {
+            padding: 0.8rem 1.8rem;
+            border-radius: 50px;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            transition: 0.2s;
+        }
+        .btn-next {
+            background: #C9A03D;
+            color: #0B1A1A;
+        }
+        .btn-prev {
+            background: transparent;
+            border: 1px solid #5A7868;
+            color: #E6E0D4;
+        }
+
+        /* Result screen */
+        .result-card {
+            text-align: center;
+        }
+        .big-price {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: #C9A03D;
+            margin: 1rem 0;
+        }
+        .original-price {
+            text-decoration: line-through;
+            color: #8A9A8A;
+            font-size: 1.2rem;
+        }
+        .savings-badge {
+            background: #2A6B47;
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 60px;
+            margin: 1rem 0;
+        }
+        .share-btn, .book-btn {
+            display: block;
+            width: 100%;
+            padding: 1rem;
+            margin: 0.8rem 0;
+            text-align: center;
+            font-weight: 700;
+            border-radius: 60px;
+            text-decoration: none;
+        }
+        .share-btn {
+            background: #1E6F5C;
+            color: white;
+        }
+        .book-btn {
+            background: #C9A03D;
+            color: #0B1A1A;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            font-size: 0.7rem;
+            color: #5A7868;
+        }
+    </style>
+</head>
+<body>
+
+<div class="live-counter">
+    <i class="fas fa-users"></i> <span id="liveBookings">47</span> people booked a trip in the last 24 hours • <i class="fas fa-shield-alt"></i> 100% refund guarantee
+</div>
+
+<div class="container">
+    <div class="progress-container">
+        <div class="progress-steps">
+            <span>1. Destination</span>
+            <span>2. Travel style</span>
+            <span>3. Duration</span>
+            <span>4. Group size</span>
+            <span>5. Your price</span>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+        </div>
+    </div>
+
+    <div class="card" id="quizCard">
+        <!-- Questions will be injected here -->
+    </div>
+</div>
+
+<footer>
+    <i class="fas fa-lock"></i> No spam. No obligation. Prices include taxes & local support.<br>
+    TripsToColombia.com — Book with confidence. 24/7 local assistance.
+</footer>
+
+<script>
+    // Live counter simulation (increments randomly to create urgency)
+    let liveCount = 47;
+    const liveSpan = document.getElementById('liveBookings');
+    setInterval(() => {
+        liveCount += Math.floor(Math.random() * 3);
+        if (liveSpan) liveSpan.innerText = liveCount;
+    }, 8000);
+
+    // Questions data
+    const questions = [
+        {
+            text: "Where do you want to go?",
+            options: ["Medellín & Coffee Region", "Cartagena & Caribbean Coast", "Bogotá & Andes", "I want a mix — surprise me"]
+        },
+        {
+            text: "What's your travel style?",
+            options: ["Backpacker (budget, hostels)", "Mid-range (private rooms, good tours)", "Premium (boutique hotels, private guides)", "Luxury (I want the best)"]
+        },
+        {
+            text: "How many days?",
+            options: ["4-5 days (weekender)", "6-8 days (one week)", "9-12 days (deep dive)", "13+ days (full immersion)"]
+        },
+        {
+            text: "How many people?",
+            options: ["Solo adventurer", "2 people (couple/friend)", "3-4 people (small group)", "5+ (family/group)"]
+        }
+    ];
+
+    // Pricing logic (returns object with retail and our price)
+    function calculatePrice(destIdx, styleIdx, daysIdx, groupIdx) {
+        // Base retail price per person for 7 days mid-range
+        const destMultiplier = [1.0, 1.1, 0.9, 0.95]; // Medellin baseline, Cartagena +10%, Bogota -10%, mix -5%
+        const styleMultiplier = [0.7, 1.0, 1.6, 2.5];
+        const daysMap = [5, 7, 10, 14];
+        const groupDiscount = [1.0, 0.9, 0.8, 0.7]; // solo full price, groups cheaper per person
+        
+        const baseDailyRetail = 120; // $120 USD per person per day mid-range
+        const days = daysMap[daysIdx];
+        const retailPerPerson = baseDailyRetail * days * destMultiplier[destIdx] * styleMultiplier[styleIdx];
+        const retailTotal = retailPerPerson * groupDiscount[groupIdx] * (groupIdx === 0 ? 1 : (groupIdx === 1 ? 2 : (groupIdx === 2 ? 3.5 : 5)));
+        
+        // Our price: 20-30% cheaper
+        let ourPrice = retailTotal * 0.75;
+        if (styleIdx === 0) ourPrice = retailTotal * 0.68; // bigger discount for budget
+        if (styleIdx === 3) ourPrice = retailTotal * 0.85; // luxury smaller margin
+        
+        return {
+            retail: Math.round(retailTotal),
+            ourPrice: Math.round(ourPrice),
+            savings: Math.round(retailTotal - ourPrice)
+        };
+    }
+
+    let currentStep = 0;
+    let answers = [null, null, null, null];
+    let result = null;
+
+    const quizCard = document.getElementById('quizCard');
+    const progressFill = document.getElementById('progressFill');
+
+    function renderQuestion() {
+        if (currentStep < questions.length) {
+            const q = questions[currentStep];
+            let html = `
+                <div class="question active">
+                    <span class="badge-save"><i class="fas fa-tag"></i> SAVE 20-32% vs booking direct</span>
+                    <h1>${q.text}</h1>
+                    <div class="options" id="optionsContainer">
+            `;
+            q.options.forEach((opt, idx) => {
+                const isSelected = (answers[currentStep] === idx);
+                html += `
+                    <div class="option-btn ${isSelected ? 'selected' : ''}" data-val="${idx}">
+                        <span>${opt}</span>
+                        ${isSelected ? '<i class="fas fa-check-circle"></i>' : ''}
+                    </div>
+                `;
+            });
+            html += `
+                    </div>
+                    <div class="nav-buttons">
+                        ${currentStep > 0 ? '<button class="btn btn-prev" id="prevBtn"><i class="fas fa-arrow-left"></i> Back</button>' : '<div></div>'}
+                        <button class="btn btn-next" id="nextBtn">${currentStep === questions.length-1 ? 'See my price →' : 'Next →'}</button>
+                    </div>
+                </div>
+            `;
+            quizCard.innerHTML = html;
+            
+            // Attach option listeners
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const val = parseInt(btn.getAttribute('data-val'));
+                    answers[currentStep] = val;
+                    renderQuestion(); // re-render to show selection
+                });
+            });
+            
+            document.getElementById('nextBtn').addEventListener('click', () => {
+                if (answers[currentStep] === null) {
+                    alert("Please select an option to continue.");
+                    return;
+                }
+                if (currentStep === questions.length - 1) {
+                    // Calculate and show results
+                    const pricing = calculatePrice(answers[0], answers[1], answers[2], answers[3]);
+                    result = pricing;
+                    showResult();
+                } else {
+                    currentStep++;
+                    updateProgress();
+                    renderQuestion();
+                }
+            });
+            
+            if (document.getElementById('prevBtn')) {
+                document.getElementById('prevBtn').addEventListener('click', () => {
+                    currentStep--;
+                    updateProgress();
+                    renderQuestion();
+                });
+            }
+        }
+        updateProgress();
+    }
+    
+    function updateProgress() {
+        const percent = ((currentStep + 1) / questions.length) * 100;
+        progressFill.style.width = `${percent}%`;
+    }
+    
+    function showResult() {
+        if (!result) return;
+        const groupSizeText = ["solo", "2 people", "3-4 people", "5+ people"][answers[3]];
+        const destText = ["Medellín & Coffee Region", "Cartagena Coast", "Bogotá & Andes", "A Mix"][answers[0]];
+        
+        const html = `
+            <div class="result-card question active">
+                <i class="fas fa-calculator" style="font-size: 2.5rem; color:#C9A03D;"></i>
+                <h1>Your custom trip price</h1>
+                <p>${destText} • ${groupSizeText} • ${["4-5","6-8","9-12","13+"][answers[2]]} days</p>
+                
+                <div class="original-price">Regular price: $${result.retail} USD</div>
+                <div class="big-price">$${result.ourPrice} USD</div>
+                <div class="savings-badge"><i class="fas fa-gem"></i> You save $${result.savings} (${Math.round(result.savings/result.retail*100)}%)</div>
+                
+                <p style="margin: 1rem 0;">Includes: hand-picked hotels, tours, 24/7 support, and all taxes.</p>
+                
+                <a href="https://tripstocolombia.com/book?ref=costbreaker&save=${result.savings}" class="book-btn" target="_blank">
+                    <i class="fas fa-luggage-cart"></i> Claim this price → Book Now
+                </a>
+                
+                <button id="shareResultBtn" class="share-btn">
+                    <i class="fab fa-whatsapp"></i> Share & unlock $20 credit
+                </button>
+                
+                <p style="font-size: 0.7rem; margin-top: 1rem;">No payment needed to see full itinerary. Refund guarantee.</p>
+            </div>
+        `;
+        quizCard.innerHTML = html;
+        
+        // Add share functionality (viral loop)
+        document.getElementById('shareResultBtn')?.addEventListener('click', () => {
+            const text = `🇨🇴 Just priced my Colombia trip: ${result.days} days for only $${result.ourPrice} (reg $${result.retail}). Save ${Math.round(result.savings/result.retail*100)}% with @TripsToColombia → `;
+            const url = `https://tripstocolombia.com/cost-breaker?ref=share`;
+            const shareText = encodeURIComponent(text + " " + url);
+            window.open(`https://wa.me/?text=${shareText}`, '_blank');
+            
+            // Show credit message
+            const btn = document.getElementById('shareResultBtn');
+            btn.innerHTML = '<i class="fas fa-check"></i> $20 credit added! Use code SHARE20';
+            btn.style.background = '#2A6B47';
+            
+            // Store in localStorage
+            localStorage.setItem('shareCredit', 'true');
+        });
+    }
+    
+    // Start the quiz
+    renderQuestion();
+    
+    // Add WhatsApp floating button for direct contact
+    const waFloat = document.createElement('div');
+    waFloat.style.position = 'fixed';
+    waFloat.style.bottom = '20px';
+    waFloat.style.right = '20px';
+    waFloat.style.background = '#25D366';
+    waFloat.style.borderRadius = '50px';
+    waFloat.style.padding = '12px 20px';
+    waFloat.style.color = 'black';
+    waFloat.style.fontWeight = 'bold';
+    waFloat.style.zIndex = '1000';
+    waFloat.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
+    waFloat.style.cursor = 'pointer';
+    waFloat.innerHTML = '<i class="fab fa-whatsapp"></i> Need help? Chat now';
+    waFloat.onclick = () => {
+        window.open('https://wa.me/573218844032?text=I%20just%20used%20the%20Cost%20Breaker%20and%20have%20a%20question%20about%20booking.', '_blank');
+    };
+    document.body.appendChild(waFloat);
+</script>
+</body>
+</html>
