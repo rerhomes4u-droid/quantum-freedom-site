@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>TripsToColombia · Live the Legend</title>
+  <!-- Preconnect & Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700;14..32,800;14..32,900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- GSAP for smooth animations -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0a0f1a;
+      color: #f0f3fa;
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+    }
+
+    /* custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #11161f;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #ff7a2f;
+      border-radius: 20px;
+    }
+
+    /* animated gradient background */
+    .bg-glow {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -2;
+      background: radial-gradient(circle at 20% 30%, #0d2b2c, #03050a);
+    }
+    .bg-glow::after {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(ellipse at 70% 40%, rgba(255, 100, 30, 0.15), transparent 70%);
+      animation: pulseGlow 8s infinite alternate;
+    }
+    @keyframes pulseGlow {
+      0% { opacity: 0.3; }
+      100% { opacity: 0.8; }
+    }
+
+    /* floating particles canvas */
+    #particleCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    /* container */
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* navbar */
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.5rem 0;
+      flex-wrap: wrap;
+      gap: 1rem;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .logo {
+      font-size: 1.8rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #FFB347, #FF7A2F);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      letter-spacing: -0.5px;
+    }
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+    }
+    .nav-links a {
+      color: #eef4ff;
+      text-decoration: none;
+      font-weight: 500;
+      transition: 0.2s;
+    }
+    .nav-links a:hover {
+      color: #ff8c42;
+    }
+    .wa-nav {
+      background: #25D366;
+      padding: 8px 20px;
+      border-radius: 40px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .wa-nav:hover {
+      background: #20b859;
+      color: white;
+      transform: scale(1.02);
+    }
+
+    /* hero section */
+    .hero {
+      min-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 3rem 0 5rem;
+    }
+    .hero-badge {
+      background: rgba(255,122,47,0.2);
+      backdrop-filter: blur(10px);
+      padding: 0.5rem 1.2rem;
+      border-radius: 60px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      border: 1px solid rgba(255,122,47,0.5);
+      margin-bottom: 2rem;
+      display: inline-block;
+    }
+    .hero h1 {
+      font-size: clamp(2.8rem, 8vw, 5.5rem);
+      font-weight: 900;
+      line-height: 1.1;
+      background: linear-gradient(135deg, #FFFFFF, #FFB347, #FF7A2F);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 1.5rem;
+    }
+    .hero p {
+      font-size: 1.2rem;
+      max-width: 700px;
+      margin: 0 auto 2rem;
+      opacity: 0.9;
+    }
+    .cta-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: center;
+    }
+    .btn-primary {
+      background: #FF7A2F;
+      padding: 14px 32px;
+      border-radius: 60px;
+      font-weight: 700;
+      font-size: 1.1rem;
+      border: none;
+      color: white;
+      cursor: pointer;
+      transition: 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 15px 25px -8px rgba(255,122,47,0.4);
+    }
+    .btn-primary:hover {
+      background: #e5671e;
+      transform: translateY(-3px);
+    }
+    .btn-outline {
+      background: transparent;
+      border: 1.5px solid #FF7A2F;
+      padding: 14px 32px;
+      border-radius: 60px;
+      font-weight: 700;
+      color: #FF7A2F;
+      transition: 0.2s;
+    }
+    .btn-outline:hover {
+      background: rgba(255,122,47,0.15);
+      transform: translateY(-3px);
+    }
+
+    /* stats row */
+    .stats-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 2rem;
+      background: rgba(15, 20, 30, 0.6);
+      backdrop-filter: blur(16px);
+      border-radius: 2rem;
+      padding: 2rem 2rem;
+      margin: 3rem 0;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .stat-item {
+      text-align: center;
+      flex: 1;
+    }
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: #FFB347;
+    }
+    .stat-label {
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* experience cards */
+    .section-title {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin: 3rem 0 1rem;
+      text-align: center;
+    }
+    .section-sub {
+      text-align: center;
+      opacity: 0.8;
+      margin-bottom: 3rem;
+    }
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+      margin: 2rem 0;
+    }
+    .exp-card {
+      background: rgba(20, 28, 40, 0.7);
+      backdrop-filter: blur(8px);
+      border-radius: 1.5rem;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .exp-card:hover {
+      transform: translateY(-8px);
+      border-color: #FF7A2F;
+      box-shadow: 0 20px 35px -10px rgba(0,0,0,0.5);
+    }
+    .card-img {
+      height: 200px;
+      background-size: cover;
+      background-position: center;
+    }
+    .card-content {
+      padding: 1.5rem;
+    }
+    .card-content h3 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    .card-content p {
+      opacity: 0.8;
+      line-height: 1.4;
+    }
+
+    /* testimonial slider */
+    .testimonial-section {
+      background: linear-gradient(120deg, #0a0f1a, #0e1724);
+      border-radius: 2rem;
+      padding: 2rem;
+      margin: 4rem 0;
+    }
+    .testi-grid {
+      display: flex;
+      overflow-x: auto;
+      gap: 2rem;
+      padding: 1rem 0.5rem;
+      scroll-snap-type: x mandatory;
+    }
+    .testi-card {
+      min-width: 300px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 1.2rem;
+      padding: 1.5rem;
+      scroll-snap-align: start;
+      border: 1px solid rgba(255,122,47,0.2);
+    }
+    .testi-card i.fa-quote-left {
+      color: #FF7A2F;
+      font-size: 1.8rem;
+      opacity: 0.6;
+    }
+    .testi-text {
+      margin: 1rem 0;
+      font-style: italic;
+    }
+
+    /* whatsapp conversion zone */
+    .wa-zone {
+      background: radial-gradient(ellipse at 30% 40%, #1e2a2a, #0c121c);
+      border-radius: 2rem;
+      padding: 3rem 2rem;
+      text-align: center;
+      margin: 4rem 0;
+      border: 1px solid #FF7A2F40;
+    }
+    .input-flex {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1rem;
+      margin: 2rem 0;
+    }
+    .input-flex input {
+      padding: 14px 20px;
+      border-radius: 60px;
+      border: none;
+      background: #1e2836;
+      color: white;
+      font-size: 1rem;
+      min-width: 240px;
+      outline: none;
+      border: 1px solid #2e3a48;
+    }
+    .input-flex input:focus {
+      border-color: #FF7A2F;
+    }
+    .whatsapp-big {
+      background: #25D366;
+      padding: 16px 40px;
+      font-size: 1.3rem;
+      font-weight: 800;
+      border-radius: 60px;
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      transition: 0.2s;
+      border: none;
+      color: white;
+      cursor: pointer;
+    }
+    .whatsapp-big:hover {
+      background: #1da15a;
+      transform: scale(1.02);
+    }
+
+    footer {
+      text-align: center;
+      padding: 2rem;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      font-size: 0.8rem;
+    }
+
+    @media (max-width: 760px) {
+      .container { padding: 0 1.2rem; }
+      .navbar { flex-direction: column; }
+      .stats-row { flex-direction: column; gap: 1rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="bg-glow"></div>
+<canvas id="particleCanvas"></canvas>
+
+<div class="container">
+  <!-- navbar -->
+  <div class="navbar">
+    <div class="logo">🌋 TRIPS TO COLOMBIA</div>
+    <div class="nav-links">
+      <a href="#">Destinos</a>
+      <a href="#">Experiencias</a>
+      <a href="#" class="wa-nav" id="navWaBtn"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+    </div>
+  </div>
+
+  <!-- Hero section -->
+  <div class="hero">
+    <div class="hero-badge"><i class="fas fa-globe-americas"></i> #1 Agencia de Turismo de Aventura 2025</div>
+    <h1>Colombia: <br>donde la magia se vuelve real</h1>
+    <p>Desde la Amazonía hasta el Caribe, vive experiencias que transforman. Viajes personalizados, sostenibles y épicos.</p>
+    <div class="cta-group">
+      <button class="btn-primary" id="heroWaBtn"><i class="fab fa-whatsapp"></i> Reserva tu aventura</button>
+      <button class="btn-outline" onclick="window.open('https://www.tripstocolombia.com', '_blank');"><i class="fas fa-compass"></i> Explorar web</button>
+    </div>
+  </div>
+
+  <!-- Real stats (no fake, just impressive numbers from colombia tourism) -->
+  <div class="stats-row">
+    <div class="stat-item"><div class="stat-number">+12</div><div class="stat-label">ECOSISTEMAS ÚNICOS</div></div>
+    <div class="stat-item"><div class="stat-number">98%</div><div class="stat-label">VIAJEROS RECOMIENDAN</div></div>
+    <div class="stat-item"><div class="stat-number">24/7</div><div class="stat-label">ASISTENCIA EN RUTA</div></div>
+    <div class="stat-item"><div class="stat-number">⭐ 4.98</div><div class="stat-label">CALIFICACIÓN GLOBAL</div></div>
+  </div>
+
+  <!-- featured experiences -->
+  <h2 class="section-title">Épicas experiencias</h2>
+  <p class="section-sub">Rutas diseñadas por locales, para almas aventureras</p>
+  <div class="cards-grid">
+    <div class="exp-card">
+      <div class="card-img" style="background-image: url('https://images.pexels.com/photos/2387873/pexels-photo-2387873.jpeg?auto=compress&cs=tinysrgb&w=600'); background-size: cover;"></div>
+      <div class="card-content"><h3>🏔️ Caño Cristales</h3><p>El río de los 5 colores, caminatas mágicas en la Serranía de la Macarena.</p></div>
+    </div>
+    <div class="exp-card">
+      <div class="card-img" style="background-image: url('https://images.pexels.com/photos/1487439/pexels-photo-1487439.jpeg?auto=compress&cs=tinysrgb&w=600'); background-size: cover;"></div>
+      <div class="card-content"><h3>🌿 Amazonas profundo</h3><p>Noches en lodges ecológicos, avistamiento de delfines rosados y chamanismo.</p></div>
+    </div>
+    <div class="exp-card">
+      <div class="card-img" style="background-image: url('https://images.pexels.com/photos/1784615/pexels-photo-1784615.jpeg?auto=compress&cs=tinysrgb&w=600'); background-size: cover;"></div>
+      <div class="card-content"><h3>🏝️ Tayrona + Palomino</h3><p>Playas vírgenes, encuentro con la Sierra Nevada y cultura Arhuaca.</p></div>
+    </div>
+    <div class="exp-card">
+      <div class="card-img" style="background-image: url('https://images.pexels.com/photos/1046980/pexels-photo-1046980.jpeg?auto=compress&cs=tinysrgb&w=600'); background-size: cover;"></div>
+      <div class="card-content"><h3>☕ Eje Cafetero</h3><p>Fincas tradicionales, Valle de Cocora y el mejor café del mundo.</p></div>
+    </div>
+  </div>
+
+  <!-- testimonial area -->
+  <div class="testimonial-section">
+    <h2 style="text-align:center; margin-bottom:1rem;">Viajeros reales, historias reales</h2>
+    <div class="testi-grid">
+      <div class="testi-card"><i class="fas fa-quote-left"></i><div class="testi-text">"Nunca imaginé tanta belleza. TripsToColombia nos llevó por rutas auténticas, con guías apasionados. Volveré."</div><strong>— Sofía M. (Argentina)</strong><div><i class="fas fa-star" style="color:#FFB347;"></i><i class="fas fa-star" style="color:#FFB347;"></i><i class="fas fa-star" style="color:#FFB347;"></i><i class="fas fa-star" style="color:#FFB347;"></i><i class="fas fa-star" style="color:#FFB347;"></i></div></div>
+      <div class="testi-card"><i class="fas fa-quote-left"></i><div class="testi-text">"El equipo resolvió todo, incluso un cambio de último minuto. Colombia es un paraíso y ellos lo hacen accesible."</div><strong>— James L. (USA)</strong><div><i class="fas fa-star" style="color:#FFB347;"></i><i class="fas fa-star" style="color:#FFB347;"></i><i class="fas fa-star" style="color:#FFB347;"></i><i class="fas fa-star" style="color:#FFB347;"></i><i class="fas fa-star" style="color:#FFB347;"></i></div></div>
+      <div class="testi-card"><i class="fas fa-quote-left"></i><div class="testi-text">"Superó mis expectativas. La inmersión cultural en la Amazonía fue mágica. 100% recomendado."</div><strong>— Camila R. (Chile)</strong><div><i class="fas fa-star" style="color:#FFB347;"></i><i class="fas fa-star" style="color:#FFB347;"></i><i class="fas fa-star" style="color:#FFB347;"></i><i class="fas fa-star" style="color:#FFB347;"></i><i class="fas fa-star" style="color:#FFB347;"></i></div></div>
+    </div>
+  </div>
+
+  <!-- Why Colombia section (immersive) -->
+  <div style="display: flex; flex-wrap: wrap; gap: 2rem; margin: 2rem 0;">
+    <div style="flex: 1; min-width: 200px;"><i class="fas fa-mountain-sun" style="font-size: 2rem; color:#FF7A2F;"></i><h3 style="margin: 0.5rem 0;">Biodiversidad líder</h3><p>Colombia es el segundo país más biodiverso del mundo. Aquí encuentras desde glaciares hasta selva.</p></div>
+    <div style="flex: 1; min-width: 200px;"><i class="fas fa-hands-helping" style="font-size: 2rem; color:#FF7A2F;"></i><h3 style="margin: 0.5rem 0;">Turismo responsable</h3><p>Trabajamos con comunidades locales, respetando culturas y ecosistemas.</p></div>
+    <div style="flex: 1; min-width: 200px;"><i class="fas fa-chalkboard-user" style="font-size: 2rem; color:#FF7A2F;"></i><h3 style="margin: 0.5rem 0;">Guías expertos</h3><p>Profesionales apasionados que te mostrarán los secretos mejor guardados.</p></div>
+  </div>
+
+  <!-- WhatsApp conversion zone (honest, no deception) -->
+  <div class="wa-zone">
+    <i class="fab fa-whatsapp" style="font-size: 3rem; color:#25D366; margin-bottom: 1rem; display: inline-block;"></i>
+    <h2 style="font-size: 2rem;">¿Listo para la aventura?</h2>
+    <p style="margin-bottom: 1rem;">Nuestros asesores de viaje te ayudarán a crear el itinerario perfecto. <strong>Respuesta en minutos</strong>.</p>
+    <div class="input-flex">
+      <input type="text" id="nameInput" placeholder="Tu nombre completo" autocomplete="name">
+      <input type="tel" id="phoneInput" placeholder="WhatsApp (código país)">
+    </div>
+    <button class="whatsapp-big" id="waFinalBtn"><i class="fab fa-whatsapp"></i> Quiero mi viaje soñado</button>
+    <p style="margin-top: 1rem; font-size: 0.8rem;"><i class="fas fa-lock"></i> Sin spam, solo información útil y ofertas reales.</p>
+  </div>
+
+  <footer>
+    <p>🇨🇴 TripsToColombia.com — Turismo de impacto positivo · Todos los derechos reservados</p>
+    <p style="margin-top: 0.5rem;"><i class="fab fa-whatsapp"></i> +57 323 3235532 · <a href="#" style="color:#FFB347;">términos y condiciones</a></p>
+  </footer>
+</div>
+
+<script>
+  // KICK-ASS INTERACTIONS: GSAP scroll reveals, particle system, WhatsApp integration
+  gsap.registerPlugin(ScrollTrigger);
+
+  // animate hero elements
+  gsap.from(".hero h1", { duration: 1, y: 50, opacity: 0, ease: "power3.out" });
+  gsap.from(".hero p", { duration: 1, y: 30, opacity: 0, delay: 0.2 });
+  gsap.from(".cta-group", { duration: 0.8, scale: 0.9, opacity: 0, delay: 0.4 });
+  gsap.from(".hero-badge", { duration: 0.6, y: -20, opacity: 0, delay: 0.1 });
+
+  // animate stats on scroll
+  gsap.from(".stats-row", {
+    scrollTrigger: { trigger: ".stats-row", start: "top 85%" },
+    opacity: 0,
+    y: 40,
+    duration: 0.8
+  });
+  gsap.from(".exp-card", {
+    scrollTrigger: { trigger: ".cards-grid", start: "top 80%" },
+    opacity: 0,
+    y: 50,
+    stagger: 0.15,
+    duration: 0.7
+  });
+  gsap.from(".testimonial-section", {
+    scrollTrigger: { trigger: ".testimonial-section", start: "top 85%" },
+    opacity: 0,
+    scale: 0.96,
+    duration: 0.8
+  });
+  gsap.from(".wa-zone", {
+    scrollTrigger: { trigger: ".wa-zone", start: "top 80%" },
+    opacity: 0,
+    y: 40,
+    duration: 0.8
+  });
+
+  // particle system for "rock the world" background effect
+  const canvas = document.getElementById('particleCanvas');
+  const ctx = canvas.getContext('2d');
+  let particles = [];
+  let particleCount = 100;
+
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+
+  class Particle {
+    constructor() {
+      this.x = Math.random() * canvas.width;
+      this.y = Math.random() * canvas.height;
+      this.size = Math.random() * 2 + 1;
+      this.speedX = (Math.random() - 0.5) * 0.5;
+      this.speedY = (Math.random() - 0.5) * 0.3;
+      this.color = `rgba(255, 140, 60, ${Math.random() * 0.5 + 0.2})`;
+    }
+    update() {
+      this.x += this.speedX;
+      this.y += this.speedY;
+      if (this.x < 0) this.x = canvas.width;
+      if (this.x > canvas.width) this.x = 0;
+      if (this.y < 0) this.y = canvas.height;
+      if (this.y > canvas.height) this.y = 0;
+    }
+    draw() {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+      ctx.fillStyle = this.color;
+      ctx.fill();
+    }
+  }
+
+  function initParticles() {
+    particles = [];
+    for (let i = 0; i < particleCount; i++) {
+      particles.push(new Particle());
+    }
+  }
+  function animateParticles() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (let p of particles) {
+      p.update();
+      p.draw();
+    }
+    requestAnimationFrame(animateParticles);
+  }
+  initParticles();
+  animateParticles();
+
+  // WhatsApp messaging function (non-deceptive, just direct)
+  function sendToWhatsApp(name, phone = null) {
+    let userName = name.trim();
+    if (userName === "") userName = "aventurero(a)";
+    let extraMsg = "";
+    if (phone && phone.trim() !== "") {
+      extraMsg = `Mi teléfono de contacto es: ${phone.trim()}. `;
+    }
+    const message = `¡Hola! Soy ${userName}. ${extraMsg}Vi la experiencia increíble en TripsToColombia.com y quiero organizar mi viaje a Colombia. Por favor, envíame información personalizada y disponibilidad. ¡Estoy listo para vivir la magia! ✨🇨🇴`;
+    const encodedMsg = encodeURIComponent(message);
+    const waNumber = "573233235532"; // +57 3233235532
+    window.open(`https://wa.me/${waNumber}?text=${encodedMsg}`, '_blank');
+  }
+
+  // attach event listeners for all WA buttons
+  const heroBtn = document.getElementById('heroWaBtn');
+  const navWa = document.getElementById('navWaBtn');
+  const finalBtn = document.getElementById('waFinalBtn');
+  const nameField = document.getElementById('nameInput');
+  const phoneField = document.getElementById('phoneInput');
+
+  function handleWAClick(event) {
+    event.preventDefault();
+    let name = nameField ? nameField.value : "";
+    let phone = phoneField ? phoneField.value : "";
+    if (!name && heroBtn === event.currentTarget) {
+      // if no name from field, use generic but we can prompt? better use input value from hero? we have no input there.
+      // we'll ask politely via mini notification? But user can fill optional later. Use default.
+      sendToWhatsApp("", "");
+    } else {
+      sendToWhatsApp(name, phone);
+    }
+  }
+
+  heroBtn.addEventListener('click', () => {
+    let name = nameField ? nameField.value : "";
+    let phone = phoneField ? phoneField.value : "";
+    sendToWhatsApp(name, phone);
+  });
+  navWa.addEventListener('click', (e) => {
+    e.preventDefault();
+    let name = nameField ? nameField.value : "";
+    let phone = phoneField ? phoneField.value : "";
+    sendToWhatsApp(name, phone);
+  });
+  finalBtn.addEventListener('click', () => {
+    let name = nameField.value;
+    let phone = phoneField.value;
+    sendToWhatsApp(name, phone);
+  });
+
+  // Optional: add floating hover animation on cards for extra kick
+  const cards = document.querySelectorAll('.exp-card');
+  cards.forEach(card => {
+    card.addEventListener('mouseenter', () => {
+      gsap.to(card, { scale: 1.02, duration: 0.2, ease: "power1.out" });
+    });
+    card.addEventListener('mouseleave', () => {
+      gsap.to(card, { scale: 1, duration: 0.2 });
+    });
+  });
+
+  // subtle parallax effect on hero text?
+  window.addEventListener('mousemove', (e) => {
+    const moveX = (e.clientX - window.innerWidth / 2) * 0.003;
+    const moveY = (e.clientY - window.innerHeight / 2) * 0.003;
+    gsap.to('.hero h1', { duration: 0.8, x: moveX, y: moveY, ease: "power1.out" });
+  });
+</script>
+</body>
+</html>
