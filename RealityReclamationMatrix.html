@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>FORBIDDEN KNOWLEDGE • The Sovereign Database</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: #0a0c12;
+      font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, 'Courier New', monospace;
+      color: #e3e6f0;
+      padding: 2rem 1.5rem;
+      line-height: 1.4;
+    }
+
+    /* glitch / transmission effect */
+    @keyframes flicker {
+      0% { opacity: 0.96; text-shadow: 0 0 1px rgba(255,0,80,0.3);}
+      100% { opacity: 1; text-shadow: 0 0 4px rgba(255,80,40,0.5);}
+    }
+
+    .container {
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+
+    /* header — sovereign arsenal */
+    .header {
+      border-bottom: 2px solid #ff2a4a;
+      margin-bottom: 2rem;
+      padding-bottom: 1.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 1rem;
+    }
+
+    .title-section h1 {
+      font-size: 2.2rem;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #fff, #ff3b6f, #b95eff);
+      background-clip: text;
+      -webkit-background-clip: text;
+      color: transparent;
+      text-transform: uppercase;
+      font-weight: 800;
+    }
+
+    .title-section p {
+      font-family: monospace;
+      color: #a0a8c0;
+      margin-top: 0.5rem;
+      font-size: 0.85rem;
+      border-left: 3px solid #ff2a4a;
+      padding-left: 0.75rem;
+    }
+
+    .substack-badge {
+      background: #171b26;
+      padding: 0.6rem 1.3rem;
+      border-radius: 40px;
+      border: 1px solid #ff2a4a80;
+      transition: 0.2s;
+      font-weight: 600;
+    }
+
+    .substack-badge a {
+      color: #ffb347;
+      text-decoration: none;
+      font-family: monospace;
+      font-size: 1.1rem;
+    }
+
+    .substack-badge:hover {
+      background: #ff2a4a20;
+      border-color: #ff2a4a;
+      box-shadow: 0 0 10px #ff2a4a40;
+    }
+
+    /* filters panel */
+    .filter-panel {
+      background: #0f111a;
+      border-radius: 28px;
+      padding: 1.2rem 1.5rem;
+      margin-bottom: 2rem;
+      border: 1px solid #232635;
+      backdrop-filter: blur(4px);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .filter-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+      align-items: center;
+    }
+
+    .filter-group label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: #ff8a5c;
+      font-weight: 600;
+    }
+
+    select, .search-input {
+      background: #01010c;
+      border: 1px solid #2e3348;
+      color: #f0f3ff;
+      padding: 0.5rem 1rem;
+      border-radius: 40px;
+      font-family: monospace;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+
+    .search-input {
+      min-width: 220px;
+    }
+
+    .stats {
+      background: #00000070;
+      padding: 0.3rem 1rem;
+      border-radius: 30px;
+      font-size: 0.8rem;
+      font-family: monospace;
+      color: #b9c3ff;
+    }
+
+    /* TABLE — main weapon */
+    .table-wrapper {
+      overflow-x: auto;
+      border-radius: 20px;
+      border: 1px solid #222638;
+      background: #0b0e16;
+      margin-bottom: 2rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.8rem;
+      min-width: 1000px;
+    }
+
+    th {
+      text-align: left;
+      padding: 1rem 0.9rem;
+      background: #11141f;
+      color: #ffc285;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      border-bottom: 2px solid #2a2f44;
+      font-size: 0.7rem;
+    }
+
+    td {
+      padding: 1rem 0.9rem;
+      border-bottom: 1px solid #1a1e2c;
+      vertical-align: top;
+      background-color: #0c0f18;
+      transition: 0.1s;
+    }
+
+    tr:hover td {
+      background: #13182a;
+    }
+
+    .category-badge {
+      display: inline-block;
+      background: #1f2335;
+      padding: 0.2rem 0.6rem;
+      border-radius: 30px;
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: #ffbc6e;
+    }
+
+    .evidence-link {
+      color: #6ea8ff;
+      text-decoration: none;
+      border-bottom: 1px dashed #6ea8ff;
+      font-size: 0.75rem;
+    }
+
+    .evidence-link:hover {
+      color: white;
+      border-bottom: 1px solid white;
+    }
+
+    .whistleblower {
+      font-weight: 500;
+      color: #ff9f7c;
+    }
+
+    .status-active {
+      color: #ff5e6b;
+      font-weight: bold;
+      background: #ff2a4a20;
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
+      border-radius: 30px;
+      font-size: 0.7rem;
+    }
+
+    .footer-note {
+      text-align: center;
+      font-family: monospace;
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid #222638;
+      font-size: 0.75rem;
+      color: #7c84a8;
+    }
+
+    .konami {
+      font-family: monospace;
+      letter-spacing: 2px;
+    }
+
+    button {
+      background: none;
+      border: none;
+      color: inherit;
+    }
+
+    @media (max-width: 700px) {
+      body { padding: 1rem; }
+      .title-section h1 { font-size: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <div class="title-section">
+      <h1>⚡ FORBIDDEN KNOWLEDGE ⚡</h1>
+      <p>THE SOVEREIGN DATABASE • REALITY RECLAMATION MATRIX<br>whistleblowers • evidence • taboo currents • active transmission 2026</p>
+    </div>
+    <div class="substack-badge">
+      <a href="https://ForbiddenKnowledge.substack.com" target="_blank" rel="noopener noreferrer">
+        ✦ SUBSCRIBE: FORBIDDEN KNOWLEDGE ✦
+      </a>
+    </div>
+  </div>
+
+  <!-- FILTERS + SEARCH ENGINE -->
+  <div class="filter-panel">
+    <div class="filter-group">
+      <label>🎯 CATEGORY</label>
+      <select id="categoryFilter">
+        <option value="all">ALL TRANSMISSIONS</option>
+        <option value="Elite Corruption">Elite Corruption</option>
+        <option value="Geopolitics">Geopolitics</option>
+        <option value="Miscarriage of Justice">Miscarriage of Justice</option>
+        <option value="Environment">Environment</option>
+        <option value="Technology">Technology</option>
+        <option value="Health">Health</option>
+        <option value="Culture">Culture</option>
+      </select>
+    </div>
+    <div class="filter-group">
+      <label>🔍 DEEP SCAN</label>
+      <input type="text" id="searchInput" class="search-input" placeholder="epstein, letby, AI, Iran, Pharma..." autocomplete="off">
+    </div>
+    <div class="stats" id="statsDisplay">LOADING MATRIX...</div>
+  </div>
+
+  <!-- MAIN TABLE : DYNAMIC RENDER -->
+  <div class="table-wrapper">
+    <table id="knowledgeTable">
+      <thead>
+        <tr><th>TOPIC / EVENT</th><th>CATEGORY</th><th>SUB‑CATEGORY</th><th>STATUS (2026)</th><th>KEY CLAIMS</th><th>EVIDENCE / PROOF</th><th>WHISTLEBLOWERS</th><th>🔗 LINKS / SOURCES</th></tr>
+      </thead>
+      <tbody id="tableBody">
+        <!-- dynamic injected -->
+      </tbody>
+    </table>
+  </div>
+
+  <div class="footer-note">
+    <span class="konami">⬆ ⬆ ⬇ ⬇ ⬅ ➡ ⬅ ➡ B A</span> &nbsp;|&nbsp; THE KONAMI CODE IS NOT A METAPHOR — TRANSMISSION ACTIVE &nbsp;|&nbsp; <strong>PERCEIVE. PREPARE. PROCEED.</strong>
+  </div>
+</div>
+
+<script>
+  // ———————————— FORBIDDEN DATASET ————————————
+  // expanded from original matrix with links, evidence, whistleblowers, cross-references
+  const topicsData = [
+    {
+      id: 1,
+      topic: "🔥 The Epstein Files",
+      category: "Elite Corruption",
+      subCategory: "Human Trafficking / Blackmail",
+      status: "Active Blowback",
+      claims: "Files are being withheld/redacted; high-level political figures implicated; blackmail operation spanning decades. New 2026 tranche shows sealed depositions.",
+      evidence: "3M+ pages released by DOJ (Jan 2026); missing 'whiteboard' logs; flight logs with obscured names; inconsistencies in interview recordings.",
+      whistleblowers: "Melania Trump (called for hearings) • Sen. Chuck Schumer (cover-up allegations) • Danielle Bensky (survivor testimony)",
+      links: "<a class='evidence-link' href='https://www.justice.gov' target='_blank'>DOJ Epstein Archive</a> • <a class='evidence-link' href='https://www.democrats.senate.gov' target='_blank'>Schumer Statement</a>"
+    },
+    {
+      id: 2,
+      topic: "⚔️ US-Iran War / Conflict",
+      category: "Geopolitics",
+      subCategory: "Military Industrial Complex / Misinfo",
+      status: "Active War (Feb 28+)",
+      claims: "US/Israel strikes killed Iranian IRGC leadership; Tehran retaliation with hypersonic missiles; mainstream media downplaying casualties and using old footage.",
+      evidence: "Viral videos debunked as 2023/2025 footage or AI-generated; AI images of US soldiers captured; satellite imagery shows missile impact craters.",
+      whistleblowers: "Maram Susli (Syrian Girl) field footage • Rachel Maddow (critiquing readiness) • independent OSINT analysts.",
+      links: "<a class='evidence-link' href='https://factcheck.afp.com' target='_blank'>AFP Fact Check</a> • <a class='evidence-link' href='https://www.aap.com.au/factcheck/' target='_blank'>AAP Fact Check</a>"
+    },
+    {
+      id: 3,
+      topic: "🩸 Lucy Letby Case",
+      category: "Miscarriage of Justice",
+      subCategory: "Medical Negligence / Expert Fraud",
+      status: "Ongoing Review",
+      claims: "Letby may be innocent; babies died due to hospital-acquired infections (sepsis/Stenotrophomonas) & systemic failures, not murder.",
+      evidence: "NEW: Stenotrophomonas maltophilia bacteria found in baby's tube; Glasgow hospital admits water system killed infants; raw sewage in ceiling tiles above NICU.",
+      whistleblowers: "Dr. Martyn Pitman (whistleblower sacked) • Prof. Shoo Lee (neonatology expert) • Dr. Michael Hall.",
+      links: "<a class='evidence-link' href='https://thirlwall.public-inquiry.uk/' target='_blank'>Thirlwall Inquiry</a> • <a class='evidence-link' href='https://ccrc.gov.uk/' target='_blank'>CCRC Review</a>"
+    },
+    {
+      id: 4,
+      topic: "🌍 Climate Truth / Narrative War",
+      category: "Environment",
+      subCategory: "Fear vs. Skepticism",
+      status: "Polarized 2026",
+      claims: "Advocates claim crisis while using 'doom-optimism'; Skeptics use technical jargon to deny warming; Politicians stuck in 'murky middle'.",
+      evidence: "Study of 21k+ documents shows skeptics use academic framing; NOAA data confirms warmest decade on record; winter storms weaponized politically.",
+      whistleblowers: "Trump (mocks global warming) • Greta Thunberg • climate data scientists from NOAA.",
+      links: "<a class='evidence-link' href='https://www.noaa.gov/climate' target='_blank'>NOAA Climate Data</a> • <a class='evidence-link' href='https://www.nature.com/srep/' target='_blank'>Scientific Reports Study</a>"
+    },
+    {
+      id: 5,
+      topic: "🤖 AI Misinformation Engine",
+      category: "Technology",
+      subCategory: "Synthetic Media / Deepfakes",
+      status: "Critical Threat",
+      claims: "Generative AI flooding social media with fake war footage, 'brainrot' content, and synthetic whistleblowers to destabilize reality.",
+      evidence: "Google Gemini watermarks found on fake Iran War prisoner photos; AI-generated videos of 'dead soldiers' going viral; deepfake audio of politicians.",
+      whistleblowers: "SpaceHey bloggers • independent fact-checkers (AAP/AFP) • AI watermark reverse engineers.",
+      links: "<a class='evidence-link' href='https://www.aap.com.au/factcheck/' target='_blank'>AAP Fact Check AI</a> • <a class='evidence-link' href='https://spacehey.com' target='_blank'>SpaceHey Trends</a>"
+    },
+    {
+      id: 6,
+      topic: "💊 Big Pharma Fraud (J&J)",
+      category: "Health",
+      subCategory: "Corruption / Whistleblower Rewards",
+      status: "Legal Battle",
+      claims: "Johnson & Johnson illegally promoted HIV drugs (Prezista/Intelence) off-label to doctors, defrauding Medicare/Medicaid of billions.",
+      evidence: "$1.6 Billion judgment; 159,574 false claims; internal emails: 'hoodwinking doctors' ; whistleblower reward ~$267M.",
+      whistleblowers: "Jessica Penelow & Christine Brancaccio (filed 2012) • former J&J sales reps.",
+      links: "<a class='evidence-link' href='https://news.bloomberglaw.com/' target='_blank'>Bloomberg Law Docket</a> • <a class='evidence-link' href='https://www.ca3.uscourts.gov/' target='_blank'>Janssen Case No. 25-1818</a>"
+    },
+    {
+      id: 7,
+      topic: "📱 Social Decay / Alt-Culture",
+      category: "Culture",
+      subCategory: "Addiction / Loneliness Epidemic",
+      status: "Reactionary Phase",
+      claims: "Influencer culture is 'dying'; Gen Z moving to dumbphones; alt-culture becoming hypocritically conformist; rise of anti-BBL aesthetics.",
+      evidence: "Vogue declares 'Boyfriends embarrassing'; 'poser' witch hunts on TikTok; Rise of offline communities; rejection of Kardashian metrics.",
+      whistleblowers: "Helen Coffey (The Independent) • Chanté Joseph (Vogue) • digital detox creators.",
+      links: "<a class='evidence-link' href='https://www.independent.co.uk' target='_blank'>The Independent</a> • <a class='evidence-link' href='https://reddit.com/r/decidingtobebetter' target='_blank'>r/decidingtobebetter</a>"
+    },
+    // Additional taboo topics to expand richness: Disease cover-up, Pandemic origins, etc.
+    {
+      id: 8,
+      topic: "🧬 COVID Origin & Gain-of-Function",
+      category: "Health",
+      subCategory: "Bioweapon Hypothesis",
+      status: "Underground Fire",
+      claims: "Lab leak not ruled out; key data withheld; NIH funded risky research; US/EU political pressure to bury reports.",
+      evidence: "FOIA documents delayed; Wuhan Institute virology sequences; 2026 declassified emails show 'lack of transparency'.",
+      whistleblowers: "Dr. Steven Quay • anonymous NIH sources • EcoHealth Alliance memos.",
+      links: "<a class='evidence-link' href='https://www.oversight.house.gov/' target='_blank'>House Select Subcommittee</a>"
+    },
+    {
+      id: 9,
+      topic: "🌪️ Hidden Geopolitics: Nord Stream & Black Swan",
+      category: "Geopolitics",
+      subCategory: "Energy Warfare",
+      status: "Smoldering",
+      claims: "2022 pipeline sabotage covered up; Western media ignored investigative leads; 2026 new leaks point to state actors.",
+      evidence: "Seymour Hersh investigation; 2026 German intelligence contradictory reports; satellite timeline anomalies.",
+      whistleblowers: "Seymour Hersh • anonymous CIA sources • European journalists.",
+      links: "<a class='evidence-link' href='https://www.seymourhersh.com/' target='_blank'>Hersh Investigation</a>"
+    }
+  ];
+
+  // render engine
+  function renderTable() {
+    const categoryFilter = document.getElementById('categoryFilter').value;
+    const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+
+    let filtered = [...topicsData];
+
+    if (categoryFilter !== 'all') {
+      filtered = filtered.filter(item => item.category === categoryFilter);
+    }
+    if (searchTerm.trim() !== '') {
+      filtered = filtered.filter(item => 
+        item.topic.toLowerCase().includes(searchTerm) ||
+        item.claims.toLowerCase().includes(searchTerm) ||
+        item.whistleblowers.toLowerCase().includes(searchTerm) ||
+        item.subCategory.toLowerCase().includes(searchTerm) ||
+        item.evidence.toLowerCase().includes(searchTerm)
+      );
+    }
+
+    // update stats
+    const statsSpan = document.getElementById('statsDisplay');
+    statsSpan.innerHTML = `🔍 ACTIVE ENTRIES: ${filtered.length} / ${topicsData.length}  |  ⚡ REALITY FILTER`;
+
+    const tbody = document.getElementById('tableBody');
+    tbody.innerHTML = '';
+    if (filtered.length === 0) {
+      const row = document.createElement('tr');
+      row.innerHTML = `<td colspan="8" style="text-align:center; padding: 3rem;">⛔ NO FORBIDDEN RESULTS — ADJUST SEARCH OR CATEGORY ⛔</td>`;
+      tbody.appendChild(row);
+      return;
+    }
+
+    filtered.forEach(item => {
+      const row = document.createElement('tr');
+      // status badge logic
+      let statusHtml = `<span class="status-active">${item.status}</span>`;
+      if (item.status === "Polarized 2026" || item.status === "Smoldering") statusHtml = `<span style="background:#2c2a3e; padding:0.2rem 0.6rem; border-radius:30px;">${item.status}</span>`;
+      if (item.status === "Legal Battle") statusHtml = `<span style="background:#332c1f; color:#ffbc6e; padding:0.2rem 0.6rem; border-radius:30px;">${item.status}</span>`;
+
+      row.innerHTML = `
+        <td style="font-weight: 600;">${item.topic}</td>
+        <td><span class="category-badge">${item.category}</span></td>
+        <td>${item.subCategory}</td>
+        <td>${statusHtml}</td>
+        <td style="max-width: 260px;">${item.claims}</td>
+        <td style="max-width: 260px; font-size:0.75rem;">${item.evidence}</td>
+        <td><span class="whistleblower">${item.whistleblowers}</span></td>
+        <td>${item.links}</td>
+      `;
+      tbody.appendChild(row);
+    });
+  }
+
+  // event listeners
+  document.getElementById('categoryFilter').addEventListener('change', renderTable);
+  document.getElementById('searchInput').addEventListener('input', renderTable);
+  
+  // initial render
+  renderTable();
+
+  // add Konami interactive hint (easter egg reference)
+  let konamiIndex = 0;
+  const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'B', 'a', 'A'];
+  window.addEventListener('keydown', (e) => {
+    const key = e.key;
+    if (key === konamiCode[konamiIndex] || (key === 'b' && konamiCode[konamiIndex] === 'B') || (key === 'a' && konamiCode[konamiIndex] === 'A')) {
+      konamiIndex++;
+      if (konamiIndex === konamiCode.length) {
+        // secret link to substack with style flare
+        const overlay = document.createElement('div');
+        overlay.style.position = 'fixed';
+        overlay.style.bottom = '20px';
+        overlay.style.right = '20px';
+        overlay.style.backgroundColor = '#ff2a4a';
+        overlay.style.color = '#fff';
+        overlay.style.padding = '12px 20px';
+        overlay.style.borderRadius = '40px';
+        overlay.style.fontFamily = 'monospace';
+        overlay.style.zIndex = '9999';
+        overlay.style.fontWeight = 'bold';
+        overlay.style.cursor = 'pointer';
+        overlay.style.boxShadow = '0 0 20px #ff2a4a';
+        overlay.innerHTML = '⚡ KONAMI UNLOCKED → ACCESS FORBIDDEN TRANSMISSION ⚡';
+        overlay.onclick = () => { window.open('https://ForbiddenKnowledge.substack.com', '_blank'); overlay.remove(); };
+        document.body.appendChild(overlay);
+        setTimeout(() => { if(overlay) overlay.style.opacity = '0.8'; }, 300);
+        konamiIndex = 0;
+        setTimeout(() => overlay.remove(), 8000);
+      }
+    } else {
+      konamiIndex = 0;
+    }
+  });
+</script>
+</body>
+</html>
