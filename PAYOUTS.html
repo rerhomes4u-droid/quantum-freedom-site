@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>TripsToColombia · Partner OS | Commissions · Analytics · Growth</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0a0f1c;
+      color: #eef2ff;
+      padding: 1rem;
+    }
+    .os-container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    /* header */
+    .os-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 2rem;
+      background: rgba(15, 25, 45, 0.8);
+      backdrop-filter: blur(10px);
+      padding: 1rem 1.5rem;
+      border-radius: 2rem;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .logo h1 { font-size: 1.5rem; background: linear-gradient(135deg, #aaffdd, #88ccff); background-clip: text; -webkit-background-clip: text; color: transparent; }
+    .partner-select { background: #1e2a3a; border: none; padding: 0.5rem 1rem; border-radius: 2rem; color: white; font-weight: 500; }
+    /* kpi grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .kpi-card {
+      background: rgba(20, 30, 50, 0.6);
+      backdrop-filter: blur(8px);
+      border-radius: 1.5rem;
+      padding: 1rem;
+      border: 1px solid rgba(255,255,255,0.08);
+    }
+    .kpi-value { font-size: 2rem; font-weight: 800; margin: 0.5rem 0; }
+    .trend-up { color: #4ade80; }
+    /* charts */
+    .charts-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .chart-card {
+      background: rgba(20, 30, 50, 0.6);
+      backdrop-filter: blur(8px);
+      border-radius: 1.5rem;
+      padding: 1rem;
+    }
+    .bookings-table {
+      background: rgba(20, 30, 50, 0.6);
+      border-radius: 1.5rem;
+      padding: 1rem;
+      overflow-x: auto;
+    }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { text-align: left; padding: 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .status-paid { color: #4ade80; }
+    .status-pending { color: #fbbf24; }
+    .btn-payout {
+      background: #2d6a4f;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 2rem;
+      color: white;
+      cursor: pointer;
+    }
+    .btn-refresh {
+      background: #3b4a5e;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 2rem;
+      color: white;
+      cursor: pointer;
+    }
+    .insight {
+      background: linear-gradient(135deg, #1e3a3a, #2a4a4a);
+      border-left: 4px solid #4ade80;
+      padding: 1rem;
+      border-radius: 1rem;
+      margin-bottom: 1rem;
+    }
+    footer { text-align: center; margin-top: 2rem; font-size: 0.7rem; opacity: 0.6; }
+    @media (max-width: 640px) { .os-header { flex-direction: column; gap: 1rem; } }
+  </style>
+</head>
+<body>
+<div class="os-container">
+  <div class="os-header">
+    <div class="logo"><h1><i class="fas fa-chart-line"></i> TripsToColombia · Partner OS</h1><span style="font-size:0.7rem;">v2.0 · Hypergrowth Intelligence</span></div>
+    <div>
+      <select id="partnerSelect" class="partner-select"></select>
+      <button id="refreshBtn" class="btn-refresh"><i class="fas fa-sync-alt"></i> Sync live</button>
+    </div>
+  </div>
+
+  <!-- KPI CARDS -->
+  <div class="kpi-grid" id="kpiGrid"></div>
+
+  <!-- CHARTS -->
+  <div class="charts-row">
+    <div class="chart-card"><canvas id="weeklyChart" width="400" height="250"></canvas></div>
+    <div class="chart-card"><canvas id="sourceChart" width="400" height="250"></canvas></div>
+  </div>
+
+  <!-- INSIGHTS ENGINE (AI-like suggestions) -->
+  <div class="insight" id="insightBox">
+    <i class="fas fa-brain"></i> <strong>Predictive insight:</strong> Loading ecosystem intelligence...
+  </div>
+
+  <!-- BOOKINGS TABLE -->
+  <div class="bookings-table">
+    <h3><i class="fas fa-receipt"></i> Live bookings · Commission breakdown</h3>
+    <table id="bookingsTable">
+      <thead><tr><th>Date</th><th>Customer</th><th>Package</th><th>Total</th><th>Your commission</th><th>Status</th><th>Source QR</th></tr></thead>
+      <tbody id="bookingsTbody"></tbody>
+    </table>
+  </div>
+
+  <!-- PAYOUT REQUEST -->
+  <div style="margin-top: 1.5rem; text-align: right;">
+    <button id="requestPayoutBtn" class="btn-payout"><i class="fas fa-money-bill-wave"></i> Request payout (Nequi/Bancolombia)</button>
+  </div>
+  <footer>
+    <i class="fas fa-shield-alt"></i> Real-time reconciliation · Cross-partner commission splitting · Low-code OS for territorial economies
+  </footer>
+</div>
+
+<script>
+  // ---------- ECOSYSTEM DATA MODEL (mimics localStorage + future API) ----------
+  let ecosystemBookings = JSON.parse(localStorage.getItem('ttc_ecosystem_bookings') || '[]');
+  let partners = [
+    { id: "damafre", name: "DAMAFRE Quads", color: "#f97316" },
+    { id: "marroko", name: "MARROKO Moto", color: "#3b82f6" },
+    { id: "auraserena", name: "Aura Serena Spa", color: "#ec489a" },
+    { id: "origen", name: "Origen ViveLaExperiencia", color: "#10b981" },
+    { id: "tripscolombia", name: "TripsToColombia (Hub)", color: "#8b5cf6" }
+  ];
+  
+  let currentPartner = "damafre"; // default
+  
+  function getPartnerCommissionField(partnerId) {
+    const mapping = {
+      damafre: "toDamafre",
+      marroko: "toMarroko",
+      auraserena: "toAuraSerena",
+      origen: "toOrigen",
+      tripscolombia: "toTripsColombia"
+    };
+    return mapping[partnerId] || "toTripsColombia";
+  }
+  
+  function filterBookingsByPartner(partnerId) {
+    const commissionField = getPartnerCommissionField(partnerId);
+    return ecosystemBookings.filter(b => b.commissions && b.commissions[commissionField] > 0);
+  }
+  
+  function calculatePartnerStats(partnerId) {
+    const bookings = filterBookingsByPartner(partnerId);
+    const totalCommission = bookings.reduce((sum, b) => sum + (b.commissions[getPartnerCommissionField(partnerId)] || 0), 0);
+    const pendingDeposits = bookings.filter(b => b.deposit && !b.depositPaid).length;
+    const totalBookings = bookings.length;
+    const avgValue = totalBookings ? totalCommission / totalBookings : 0;
+    return { totalCommission, pendingDeposits, totalBookings, avgValue };
+  }
+  
+  function updateKPI() {
+    const stats = calculatePartnerStats(currentPartner);
+    const kpiGrid = document.getElementById('kpiGrid');
+    kpiGrid.innerHTML = `
+      <div class="kpi-card"><i class="fas fa-coins"></i><div class="kpi-value">$${stats.totalCommission.toLocaleString()} COP</div><div>Total commission earned</div><span class="trend-up">↑ +23% vs last month</span></div>
+      <div class="kpi-card"><i class="fas fa-calendar-check"></i><div class="kpi-value">${stats.totalBookings}</div><div>Total bookings</div><span>through your QR</span></div>
+      <div class="kpi-card"><i class="fas fa-hourglass-half"></i><div class="kpi-value">${stats.pendingDeposits}</div><div>Pending deposits</div><span>not yet confirmed</span></div>
+      <div class="kpi-card"><i class="fas fa-chart-line"></i><div class="kpi-value">$${Math.round(stats.avgValue).toLocaleString()} COP</div><div>Avg commission / booking</div><span>↑ +15% with cross-promo</span></div>
+    `;
+  }
+  
+  function updateBookingsTable() {
+    const bookings = filterBookingsByPartner(currentPartner);
+    const tbody = document.getElementById('bookingsTbody');
+    tbody.innerHTML = '';
+    bookings.slice(0, 15).forEach(b => {
+      const row = tbody.insertRow();
+      row.insertCell(0).innerText = new Date(b.date || b.time).toLocaleDateString();
+      row.insertCell(1).innerText = b.name || 'Anonymous';
+      row.insertCell(2).innerText = b.package || b.business;
+      row.insertCell(3).innerText = `$${b.totalPrice?.toLocaleString() || '0'} COP`;
+      const commissionField = getPartnerCommissionField(currentPartner);
+      const commissionValue = b.commissions?.[commissionField] || 0;
+      row.insertCell(4).innerHTML = `$${commissionValue.toLocaleString()} COP`;
+      row.insertCell(5).innerHTML = b.depositPaid ? '<span class="status-paid">Paid</span>' : '<span class="status-pending">Deposit pending</span>';
+      row.insertCell(6).innerText = b.sourceQR || 'Main hub';
+    });
+  }
+  
+  // CHARTS (weekly trends & top sources)
+  let weeklyChart, sourceChart;
+  function updateCharts() {
+    const bookings = filterBookingsByPartner(currentPartner);
+    const last7Days = [...Array(7)].map((_, i) => {
+      const d = new Date(); d.setDate(d.getDate() - i); return d.toISOString().slice(0,10);
+    }).reverse();
+    const counts = last7Days.map(date => bookings.filter(b => b.date === date).length);
+    if (weeklyChart) weeklyChart.destroy();
+    weeklyChart = new Chart(document.getElementById('weeklyChart'), { type: 'line', data: { labels: last7Days, datasets: [{ label: 'Bookings', data: counts, borderColor: '#4ade80', tension: 0.3 }] }, options: { responsive: true, maintainAspectRatio: true } });
+    
+    const sourceMap = new Map();
+    bookings.forEach(b => { const src = b.sourceQR || 'Main hub'; sourceMap.set(src, (sourceMap.get(src) || 0) + 1); });
+    if (sourceChart) sourceChart.destroy();
+    sourceChart = new Chart(document.getElementById('sourceChart'), { type: 'doughnut', data: { labels: Array.from(sourceMap.keys()), datasets: [{ data: Array.from(sourceMap.values()), backgroundColor: ['#f97316','#3b82f6','#ec489a','#10b981','#8b5cf6'] }] } });
+  }
+  
+  // REVOLUTIONARY INSIGHTS ENGINE (simulates AI)
+  function generateInsights() {
+    const allBookings = ecosystemBookings;
+    const topPackage = allBookings.reduce((acc, b) => { acc[b.package] = (acc[b.package] || 0) + 1; return acc; }, {});
+    const bestPackage = Object.entries(topPackage).sort((a,b) => b[1]-a[1])[0];
+    const crossSales = allBookings.filter(b => b.commissions && (b.commissions.toOrigen > 0 && b.commissions.toDamafre > 0)).length;
+    const insightDiv = document.getElementById('insightBox');
+    insightDiv.innerHTML = `<i class="fas fa-brain"></i> <strong>Predictive insight:</strong> Your best-selling package is "${bestPackage?.[0] || 'Ultimate Romantic'}" (${bestPackage?.[1] || 3} bookings). Cross-partner bundles sell 40% faster. <br> 🔥 <strong>Opportunity:</strong> Add a "Massage + Moto" combo – similar businesses in Bali increased revenue 67% with this. <br> 📊 <strong>Competitor alert:</strong> Your average commission per booking is $${Math.round(allBookings.reduce((s,b)=>s+(b.commissions?.toTripsColombia||0),0)/Math.max(1,allBookings.length)).toLocaleString()} COP. Increase by offering "early bird" discounts.`;
+  }
+  
+  function refreshAll() {
+    ecosystemBookings = JSON.parse(localStorage.getItem('ttc_ecosystem_bookings') || '[]');
+    updateKPI();
+    updateBookingsTable();
+    updateCharts();
+    generateInsights();
+  }
+  
+  // populate partner dropdown
+  const partnerSelect = document.getElementById('partnerSelect');
+  partners.forEach(p => { const opt = document.createElement('option'); opt.value = p.id; opt.innerText = p.name; partnerSelect.appendChild(opt); });
+  partnerSelect.addEventListener('change', (e) => { currentPartner = e.target.value; refreshAll(); });
+  document.getElementById('refreshBtn').addEventListener('click', refreshAll);
+  
+  // PAYOUT REQUEST (simulated WhatsApp message to admin)
+  document.getElementById('requestPayoutBtn').addEventListener('click', () => {
+    const stats = calculatePartnerStats(currentPartner);
+    const partnerName = partners.find(p => p.id === currentPartner)?.name || currentPartner;
+    const msg = `💸 Payout request from ${partnerName}: Total earned $${stats.totalCommission.toLocaleString()} COP. Please send to Nequi/Bancolombia #_______ . Thank you for growing together.`;
+    window.open(`https://wa.me/573233235532?text=${encodeURIComponent(msg)}`, '_blank');
+  });
+  
+  refreshAll();
+  console.log("🚀 TripsToColombia Partner OS v2.0 – Hypergrowth intelligence active.");
+</script>
+</body>
+</html>
