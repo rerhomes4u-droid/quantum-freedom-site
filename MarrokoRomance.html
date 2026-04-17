@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>MARROKO · Romantic Colombia Adventure | Motorcycle + Origen Experiences</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #0f1f1a;
+      color: #ece3d8;
+      padding: 1rem;
+    }
+    .container {
+      max-width: 880px;
+      margin: 0 auto;
+      background: #fefaf5;
+      color: #1e2a2b;
+      border-radius: 2rem;
+      overflow: hidden;
+      box-shadow: 0 25px 40px -12px black;
+    }
+    .hero {
+      background: linear-gradient(135deg, #2c1810, #5c3a2a);
+      padding: 2rem 1.5rem;
+      text-align: center;
+      color: white;
+      position: relative;
+    }
+    .lang-toggle {
+      position: absolute;
+      right: 1rem;
+      top: 1rem;
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: white;
+      padding: 0.3rem 0.8rem;
+      border-radius: 2rem;
+      cursor: pointer;
+      font-size: 0.7rem;
+    }
+    .hero h1 { font-size: 1.8rem; margin-bottom: 0.3rem; }
+    .hero p { opacity: 0.9; font-size: 0.9rem; }
+    .qr-row { text-align: center; padding: 1rem; background: #f0ebe2; }
+    #qrCodeCanvas { width: 110px; height: 110px; margin: 0 auto; display: block; background: white; padding: 5px; border-radius: 1rem; }
+    .content { padding: 1.5rem; }
+    .section-title { font-size: 1.3rem; margin: 1rem 0 1rem 0; border-left: 4px solid #b1624b; padding-left: 0.8rem; }
+    .package-card {
+      background: white;
+      border-radius: 1.5rem;
+      margin-bottom: 1.2rem;
+      border: 1px solid #e2d9cf;
+      overflow: hidden;
+      transition: 0.1s;
+      cursor: pointer;
+    }
+    .package-card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+    .package-header {
+      background: #faf7f2;
+      padding: 1rem;
+      font-weight: 700;
+      border-bottom: 1px solid #eee5db;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+    .package-body { padding: 1rem; }
+    .price-tag { font-weight: 800; color: #b1624b; font-size: 1.2rem; }
+    .btn-select {
+      background: #b1624b;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 2rem;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 0.5rem;
+    }
+    .booking-form { background: #f4efe7; border-radius: 1.5rem; padding: 1rem; margin-top: 1.5rem; }
+    .form-group { margin-bottom: 0.8rem; }
+    input, select { width: 100%; padding: 0.7rem; border-radius: 1rem; border: 1px solid #ccc; font-family: inherit; }
+    .reserve-btn { background: #1f5e46; color: white; width: 100%; padding: 0.8rem; border-radius: 2rem; font-weight: bold; border: none; cursor: pointer; }
+    .commission-note { background: #e6f0ea; border-radius: 1rem; padding: 0.8rem; margin: 1rem 0; font-size: 0.7rem; text-align: center; }
+    .footer { font-size: 0.7rem; text-align: center; padding: 1rem; border-top: 1px solid #e2d9cf; color: #6b5a4a; }
+    .selected-badge { background: #2c5f4e; color: white; padding: 0.2rem 0.6rem; border-radius: 40px; font-size: 0.7rem; display: inline-block; margin-left: 0.5rem; }
+    [data-lang] { display: none; }
+    [data-lang].active-lang { display: block; }
+    .inline-lang { display: inline; }
+  </style>
+</head>
+<body>
+<div class="container" id="app">
+  <div class="hero">
+    <button id="langToggleBtn" class="lang-toggle">🇬🇧 EN / 🇪🇸 ES</button>
+    <h1><i class="fas fa-motorcycle"></i> <span data-lang="en" class="active-lang">MARROKO · Romantic Colombia Adventure</span><span data-lang="es">MARROKO · Aventura Romántica Colombia</span></h1>
+    <p data-lang="en" class="active-lang">Motorcycle + Origen Experiences · Freedom on Two Wheels</p>
+    <p data-lang="es">Moto + Experiencias Origen · Libertad sobre dos ruedas</p>
+  </div>
+  <div class="qr-row">
+    <div id="qrCodeCanvas"></div>
+    <p data-lang="en" class="active-lang">Scan → Book your romantic ride</p>
+    <p data-lang="es">Escanea → Reserva tu paseo romántico</p>
+  </div>
+  <div class="content">
+    <div class="section-title"><span data-lang="en" class="active-lang">🌄 Romantic packages · Moto + Origen</span><span data-lang="es">🌄 Paquetes románticos · Moto + Origen</span></div>
+    <div id="packagesList"></div>
+
+    <div class="booking-form">
+      <h4><span data-lang="en" class="active-lang">📋 Reserve your romantic adventure</span><span data-lang="es">📋 Reserva tu aventura romántica</span></h4>
+      <div id="notifyArea"></div>
+      <form id="bookingForm">
+        <div class="form-group"><label>📛 <span data-lang="en" class="active-lang">Full name</span><span data-lang="es">Nombre completo</span></label><input type="text" id="clientName" required></div>
+        <div class="form-group"><label>📱 WhatsApp</label><input type="tel" id="clientPhone" required></div>
+        <div class="form-group"><label>📅 <span data-lang="en" class="active-lang">Date</span><span data-lang="es">Fecha</span></label><input type="date" id="bookingDate" required></div>
+        <div class="form-group"><label>⏰ <span data-lang="en" class="active-lang">Time</span><span data-lang="es">Hora</span></label><input type="time" id="bookingTime" required></div>
+        <div class="form-group"><label>👥 <span data-lang="en" class="active-lang">Number of people (couple = 2)</span><span data-lang="es">Número de personas (pareja = 2)</span></label><input type="number" id="peopleCount" value="2" min="1" max="4"></div>
+        <div class="form-group"><label>📦 <span data-lang="en" class="active-lang">Selected package</span><span data-lang="es">Paquete seleccionado</span></label><input type="text" id="selectedPackageName" readonly placeholder="Select a package above"></div>
+        <button type="submit" class="reserve-btn"><i class="fas fa-heart"></i> <span data-lang="en" class="active-lang">Reserve with 10% deposit</span><span data-lang="es">Reservar con 10% de anticipo</span></button>
+      </form>
+    </div>
+
+    <div class="commission-note" id="commissionNote">
+      🤝 <span data-lang="en" class="active-lang">We share commissions: MARROKO ↔ Origen ↔ TripsToColombia. Every booking supports local families and keeps these experiences alive.</span>
+      <span data-lang="es">Compartimos comisiones: MARROKO ↔ Origen ↔ TripsToColombia. Cada reserva apoya a familias locales y mantiene vivas estas experiencias.</span>
+    </div>
+    <div class="footer">
+      <i class="fab fa-whatsapp"></i> +57 323 323 5532 · 10% deposit non-refundable · Includes helmet, insurance, secret GPS routes<br>
+      <span id="ecosystemStatus">🌐 Ecosistema TripsToColombia · MARROKO + ORIGEN v1.0</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ---------- PACKAGE DEFINITIONS (mirroring DAMAFRE but with motorcycle pricing) ----------
+  // Base motorcycle rental: $35 USD/day ≈ $140,000 COP (using $150,000 for easier math)
+  // Travel time to Origen and back: 3 hours (half-day rental)
+  const MOTORCYCLE_HALF_DAY = 150000; // COP
+  const MOTORCYCLE_FULL_DAY = 220000;
+  
+  const packages = [
+    {
+      id: "moto_only",
+      name_en: "🏍️ Romantic Ride · Motorcycle to Origen & back",
+      name_es: "🏍️ Paseo Romántico · Moto a Origen ida y vuelta",
+      duration: "half-day",
+      price_couple: 220000,
+      includes_en: "Motorcycle (automatic/manual), 2 helmets, insurance, secret GPS routes to Origen, basic snack at midpoint",
+      includes_es: "Motocicleta (automática/manual), 2 cascos, seguro, rutas GPS secretas a Origen, snack básico en el camino",
+      addons: []
+    },
+    {
+      id: "romantic_horse",
+      name_en: "🐎 Horseback Ride at Origen + Motorcycle",
+      name_es: "🐎 Cabalgata en Origen + Motocicleta",
+      duration: "half-day + 1.5hr horse",
+      price_couple: 350000,
+      includes_en: "Motorcycle to Origen + 1.5hr guided horse ride (romantic trail) + return ride",
+      includes_es: "Motocicleta a Origen + 1.5hrs de cabalgata guiada (sendero romántico) + regreso",
+      addons: [{ type: "horse", commission_to_origen: 120000, commission_to_damafre: 0 }]
+    },
+    {
+      id: "chocolate_bread",
+      name_en: "🍫 Chocolate, Bread & Cheese Tasting + Motorcycle",
+      name_es: "🍫 Degustación de Chocolate, Pan y Queso + Moto",
+      duration: "half-day + tasting",
+      price_couple: 280000,
+      includes_en: "Motorcycle to Origen + artisanal chocolate, fresh bread, local cheese tasting",
+      includes_es: "Motocicleta a Origen + degustación de chocolate artesanal, pan fresco, queso local",
+      addons: []
+    },
+    {
+      id: "overnight_magic",
+      name_en: "🌙 Overnight Stay · Magic Circle + River Plunge + Dinner",
+      name_es: "🌙 Estancia Nocturna · Círculo Mágico + Río + Cena",
+      duration: "24hrs (overnight)",
+      price_couple: 620000,
+      includes_en: "Motorcycle to Origen (overnight stay included), magic circle hike, cold plunge, body vaporizers, dinner & breakfast",
+      includes_es: "Motocicleta a Origen (estadía incluida), caminata círculo mágico, baño frío, vaporizadores, cena y desayuno",
+      addons: [{ type: "healing", commission_to_origen: 250000, commission_to_damafre: 30000 }]
+    },
+    {
+      id: "ultimate_romantic",
+      name_en: "💖 Ultimate Romantic · Horse + Chocolate + Magic Circle + Overnight",
+      name_es: "💖 Romántico Definitivo · Caballo + Chocolate + Círculo Mágico + Noche",
+      duration: "24hrs",
+      price_couple: 850000,
+      includes_en: "Everything: motorcycle, horse ride, chocolate tasting, magic circle, river plunge, dinner, breakfast, sunset toast",
+      includes_es: "Todo: moto, cabalgata, degustación chocolate, círculo mágico, río, cena, desayuno, brindis al atardecer",
+      addons: [{ type: "premium", commission_to_origen: 380000, commission_to_damafre: 50000 }]
+    }
+  ];
+
+  let currentLang = localStorage.getItem('marroko_lang') || 'en';
+  let selectedPackageId = null;
+
+  function renderPackages() {
+    const container = document.getElementById('packagesList');
+    container.innerHTML = '';
+    packages.forEach(pkg => {
+      const card = document.createElement('div');
+      card.className = 'package-card';
+      card.innerHTML = `
+        <div class="package-header">
+          <span>${currentLang === 'en' ? pkg.name_en : pkg.name_es}</span>
+          <span class="price-tag">$${pkg.price_couple.toLocaleString()} COP</span>
+        </div>
+        <div class="package-body">
+          <p>${currentLang === 'en' ? pkg.includes_en : pkg.includes_es}</p>
+          <button class="btn-select" data-pkg-id="${pkg.id}">${currentLang === 'en' ? 'Select this romantic package' : 'Seleccionar este paquete romántico'}</button>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+    document.querySelectorAll('.btn-select').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        selectedPackageId = btn.getAttribute('data-pkg-id');
+        const pkg = packages.find(p => p.id === selectedPackageId);
+        document.getElementById('selectedPackageName').value = currentLang === 'en' ? pkg.name_en : pkg.name_es;
+        document.getElementById('selectedPackageName').style.background = '#e6f0ea';
+        // scroll to form
+        document.querySelector('.booking-form').scrollIntoView({ behavior: 'smooth' });
+      });
+    });
+  }
+
+  function toggleLanguage() {
+    currentLang = currentLang === 'en' ? 'es' : 'en';
+    localStorage.setItem('marroko_lang', currentLang);
+    document.querySelectorAll('[data-lang]').forEach(el => {
+      if (el.getAttribute('data-lang') === currentLang) {
+        el.classList.add('active-lang');
+      } else {
+        el.classList.remove('active-lang');
+      }
+    });
+    renderPackages();
+    if (selectedPackageId) {
+      const pkg = packages.find(p => p.id === selectedPackageId);
+      if (pkg) document.getElementById('selectedPackageName').value = currentLang === 'en' ? pkg.name_en : pkg.name_es;
+    }
+  }
+
+  // Load ecosystem profile from hub
+  let ecosystemProfile = JSON.parse(localStorage.getItem('ttc_ecosystem_profile')) || { name: '', phone: '', interests: '' };
+  if (ecosystemProfile.name) {
+    document.getElementById('clientName').value = ecosystemProfile.name;
+    document.getElementById('clientPhone').value = ecosystemProfile.phone;
+  }
+
+  function notifySystem(msg, data) {
+    const area = document.getElementById('notifyArea');
+    const notif = document.createElement('div');
+    notif.style.background = '#dff3e3';
+    notif.style.padding = '0.8rem';
+    notif.style.borderRadius = '1rem';
+    notif.style.marginBottom = '0.5rem';
+    notif.innerHTML = `<i class="fas fa-bell"></i> ${msg}`;
+    area.prepend(notif);
+    setTimeout(() => notif.remove(), 7000);
+    console.log("🔔 MARROKO+ORIGEN NOTIF:", msg, data);
+    let logs = JSON.parse(localStorage.getItem('marroko_origen_log') || '[]');
+    logs.unshift({ time: new Date().toISOString(), msg, data });
+    localStorage.setItem('marroko_origen_log', JSON.stringify(logs.slice(0, 30)));
+  }
+
+  // INTERNAL COMMISSION CALCULATOR (not shown to customer, but logged for partners)
+  function calculateCommissions(pkg, people) {
+    let total = pkg.price_couple;
+    if (people === 1) total = total * 0.6;
+    if (people > 2) total = total + (people-2) * (total * 0.4);
+    
+    const motorcycleRevenue = MOTORCYCLE_HALF_DAY;
+    let toOrigen = 0;
+    let toMarroko = motorcycleRevenue;
+    let toTripsColombia = total * 0.10;
+    
+    // Add-on commissions
+    if (pkg.addons && pkg.addons.length) {
+      pkg.addons.forEach(add => {
+        if (add.commission_to_origen) {
+          toOrigen += add.commission_to_origen;
+          toMarroko -= add.commission_to_origen * 0.3; // Marroko shares part
+        }
+        if (add.commission_to_damafre) toMarroko -= add.commission_to_damafre;
+      });
+    }
+    
+    // Standard cross-promo: 10% of motorcycle revenue to Origen for referrals
+    toOrigen += motorcycleRevenue * 0.10;
+    toMarroko = motorcycleRevenue - (motorcycleRevenue * 0.10) - (motorcycleRevenue * 0.05);
+    
+    return { total, deposit: total * 0.1, toOrigen, toMarroko, toTripsColombia };
+  }
+
+  document.getElementById('bookingForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (!selectedPackageId) {
+      alert(currentLang === 'en' ? 'Please select a romantic package first.' : 'Primero selecciona un paquete romántico.');
+      return;
+    }
+    const name = document.getElementById('clientName').value.trim();
+    const phone = document.getElementById('clientPhone').value.trim();
+    const date = document.getElementById('bookingDate').value;
+    const time = document.getElementById('bookingTime').value;
+    const people = parseInt(document.getElementById('peopleCount').value);
+    const pkg = packages.find(p => p.id === selectedPackageId);
+    if (!pkg) return;
+    
+    const commissions = calculateCommissions(pkg, people);
+    
+    notifySystem(
+      `💝 NEW ROMANTIC BOOKING: ${name} - ${currentLang === 'en' ? pkg.name_en : pkg.name_es} - ${people} ppl - Total $${commissions.total.toLocaleString()} COP - Deposit $${commissions.deposit.toLocaleString()} COP`,
+      { name, phone, date, time, pkg, people, commissions }
+    );
+    
+    alert(currentLang === 'en' ? 
+      `✅ Romantic adventure reserved! We'll contact you on WhatsApp for the 10% deposit ($${commissions.deposit.toLocaleString()} COP). Get ready for an unforgettable journey through Colombia's hidden gems.` : 
+      `✅ ¡Aventura romántica reservada! Te contactaremos por WhatsApp para el anticipo del 10% ($${commissions.deposit.toLocaleString()} COP). Prepárate para un viaje inolvidable por los tesoros escondidos de Colombia.`
+    );
+    
+    let allBookings = JSON.parse(localStorage.getItem('ttc_ecosystem_bookings') || '[]');
+    allBookings.push({
+      business: 'MARROKO+ORIGEN',
+      package: pkg.id,
+      name, phone, date, time, people,
+      totalPrice: commissions.total,
+      deposit: commissions.deposit,
+      commissions: {
+        toMarroko: commissions.toMarroko,
+        toOrigen: commissions.toOrigen,
+        toTripsColombia: commissions.toTripsColombia
+      }
+    });
+    localStorage.setItem('ttc_ecosystem_bookings', JSON.stringify(allBookings));
+  });
+
+  // QR code
+  new QRCode(document.getElementById('qrCodeCanvas'), { text: window.location.href, width: 110, height: 110, colorDark: "#1e2a2b" });
+  document.getElementById('langToggleBtn').addEventListener('click', toggleLanguage);
+  renderPackages();
+  
+  console.log("🎯 MARROKO ROMANTIC PACKAGES v1.0: bilingual, commission-sharing, ecosystem-ready.");
+  console.log("Internal commission structure logged to localStorage 'ttc_ecosystem_bookings'");
+</script>
+</body>
+</html>
