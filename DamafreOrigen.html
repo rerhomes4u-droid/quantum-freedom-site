@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>DAMAFRE · Guided Quad Tours + Origen Experiences | Salento</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #1a2a24;
+      color: #ece3d8;
+      padding: 1rem;
+    }
+    .container {
+      max-width: 850px;
+      margin: 0 auto;
+      background: #fefaf5;
+      color: #1e2a2b;
+      border-radius: 2rem;
+      overflow: hidden;
+      box-shadow: 0 25px 40px -12px black;
+    }
+    .hero {
+      background: linear-gradient(135deg, #1f4e3c, #2d6a4f);
+      padding: 2rem 1.5rem;
+      text-align: center;
+      color: white;
+    }
+    .lang-toggle {
+      position: absolute;
+      right: 1rem;
+      top: 1rem;
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: white;
+      padding: 0.3rem 0.8rem;
+      border-radius: 2rem;
+      cursor: pointer;
+    }
+    .hero h1 { font-size: 2rem; }
+    .qr-row { text-align: center; padding: 1rem; background: #f0ebe2; }
+    #qrCodeCanvas { width: 110px; height: 110px; margin: 0 auto; display: block; background: white; padding: 5px; border-radius: 1rem; }
+    .content { padding: 1.5rem; }
+    .section-title { font-size: 1.3rem; margin: 1rem 0; border-left: 4px solid #b1624b; padding-left: 0.8rem; }
+    .package-card {
+      background: white;
+      border-radius: 1.5rem;
+      margin-bottom: 1.2rem;
+      border: 1px solid #e2d9cf;
+      overflow: hidden;
+      transition: 0.1s;
+    }
+    .package-header {
+      background: #faf7f2;
+      padding: 1rem;
+      font-weight: 700;
+      border-bottom: 1px solid #eee5db;
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+    .package-body { padding: 1rem; }
+    .price-tag { font-weight: 800; color: #b1624b; font-size: 1.2rem; }
+    .btn-select {
+      background: #b1624b;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 2rem;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 0.5rem;
+    }
+    .booking-form { background: #f4efe7; border-radius: 1.5rem; padding: 1rem; margin-top: 1.5rem; }
+    .form-group { margin-bottom: 0.8rem; }
+    input, select { width: 100%; padding: 0.7rem; border-radius: 1rem; border: 1px solid #ccc; }
+    .reserve-btn { background: #1f5e46; color: white; width: 100%; padding: 0.8rem; border-radius: 2rem; font-weight: bold; border: none; cursor: pointer; }
+    .commission-note { background: #e6f0ea; border-radius: 1rem; padding: 0.8rem; margin: 1rem 0; font-size: 0.7rem; text-align: center; }
+    .footer { font-size: 0.7rem; text-align: center; padding: 1rem; border-top: 1px solid #e2d9cf; }
+    [data-lang] { display: none; }
+    [data-lang].active-lang { display: block; }
+    .lang-active { display: block; }
+    .inline-lang { display: inline; }
+  </style>
+</head>
+<body>
+<div class="container" id="app">
+  <div class="hero" style="position: relative;">
+    <button id="langToggleBtn" class="lang-toggle">🇬🇧 EN / 🇪🇸 ES</button>
+    <h1><i class="fas fa-tractor"></i> <span data-lang="en" class="active-lang">DAMAFRE + ORIGEN</span><span data-lang="es">DAMAFRE + ORIGEN</span></h1>
+    <p data-lang="en" class="active-lang">Guided Quad Tours · Origen Experiences · Romantic Packages</p>
+    <p data-lang="es">Tours Guiados en Quad · Experiencias Origen · Paquetes Románticos</p>
+  </div>
+  <div class="qr-row">
+    <div id="qrCodeCanvas"></div>
+    <p data-lang="en" class="active-lang">Scan → Book your adventure</p>
+    <p data-lang="es">Escanea → Reserva tu aventura</p>
+  </div>
+  <div class="content">
+    <!-- PACKAGES SECTION -->
+    <div class="section-title"><span data-lang="en" class="active-lang">🌄 Choose your experience</span><span data-lang="es">🌄 Elige tu experiencia</span></div>
+    <div id="packagesList"></div>
+
+    <!-- BOOKING FORM -->
+    <div class="booking-form">
+      <h4><span data-lang="en" class="active-lang">📋 Reserve your package</span><span data-lang="es">📋 Reserva tu paquete</span></h4>
+      <div id="notifyArea"></div>
+      <form id="bookingForm">
+        <div class="form-group"><label>📛 <span data-lang="en" class="active-lang">Full name</span><span data-lang="es">Nombre completo</span></label><input type="text" id="clientName" required></div>
+        <div class="form-group"><label>📱 WhatsApp</label><input type="tel" id="clientPhone" required></div>
+        <div class="form-group"><label>📅 <span data-lang="en" class="active-lang">Date</span><span data-lang="es">Fecha</span></label><input type="date" id="bookingDate" required></div>
+        <div class="form-group"><label>⏰ <span data-lang="en" class="active-lang">Time</span><span data-lang="es">Hora</span></label><input type="time" id="bookingTime" required></div>
+        <div class="form-group"><label>👥 <span data-lang="en" class="active-lang">Number of people</span><span data-lang="es">Número de personas</span></label><input type="number" id="peopleCount" value="2" min="1" max="6"></div>
+        <div class="form-group" id="selectedPackageDisplay"><label>📦 <span data-lang="en" class="active-lang">Selected package</span><span data-lang="es">Paquete seleccionado</span></label><input type="text" id="selectedPackageName" readonly placeholder="Select a package above"></div>
+        <button type="submit" class="reserve-btn"><i class="fas fa-feather-alt"></i> <span data-lang="en" class="active-lang">Reserve with 10% deposit</span><span data-lang="es">Reservar con 10% de anticipo</span></button>
+      </form>
+    </div>
+
+    <!-- COMMISSION TRANSPARENCY -->
+    <div class="commission-note" id="commissionNote">
+      🤝 <span data-lang="en" class="active-lang">We share commissions: DAMAFRE ↔ Origen ↔ TripsToColombia. Every booking supports local families.</span>
+      <span data-lang="es">Compartimos comisiones: DAMAFRE ↔ Origen ↔ TripsToColombia. Cada reserva apoya a familias locales.</span>
+    </div>
+    <div class="footer">
+      <i class="fab fa-whatsapp"></i> +57 323 323 5532 · 10% deposit non-refundable<br>
+      <span id="ecosystemStatus">🌐 Ecosistema TripsToColombia · Versión 2.0</span>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ---------- PACKAGE DEFINITIONS (bilingual, commission-aware) ----------
+  // Travel time to Origen and back: 3 hours quad riding
+  // Base quad cost for couple: $130,000/hr x 3hrs = $390,000 (we use $150,000/hr marked up)
+  const MARKUP_RATE = 150000; // per hour for couple (public price)
+  const DAMAFRE_BASE_RATE = 130000; // what DAMAFRE receives per hour
+  const COMMISSION_SPLIT = {
+    toOrigenFromQuad: 0.10, // 10% of quad revenue goes to Origen
+    toDamafreFromOrigen: 0.05, // 5% of Origen add-ons goes to DAMAFRE
+    toTripsColombia: 0.10 // 10% of total to platform
+  };
+
+  const packages = [
+    {
+      id: "quad_only",
+      name_en: "🚜 Quad Adventure Only · Guided round trip to Origen",
+      name_es: "🚜 Solo Aventura en Quad · Ida y vuelta guiada a Origen",
+      base_hours: 3,
+      price_couple_public: 450000, // 3hrs x 150,000
+      includes_en: "3hr guided quad ride (round trip to Origen), helmets, insurance, basic snack",
+      includes_es: "3hrs de quad guiado (ida/vuelta a Origen), cascos, seguro, snack básico",
+      addons: []
+    },
+    {
+      id: "romantic_horse",
+      name_en: "🐎 Romantic Horseback Ride + Quad",
+      name_es: "🐎 Paseo a Caballo Romántico + Quad",
+      base_hours: 3,
+      addon_hours: 1.5,
+      addon_price_couple: 150000, // Origen keeps 120,000 after commission
+      price_couple_public: 600000, // 450k quad + 150k horse
+      includes_en: "3hr quad + 1.5hr horse ride at Origen (guide included), romantic trail",
+      includes_es: "3hrs quad + 1.5hrs cabalgata en Origen (guía incluido), sendero romántico",
+      addons: [{ type: "horse", commission_to_origen: 120000, commission_to_damafre: 0 }]
+    },
+    {
+      id: "chocolate_bread",
+      name_en: "🍫 Chocolate, Bread & Cheese Tasting",
+      name_es: "🍫 Degustación de Chocolate, Pan y Queso",
+      base_hours: 3,
+      addon_hours: 0.5,
+      addon_price_couple: 60000,
+      price_couple_public: 510000,
+      includes_en: "3hr quad + artisanal chocolate, fresh bread, local cheese tasting at Origen",
+      includes_es: "3hrs quad + degustación de chocolate artesanal, pan fresco, queso local en Origen",
+      addons: []
+    },
+    {
+      id: "full_immersion",
+      name_en: "🌿 Full Immersion · Magic Circle + River Plunge",
+      name_es: "🌿 Inmersión Total · Círculo Mágico + Río Frío",
+      base_hours: 3,
+      addon_hours: 2,
+      addon_price_couple: 180000,
+      price_couple_public: 630000,
+      includes_en: "3hr quad + hike to magic healing circle + cold plunge in natural pools + body vaporizers session",
+      includes_es: "3hrs quad + caminata al círculo mágico de sanación + baño frío en pozos naturales + sesión de vaporizadores corporales",
+      addons: [{ type: "healing", commission_to_origen: 150000, commission_to_damafre: 30000 }]
+    },
+    {
+      id: "ultimate_romantic",
+      name_en: "💖 Ultimate Romantic Package · Horse + Chocolate + Magic Circle",
+      name_es: "💖 Paquete Romántico Definitivo · Caballo + Chocolate + Círculo Mágico",
+      base_hours: 3,
+      addon_hours: 3.5,
+      addon_price_couple: 300000,
+      price_couple_public: 750000,
+      includes_en: "Quad + horse ride + chocolate tasting + magic circle hike + river plunge + sunset toast",
+      includes_es: "Quad + cabalgata + degustación chocolate + caminata círculo mágico + baño río + brindis al atardecer",
+      addons: [{ type: "premium", commission_to_origen: 250000, commission_to_damafre: 50000 }]
+    }
+  ];
+
+  let currentLang = localStorage.getItem('damafre_lang') || 'en';
+  let selectedPackageId = null;
+
+  function renderPackages() {
+    const container = document.getElementById('packagesList');
+    container.innerHTML = '';
+    packages.forEach(pkg => {
+      const card = document.createElement('div');
+      card.className = 'package-card';
+      card.innerHTML = `
+        <div class="package-header">
+          <span>${currentLang === 'en' ? pkg.name_en : pkg.name_es}</span>
+          <span class="price-tag">$${pkg.price_couple_public.toLocaleString()} COP</span>
+        </div>
+        <div class="package-body">
+          <p>${currentLang === 'en' ? pkg.includes_en : pkg.includes_es}</p>
+          <button class="btn-select" data-pkg-id="${pkg.id}">${currentLang === 'en' ? 'Select this package' : 'Seleccionar este paquete'}</button>
+        </div>
+      `;
+      container.appendChild(card);
+    });
+    document.querySelectorAll('.btn-select').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        selectedPackageId = btn.getAttribute('data-pkg-id');
+        const pkg = packages.find(p => p.id === selectedPackageId);
+        document.getElementById('selectedPackageName').value = currentLang === 'en' ? pkg.name_en : pkg.name_es;
+        document.getElementById('selectedPackageName').style.background = '#e6f0ea';
+        alert(currentLang === 'en' ? `Package "${pkg.name_en}" selected. Complete the form below.` : `Paquete "${pkg.name_es}" seleccionado. Completa el formulario.`);
+      });
+    });
+  }
+
+  function toggleLanguage() {
+    currentLang = currentLang === 'en' ? 'es' : 'en';
+    localStorage.setItem('damafre_lang', currentLang);
+    document.querySelectorAll('[data-lang]').forEach(el => {
+      if (el.getAttribute('data-lang') === currentLang) {
+        el.classList.add('active-lang');
+      } else {
+        el.classList.remove('active-lang');
+      }
+    });
+    renderPackages();
+    updateUITexts();
+  }
+
+  function updateUITexts() {
+    // simple field placeholders can be updated; we'll keep it dynamic via data-lang but for inputs we refresh
+    const packageInput = document.getElementById('selectedPackageName');
+    if (selectedPackageId) {
+      const pkg = packages.find(p => p.id === selectedPackageId);
+      if (pkg) packageInput.value = currentLang === 'en' ? pkg.name_en : pkg.name_es;
+    }
+  }
+
+  // Load ecosystem profile
+  let ecosystemProfile = JSON.parse(localStorage.getItem('ttc_ecosystem_profile')) || { name: '', phone: '', interests: '' };
+  if (ecosystemProfile.name) {
+    document.getElementById('clientName').value = ecosystemProfile.name;
+    document.getElementById('clientPhone').value = ecosystemProfile.phone;
+  }
+
+  function notifySystem(msg, data) {
+    const area = document.getElementById('notifyArea');
+    const notif = document.createElement('div');
+    notif.style.background = '#dff3e3';
+    notif.style.padding = '0.8rem';
+    notif.style.borderRadius = '1rem';
+    notif.style.marginBottom = '0.5rem';
+    notif.innerHTML = `<i class="fas fa-bell"></i> ${msg}`;
+    area.prepend(notif);
+    setTimeout(() => notif.remove(), 7000);
+    console.log("🔔 DAMAFRE+ORIGEN NOTIF:", msg, data);
+    let logs = JSON.parse(localStorage.getItem('damafre_origen_log') || '[]');
+    logs.unshift({ time: new Date().toISOString(), msg, data });
+    localStorage.setItem('damafre_origen_log', JSON.stringify(logs.slice(0, 30)));
+  }
+
+  document.getElementById('bookingForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (!selectedPackageId) { alert(currentLang === 'en' ? 'Please select a package first.' : 'Primero selecciona un paquete.'); return; }
+    const name = document.getElementById('clientName').value.trim();
+    const phone = document.getElementById('clientPhone').value.trim();
+    const date = document.getElementById('bookingDate').value;
+    const time = document.getElementById('bookingTime').value;
+    const people = parseInt(document.getElementById('peopleCount').value);
+    const pkg = packages.find(p => p.id === selectedPackageId);
+    if (!pkg) return;
+    let totalPrice = pkg.price_couple_public;
+    if (people !== 2) {
+      // simple adjustment: for singles 60%, for extra people +40% each
+      if (people === 1) totalPrice = Math.round(totalPrice * 0.6);
+      else if (people > 2) totalPrice = totalPrice + (people-2) * Math.round(totalPrice * 0.4);
+    }
+    const deposit = totalPrice * 0.1;
+    // calculate commissions
+    const quadRevenue = MARKUP_RATE * pkg.base_hours;
+    const toOrigen = Math.round(quadRevenue * COMMISSION_SPLIT.toOrigenFromQuad);
+    let toDamafre = Math.round(quadRevenue * (1 - COMMISSION_SPLIT.toOrigenFromQuad - COMMISSION_SPLIT.toTripsColombia));
+    if (pkg.addons && pkg.addons.length) {
+      pkg.addons.forEach(add => {
+        if (add.commission_to_origen) toOrigen += add.commission_to_origen;
+        if (add.commission_to_damafre) toDamafre += add.commission_to_damafre;
+      });
+    }
+    notifySystem(`📅 NEW BOOKING: ${name} - ${currentLang === 'en' ? pkg.name_en : pkg.name_es} - ${people} ppl - Total $${totalPrice.toLocaleString()} COP - Deposit $${deposit.toLocaleString()} COP`, { name, phone, date, time, pkg, totalPrice, deposit, commissions: { toOrigen, toDamafre, toTripsColombia: totalPrice * 0.1 } });
+    alert(`${currentLang === 'en' ? `✅ Reservation recorded. We'll contact you on WhatsApp for the 10% deposit ($${deposit.toLocaleString()} COP). Get ready for an unforgettable journey!` : `✅ Reserva registrada. Te contactaremos por WhatsApp para el anticipo del 10% ($${deposit.toLocaleString()} COP). ¡Prepárate para un viaje inolvidable!`}`);
+    let allBookings = JSON.parse(localStorage.getItem('ttc_ecosystem_bookings') || '[]');
+    allBookings.push({ business: 'DAMAFRE+ORIGEN', package: pkg.id, name, phone, date, time, people, totalPrice, deposit, commissions: { toOrigen, toDamafre, toTripsColombia: totalPrice * 0.1 } });
+    localStorage.setItem('ttc_ecosystem_bookings', JSON.stringify(allBookings));
+  });
+
+  // QR code
+  new QRCode(document.getElementById('qrCodeCanvas'), { text: window.location.href, width: 110, height: 110, colorDark: "#1e2a2b" });
+  document.getElementById('langToggleBtn').addEventListener('click', toggleLanguage);
+  renderPackages();
+  console.log("DAMAFRE+ORIGEN v2: bilingual, commission-sharing, romantic packages, ecosystem-ready.");
+</script>
+</body>
+</html>
