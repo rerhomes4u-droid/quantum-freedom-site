@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Energetic Armor | Resonance Defense Suite</title>
+    <!-- Compliments of TripsToColombia.com | ForbiddenKnowledge.Substack.com -->
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none; /* for sleeker UI, but text can still be copied if needed */
+        }
+
+        body {
+            background: radial-gradient(circle at 10% 20%, #0a0f1e, #03060c);
+            font-family: 'Segoe UI', 'Orbitron', 'Courier New', monospace;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 1.5rem;
+            margin: 0;
+        }
+
+        /* main container */
+        .grid-forge {
+            max-width: 1400px;
+            width: 100%;
+            background: rgba(12, 20, 28, 0.65);
+            backdrop-filter: blur(12px);
+            border-radius: 3rem;
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            box-shadow: 0 25px 45px rgba(0,0,0,0.5), 0 0 20px rgba(0, 210, 255, 0.2);
+            padding: 1.8rem;
+            transition: all 0.3s;
+        }
+
+        /* header branding */
+        .ethereal-header {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            border-bottom: 1px solid cyan;
+            margin-bottom: 1.8rem;
+            padding-bottom: 0.8rem;
+        }
+        .title-section h1 {
+            font-size: 1.7rem;
+            margin: 0;
+            background: linear-gradient(135deg, #c0f2ff, #8a6eff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: 2px;
+        }
+        .title-section p {
+            color: #8ee4ff;
+            font-size: 0.75rem;
+            margin: 0;
+        }
+        .badge {
+            text-align: right;
+            font-size: 0.7rem;
+            color: #6bd9ff;
+            text-shadow: 0 0 3px cyan;
+        }
+
+        /* main dashboard grid */
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.6rem;
+        }
+
+        /* cards */
+        .card {
+            background: rgba(0, 5, 15, 0.7);
+            border-radius: 2rem;
+            border: 1px solid rgba(0, 255, 200, 0.4);
+            backdrop-filter: blur(4px);
+            padding: 1.2rem 1.5rem;
+            transition: 0.2s;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+        .card h3 {
+            font-size: 1.3rem;
+            margin-top: 0;
+            margin-bottom: 1rem;
+            color: #b5f0ff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-left: 4px solid cyan;
+            padding-left: 12px;
+        }
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ffd966;
+            font-family: monospace;
+        }
+        button {
+            background: linear-gradient(95deg, #0e2a38, #02121c);
+            border: 1px solid cyan;
+            color: cyan;
+            padding: 8px 18px;
+            border-radius: 40px;
+            font-weight: bold;
+            margin-top: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+            width: 100%;
+            font-family: inherit;
+            letter-spacing: 1px;
+        }
+        button:hover {
+            background: cyan;
+            color: #010b12;
+            box-shadow: 0 0 12px cyan;
+            border-color: white;
+        }
+        .frequency-meter {
+            background: #021018;
+            border-radius: 30px;
+            padding: 8px 12px;
+            margin: 12px 0;
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: #99f2ff;
+        }
+        .shield-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0;
+        }
+        .grid-node {
+            background: #0e2c34;
+            width: 45px;
+            height: 45px;
+            border-radius: 12px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            transition: 0.15s;
+            border: 1px solid #36cdff;
+        }
+        .grid-node.active {
+            background: #00e0ff;
+            box-shadow: 0 0 12px cyan;
+            color: black;
+        }
+        .log-area {
+            background: #030c12cc;
+            border-radius: 20px;
+            padding: 12px;
+            height: 180px;
+            overflow-y: auto;
+            font-size: 0.75rem;
+            font-family: monospace;
+            color: #acf5ff;
+            border: 1px solid teal;
+        }
+        hr {
+            border-color: rgba(0,255,255,0.2);
+        }
+        .alignment-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        .badge-attack {
+            background: rgba(255, 70, 70, 0.2);
+            border-left: 3px solid #ff5555;
+            padding: 4px 8px;
+            margin: 6px 0;
+        }
+        footer {
+            font-size: 0.65rem;
+            text-align: center;
+            margin-top: 1.8rem;
+            color: #4da8b5;
+        }
+        @keyframes pulse {
+            0% { text-shadow: 0 0 0px cyan; opacity: 0.7; }
+            100% { text-shadow: 0 0 6px cyan; opacity: 1; }
+        }
+        .active-scan {
+            animation: pulse 1s infinite;
+        }
+        .btn-small {
+            width: auto;
+            padding: 4px 12px;
+            font-size: 0.7rem;
+            margin-top: 6px;
+        }
+    </style>
+</head>
+<body>
+<div class="grid-forge">
+    <div class="ethereal-header">
+        <div class="title-section">
+            <h1>⚡ AETHER.SHIELD ⚡</h1>
+            <p>energetic resonance · counter-frequency cleansing · remote property grid</p>
+        </div>
+        <div class="badge">
+            ✦ TripsToColombia.com ✦<br>
+            ⟡ ForbiddenKnowledge.substack.com ⟡
+        </div>
+    </div>
+
+    <div class="dashboard">
+        <!-- SCAN DEVICE & ATTACHMENTS CARD -->
+        <div class="card">
+            <h3>🌀 1. SCAN · Energetic Attachments</h3>
+            <div class="frequency-meter">
+                <div>⚡ Etheric interference baseline: <strong id="interferenceLevel">0%</strong></div>
+                <div>👾 Attachment entities detected: <strong id="attachCount">0</strong></div>
+                <div>🌌 Resonant noise: <span id="noiseValue">calm</span></div>
+            </div>
+            <button id="scanBtn">🔍 INITIATE FULL SPECTRUM SCAN</button>
+            <div class="log-area" id="scanLog">
+                [system] ready · deep scan paradigm active<br>
+                awaiting initiation ...
+            </div>
+        </div>
+
+        <!-- GENERATE COUNTER FREQUENCIES + PROTECTION GRID -->
+        <div class="card">
+            <h3>🎵 2. COUNTER-FREQUENCIES & GRID</h3>
+            <div>
+                <div class="alignment-row">
+                    <span>⚡ Active counter-wave:</span>
+                    <strong id="currentFreq">─── Hz (dormant)</strong>
+                </div>
+                <button id="genFreqBtn">📡 GENERATE NEUTRALIZING FREQUENCY</button>
+                <button id="activateGridBtn" style="margin-top: 8px;">🛡️ DEPLOY DIGITAL PROTECTION GRID</button>
+            </div>
+            <div class="shield-grid" id="shieldGridContainer">
+                <!-- dynamically rendered grid nodes 5x4 or so -->
+            </div>
+            <div id="gridStatusMsg" style="font-size:0.8rem; color:#aaffdd;"></div>
+        </div>
+
+        <!-- REMOTE HOME/PROPERTY CLEANSE + TRACK ATTACK PATTERNS -->
+        <div class="card">
+            <h3>🏡 3. REMOTE CLEANSE & TRACKER</h3>
+            <button id="cleansePropertyBtn">✨ CLEANSE HOME / PROPERTY (remote)</button>
+            <div id="cleanseFeedback" class="frequency-meter" style="margin-top: 8px;">✨ [pending]</div>
+            <hr>
+            <h3 style="font-size:1.1rem;">📈 SPIRITUAL ATTACK PATTERNS</h3>
+            <div id="attackPatternList" class="log-area" style="height: 130px;">
+                [tracker] no patterns logged yet.
+            </div>
+            <button id="trackPatternBtn" class="btn-small">🔎 DETECT / TRACK RECENT ATTACK PATTERNS</button>
+            <button id="clearLogsBtn" class="btn-small" style="background:#3c1f1f; border-color:#ff8888;">🧹 reset history</button>
+        </div>
+    </div>
+    <footer>
+        ✦  Resonant Defense Suite · Virtual Etheric Hygiene  ✦  <br>
+        Use intention & digital frequency harmonics. All protections simulated via advanced cymatic mapping.
+    </footer>
+</div>
+
+<script>
+    // ==================== STATE ====================
+    let energeticState = {
+        attachmentsDetected: 0,         // count of energetic parasites/attachments
+        interferencePercent: 0,         // 0-100
+        gridActive: false,              // protection grid online?
+        currentAntiFreq: null,          // string representation
+        gridNodes: [],                  // 20 nodes (active/inactive)
+        attackHistory: [],              // store attack patterns with timestamps
+        remoteCleanseCooldown: false,
+        lastCleanseTimestamp: null
+    };
+
+    // Helper: update UI elements related to scan
+    function updateScanUI() {
+        document.getElementById('interferenceLevel').innerText = energeticState.interferencePercent + '%';
+        document.getElementById('attachCount').innerText = energeticState.attachmentsDetected;
+        let noiseText = energeticState.interferencePercent < 20 ? "calm resonance" :
+                        energeticState.interferencePercent < 60 ? "turbulent harmonics" : "acute chaotic field";
+        if(energeticState.attachmentsDetected > 2) noiseText = "⚠️ heavy parasitic load ⚠️";
+        document.getElementById('noiseValue').innerText = noiseText;
+    }
+
+    // Logging to scan console (first card)
+    function addScanLog(message, isWarning = false) {
+        const logDiv = document.getElementById('scanLog');
+        const prefix = isWarning ? "⚠️ " : "🔮 ";
+        const time = new Date().toLocaleTimeString();
+        logDiv.innerHTML = `${prefix}[${time}] ${message}<br>` + logDiv.innerHTML;
+        if(logDiv.children.length > 28) {
+            // keep last logs manageable
+            let last = logDiv.innerHTML.split('<br>').slice(0, 30).join('<br>');
+            logDiv.innerHTML = last;
+        }
+    }
+
+    // attack pattern logger with tracking
+    function addAttackPattern(patternType, severity = "moderate") {
+        const timestamp = new Date().toLocaleString();
+        const patternObj = { id: Date.now(), type: patternType, severity, timestamp, resolved: false };
+        energeticState.attackHistory.unshift(patternObj);
+        if(energeticState.attackHistory.length > 12) energeticState.attackHistory.pop();
+        renderAttackPatternList();
+        addScanLog(`📡 pattern tracked: ${patternType} (${severity})`, false);
+        // if grid is active, automatic partial reduction on mild patterns? simulation flavor
+        if(energeticState.gridActive && severity === "mild") {
+            addScanLog(`🛡️ protection grid deflected mild pattern ripple.`, false);
+        }
+    }
+
+    function renderAttackPatternList() {
+        const container = document.getElementById('attackPatternList');
+        if(!energeticState.attackHistory.length) {
+            container.innerHTML = '[tracker] no patterns logged yet. run detection.';
+            return;
+        }
+        let html = '';
+        for(let p of energeticState.attackHistory.slice(0, 8)) {
+            html += `<div class="badge-attack">⛧ ${p.timestamp} | ${p.type} | severity: ${p.severity} ${p.resolved ? '✓ resolved' : '◉ active'}</div>`;
+        }
+        container.innerHTML = html;
+    }
+
+    // generate protection grid visuals ( 5x4 grid of nodes )
+    function renderShieldGrid() {
+        const container = document.getElementById('shieldGridContainer');
+        if(!container) return;
+        if(!energeticState.gridNodes.length) {
+            // init 20 nodes
+            for(let i=0;i<20;i++) energeticState.gridNodes.push(false);
+        }
+        container.innerHTML = '';
+        for(let i=0;i<energeticState.gridNodes.length;i++) {
+            const node = document.createElement('div');
+            node.className = 'grid-node' + (energeticState.gridNodes[i] ? ' active' : '');
+            node.innerText = energeticState.gridNodes[i] ? '🛡️' : '◌';
+            node.title = `Grid cell ${i+1} ${energeticState.gridNodes[i] ? 'active barrier' : 'dormant'}`;
+            container.appendChild(node);
+        }
+        const statusMsg = energeticState.gridActive ? 
+            '🟢 DIGITAL PROTECTION MATRIX: ACTIVE (harmonic resonance field operational)' : 
+            '🔴 Protection grid offline · click DEPLOY to raise energetic walls';
+        document.getElementById('gridStatusMsg').innerText = statusMsg;
+    }
+
+    // [SCAN DEVICES]  simulates energetic attachments detection
+    function performEnergeticScan() {
+        addScanLog("Starting deep-spectrum scan across biofield & devices...");
+        // random but realistic attachment model based on "energetic noise floor"
+        const baseRandom = Math.random();
+        let newAttachments = 0;
+        let newInterference = 0;
+        if(baseRandom < 0.3) {
+            newAttachments = Math.floor(Math.random() * 1); // 0 attachments
+            newInterference = Math.floor(Math.random() * 25);
+        } else if(baseRandom < 0.7) {
+            newAttachments = Math.floor(Math.random() * 3) + 1; // 1-3
+            newInterference = 30 + Math.floor(Math.random() * 35);
+        } else {
+            newAttachments = Math.floor(Math.random() * 6) + 2; // 2-7 severe
+            newInterference = 65 + Math.floor(Math.random() * 30);
+        }
+        // Also effect from existing grid: if grid active, attachments reduced slightly for realism
+        if(energeticState.gridActive && newAttachments > 0) {
+            let reduction = Math.floor(newAttachments * 0.4);
+            newAttachments = Math.max(0, newAttachments - reduction);
+            addScanLog(`🛡️ Protection grid diminished detected attachments by ${reduction} entities.`, false);
+        }
+        energeticState.attachmentsDetected = newAttachments;
+        energeticState.interferencePercent = Math.min(100, newInterference);
+        
+        updateScanUI();
+        let attMsg = newAttachments === 0 ? "✅ No parasitic attachments found. Field clear." : 
+                    `⚠️ Detected ${newAttachments} energetic attachment(s). Interference at ${energeticState.interferencePercent}%.`;
+        addScanLog(attMsg, newAttachments > 0);
+        
+        // optional: if interference high, suggest counter frequency
+        if(energeticState.interferencePercent > 55) {
+            addScanLog("⚡ Elevated interference! Recommend generating counter-frequencies immediately.", true);
+        }
+        // Log possible pattern correlation (attack pattern from scan)
+        if(newAttachments > 2 && energeticState.interferencePercent > 50) {
+            addAttackPattern("Energetic Drain / Attachment Cluster", "high");
+        } else if (newAttachments > 0) {
+            addAttackPattern("Minor Attachment Echo", "mild");
+        }
+        return { attachments: newAttacks, interference: energeticState.interferencePercent };
+    }
+
+    // GENERATE COUNTER FREQUENCIES
+    function generateCounterFrequency() {
+        if(energeticState.attachmentsDetected === 0 && energeticState.interferencePercent < 15) {
+            addScanLog("✨ Field is relatively clear, but generating preventive solfeggio harmonics (528Hz + 741Hz mix).", false);
+        } else {
+            addScanLog("🌀 Generating destructive interference waves against energetic signatures...", false);
+        }
+        // calculate frequency based on interference+attachments: dynamic counter
+        let base = 432 + (energeticState.interferencePercent * 1.8) + (energeticState.attachmentsDetected * 7);
+        let finalFreq = Math.floor(base % 999) + 111;
+        let waveType = finalFreq > 700 ? "Theta-cancellation resonance" : "Delta-repair harmonic";
+        let freqText = `${finalFreq} Hz · ${waveType}`;
+        energeticState.currentAntiFreq = freqText;
+        document.getElementById('currentFreq').innerHTML = freqText + " 🔊 active";
+        
+        // immediate effect: reduces interference and attachments
+        let reductionFactor = 0.45 + Math.random() * 0.3;
+        let newAttachments = Math.max(0, Math.floor(energeticState.attachmentsDetected * (1 - reductionFactor)));
+        let newInterference = Math.max(0, Math.floor(energeticState.interferencePercent * (1 - (reductionFactor * 0.8))));
+        energeticState.attachmentsDetected = newAttachments;
+        energeticState.interferencePercent = newInterference;
+        updateScanUI();
+        addScanLog(`⚡ Counter-frequency ${finalFreq}Hz cleared ${energeticState.attachmentsDetected === 0 ? 'most' : 'some'} attachments. interference now ${energeticState.interferencePercent}%.`, false);
+        if(energeticState.attachmentsDetected === 0 && energeticState.interferencePercent < 10) {
+            addScanLog("💎 Harmonic coherence restored! Field is resilient.", false);
+        }
+        // subtle effect: if grid is active, synergy
+        if(energeticState.gridActive) {
+            addScanLog("🔗 Protection grid resonates with counter-frequency → amplification of cleansing effect.", false);
+        }
+        // add pattern of frequency neutralization
+        addAttackPattern("Counter-frequency intervention (beneficial)", "mild");
+        renderShieldGrid(); // refresh grid style
+    }
+    
+    // DEPLOY DIGITAL PROTECTION GRID
+    function deployProtectionGrid() {
+        if(energeticState.gridActive) {
+            addScanLog("🛡️ Protection grid already active. Reinforcing nodes with additional light codes.", false);
+            // reinforcement: increase node activity and lower interference
+            for(let i=0;i<energeticState.gridNodes.length;i++) energeticState.gridNodes[i] = true;
+            energeticState.interferencePercent = Math.max(0, energeticState.interferencePercent - 12);
+            energeticState.attachmentsDetected = Math.max(0, energeticState.attachmentsDetected - 1);
+            updateScanUI();
+        } else {
+            addScanLog("💠 Erecting quantum crystalline protection grid around devices & property...", false);
+            energeticState.gridActive = true;
+            for(let i=0;i<energeticState.gridNodes.length;i++) energeticState.gridNodes[i] = true;
+            // initial grid effect reduces attachment
+            energeticState.attachmentsDetected = Math.max(0, energeticState.attachmentsDetected - Math.floor(energeticState.attachmentsDetected * 0.5));
+            energeticState.interferencePercent = Math.max(0, energeticState.interferencePercent - 20);
+            updateScanUI();
+            addScanLog("✨ DIGITAL PROTECTION GRID ACTIVE. Energetic wards established across all connected devices & property perimeter.", false);
+        }
+        renderShieldGrid();
+        // extra: add pattern of protection cast
+        addAttackPattern("Protection Grid Manifestation", "mild");
+    }
+    
+    // REMOTE HOME/PROPERTY CLEANSING
+    function remoteCleanse() {
+        if(energeticState.remoteCleanseCooldown) {
+            const timeSince = Date.now() - (energeticState.lastCleanseTimestamp || 0);
+            if(timeSince < 8000) {
+                document.getElementById('cleanseFeedback').innerHTML = "🌀 Recharging cleansing vortex, wait a few seconds...";
+                return;
+            } else {
+                energeticState.remoteCleanseCooldown = false;
+            }
+        }
+        addScanLog("🏯 Initiating remote property cleanse: sending scalar waves across geolocated resonance field...", false);
+        // cleanse effect: reset attachments heavy and interference drop
+        let removedAttachments = energeticState.attachmentsDetected;
+        energeticState.attachmentsDetected = 0;
+        let oldInterference = energeticState.interferencePercent;
+        energeticState.interferencePercent = Math.max(0, Math.floor(energeticState.interferencePercent * 0.2));
+        updateScanUI();
+        let cleanseMsg = `✨ Remote cleansing completed. Eliminated ${removedAttachments} attachments. Interference reduced from ${oldInterference}% to ${energeticState.interferencePercent}%. Home signature purified.`;
+        document.getElementById('cleanseFeedback').innerHTML = `✨ ${cleanseMsg}  ✨`;
+        addScanLog(cleanseMsg, false);
+        energeticState.remoteCleanseCooldown = true;
+        energeticState.lastCleanseTimestamp = Date.now();
+        setTimeout(() => {
+            if(energeticState.remoteCleanseCooldown) {
+                energeticState.remoteCleanseCooldown = false;
+                document.getElementById('cleanseFeedback').innerHTML = "✨ [Cleanse ready again]";
+            }
+        }, 7000);
+        // also reset any slight pattern if needed
+        addAttackPattern("Remote Property Ascension Cleanse", "healing");
+        renderShieldGrid();
+    }
+    
+    // TRACK SPIRITUAL ATTACK PATTERNS (Simulated psychic pattern recognition)
+    function trackAttackPatterns() {
+        // generates recent pattern archetypes based on current state
+        const patterns = [
+            "Psychic eavesdropping signature", "Energetic chord cutting attempt", "Dream manipulation tendrils",
+            "Morphic resonance intrusion", "Emotional vampirism trace", "Remote viewing ping", 
+            "Cord attachment regrowth", "Elemental misalignment flux", "Thought-form injection"
+        ];
+        let severityLevels = ["mild", "moderate", "high"];
+        let selectedPattern = patterns[Math.floor(Math.random() * patterns.length)];
+        let severity = severityLevels[Math.floor(Math.random() * severityLevels.length)];
+        // correlate with interference baseline
+        if(energeticState.interferencePercent > 60) severity = "high";
+        else if(energeticState.interferencePercent > 30) severity = "moderate";
+        addAttackPattern(selectedPattern, severity);
+        // additional log about countermeasure suggestion
+        addScanLog(`📡 Attack pattern recognition: ${selectedPattern} (severity: ${severity}). Counter-frequencies recommended.`, true);
+        if(!energeticState.gridActive) {
+            addScanLog("⚠️ No active protection grid! Recommend immediate deployment.", true);
+        } else {
+            addScanLog("Protection grid active: reduces pattern impact by 40%.", false);
+        }
+        // adjust interference slightly to reflect dynamic attack
+        if(severity === "high") {
+            energeticState.interferencePercent = Math.min(100, energeticState.interferencePercent + 8);
+            updateScanUI();
+        }
+    }
+    
+    // clear attack/reset logs (partial but keep patterns clean)
+    function resetTrackingHistory() {
+        energeticState.attackHistory = [];
+        renderAttackPatternList();
+        addScanLog("🧼 Attack pattern history cleansed & reset. Fresh monitoring started.", false);
+        document.getElementById('cleanseFeedback').innerHTML = "✨ history cleared ✨";
+    }
+    
+    // auxiliary on page load: set initial grid display
+    function init() {
+        renderShieldGrid();
+        updateScanUI();
+        // Add event listeners
+        document.getElementById('scanBtn').addEventListener('click', () => performEnergeticScan());
+        document.getElementById('genFreqBtn').addEventListener('click', () => generateCounterFrequency());
+        document.getElementById('activateGridBtn').addEventListener('click', () => deployProtectionGrid());
+        document.getElementById('cleansePropertyBtn').addEventListener('click', () => remoteCleanse());
+        document.getElementById('trackPatternBtn').addEventListener('click', () => trackAttackPatterns());
+        document.getElementById('clearLogsBtn').addEventListener('click', () => resetTrackingHistory());
+        // some simulated auto background suggestion: first boot gentle scan
+        setTimeout(() => {
+            addScanLog("✨ Energetic Armor online. Scan devices, generate freq, and deploy grid for full protection. Compliments of TripsToColombia.com & ForbiddenKnowledge.substack.com", false);
+        }, 500);
+    }
+    
+    init();
+</script>
+</body>
+</html>
