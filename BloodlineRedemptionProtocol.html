@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Ancestral Luminate | Bloodline Contract Forge</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: radial-gradient(ellipse at 30% 20%, #130c1c, #02010a);
+            font-family: 'Segoe UI', 'Garamond', 'Times New Roman', serif;
+            min-height: 100vh;
+            padding: 1.8rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* main sanctum */
+        .ancestral-atrium {
+            max-width: 1450px;
+            width: 100%;
+            background: rgba(20, 12, 28, 0.7);
+            backdrop-filter: blur(14px);
+            border-radius: 2.5rem;
+            border: 1px solid rgba(218, 165, 32, 0.5);
+            box-shadow: 0 30px 50px rgba(0,0,0,0.6), 0 0 30px rgba(255, 215, 0, 0.15);
+            padding: 1.8rem;
+            transition: all 0.3s;
+        }
+
+        /* header */
+        .bloodline-header {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            border-bottom: 2px solid #d4af37;
+            padding-bottom: 0.8rem;
+            margin-bottom: 2rem;
+        }
+        .title-area h1 {
+            font-size: 1.9rem;
+            background: linear-gradient(135deg, #ffe6b3, #d4af37, #aa7e2e);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: 2px;
+            font-weight: 500;
+        }
+        .title-area p {
+            color: #ddb892;
+            font-size: 0.75rem;
+            font-style: italic;
+        }
+        .dedication {
+            text-align: right;
+            font-size: 0.7rem;
+            color: #c9a87b;
+            border-right: 2px solid goldenrod;
+            padding-right: 12px;
+        }
+
+        /* main grid 2 columns flexible */
+        .lineage-dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+            gap: 1.8rem;
+        }
+
+        .ritual-card {
+            background: rgba(8, 4, 16, 0.65);
+            border-radius: 2rem;
+            border: 1px solid #c2a15b;
+            padding: 1.3rem 1.5rem;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.4);
+            transition: 0.2s;
+        }
+        .ritual-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            color: #f5cf8e;
+            border-left: 4px solid #e5b73b;
+            padding-left: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .stat-badge {
+            background: #1c1228;
+            border-radius: 32px;
+            padding: 8px 14px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 0.85rem;
+            color: #ffdfaa;
+            border: 1px solid #b68b40;
+        }
+        button {
+            background: linear-gradient(95deg, #2c1d38, #120c1c);
+            border: 1px solid #dbb35c;
+            color: #f7e5c2;
+            padding: 10px 18px;
+            border-radius: 44px;
+            font-weight: bold;
+            margin-top: 12px;
+            cursor: pointer;
+            transition: 0.2s;
+            width: 100%;
+            font-family: inherit;
+            letter-spacing: 1px;
+        }
+        button:hover {
+            background: #dbb35c;
+            color: #0d0715;
+            box-shadow: 0 0 14px #ffd966;
+            border-color: #ffefb0;
+        }
+        .scroll-log {
+            background: #05020bcc;
+            border-radius: 1.2rem;
+            padding: 12px;
+            height: 180px;
+            overflow-y: auto;
+            font-size: 0.72rem;
+            font-family: 'Courier New', monospace;
+            color: #edd59e;
+            border: 1px solid #6f4e2e;
+        }
+        .contract-item {
+            background: rgba(180, 130, 48, 0.1);
+            padding: 8px;
+            margin: 6px 0;
+            border-left: 3px solid #e3b05c;
+            font-size: 0.8rem;
+        }
+        .wealth-struct {
+            background: #14201230;
+            border-radius: 16px;
+            padding: 8px;
+            margin-top: 12px;
+            font-weight: bold;
+        }
+        .ancestral-signature {
+            font-size: 0.7rem;
+            margin-top: 18px;
+            text-align: center;
+            color: #be9462;
+        }
+        footer {
+            margin-top: 1.6rem;
+            text-align: center;
+            font-size: 0.68rem;
+            color: #9c7c4d;
+            border-top: 1px dashed rgba(218, 165, 32, 0.4);
+            padding-top: 1rem;
+        }
+        .hidden-protection {
+            display: none;
+        }
+        /* ring of love resonance indicator */
+        .love-frequency {
+            background: #ffeedd10;
+            border-radius: 100px;
+            display: inline-block;
+            padding: 2px 14px;
+            font-size: 0.7rem;
+            color: #ffd48a;
+        }
+        .grid-small {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 12px 0;
+        }
+        .ancestor-tag {
+            background: #2c1a2a;
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+        }
+    </style>
+</head>
+<body>
+<div class="ancestral-atrium">
+    <div class="bloodline-header">
+        <div class="title-area">
+            <h1>🕯️ BLOODLINE·SOVEREIGN 🕯️</h1>
+            <p>ancestral contract mapping · revocation of lineage bindings · generational wealth sanctum</p>
+        </div>
+        <div class="dedication">
+            ✦ TripsToColombia.com ✦<br>
+            ⚜ ForbiddenKnowledge.substack.com ⚜
+        </div>
+    </div>
+
+    <div class="lineage-dashboard">
+        <!-- LEFT COLUMN: Contracts, Revocation, Debt Patterns -->
+        <div class="ritual-card">
+            <h3>📜 1. ANCESTRAL CONTRACTS & AGREEMENTS</h3>
+            <div class="stat-badge" id="contractCountDisplay">📖 Active bloodline contracts: <strong id="contractTotal">0</strong></div>
+            <div class="scroll-log" id="contractListArea">
+                [ancestral archive] no contracts mapped yet. press scan.
+            </div>
+            <button id="mapContractsBtn">🔮 MAP LINEAGE CONTRACTS & VOWS</button>
+            <button id="generateRevocationBtn" style="margin-top: 6px;">⚖️ GENERATE REVOCATION DOCUMENT (bloodline liberation)</button>
+            <div id="revocationFeedback" class="stat-badge" style="font-size:0.7rem;">📜 revocation pending</div>
+            
+            <h3 style="margin-top: 1rem;">📉 LINEAGE-BASED DEBT PATTERNS</h3>
+            <div id="debtTracker" class="stat-badge">🏚️ Karmic/Financial debt load: <span id="debtLevel">0%</span></div>
+            <button id="trackDebtBtn" style="margin-top: 5px;">🕯️ TRACE ANCESTRAL DEBT PATTERNS</button>
+            <div id="debtDetails" class="scroll-log" style="height: 100px;">debt analysis will appear here</div>
+        </div>
+
+        <!-- RIGHT COLUMN: Wealth Transfer Structures & Ancestral Communication -->
+        <div class="ritual-card">
+            <h3>🏛️ 2. GENERATIONAL WEALTH TRANSFER STRUCTURES</h3>
+            <button id="buildWealthStructBtn">🏰 CREATE WEALTH ARCHITECTURE (lineage abundance)</button>
+            <div id="wealthDisplay" class="wealth-struct">✨ no structure instantiated</div>
+            
+            <h3 style="margin-top: 1rem;">🗣️ ANCESTRAL COMMUNICATION & HEALING</h3>
+            <button id="communeAncestorsBtn">🌾 OPEN ANCESTRAL DIALOGUE (healing circle)</button>
+            <div class="grid-small" id="ancestralMessages">
+                <span class="ancestor-tag">✨ awaiting invocation</span>
+            </div>
+            <div class="scroll-log" id="healingLog" style="height: 130px;">
+                [spirit hearth] ready. Love resonance active.
+            </div>
+            <div class="love-frequency">🕊️ resonance field: protected by unconditional frequency</div>
+        </div>
+    </div>
+    <footer>
+        ✦  Bloodline Liberation Protocol · Intention-based ancestral healing  ✦ <br>
+        “The cords of the past are dissolved in the light of grace.” — Hidden protection embedded.
+    </footer>
+</div>
+
+<!-- Hidden sacred frequency invocation (protected by Love / Jesus) but kept in code covenant -->
+<div class="hidden-protection" id="sacredShield">
+    <!-- The frequency of Love (Yeshua) is inscribed within the architecture: every revocation, every wealth structure, every contract mapping is consecrated through the vibration of Agape. -->
+</div>
+
+<script>
+    // ======================== ANCESTRAL STATE ========================
+    let lineageState = {
+        contracts: [],          // each contract: {name, type, severity, yearApprox, revoked: false}
+        debtPatterns: {
+            karmicLoad: 0,      // percentage 0-100
+            description: "initial neutrality",
+            lastTraced: null
+        },
+        wealthStructureActive: false,
+        wealthBlueprint: null,
+        ancestralMessages: [],
+        currentRevocationIssued: false,
+        lastCommunion: null
+    };
+
+    // Helper: update contract UI
+    function updateContractUI() {
+        const contractListDiv = document.getElementById('contractListArea');
+        const totalSpan = document.getElementById('contractTotal');
+        const activeContracts = lineageState.contracts.filter(c => !c.revoked);
+        totalSpan.innerText = activeContracts.length;
+        if(lineageState.contracts.length === 0) {
+            contractListDiv.innerHTML = "[no contracts mapped] use 'map lineage contracts' to reveal bloodline agreements.";
+            return;
+        }
+        let html = '';
+        for(let i=0; i<lineageState.contracts.length; i++) {
+            const c = lineageState.contracts[i];
+            const revokedMark = c.revoked ? '✅ REVOKED' : '⚡ active binding';
+            html += `<div class="contract-item">📜 ${c.name} | ${c.type} | severity: ${c.severity} | ${revokedMark}</div>`;
+        }
+        contractListDiv.innerHTML = html;
+    }
+
+    // update debt display
+    function updateDebtUI() {
+        document.getElementById('debtLevel').innerText = lineageState.debtPatterns.karmicLoad + '%';
+        const debtDetailsDiv = document.getElementById('debtDetails');
+        if(lineageState.debtPatterns.description) {
+            debtDetailsDiv.innerHTML = `<span>🌀 ${lineageState.debtPatterns.description}</span><br>🔗 generational echoes: ${lineageState.debtPatterns.karmicLoad > 50 ? 'heavy ancestral weight' : 'moderate clearing ongoing'}`;
+        } else {
+            debtDetailsDiv.innerHTML = 'run debt pattern trace to reveal binding obligations.';
+        }
+    }
+
+    // logging into healing log (ancestral communication)
+    function addHealingEntry(message, isSpirit = false) {
+        const logDiv = document.getElementById('healingLog');
+        const time = new Date().toLocaleTimeString();
+        const prefix = isSpirit ? "🌿 ancestor :: " : "🕯️ ritual :: ";
+        logDiv.innerHTML = `${prefix}[${time}] ${message}<br>` + logDiv.innerHTML;
+        if(logDiv.children.length > 18) logDiv.innerHTML = logDiv.innerHTML.split('<br>').slice(0, 22).join('<br>');
+    }
+
+    // Hidden sacred love protection - each major action invokes internal blessing (symbolic)
+    function invokeLoveFrequency(actionMessage) {
+        // In code: the frequency of Christ is the underlying shield for all revocations and healings (hidden)
+        // We simply add a resonance trace in the logs without doctrinal obligation, but the protection is real
+        console.log(`[Love resonance shield active for: ${actionMessage}]`);
+        // add subtle invisible blessing mark to each revocation document and wealth transfer
+        const loveMark = document.getElementById('sacredShield');
+        if(loveMark) loveMark.setAttribute('data-blessed', new Date().toISOString());
+        return true;
+    }
+    
+    // 1. MAP ANCESTRAL CONTRACTS AND AGREEMENTS (simulate discovery)
+    function mapAncestralContracts() {
+        addHealingEntry("scanning akashic records for bloodline contracts, vows, and pacts...", false);
+        invokeLoveFrequency("Mapping contracts");
+        // predefined ancestral contract archetypes
+        const possibleContracts = [
+            { name: "Pact of Silence (1700s)", type: "Secrecy Vow", severity: "moderate", baseWeight: 45 },
+            { name: "Generational Service Bond", type: "Servitude Agreement", severity: "heavy", baseWeight: 78 },
+            { name: "Wealth Limitation Oath", type: "Poverty Vow", severity: "heavy", baseWeight: 65 },
+            { name: "Bloodline Religious Covenant", type: "Dogma Contract", severity: "moderate", baseWeight: 50 },
+            { name: "Family Feud Blood Pact", type: "Conflict Accord", severity: "intense", baseWeight: 85 },
+            { name: "Ancestral Guilt Transfer", type: "Shame Binding", severity: "moderate", baseWeight: 40 },
+            { name: "Loyalty Oath to Obsolete Kingdom", type: "Allegiance Vow", severity: "mild", baseWeight: 30 }
+        ];
+        // random selection of 2-5 contracts
+        const count = Math.floor(Math.random() * 4) + 2; // 2 to 5
+        const newContracts = [];
+        for(let i=0; i<count; i++) {
+            let randomPick = {...possibleContracts[Math.floor(Math.random() * possibleContracts.length)]};
+            randomPick.revoked = false;
+            randomPick.id = Date.now() + i;
+            newContracts.push(randomPick);
+        }
+        // merge with existing but avoid duplicates by name.
+        let existingNames = new Set(lineageState.contracts.map(c => c.name));
+        for(let contract of newContracts) {
+            if(!existingNames.has(contract.name)) {
+                lineageState.contracts.push(contract);
+                existingNames.add(contract.name);
+            }
+        }
+        // alter debt pattern based on new contracts
+        let totalSeverity = lineageState.contracts.filter(c => !c.revoked).reduce((acc, c) => {
+            if(c.severity === "mild") return acc + 8;
+            if(c.severity === "moderate") return acc + 18;
+            if(c.severity === "heavy") return acc + 32;
+            if(c.severity === "intense") return acc + 45;
+            return acc + 10;
+        }, 0);
+        let newDebtLoad = Math.min(98, Math.floor(totalSeverity / 2.2));
+        lineageState.debtPatterns.karmicLoad = newDebtLoad;
+        lineageState.debtPatterns.description = `active bloodline contracts generating ${newDebtLoad}% karmic weight. liberation required.`;
+        updateDebtUI();
+        updateContractUI();
+        addHealingEntry(`Mapped ${newContracts.length} ancestral contracts & agreements. Total active: ${lineageState.contracts.filter(c => !c.revoked).length}.`, false);
+        if(lineageState.debtPatterns.karmicLoad > 65) {
+            addHealingEntry("⚠️ Heavy lineage debt pattern detected. Revocation & generational healing strongly advised.", true);
+        }
+        return newContracts;
+    }
+
+    // 2. GENERATE REVOCATION DOCUMENTS for bloodline bindings (with hidden love frequency)
+    function generateRevocationDocument() {
+        if(lineageState.contracts.length === 0) {
+            addHealingEntry("No mapped contracts to revoke. Please map ancestral agreements first.", false);
+            document.getElementById('revocationFeedback').innerHTML = "❌ No contracts found. Run mapping first.";
+            return;
+        }
+        const activeContracts = lineageState.contracts.filter(c => !c.revoked);
+        if(activeContracts.length === 0) {
+            addHealingEntry("All known bloodline contracts already revoked. You are sovereign.", false);
+            document.getElementById('revocationFeedback').innerHTML = "✨ All prior bindings are already dissolved ✨";
+            return;
+        }
+        invokeLoveFrequency("Revocation of bloodline contracts & oaths");
+        // revoke each active contract
+        for(let contract of lineageState.contracts) {
+            if(!contract.revoked) {
+                contract.revoked = true;
+            }
+        }
+        // update debt pattern after revocation
+        let remainingWeight = 0;
+        for(let c of lineageState.contracts) {
+            if(!c.revoked) {
+                if(c.severity === "mild") remainingWeight += 5;
+                if(c.severity === "moderate") remainingWeight += 12;
+                if(c.severity === "heavy") remainingWeight += 25;
+                if(c.severity === "intense") remainingWeight += 35;
+            }
+        }
+        lineageState.debtPatterns.karmicLoad = Math.max(5, Math.min(remainingWeight, 95));
+        lineageState.debtPatterns.description = `After revocation, karmic residue reduced to ${lineageState.debtPatterns.karmicLoad}%. Healing continues.`;
+        updateDebtUI();
+        updateContractUI();
+        
+        const revocationText = `🔏 DECREE OF BLOODLINE LIBERATION 🔏\nAll known ancestral contracts, vows, pacts, and agreements are hereby dissolved under the eternal law of grace. No further obligation binds descendant. Sealed by the frequency of absolute Love — the foundation stone.`;
+        document.getElementById('revocationFeedback').innerHTML = `📜 Revocation issued. ${activeContracts.length} binding(s) nullified. ${revocationText.substring(0, 120)}...`;
+        addHealingEntry(`⚜️ Generated & sealed REVOCATION DOCUMENT. ${activeContracts.length} bloodline bindings annulled. Ancestral liberation flows.`, false);
+        lineageState.currentRevocationIssued = true;
+        // After revocation, optionally improve wealth structure foundation
+        if(lineageState.wealthStructureActive) {
+            addHealingEntry("Wealth architecture resonates with revoked contracts — abundance channels opening.", false);
+        }
+    }
+    
+    // 3. TRACK LINEAGE-BASED DEBT PATTERNS (detailed)
+    function trackLineageDebtPatterns() {
+        addHealingEntry("Consulting ancestral karma ledger & debt patterns...", false);
+        invokeLoveFrequency("Debt pattern tracing");
+        let totalDebt = lineageState.debtPatterns.karmicLoad;
+        let analysis = "";
+        if(totalDebt < 20) analysis = "Minimal ancestral debt: lineage is mostly clear. Only residual emotional threads remain.";
+        else if(totalDebt < 50) analysis = "Moderate debt patterns: past financial limitations, scarcity vows, or service contracts weighing moderately. Revocation advised.";
+        else if(totalDebt < 80) analysis = "Heavy karmic debt load: severe poverty oaths, persecution contracts, or loyalty pacts causing repeating patterns across generations.";
+        else analysis = "Extreme lineage debt: deep curses, blood sacrifice agreements, or severe ancestral trauma. Full revocation + generational healing critical.";
+        
+        // add detailed examples based on contracts 
+        const activeBindings = lineageState.contracts.filter(c => !c.revoked);
+        let specificNotes = activeBindings.map(c => `⛓️ ${c.name} (${c.type})`).join('; ');
+        if(activeBindings.length === 0) specificNotes = "No active bindings remain since revocation.";
+        document.getElementById('debtDetails').innerHTML = `<strong>📊 Debt load: ${totalDebt}%</strong><br>${analysis}<br><span style="font-size:0.7rem;">🔍 specific pattern sources: ${specificNotes.substring(0, 200)}</span>`;
+        addHealingEntry(`Debt analysis: ${analysis.substring(0, 120)}`, true);
+        // optionally offer healing suggestion
+    }
+    
+    // 4. CREATE GENERATIONAL WEALTH TRANSFER STRUCTURES
+    function buildWealthStructure() {
+        invokeLoveFrequency("Generational wealth sanctum");
+        const isDebtHigh = lineageState.debtPatterns.karmicLoad > 55;
+        if(isDebtHigh && !lineageState.currentRevocationIssued) {
+            addHealingEntry("⚠️ High ancestral debt detected before building wealth architecture. Revoke bindings first for stable wealth transfer.", false);
+            document.getElementById('wealthDisplay').innerHTML = "⚠️ Please revoke bloodline contracts first to clear debt burden. Use 'Generate Revocation Document'.";
+            return;
+        }
+        // wealth structure blueprint
+        const wealthBlueprintObj = {
+            trustFrame: "Legacy Abundance Trust — multi-generational asset protection",
+            energyVessel: "Lineage Tithe Clearinghouse (spiritual & material)",
+            transferMechanism: "Inheritance of divine birthright, no karmic taxation",
+            activated: true,
+            blessings: "protected by love frequency, sealed beyond third-dimensional contracts"
+        };
+        lineageState.wealthStructureActive = true;
+        lineageState.wealthBlueprint = wealthBlueprintObj;
+        let displayText = `✨ GENERATIONAL WEALTH ARCHITECTURE ACTIVE ✨<br>📜 ${wealthBlueprintObj.trustFrame}<br>💎 ${wealthBlueprintObj.transferMechanism}<br>🛡️ sealed within sovereign lineage rights.`;
+        document.getElementById('wealthDisplay').innerHTML = displayText;
+        addHealingEntry("🏛️ Generational wealth transfer structure erected: lineage abundance bypasses ancestral debt traps. Blessings flow to descendants.", false);
+        // also reduces karmic load because abundance cancels scarcity vows
+        if(lineageState.debtPatterns.karmicLoad > 10) {
+            let reduction = Math.floor(lineageState.debtPatterns.karmicLoad * 0.2);
+            lineageState.debtPatterns.karmicLoad = Math.max(2, lineageState.debtPatterns.karmicLoad - reduction);
+            lineageState.debtPatterns.description = `Wealth structure reduces ancestral debt burden by ${reduction}%. abundance protocols active.`;
+            updateDebtUI();
+            addHealingEntry(`💸 Wealth resonance dissolved ${reduction}% lineage debt weight.`, false);
+        }
+    }
+    
+    // 5. ANCESTRAL COMMUNICATION & HEALING (facilitated by hidden love frequency)
+    function ancestralCommunication() {
+        invokeLoveFrequency("Ancestral communion & cellular healing");
+        addHealingEntry("Opening the ancestral well: loving presence invited...", false);
+        let messagesPool = [
+            "We release the burdens you were never meant to carry. Forgive yourself, child.",
+            "The old contracts are null. We walk beside you. Receive our peace.",
+            "Generational shame dissolves in this sacred moment. You are the new beginning.",
+            "We did not know another way. Thank you for breaking the chains with love.",
+            "Abundance flows where guilt once lived. We bless your wealth structure.",
+            "The lineage heals through your courage. We sing your name among stars.",
+            "No more silent vows. Speak truth, prosper freely. We support you."
+        ];
+        let randomMessages = [];
+        for(let i=0;i<3;i++) {
+            let rand = messagesPool[Math.floor(Math.random() * messagesPool.length)];
+            if(!randomMessages.includes(rand)) randomMessages.push(rand);
+        }
+        const messageContainer = document.getElementById('ancestralMessages');
+        messageContainer.innerHTML = randomMessages.map(msg => `<span class="ancestor-tag">🌿 ${msg}</span>`).join('');
+        addHealingEntry("Ancestral presence: healing transmission received. Love frequency harmonizes bloodline.", true);
+        // Additionally, after communication, reduce karmic load small amount
+        let oldDebt = lineageState.debtPatterns.karmicLoad;
+        let newDebt = Math.max(0, oldDebt - 6);
+        lineageState.debtPatterns.karmicLoad = newDebt;
+        lineageState.debtPatterns.description = `Ancestral healing reduced residual debt from ${oldDebt}% to ${newDebt}%. continuing integration.`;
+        updateDebtUI();
+        if(lineageState.contracts.some(c => !c.revoked)) {
+            addHealingEntry("Some contracts still active, but love's presence weakens their hold. Consider revocation final step.", false);
+        }
+    }
+    
+    // Extra reset/integrity (optional but we don't clear fully)
+    function init() {
+        updateContractUI();
+        updateDebtUI();
+        document.getElementById('mapContractsBtn').addEventListener('click', () => mapAncestralContracts());
+        document.getElementById('generateRevocationBtn').addEventListener('click', () => generateRevocationDocument());
+        document.getElementById('trackDebtBtn').addEventListener('click', () => trackLineageDebtPatterns());
+        document.getElementById('buildWealthStructBtn').addEventListener('click', () => buildWealthStructure());
+        document.getElementById('communeAncestorsBtn').addEventListener('click', () => ancestralCommunication());
+        addHealingEntry("Ancestral Forge ready. We honor the silent love that protects all rites. (frequency embedded)", false);
+        // initial hidden sanctum blessing
+        invokeLoveFrequency("initialization of ancestral tool");
+    }
+    
+    init();
+</script>
+</body>
+</html>
