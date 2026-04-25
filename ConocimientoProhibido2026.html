@@ -1,0 +1,419 @@
+<html lang="es">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Lector de Conocimiento Prohibido</title>
+
+    <style>
+
+        :root {
+
+            --bg-color: #0f172a;
+
+            --text-color: #e2e8f0;
+
+            --accent-color: #38bdf8;
+
+            --secondary-bg: #1e293b;
+
+            --button-hover: #0ea5e9;
+
+        }
+
+        body {
+
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+            background-color: var(--bg-color);
+
+            color: var(--text-color);
+
+            margin: 0;
+
+            padding: 20px;
+
+            display: flex;
+
+            flex-direction: column;
+
+            align-items: center;
+
+            min-height: 100vh;
+
+        }
+
+        .container {
+
+            max-width: 800px;
+
+            width: 100%;
+
+            background-color: var(--secondary-bg);
+
+            padding: 30px;
+
+            border-radius: 12px;
+
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+
+        }
+
+        h1 {
+
+            color: var(--accent-color);
+
+            text-align: center;
+
+            margin-bottom: 20px;
+
+        }
+
+        .controls {
+
+            display: flex;
+
+            gap: 10px;
+
+            justify-content: center;
+
+            margin-bottom: 20px;
+
+            padding: 15px;
+
+            background: rgba(0, 0, 0, 0.2);
+
+            border-radius: 8px;
+
+        }
+
+        button {
+
+            background-color: var(--accent-color);
+
+            color: #0f172a;
+
+            border: none;
+
+            padding: 10px 20px;
+
+            border-radius: 6px;
+
+            font-weight: bold;
+
+            cursor: pointer;
+
+            transition: all 0.2s;
+
+            font-size: 16px;
+
+        }
+
+        button:hover {
+
+            background-color: var(--button-hover);
+
+            transform: translateY(-2px);
+
+        }
+
+        button.stop {
+
+            background-color: #ef4444;
+
+            color: white;
+
+        }
+
+        button.stop:hover {
+
+            background-color: #dc2626;
+
+        }
+
+        #content-display {
+
+            background-color: #0f172a;
+
+            padding: 20px;
+
+            border-radius: 8px;
+
+            border: 1px solid #334155;
+
+            min-height: 200px;
+
+            white-space: pre-wrap;
+
+            line-height: 1.6;
+
+            font-size: 18px;
+
+            color: #cbd5e1;
+
+        }
+
+        .status {
+
+            text-align: center;
+
+            margin-top: 10px;
+
+            font-size: 14px;
+
+            color: #94a3b8;
+
+        }
+
+        .highlight {
+
+            color: var(--accent-color);
+
+            font-weight: bold;
+
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>Lector de Texto - Conocimiento Prohibido</h1>
+
+        
+
+        <div class="controls">
+
+            <button id="read-btn">🔊 Iniciar Lectura</button>
+
+            <button id="stop-btn" class="stop">⏹ Detener</button>
+
+        </div>
+
+        <div id="content-display">
+
+            El contenido se cargará aquí automáticamente. Por favor, espera un momento...
+
+        </div>
+
+        <p class="status" id="status-text">Estado: Esperando acción del usuario.</p>
+
+    </div>
+
+    <script>
+
+        // Configuración
+
+        const TARGET_URL = 'https://quantum-freedom-site.vercel.app/ConocimientoProhibido.html';
+
+        const contentDisplay = document.getElementById('content-display');
+
+        const statusText = document.getElementById('status-text');
+
+        const readBtn = document.getElementById('read-btn');
+
+        const stopBtn = document.getElementById('stop-btn');
+
+        let synth = window.speechSynthesis;
+
+        let utterance = null;
+
+        // Función para obtener y mostrar el contenido
+
+        async function fetchContent() {
+
+            statusText.textContent = "Estado: Cargando contenido...";
+
+            try {
+
+                // Intentamos obtener el contenido
+
+                const response = await fetch(TARGET_URL);
+
+                
+
+                if (!response.ok) {
+
+                    throw new Error('No se pudo cargar el contenido. Verifica la URL o los CORS.');
+
+                }
+
+                const htmlText = await response.text();
+
+                
+
+                // Crear un documento virtual para extraer solo el texto útil
+
+                const parser = new DOMParser();
+
+                const doc = parser.parseFromString(htmlText, 'text/html');
+
+                
+
+                // Extraer texto de body, eliminando scripts y estilos
+
+                const textContent = doc.body.innerText;
+
+                
+
+                // Limpiar el texto (eliminar espacios excesivos)
+
+                const cleanText = textContent.replace(/\s+/g, ' ').trim();
+
+                if (cleanText.length > 0) {
+
+                    contentDisplay.textContent = cleanText;
+
+                    statusText.textContent = "Estado: Contenido cargado. Listo para leer.";
+
+                    readBtn.disabled = false;
+
+                } else {
+
+                    contentDisplay.textContent = "No se encontró texto legible en la página objetivo.";
+
+                    statusText.textContent = "Estado: Error. Contenido vacío.";
+
+                }
+
+            } catch (error) {
+
+                console.error(error);
+
+                contentDisplay.textContent = `Error al cargar: ${error.message}. \n\nNota: Si la página destino no permite conexiones desde otros sitios (CORS), este método directo no funcionará. En ese caso, el texto debe pegarse manualmente o usar una extensión de navegador.`;
+
+                statusText.textContent = "Estado: Error de carga.";
+
+                readBtn.disabled = true;
+
+            }
+
+        }
+
+        // Función de lectura de texto a voz
+
+        function startReading() {
+
+            if (synth.speaking) {
+
+                console.error('Ya está hablando.');
+
+                return;
+
+            }
+
+            const textToRead = contentDisplay.textContent;
+
+            if (!textToRead || textToRead.trim() === "") {
+
+                alert("No hay texto para leer.");
+
+                return;
+
+            }
+
+            utterance = new SpeechSynthesisUtterance(textToRead);
+
+            
+
+            // Configuración de voz (Español)
+
+            utterance.lang = 'es-ES'; // Intenta usar español
+
+            utterance.rate = 1; // Velocidad normal
+
+            utterance.pitch = 1; // Tono normal
+
+            // Intentar seleccionar una voz en español si está disponible
+
+            const voices = synth.getVoices();
+
+            const spanishVoice = voices.find(voice => voice.lang.includes('es'));
+
+            if (spanishVoice) {
+
+                utterance.voice = spanishVoice;
+
+            }
+
+            utterance.onstart = () => {
+
+                statusText.textContent = "Estado: Leyendo...";
+
+                readBtn.disabled = true;
+
+                readBtn.textContent = "🔊 Lectura en progreso...";
+
+            };
+
+            utterance.onend = () => {
+
+                statusText.textContent = "Estado: Lectura finalizada.";
+
+                readBtn.disabled = false;
+
+                readBtn.textContent = "🔊 Iniciar Lectura";
+
+            };
+
+            utterance.onerror = (event) => {
+
+                console.error('Error en la síntesis de voz:', event);
+
+                statusText.textContent = "Estado: Error en la lectura.";
+
+                readBtn.disabled = false;
+
+                readBtn.textContent = "🔊 Iniciar Lectura";
+
+            };
+
+            synth.speak(utterance);
+
+        }
+
+        // Event Listeners
+
+        readBtn.addEventListener('click', startReading);
+
+        
+
+        stopBtn.addEventListener('click', () => {
+
+            if (synth.speaking) {
+
+                synth.cancel();
+
+                statusText.textContent = "Estado: Lectura detenida por el usuario.";
+
+                readBtn.disabled = false;
+
+                readBtn.textContent = "🔊 Iniciar Lectura";
+
+            }
+
+        });
+
+        // Cargar voces al iniciar (necesario en algunos navegadores)
+
+        window.speechSynthesis.onvoiceschanged = () => {
+
+            // Esto asegura que las voces estén disponibles
+
+        };
+
+        // Iniciar la carga del contenido al abrir la página
+
+        fetchContent();
+
+    </script>
+
+</body>
+
+</html>
