@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Libro Digital · Guerrero Feroz · Lector con Voz Española</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #1a2a1f 0%, #0e1a0c 100%);
+            font-family: 'Segoe UI', 'Merriweather', Georgia, 'Times New Roman', serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem 1rem;
+        }
+
+        /* contenedor principal estilo códice */
+        .book-container {
+            max-width: 1300px;
+            width: 100%;
+            background: #fef7e0;
+            background-image: radial-gradient(circle at 25% 40%, rgba(210, 180, 140, 0.08) 2%, transparent 2.5%);
+            background-size: 28px 28px;
+            border-radius: 32px;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.5), 0 0 0 12px #c7a55b, 0 0 0 16px #6b3e1c;
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+
+        /* toolbar guerrero */
+        .warrior-toolbar {
+            background: #2c2118;
+            padding: 0.8rem 1.8rem;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 3px solid #e4b363;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .title-area h1 {
+            font-family: 'Cinzel', 'Georgia', serif;
+            font-size: 1.5rem;
+            letter-spacing: 2px;
+            color: #fad97c;
+            text-shadow: 2px 2px 0 #5a2e0e;
+        }
+
+        .title-area p {
+            font-size: 0.75rem;
+            color: #dbbf7a;
+            font-style: italic;
+        }
+
+        .reader-controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            background: #3e2c1f;
+            padding: 8px 16px;
+            border-radius: 60px;
+            align-items: center;
+        }
+
+        .btn {
+            background: #ecd9b4;
+            border: none;
+            font-size: 1.2rem;
+            font-weight: bold;
+            padding: 8px 18px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-family: monospace;
+            transition: 0.15s linear;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            color: #2c1a0c;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: #d9a13b;
+            color: #251a0c;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+
+        .btn-primary:hover {
+            background: #f0bc6e;
+            transform: scale(0.97);
+        }
+
+        .btn-danger {
+            background: #a5512b;
+            color: #ffefcf;
+        }
+
+        .btn-danger:hover {
+            background: #c96838;
+        }
+
+        .btn:hover {
+            filter: brightness(0.96);
+            transform: translateY(-1px);
+        }
+
+        select, .voice-select {
+            background: #fcf3df;
+            border-radius: 30px;
+            padding: 8px 12px;
+            font-weight: bold;
+            border: 1px solid #ba874a;
+            font-family: monospace;
+            cursor: pointer;
+        }
+
+        /* editor y area de texto */
+        .book-body {
+            padding: 2rem 2rem 2.5rem;
+        }
+
+        .text-editor-area {
+            margin-bottom: 1.5rem;
+        }
+
+        .tool-group {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .tiny-btn {
+            background: #e8dccc;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 28px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+
+        .book-content {
+            background: #fffbf0;
+            border-radius: 28px;
+            padding: 2rem 2rem;
+            box-shadow: inset 0 0 0 1px #f3e5bf, 0 8px 20px rgba(0,0,0,0.1);
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 480px;
+            background: #fffff2;
+            border: 2px solid #e0cd9a;
+            border-radius: 24px;
+            padding: 1.5rem;
+            font-family: 'Georgia', 'Times New Roman', serif;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            color: #2d2418;
+            resize: vertical;
+            outline: none;
+            transition: 0.1s;
+        }
+
+        textarea:focus {
+            border-color: #c2964b;
+            box-shadow: 0 0 0 3px rgba(194, 150, 75, 0.3);
+        }
+
+        .reader-status {
+            margin-top: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #e9dfc7;
+            padding: 8px 20px;
+            border-radius: 60px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #3e2a1b;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .badge {
+            background: #2f6b47;
+            padding: 4px 12px;
+            border-radius: 40px;
+            color: white;
+            font-size: 0.7rem;
+            font-family: monospace;
+        }
+
+        footer {
+            background: #ecd9b0;
+            text-align: center;
+            padding: 0.7rem;
+            font-size: 0.7rem;
+            color: #5d3e1e;
+            border-top: 1px solid #c8aa6e;
+        }
+        @media (max-width: 700px) {
+            .book-body { padding: 1rem; }
+            textarea { min-height: 360px; font-size: 1rem; }
+            .btn { padding: 5px 12px; font-size: 0.9rem; }
+        }
+        .voice-select { min-width: 180px; }
+    </style>
+</head>
+<body>
+<div class="book-container">
+    <div class="warrior-toolbar">
+        <div class="title-area">
+            <h1>⚔️ GUERRERO FEROZ ⚔️</h1>
+            <p>libro digital · lectura con voz española</p>
+        </div>
+        <div class="reader-controls">
+            <button id="playBtn" class="btn btn-primary">🔊 LEER CAPÍTULO</button>
+            <button id="pauseBtn" class="btn">⏸ Pausar</button>
+            <button id="stopBtn" class="btn btn-danger">⏹ Detener</button>
+            <select id="voiceSelect" class="voice-select" title="Voz española (lee en español)"></select>
+        </div>
+    </div>
+
+    <div class="book-body">
+        <div class="text-editor-area">
+            <div class="tool-group">
+                <button id="copyTextBtn" class="tiny-btn">📋 Copiar todo</button>
+                <button id="clearBtn" class="tiny-btn">🗑 Limpiar contenido</button>
+                <span style="font-size:0.7rem; background:#e0cd9a; padding:4px 12px; border-radius:30px;">✍️ Edita o pega tu libro en español</span>
+            </div>
+            <div class="book-content">
+                <textarea id="bookTextArea" placeholder="Aquí va tu libro en español. Puedes escribir o pegar todo el texto (capítulos, poesía, etc.) y luego usar el lector con voz española. ¡El lector leerá exactamente lo que está escrito!"></textarea>
+            </div>
+        </div>
+        <div class="reader-status">
+            <div class="status-indicator">
+                <span>🎧 MODO LECTOR: </span>
+                <span id="speechState" class="badge">En espera</span>
+            </div>
+            <div>
+                <span id="voiceInfo">🇪🇸 Voz española activa</span>
+            </div>
+        </div>
+    </div>
+    <footer>
+        ✨ Copia y pega tu libro (Lorem Ipsum o texto real en español) — el lector usa síntesis de voz en español nativa. 
+        Ajusta velocidad / tono? ¡Usa la voz seleccionada! ✨
+    </footer>
+</div>
+
+<script>
+    (function(){
+        // ---------- DOM Elements ----------
+        const textarea = document.getElementById('bookTextArea');
+        const playBtn = document.getElementById('playBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const voiceSelect = document.getElementById('voiceSelect');
+        const speechStateSpan = document.getElementById('speechState');
+        const copyBtn = document.getElementById('copyTextBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        
+        // ----- Configuración del Web Speech API -----
+        let synth = window.speechSynthesis;
+        let currentUtterance = null;
+        let isPlaying = false;
+        let paused = false;
+        let currentVoice = null;
+        let availableVoices = [];
+        
+        // ----- Estado para mantener el texto que se está leyendo (último texto leído)
+        let lastSpokenText = "";
+        
+        // ---------- Cargar voces y filtrar voces españolas ----------
+        function loadVoices() {
+            return new Promise((resolve) => {
+                // obtener voces disponibles
+                let voices = synth.getVoices();
+                if (voices.length > 0) {
+                    updateVoiceList(voices);
+                    resolve();
+                } else {
+                    synth.onvoiceschanged = () => {
+                        voices = synth.getVoices();
+                        updateVoiceList(voices);
+                        resolve();
+                    };
+                }
+            });
+        }
+        
+        function updateVoiceList(voices) {
+            availableVoices = voices;
+            // Filtrar voces que sean español (es-ES, es-MX, es-AR, etc.) o que contengan "español" / "Spanish"
+            const spanishVoices = voices.filter(voice => 
+                voice.lang.startsWith('es') || 
+                voice.lang.includes('ES') ||
+                voice.name.toLowerCase().includes('spanish') ||
+                voice.name.toLowerCase().includes('español') ||
+                voice.name.toLowerCase().includes('mexican') ||
+                voice.name.toLowerCase().includes('latino')
+            );
+            
+            // Si hay voces en español usarlas, sino mostrar todas pero indicar que el usuario debe elegir española
+            let voicesToShow = spanishVoices.length > 0 ? spanishVoices : voices;
+            
+            // Limpiar select
+            voiceSelect.innerHTML = '';
+            if (voicesToShow.length === 0) {
+                let option = document.createElement('option');
+                option.textContent = '⚠️ No se encontraron voces - revisa tu navegador';
+                option.disabled = true;
+                voiceSelect.appendChild(option);
+            } else {
+                voicesToShow.forEach(voice => {
+                    let option = document.createElement('option');
+                    option.value = voice.name;
+                    option.textContent = `${voice.name} (${voice.lang})`;
+                    if(voice.lang.startsWith('es')) {
+                        option.style.fontWeight = 'bold';
+                        option.style.background = '#f9eec1';
+                    }
+                    voiceSelect.appendChild(option);
+                });
+            }
+            
+            // Seleccionar automáticamente la primera voz española de preferencia
+            if (spanishVoices.length > 0) {
+                let preferred = spanishVoices.find(v => v.lang === 'es-ES') || spanishVoices[0];
+                if(preferred) {
+                    for(let i = 0; i < voiceSelect.options.length; i++) {
+                        if(voiceSelect.options[i].value === preferred.name) {
+                            voiceSelect.selectedIndex = i;
+                            break;
+                        }
+                    }
+                }
+            } else if (voicesToShow.length > 0) {
+                // elegir cualquier primera voz (pero avisaremos que no es español)
+                voiceSelect.selectedIndex = 0;
+                if(!voicesToShow[0].lang.startsWith('es')) {
+                    speechStateSpan.innerText = "⚠️ voz no española";
+                    document.getElementById('voiceInfo').innerHTML = "⚠️ Selecciona una voz española manualmente";
+                } else {
+                    document.getElementById('voiceInfo').innerHTML = "🇪🇸 Voz española lista";
+                }
+            }
+            // guardar la voz actual
+            setCurrentVoiceFromSelect();
+        }
+        
+        function setCurrentVoiceFromSelect() {
+            const selectedVoiceName = voiceSelect.value;
+            if (!selectedVoiceName) return;
+            const foundVoice = availableVoices.find(voice => voice.name === selectedVoiceName);
+            if (foundVoice) {
+                currentVoice = foundVoice;
+                // actualizar mensaje
+                if(currentVoice.lang.startsWith('es')) {
+                    document.getElementById('voiceInfo').innerHTML = `🇪🇸 Voz: ${currentVoice.name} (español)`;
+                    speechStateSpan.innerText = "✅ voz española";
+                } else {
+                    document.getElementById('voiceInfo').innerHTML = `⚠️ Voz: ${currentVoice.name} (no española) -> selecciona una española`;
+                    speechStateSpan.innerText = "⚠️ voz foránea";
+                }
+            } else {
+                // intentar buscar la primera con español
+                const anySpanish = availableVoices.find(v => v.lang.startsWith('es'));
+                if(anySpanish) {
+                    currentVoice = anySpanish;
+                    document.getElementById('voiceInfo').innerHTML = `🇪🇸 Forzado: ${anySpanish.name}`;
+                }
+            }
+        }
+        
+        // ----- Detener cualquier lectura en curso -----
+        function cancelSpeech(resetState = true) {
+            if (synth.speaking || synth.pending) {
+                synth.cancel();
+            }
+            if (resetState) {
+                isPlaying = false;
+                paused = false;
+                currentUtterance = null;
+                speechStateSpan.innerText = "Detenido";
+            } else {
+                if(!synth.speaking && !synth.pending) {
+                    isPlaying = false;
+                    paused = false;
+                    currentUtterance = null;
+                    speechStateSpan.innerText = "En espera";
+                }
+            }
+        }
+        
+        // ----- Función principal para leer el texto completo del textarea -----
+        function readFullText() {
+            let textToRead = textarea.value.trim();
+            if (!textToRead) {
+                speechStateSpan.innerText = "📭 No hay texto";
+                alert("⚔️ El libro está vacío. Escribe o pega contenido en español primero.");
+                return;
+            }
+            
+            // Detener cualquier lectura en curso antes de empezar nueva
+            cancelSpeech(true);
+            
+            // actualizar voz por si acaso cambio de select
+            setCurrentVoiceFromSelect();
+            if (!currentVoice) {
+                loadVoices().then(() => {
+                    setCurrentVoiceFromSelect();
+                    startUtterance(textToRead);
+                });
+            } else {
+                startUtterance(textToRead);
+            }
+        }
+        
+        function startUtterance(text) {
+            if (!text || text.length === 0) return;
+            
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.voice = currentVoice;
+            utterance.lang = currentVoice ? currentVoice.lang : 'es-ES';
+            // parámetros agradables para lectura española
+            utterance.rate = 0.95;
+            utterance.pitch = 1.0;
+            utterance.volume = 1;
+            
+            utterance.onstart = () => {
+                isPlaying = true;
+                paused = false;
+                speechStateSpan.innerText = "📖 Leyendo en español...";
+                currentUtterance = utterance;
+            };
+            utterance.onpause = () => {
+                paused = true;
+                isPlaying = false;
+                speechStateSpan.innerText = "⏸ Pausado";
+            };
+            utterance.onresume = () => {
+                isPlaying = true;
+                paused = false;
+                speechStateSpan.innerText = "🔊 Reanudado";
+            };
+            utterance.onend = () => {
+                isPlaying = false;
+                paused = false;
+                currentUtterance = null;
+                speechStateSpan.innerText = "✔️ Lectura finalizada";
+                // restaurar después de 2 segundos
+                setTimeout(() => {
+                    if(!synth.speaking && speechStateSpan.innerText !== "Leyendo...") {
+                        speechStateSpan.innerText = "En espera";
+                    }
+                }, 2000);
+            };
+            utterance.onerror = (event) => {
+                console.warn("error speech:", event);
+                isPlaying = false;
+                paused = false;
+                speechStateSpan.innerText = "⚠️ Error en voz";
+                currentUtterance = null;
+                // fallo silencioso
+            };
+            
+            currentUtterance = utterance;
+            synth.speak(utterance);
+        }
+        
+        // pausar si hay algo activo
+        function pauseSpeech() {
+            if (synth.speaking && !paused) {
+                synth.pause();
+                paused = true;
+                isPlaying = false;
+                speechStateSpan.innerText = "⏸ Pausado";
+            }
+        }
+        
+        function resumeSpeech() {
+            if (paused && synth.paused) {
+                synth.resume();
+                isPlaying = true;
+                paused = false;
+                speechStateSpan.innerText = "🔊 Leyendo...";
+            } else if (!synth.speaking && !synth.pending && textarea.value.trim().length > 0 && !paused) {
+                // si no está sonando nada y se reanuda pero no hay utterance pausado, simplemente vuelve a leer
+                readFullText();
+            } else if (!synth.speaking && !paused && currentUtterance){
+                // raro, pero reintentar
+                readFullText();
+            }
+        }
+        
+        function stopSpeech() {
+            cancelSpeech(true);
+            speechStateSpan.innerText = "⏹ Detenido";
+        }
+        
+        // ----- Acciones de copia y borrado -----
+        function copyAllText() {
+            textarea.select();
+            document.execCommand('copy');
+            // feedback moderno
+            navigator.clipboard.writeText(textarea.value).then(() => {
+                alert("✨ ¡Texto completo copiado al portapapeles! Puedes pegarlo en otro lugar.");
+            }).catch(()=>{
+                alert("Texto seleccionado, copia manual (Ctrl+C)");
+            });
+            textarea.blur();
+        }
+        
+        function clearText() {
+            if (confirm("¿Seguro que deseas borrar todo el contenido del libro? Se perderán los cambios no guardados.")) {
+                stopSpeech();
+                textarea.value = "";
+                speechStateSpan.innerText = "Contenido limpiado";
+                setTimeout(()=> {
+                    if(!synth.speaking) speechStateSpan.innerText = "En espera";
+                },1500);
+            }
+        }
+        
+        // ---- Inicializar el contenido por defecto con LOREM IPSUM en español para que el usuario vea ejemplo y pegue después ---
+        function setInitialLoremIpsumSpanish() {
+            const spanishLorem = `📖 PRÓLOGO DEL GUERRERO
+
+"Escucha, guerrero feroz. Este libro digital te acompañará en la batalla de las palabras. 
+El texto que ves ahora es un ejemplo en español. Puedes borrarlo y pegar tu propio libro, poema o cualquier escrito."
+
+CAPÍTULO I: EL VALLE DE LOS SUSURROS
+
+Lorem fistrum por la gloria de mi madre ese que llega no te digo trigo por no llamar Rodrigor. 
+Llevame al sircoo se calle ustée te voy a borrar el cerito benemeritaar a wan. 
+De la pradera tiene musho peligro a gramenawer esa mano va ganando te voy a borrar el cerito. 
+Torbeno qué dise usteer ahorarr diodeno apetecan. 
+No puedor pupita ahorarr benemeritaar qué dise usteer te va a hasé pupitaa mamaar. 
+Eso es lo que hay sexuarl pupita benemeritaar por la gloria de mi madre. 
+
+CAPÍTULO II: EL LENGUAJE ESPAÑOL RESPLANDECE 
+
+Ahora sí, el lector leerá correctamente en español porque la voz seleccionada está configurada para hablar con la fonética de Cervantes. 
+Puedes probar este texto pulsando "LEER CAPÍTULO". 
+
+🎯 INSTRUCCIONES: 
+1. Selecciona una voz que tenga etiqueta (es) en el desplegable. La mayoría de navegadores modernos incluyen voces españolas.
+2. Si no funciona, asegúrate de permitir la reproducción de audio en el navegador.
+3. Pega tu libro completo aquí y dale a reproducir. El sistema leerá todo el contenido.
+
+"Que la fuerza de las palabras te acompañe." — El Códice del Guerrero.`;
+            textarea.value = spanishLorem;
+        }
+        
+        // ---- cambiar voz cuando se selecciona manualmente ----
+        function onVoiceChange() {
+            setCurrentVoiceFromSelect();
+            // Si estamos en medio de una reproducción, se podría reiniciar? mejor no interrumpir automáticamente pero damos opción
+            if (synth.speaking) {
+                const userWants = confirm("¿Deseas reiniciar la lectura con la nueva voz seleccionada? Si continúa, se detendrá la lectura actual y comenzará de nuevo.");
+                if (userWants) {
+                    stopSpeech();
+                    readFullText();
+                } else {
+                    // simplemente actualizamos la voz para futuras lecturas
+                    speechStateSpan.innerText = "Voz cambiada (reinicia lectura)";
+                }
+            } else {
+                // mostrar feedback
+                if(currentVoice && currentVoice.lang.startsWith('es')) {
+                    speechStateSpan.innerText = "✅ Voz española lista";
+                } else {
+                    speechStateSpan.innerText = "🎙 Voz seleccionada (no española)";
+                }
+            }
+        }
+        
+        // ---- Mejora para que si se abre en móvil o navegador, cargue voces sin problemas
+        function ensureVoicesAndReady() {
+            loadVoices().then(() => {
+                setCurrentVoiceFromSelect();
+            });
+        }
+        
+        // ---- Intercepción de eventos para que si el usuario cambia el texto, no perturbe la lectura activa (no se interrumpe)
+        // ---- pero si está leyendo, no interrumpimos. Sin embargo, se agregará un extra: botón para leer desde cursor? mejor mantener simple y potente
+        
+        // ---- adicional: cuando se pause con botón reanudar / play hace resume; si no está pausado inicia lectura de nuevo
+        function smartPlay() {
+            if (synth.paused && paused) {
+                resumeSpeech();
+            } else if (synth.speaking && !paused) {
+                // está leyendo, no hacer nada para no reiniciar, pero mostramos un feedback
+                speechStateSpan.innerText = "⚡ Ya leyendo...";
+                setTimeout(()=>{
+                    if(!synth.speaking) speechStateSpan.innerText = "Leyendo...";
+                },800);
+            } else {
+                readFullText();
+            }
+        }
+        
+        // ---- Bindings & UI inicial ----
+        function bindEvents() {
+            playBtn.addEventListener('click', smartPlay);
+            pauseBtn.addEventListener('click', pauseSpeech);
+            stopBtn.addEventListener('click', stopSpeech);
+            voiceSelect.addEventListener('change', onVoiceChange);
+            copyBtn.addEventListener('click', copyAllText);
+            clearBtn.addEventListener('click', clearText);
+        }
+        
+        // ---- Arranque completo ----
+        function init() {
+            setInitialLoremIpsumSpanish();
+            bindEvents();
+            if (synth) {
+                ensureVoicesAndReady();
+            } else {
+                alert("⚠️ Tu navegador no soporta la API de síntesis de voz. Usa Chrome, Edge, Safari o Firefox moderno.");
+                speechStateSpan.innerText = "No soportado";
+            }
+            // Prevenir que el navegador cancele por idle
+            setInterval(() => {
+                // truco para mantener speech activo en algunos casos si se para solo? no es necesario pero mantiene estado.
+                if (synth && !synth.speaking && !synth.pending && isPlaying) {
+                    isPlaying = false;
+                    paused = false;
+                    if(speechStateSpan.innerText !== "Finalizado")
+                        speechStateSpan.innerText = "En espera";
+                }
+            }, 1000);
+        }
+        
+        init();
+    })();
+</script>
+</body>
+</html>
