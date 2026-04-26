@@ -162,6 +162,47 @@
     </style>
 </head>
 <body>
+    <!-- READER CONTROLS - Add this where you want buttons -->
+<div style="position: sticky; top: 10px; background: #111; padding: 10px; border: 1px solid #333; text-align: center; z-index: 100;">
+  <button onclick="startReading()" style="margin: 5px; padding: 8px 16px;">🔊 Read Aloud</button>
+  <button onclick="stopReading()" style="margin: 5px; padding: 8px 16px;">⏹️ Stop</button>
+  <select id="voiceSelect" style="margin: 5px; padding: 8px;"></select>
+</div>
+
+<script>
+  let currentUtterance = null;
+  
+  function startReading() {
+    stopReading();
+    // Get all main text (excludes buttons, disclaimers if needed)
+    const mainContent = document.querySelector('body') || document;
+    const text = mainContent.innerText || mainContent.textContent;
+    currentUtterance = new SpeechSynthesisUtterance(text);
+    currentUtterance.rate = 0.9;
+    currentUtterance.pitch = 1.0;
+    
+    // Load available voices
+    const select = document.getElementById('voiceSelect');
+    window.speechSynthesis.onvoiceschanged = () => {
+      const voices = speechSynthesis.getVoices();
+      select.innerHTML = voices.map(v => `<option value="${v.name}">${v.name}</option>`).join('');
+      select.onchange = () => {
+        if (currentUtterance) {
+          currentUtterance.voice = voices.find(v => v.name === select.value);
+        }
+      };
+    };
+    
+    speechSynthesis.speak(currentUtterance);
+  }
+  
+  function stopReading() {
+    if (currentUtterance) {
+      speechSynthesis.cancel();
+      currentUtterance = null;
+    }
+  }
+</script>
 <div class="book-container">
 
     <!-- TITLE -->
