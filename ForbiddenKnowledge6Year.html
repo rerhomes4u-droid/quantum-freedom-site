@@ -161,7 +161,67 @@
         }
     </style>
 </head>
-<body>
+<body><!-- Reader controls + click-to-read -->
+<div style="position: sticky; top: 10px; background: #000; padding: 10px; border: 1px solid #333; text-align: center; z-index: 1000;">
+  <button id="stopBtn" style="margin: 5px; padding: 8px 16px;">⏹️ Stop Reading</button>
+  <span style="color: #ccc; margin-left: 15px;">👇 Click any paragraph or heading to read from there</span>
+</div>
+
+<script>
+  let currentUtterance = null;
+
+  function stopReading() {
+    if (currentUtterance) {
+      speechSynthesis.cancel();
+      currentUtterance = null;
+    }
+  }
+
+  function readFromElement(startElement) {
+    stopReading();
+    
+    // Get all text from this element to the end of the document
+    let textToRead = [];
+    let current = startElement;
+    
+    while (current && current !== document.body) {
+      // Skip script tags, buttons, and the reader control div itself
+      const tag = current.tagName;
+      if (tag !== 'SCRIPT' && tag !== 'BUTTON' && tag !== 'SELECT' && !current.closest('#reader-controls')) {
+        const txt = current.innerText || current.textContent;
+        if (txt && txt.trim().length > 0) {
+          textToRead.push(txt.trim());
+        }
+      }
+      current = current.nextElementSibling;
+    }
+    
+    if (textToRead.length === 0) return;
+    
+    const finalText = textToRead.join('. ');
+    currentUtterance = new SpeechSynthesisUtterance(finalText);
+    currentUtterance.rate = 0.9;
+    speechSynthesis.speak(currentUtterance);
+  }
+
+  // Set up click listeners on all content blocks
+  document.addEventListener('DOMContentLoaded', () => {
+    // Target all paragraphs, headings, and divs that contain actual content
+    const contentSelectors = 'p, h1, h2, h3, h4, li, .chapter, .section, article div';
+    const clickableElements = document.querySelectorAll(contentSelectors);
+    
+    clickableElements.forEach(el => {
+      el.style.cursor = 'pointer';
+      el.addEventListener('click', (e) => {
+        e.stopPropagation();
+        readFromElement(el);
+      });
+    });
+    
+    // Stop button
+    document.getElementById('stopBtn').addEventListener('click', stopReading);
+  });
+</script>
     <!-- READER CONTROLS - Add this where you want buttons -->
 <div style="position: sticky; top: 10px; background: #111; padding: 10px; border: 1px solid #333; text-align: center; z-index: 100;">
   <button onclick="startReading()" style="margin: 5px; padding: 8px 16px;">🔊 Read Aloud</button>
