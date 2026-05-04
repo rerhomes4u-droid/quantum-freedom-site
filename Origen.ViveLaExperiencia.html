@@ -1,1 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>ORIGEN · Build Your Mountain Adventure | Salento, Colombia</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            font-family: 'Segoe UI', 'Roboto', system-ui, -apple-system, sans-serif;
+            background: #F4EFE6;
+            color: #1E2A24;
+            line-height: 1.5;
+        }
+
+        :root {
+            --moss: #2D5A3F;
+            --clay: #B85C2A;
+            --sand: #EADEC9;
+            --dark: #1E2A24;
+            --gold: #D4A259;
+            --stone: #6F6F64;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+
+        .portal {
+            background: linear-gradient(135deg, #1E2A24 0%, #2D5A3F 100%);
+            color: white;
+            border-radius: 2.5rem;
+            padding: 3rem 2rem;
+            margin-bottom: 2.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .portal::before {
+            content: "🌄";
+            font-size: 12rem;
+            position: absolute;
+            bottom: -2rem;
+            right: -1rem;
+            opacity: 0.08;
+            pointer-events: none;
+        }
+
+        .badge {
+            background: var(--gold);
+            color: var(--dark);
+            display: inline-block;
+            padding: 0.3rem 1.2rem;
+            border-radius: 60px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+            margin-bottom: 1.2rem;
+        }
+
+        .portal h1 {
+            font-size: 3.2rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.5rem;
+        }
+
+        .portal .sub {
+            font-size: 1.2rem;
+            opacity: 0.85;
+            max-width: 600px;
+            margin-bottom: 1.5rem;
+        }
+
+        .route-tag {
+            background: rgba(212, 162, 89, 0.2);
+            display: inline-block;
+            padding: 0.4rem 1rem;
+            border-radius: 60px;
+            font-size: 0.8rem;
+            backdrop-filter: blur(4px);
+        }
+
+        .lang-toggle {
+            position: absolute;
+            top: 1.8rem;
+            right: 2rem;
+            display: flex;
+            gap: 0.5rem;
+            background: rgba(255,255,255,0.12);
+            padding: 0.3rem;
+            border-radius: 60px;
+            backdrop-filter: blur(4px);
+        }
+
+        .lang-btn {
+            background: transparent;
+            border: none;
+            color: white;
+            padding: 0.4rem 1rem;
+            border-radius: 60px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .lang-btn.active {
+            background: var(--gold);
+            color: var(--dark);
+        }
+
+        .ig-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1.5rem;
+            background: rgba(255,255,255,0.12);
+            padding: 0.5rem 1.2rem;
+            border-radius: 60px;
+            text-decoration: none;
+            color: white;
+            font-size: 0.85rem;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 2rem;
+        }
+
+        @media (max-width: 850px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            .portal h1 { font-size: 2.2rem; }
+            .lang-toggle { position: static; justify-content: flex-end; display: flex; margin-bottom: 1rem; }
+        }
+
+        .card-panel {
+            background: white;
+            border-radius: 1.8rem;
+            padding: 1.6rem;
+            margin-bottom: 1.8rem;
+            box-shadow: 0 6px 14px rgba(0,0,0,0.04);
+            border: 1px solid var(--sand);
+        }
+
+        .card-panel h3 {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-size: 1.4rem;
+            margin-bottom: 1.2rem;
+            color: var(--moss);
+        }
+
+        .option-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+        }
+
+        .opt-btn {
+            background: var(--sand);
+            border: none;
+            padding: 0.7rem 1.2rem;
+            border-radius: 60px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .opt-btn.selected {
+            background: var(--clay);
+            color: white;
+            box-shadow: 0 4px 10px rgba(184,92,42,0.2);
+        }
+
+        .occasion-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin-top: 0.5rem;
+        }
+
+        .occasion-btn {
+            background: var(--sand);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 60px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: 0.2s;
+        }
+
+        .occasion-btn.selected {
+            background: var(--gold);
+            color: var(--dark);
+            font-weight: bold;
+        }
+
+        .activity-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid var(--sand);
+        }
+
+        .toggle {
+            width: 48px;
+            height: 24px;
+            background: #ccc;
+            border-radius: 30px;
+            position: relative;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .toggle.active {
+            background: var(--moss);
+        }
+
+        .toggle:after {
+            content: "";
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 4px;
+            transition: 0.2s;
+        }
+
+        .toggle.active:after {
+            left: 24px;
+        }
+
+        .cart {
+            background: var(--dark);
+            color: white;
+            border-radius: 1.8rem;
+            padding: 1.6rem;
+            position: sticky;
+            top: 1rem;
+            height: fit-content;
+        }
+
+        .cart h3 {
+            border-bottom: 1px solid #5A7A6A;
+            padding-bottom: 0.6rem;
+            margin-bottom: 1rem;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            margin: 0.7rem 0;
+        }
+
+        .cart-total {
+            font-size: 1.6rem;
+            font-weight: bold;
+            margin: 1.2rem 0;
+            border-top: 1px solid #5A7A6A;
+            padding-top: 1rem;
+        }
+
+        .whatsapp-btn {
+            background: #25D366;
+            width: 100%;
+            border: none;
+            padding: 1rem;
+            border-radius: 80px;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            margin: 1rem 0;
+            transition: 0.2s;
+            color: #1E2A24;
+        }
+
+        .preview {
+            background: #2D4A3E;
+            padding: 0.8rem;
+            border-radius: 1rem;
+            font-size: 0.7rem;
+            font-family: monospace;
+            word-break: break-word;
+            max-height: 180px;
+            overflow: auto;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 0.7rem;
+            border-radius: 1rem;
+            border: 1px solid var(--sand);
+            margin-top: 0.5rem;
+            font-family: inherit;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 2rem;
+            color: var(--stone);
+            border-top: 1px solid var(--sand);
+        }
+
+        .small-note {
+            font-size: 0.7rem;
+            margin-top: 0.8rem;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="portal">
+        <div class="lang-toggle">
+            <button class="lang-btn active" data-lang="en">EN</button>
+            <button class="lang-btn" data-lang="es">ES</button>
+        </div>
+        <div class="badge" data-translate="badge">🔥 NAVARCO TRAIL · OFF-ROAD · ORIGEN</div>
+        <h1 data-translate="title">Origen<br>Mountain Adventure</h1>
+        <div class="sub" data-translate="sub">From Salento via the ancestral trail — no La Línea, pure transformation.</div>
+        <div class="route-tag" data-translate="route">⛰️ Motorcycle · ATV · 4x4 · Paragliding · Healing Circle · Horseback</div>
+        <a href="https://www.instagram.com/origen.vivelaexperiencia/" target="_blank" class="ig-link">📸 @origen.vivelaexperiencia</a>
+    </div>
+
+    <div class="dashboard">
+        <!-- LEFT: BUILDER -->
+        <div>
+            <!-- Transport -->
+            <div class="card-panel">
+                <h3>🏍️ <span data-translate="transport_title">How will you arrive to Origen?</span></h3>
+                <div class="option-group" id="transportGroup">
+                    <button class="opt-btn" data-value="moto" data-price="120">🏍️ Motorcycle</button>
+                    <button class="opt-btn" data-value="atv" data-price="250">🚙 ATV</button>
+                    <button class="opt-btn" data-value="4x4" data-price="300">🚐 4x4 Private (up to 6)</button>
+                </div>
+                <div class="small-note" data-translate="moto_note">*Premium motorcycles & ATVs available. Full insurance included.</div>
+            </div>
+
+            <!-- Overnight -->
+            <div class="card-panel">
+                <h3>🏕️ <span data-translate="overnight_title">Stay the night at Origen?</span></h3>
+                <div class="option-group" id="overnightGroup">
+                    <button class="opt-btn" data-value="none" data-price="0" data-translate="day_only">🌄 Day only</button>
+                    <button class="opt-btn" data-value="tent" data-price="40" data-translate="tent">🏕️ Tent camping</button>
+                    <button class="opt-btn" data-value="origen" data-price="180" data-translate="room">🛖 Origen room</button>
+                </div>
+            </div>
+
+            <!-- Special Occasion -->
+            <div class="card-panel">
+                <h3>🎉 <span data-translate="occasion_title">Celebrating something special?</span></h3>
+                <div class="occasion-group" id="occasionGroup">
+                    <button class="occasion-btn" data-occasion="birthday">🎂 <span data-translate="birthday">Birthday</span></button>
+                    <button class="occasion-btn" data-occasion="anniversary">💍 <span data-translate="anniversary">Anniversary</span></button>
+                    <button class="occasion-btn" data-occasion="wedding">💒 <span data-translate="wedding">Wedding</span></button>
+                    <button class="occasion-btn" data-occasion="proposal">💘 <span data-translate="proposal">Proposal</span></button>
+                    <button class="occasion-btn" data-occasion="other">✨ <span data-translate="other">Other</span></button>
+                </div>
+                <input type="text" id="occasionDetails" placeholder="Tell us more..." data-translate-placeholder="occasion_placeholder">
+            </div>
+
+            <!-- Activities -->
+            <div class="card-panel">
+                <h3>🌀 <span data-translate="activities_title">Add Origen Magic</span></h3>
+                <div id="activitiesContainer"></div>
+            </div>
+
+            <!-- Special Requests -->
+            <div class="card-panel">
+                <h3>📝 <span data-translate="requests_title">Special requests or notes</span></h3>
+                <textarea id="specialRequests" rows="2" placeholder="Dietary restrictions, accessibility, surprises..." data-translate-placeholder="requests_placeholder"></textarea>
+            </div>
+        </div>
+
+        <!-- RIGHT: CART + WHATSAPP -->
+        <div class="cart">
+            <h3>📦 <span data-translate="cart_title">Your Adventure</span></h3>
+            <div id="cartItems"></div>
+            <div class="cart-total" id="cartTotal">COP 0</div>
+            <button class="whatsapp-btn" id="whatsappBtn">📲 <span data-translate="wa_btn">Reserve with 10% deposit</span></button>
+            <div class="preview" id="previewMsg"></div>
+            <div class="small-note" data-translate="deposit_note">🔐 10% non-refundable deposit via TripsToColombia.com. Remaining 90% at Origen.</div>
+        </div>
+    </div>
+
+    <div class="footer">
+        🌱 Origen Vive la Experiencia · Navarco ancestral trail · Salento → Origen
+    </div>
+</div>
+
+<script>
+    // ---------- PRICES (COP) ----------
+    const PRICES = {
+        transport: { moto: 120000, atv: 250000, "4x4": 300000 },
+        overnight: { none: 0, tent: 40000, origen: 180000 },
+        activities: {
+            horseOrigen: 125000,
+            healing: 50000,
+            river: 30000,
+            vapor: 45000,
+            ice: 40000,
+            nature: 35000,
+            paragliding: 220000,
+            campingOrigen: 60000
+        }
+    };
+
+    const ACTIVITY_NAMES = {
+        horseOrigen: { en: "🐎 Horseback at Origen (1h20m for two)", es: "🐎 Cabalgata en Origen (1h20m para dos)" },
+        healing: { en: "🌀 Healing Circle", es: "🌀 Círculo de sanación" },
+        river: { en: "🌊 River Trail", es: "🌊 Sendero al río" },
+        vapor: { en: "🔥 Body Vaporizers", es: "🔥 Vaporizadores corporales" },
+        ice: { en: "❄️ Ice Plunge Bath", es: "❄️ Ice plunge bath" },
+        nature: { en: "🥾 Nature Trail (Summit)", es: "🥾 Sendero cumbre" },
+        paragliding: { en: "🪂 Paragliding at Origen", es: "🪂 Parapente en Origen" },
+        campingOrigen: { en: "🏕️ Camping at Origen (extra night)", es: "🏕️ Camping en Origen (noche extra)" }
+    };
+
+    // State
+    let selectedTransport = null;
+    let selectedOvernight = "none";
+    let selectedOccasion = null;
+    let occasionDetails = "";
+    let specialRequests = "";
+    let activeActivities = {
+        horseOrigen: false,
+        healing: false,
+        river: false,
+        vapor: false,
+        ice: false,
+        nature: false,
+        paragliding: false,
+        campingOrigen: false
+    };
+    let currentLang = "en";
+
+    const TRANSLATIONS = {
+        en: {
+            badge: "🔥 NAVARCO TRAIL · OFF-ROAD · ORIGEN",
+            title: "Origen<br>Mountain Adventure",
+            sub: "From Salento via the ancestral trail — no La Línea, pure transformation.",
+            route: "⛰️ Motorcycle · ATV · 4x4 · Paragliding · Healing Circle · Horseback",
+            transport_title: "How will you arrive to Origen?",
+            moto_note: "*Premium motorcycles & ATVs available. Full insurance included.",
+            overnight_title: "Stay the night at Origen?",
+            day_only: "🌄 Day only",
+            tent: "🏕️ Tent camping",
+            room: "🛖 Origen room",
+            occasion_title: "Celebrating something special?",
+            birthday: "Birthday",
+            anniversary: "Anniversary",
+            wedding: "Wedding",
+            proposal: "Proposal",
+            other: "Other",
+            occasion_placeholder: "Tell us more...",
+            activities_title: "Add Origen Magic",
+            requests_title: "Special requests or notes",
+            requests_placeholder: "Dietary restrictions, accessibility, surprises...",
+            cart_title: "Your Adventure",
+            wa_btn: "Reserve with 10% deposit",
+            deposit_note: "🔐 10% non-refundable deposit via TripsToColombia.com. Remaining 90% at Origen.",
+            total_label: "Total"
+        },
+        es: {
+            badge: "🔥 RUTA NAVARCO · OFF-ROAD · ORIGEN",
+            title: "Origen<br>Aventura en la Montaña",
+            sub: "Desde Salento por el camino ancestral — nada de La Línea, transformación pura.",
+            route: "⛰️ Motocicleta · ATV · 4x4 · Parapente · Círculo sanación · Cabalgata",
+            transport_title: "¿Cómo llegarás a Origen?",
+            moto_note: "*Motocicletas y ATVs premium disponibles. Seguro incluido.",
+            overnight_title: "¿Te quedas la noche en Origen?",
+            day_only: "🌄 Solo día",
+            tent: "🏕️ Camping carpa",
+            room: "🛖 Habitación Origen",
+            occasion_title: "¿Celebras algo especial?",
+            birthday: "Cumpleaños",
+            anniversary: "Aniversario",
+            wedding: "Boda",
+            proposal: "Propuesta",
+            other: "Otro",
+            occasion_placeholder: "Cuéntanos más...",
+            activities_title: "Agrega Magia Origen",
+            requests_title: "Solicitudes especiales",
+            requests_placeholder: "Restricciones dietéticas, accesibilidad, sorpresas...",
+            cart_title: "Tu Aventura",
+            wa_btn: "Reservar con 10% apartado",
+            deposit_note: "🔐 10% depósito no reembolsable vía TripsToColombia.com. Restante 90% en Origen.",
+            total_label: "Total"
+        }
+    };
+
+    function updateLanguage() {
+        const t = TRANSLATIONS[currentLang];
+        document.querySelectorAll("[data-translate]").forEach(el => {
+            const key = el.getAttribute("data-translate");
+            if (t[key]) el.innerHTML = t[key];
+        });
+        document.querySelectorAll("[data-translate-placeholder]").forEach(el => {
+            const key = el.getAttribute("data-translate-placeholder");
+            if (t[key]) el.placeholder = t[key];
+        });
+        renderActivitiesList();
+        renderCart();
+    }
+
+    function renderActivitiesList() {
+        const container = document.getElementById("activitiesContainer");
+        container.innerHTML = "";
+        const order = ["horseOrigen", "healing", "river", "vapor", "ice", "nature", "paragliding", "campingOrigen"];
+        for (const key of order) {
+            const active = activeActivities[key];
+            const nameObj = ACTIVITY_NAMES[key];
+            const display = currentLang === "en" ? nameObj.en : nameObj.es;
+            const div = document.createElement("div");
+            div.className = "activity-row";
+            div.innerHTML = `
+                <span>${display}</span>
+                <div class="toggle ${active ? 'active' : ''}" data-act="${key}"></div>
+            `;
+            div.querySelector(".toggle").addEventListener("click", () => {
+                activeActivities[key] = !activeActivities[key];
+                renderActivitiesList();
+                renderCart();
+            });
+            container.appendChild(div);
+        }
+    }
+
+    function renderCart() {
+        let total = 0;
+        let items = [];
+
+        if (selectedTransport && PRICES.transport[selectedTransport]) {
+            const price = PRICES.transport[selectedTransport];
+            total += price;
+            let tName = selectedTransport === "moto" ? "🏍️ Motorcycle" : (selectedTransport === "atv" ? "🚙 ATV" : "🚐 4x4 Private");
+            items.push({ name: tName, price });
+        }
+
+        if (selectedOvernight && selectedOvernight !== "none" && PRICES.overnight[selectedOvernight]) {
+            const price = PRICES.overnight[selectedOvernight];
+            total += price;
+            let oname = selectedOvernight === "tent" ? "🏕️ Tent camping" : "🛖 Origen room";
+            items.push({ name: oname, price });
+        }
+
+        for (const [act, active] of Object.entries(activeActivities)) {
+            if (active && PRICES.activities[act]) {
+                const price = PRICES.activities[act];
+                total += price;
+                const nameObj = ACTIVITY_NAMES[act];
+                const actName = currentLang === "en" ? nameObj.en : nameObj.es;
+                items.push({ name: actName, price });
+            }
+        }
+
+        const cartDiv = document.getElementById("cartItems");
+        if (items.length === 0) {
+            cartDiv.innerHTML = `<div style="color:#aaa;">✨ Select your adventure</div>`;
+        } else {
+            cartDiv.innerHTML = items.map(i => `<div class="cart-item"><span>${i.name}</span><span>${i.price.toLocaleString()} COP</span></div>`).join("");
+        }
+        document.getElementById("cartTotal").innerHTML = `${TRANSLATIONS[currentLang].total_label}: ${total.toLocaleString()} COP`;
+
+        // Build WhatsApp message
+        let msg = "";
+        if (currentLang === "en") {
+            msg = "🌄 ORIGEN ADVENTURE REQUEST%0A";
+            if (selectedTransport) msg += `🚗 Transport: ${items.find(i=>i.name.includes("Motorcycle")||i.name.includes("ATV")||i.name.includes("4x4"))?.name || "None"}%0A`;
+            if (selectedOvernight && selectedOvernight !== "none") msg += `🏕️ Overnight: ${selectedOvernight === "tent" ? "Tent" : "Origen room"}%0A`;
+            if (selectedOccasion) {
+                let occText = selectedOccasion;
+                if (occasionDetails) occText += ` (${occasionDetails})`;
+                msg += `🎉 Special occasion: ${occText}%0A`;
+            }
+            const actItems = items.filter(i => i.name.includes("Horseback") || i.name.includes("Circle") || i.name.includes("River") || i.name.includes("Vapor") || i.name.includes("Ice") || i.name.includes("Trail") || i.name.includes("Paragliding") || i.name.includes("Camping"));
+            if (actItems.length) msg += `✨ Activities: ${actItems.map(i=>i.name).join(", ")}%0A`;
+            if (specialRequests) msg += `📝 Notes: ${specialRequests}%0A`;
+            msg += `💰 Total: ${total.toLocaleString()} COP%0A`;
+            msg += `🔐 I'm ready to book with 10% deposit via TripsToColombia.com.`;
+        } else {
+            msg = "🌄 SOLICITUD AVENTURA ORIGEN%0A";
+            if (selectedTransport) msg += `🚗 Transporte: ${items.find(i=>i.name.includes("Motorcycle")||i.name.includes("ATV")||i.name.includes("4x4"))?.name || "Ninguno"}%0A`;
+            if (selectedOvernight && selectedOvernight !== "none") msg += `🏕️ Pernocta: ${selectedOvernight === "tent" ? "Carpa" : "Habitación Origen"}%0A`;
+            if (selectedOccasion) {
+                let occText = selectedOccasion === "birthday" ? "Cumpleaños" : (selectedOccasion === "anniversary" ? "Aniversario" : (selectedOccasion === "wedding" ? "Boda" : (selectedOccasion === "proposal" ? "Propuesta" : "Otro")));
+                if (occasionDetails) occText += ` (${occasionDetails})`;
+                msg += `🎉 Ocasión especial: ${occText}%0A`;
+            }
+            const actItems = items.filter(i => i.name.includes("Cabalgata") || i.name.includes("sanación") || i.name.includes("río") || i.name.includes("vaporizadores") || i.name.includes("ice") || i.name.includes("cumbre") || i.name.includes("Parapente") || i.name.includes("Camping"));
+            if (actItems.length) msg += `✨ Actividades: ${actItems.map(i=>i.name).join(", ")}%0A`;
+            if (specialRequests) msg += `📝 Notas: ${specialRequests}%0A`;
+            msg += `💰 Total: ${total.toLocaleString()} COP%0A`;
+            msg += `🔐 Listo para reservar con 10% de apartado por TripsToColombia.com.`;
+        }
+        document.getElementById("previewMsg").innerText = decodeURIComponent(msg).replace(/\+/g, ' ');
+        window.whatsappMessage = msg;
+        
+        // Also send to Google Sheet (silent)
+        sendToGoogleSheet(items, total);
+    }
+
+    // Google Sheets Webhook (fetch POST to your Apps Script URL)
+    function sendToGoogleSheet(items, total) {
+        // Replace this URL with your actual Google Apps Script Webhook URL
+        const sheetWebhookURL = "https://script.google.com/macros/s/YOUR_GOOGLE_APPS_SCRIPT_ID/exec";
+        
+        const data = {
+            timestamp: new Date().toISOString(),
+            transport: selectedTransport || "none",
+            overnight: selectedOvernight,
+            occasion: selectedOccasion,
+            occasionDetails: occasionDetails,
+            specialRequests: specialRequests,
+            activities: Object.entries(activeActivities).filter(([k,v]) => v).map(([k]) => k).join(", "),
+            items: items.map(i => `${i.name}: ${i.price}`).join(" | "),
+            total: total,
+            language: currentLang
+        };
+        
+        fetch(sheetWebhookURL, {
+            method: "POST",
+            mode: "no-cors", // avoids CORS issues; you won't see response but data arrives
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data)
+        }).catch(e => console.log("Sheet log error (non-critical):", e));
+    }
+
+    function initButtons() {
+        document.querySelectorAll("#transportGroup .opt-btn").forEach(btn => {
+            btn.addEventListener("click", () => {
+                document.querySelectorAll("#transportGroup .opt-btn").forEach(b => b.classList.remove("selected"));
+                btn.classList.add("selected");
+                selectedTransport = btn.dataset.value;
+                renderCart();
+            });
+        });
+        document.querySelectorAll("#overnightGroup .opt-btn").forEach(btn => {
+            btn.addEventListener("click", () => {
+                document.querySelectorAll("#overnightGroup .opt-btn").forEach(b => b.classList.remove("selected"));
+                btn.classList.add("selected");
+                selectedOvernight = btn.dataset.value;
+                renderCart();
+            });
+        });
+        document.querySelectorAll(".occasion-btn").forEach(btn => {
+            btn.addEventListener("click", () => {
+                document.querySelectorAll(".occasion-btn").forEach(b => b.classList.remove("selected"));
+                btn.classList.add("selected");
+                selectedOccasion = btn.dataset.occasion;
+                renderCart();
+            });
+        });
+        document.querySelector("#overnightGroup .opt-btn[data-value='none']").classList.add("selected");
+        document.getElementById("occasionDetails").addEventListener("input", (e) => {
+            occasionDetails = e.target.value;
+            renderCart();
+        });
+        document.getElementById("specialRequests").addEventListener("input", (e) => {
+            specialRequests = e.target.value;
+            renderCart();
+        });
+    }
+
+    document.getElementById("whatsappBtn").addEventListener("click", () => {
+        if (!selectedTransport) {
+            alert(currentLang === "en" ? "Please select transport first" : "Primero elige el transporte");
+            return;
+        }
+        window.open(`https://wa.me/573233235532?text=${window.whatsappMessage}`, "_blank");
+    });
+
+    document.querySelectorAll(".lang-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            document.querySelectorAll(".lang-btn").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            currentLang = btn.dataset.lang;
+            updateLanguage();
+        });
+    });
+
+    renderActivitiesList();
+    initButtons();
+    updateLanguage();
+    renderCart();
+</script>
+</body>
+</html>
