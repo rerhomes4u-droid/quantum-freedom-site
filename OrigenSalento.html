@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Origen Salento · Build Your Adventure</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: #F7F3EB;
+            color: #1E2F2C;
+            line-height: 1.5;
+        }
+
+        :root {
+            --green-deep: #1A3A2E;
+            --green-moss: #3B6B52;
+            --clay: #C47A44;
+            --sand: #F0E3D0;
+            --warm: #F4A261;
+            --earth: #8B5A2B;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+
+        /* Header */
+        .hero {
+            background: linear-gradient(135deg, #1A3A2E 0%, #2D5A46 100%);
+            color: white;
+            border-radius: 2rem;
+            padding: 2rem 2rem;
+            margin-bottom: 2rem;
+            position: relative;
+        }
+
+        .lang-toggle {
+            position: absolute;
+            top: 1.5rem;
+            right: 2rem;
+            background: rgba(255,255,255,0.2);
+            border-radius: 40px;
+            padding: 0.3rem;
+            display: flex;
+            gap: 0.3rem;
+        }
+
+        .lang-btn {
+            background: transparent;
+            border: none;
+            color: white;
+            padding: 0.4rem 1rem;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        .lang-btn.active {
+            background: #F4A261;
+            color: #1A3A2E;
+        }
+
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            padding-right: 120px;
+        }
+
+        .badge {
+            background: #F4A261;
+            display: inline-block;
+            padding: 0.3rem 1rem;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: #1A3A2E;
+            margin-bottom: 0.8rem;
+        }
+
+        .route-highlight {
+            background: rgba(244,162,97,0.25);
+            padding: 0.4rem 1rem;
+            border-radius: 80px;
+            display: inline-block;
+            font-size: 0.85rem;
+            margin-top: 0.5rem;
+        }
+
+        .instagram-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #ffffff20;
+            padding: 0.5rem 1.2rem;
+            border-radius: 40px;
+            text-decoration: none;
+            color: white;
+            margin-top: 1rem;
+            font-weight: 500;
+        }
+
+        /* 2 column layout */
+        .builder-layout {
+            display: grid;
+            grid-template-columns: 1fr 380px;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        @media (max-width: 800px) {
+            .builder-layout {
+                grid-template-columns: 1fr;
+            }
+            .lang-toggle { position: static; justify-content: flex-end; display: flex; margin-bottom: 1rem; }
+            .hero h1 { padding-right: 0; }
+        }
+
+        /* selection panels */
+        .panel {
+            background: white;
+            border-radius: 1.8rem;
+            padding: 1.5rem;
+            margin-bottom: 1.8rem;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            border: 1px solid #EADEC9;
+        }
+
+        .panel h3 {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            font-size: 1.4rem;
+            color: #1A3A2E;
+        }
+
+        .option-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            margin-top: 0.5rem;
+        }
+
+        .option-btn {
+            background: #F0E3D0;
+            border: none;
+            padding: 0.7rem 1.2rem;
+            border-radius: 60px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .option-btn.selected {
+            background: #C47A44;
+            color: white;
+            box-shadow: 0 2px 8px rgba(196,122,68,0.3);
+        }
+
+        .activity-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.7rem 0;
+            border-bottom: 1px solid #EADEC9;
+        }
+
+        .activity-name {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .toggle-switch {
+            width: 48px;
+            height: 24px;
+            background: #ddd;
+            border-radius: 30px;
+            position: relative;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .toggle-switch.active {
+            background: #3B6B52;
+        }
+
+        .toggle-switch:after {
+            content: "";
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 4px;
+            transition: 0.2s;
+        }
+
+        .toggle-switch.active:after {
+            left: 24px;
+        }
+
+        /* cart */
+        .cart {
+            background: #1A3A2E;
+            color: white;
+            border-radius: 1.8rem;
+            padding: 1.5rem;
+            position: sticky;
+            top: 1rem;
+            height: fit-content;
+        }
+
+        .cart h3 {
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #5a7a6a;
+            padding-bottom: 0.5rem;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 0.8rem 0;
+            font-size: 0.9rem;
+        }
+
+        .cart-total {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 1rem 0;
+            border-top: 1px solid #5a7a6a;
+            padding-top: 1rem;
+        }
+
+        .whatsapp-btn {
+            background: #25D366;
+            width: 100%;
+            border: none;
+            padding: 1rem;
+            border-radius: 60px;
+            font-weight: bold;
+            color: #1A3A2E;
+            cursor: pointer;
+            font-size: 1rem;
+            margin: 1rem 0;
+            transition: 0.2s;
+        }
+
+        .whatsapp-btn:hover {
+            background: #128C7E;
+            color: white;
+        }
+
+        .preview-message {
+            background: #2D4A3E;
+            padding: 0.8rem;
+            border-radius: 1rem;
+            font-size: 0.75rem;
+            font-family: monospace;
+            word-break: break-word;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 2rem 0;
+            color: #6B6B66;
+        }
+
+        [data-translate] {
+            transition: 0.1s;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="hero">
+        <div class="lang-toggle">
+            <button class="lang-btn active" data-lang="en">EN</button>
+            <button class="lang-btn" data-lang="es">ES</button>
+        </div>
+        <div class="badge" data-translate="badge">🔥 RUTA NAVARCO · OFF-ROAD REAL</div>
+        <h1 data-translate="title">Origen Salento</h1>
+        <div class="route-highlight" data-translate="route">Desde Salento por el camino ancestral — nada de La Línea</div>
+        <a href="https://www.instagram.com/origen.vivelaexperiencia/" target="_blank" class="instagram-link">
+            📸 @origen.vivelaexperiencia
+        </a>
+    </div>
+
+    <div class="builder-layout">
+        <!-- left: builder -->
+        <div>
+            <!-- transport -->
+            <div class="panel">
+                <h3>🏍️ <span data-translate="transport_title">How do you want to get there?</span></h3>
+                <div class="option-group" id="transport-group">
+                    <button class="option-btn" data-value="moto" data-price="120">🏍️ Moto Marroko</button>
+                    <button class="option-btn" data-value="atv" data-price="250">🚙 ATV / Cuatrimoto</button>
+                    <button class="option-btn" data-value="horse" data-price="150">🐎 Horseback</button>
+                    <button class="option-btn" data-value="4x4" data-price="300">🚐 4x4 privado (hasta 6)</button>
+                </div>
+            </div>
+
+            <!-- overnight -->
+            <div class="panel">
+                <h3>🏕️ <span data-translate="overnight_title">Spending the night?</span></h3>
+                <div class="option-group" id="overnight-group">
+                    <button class="option-btn" data-value="none" data-price="0">📅 <span data-translate="day_only">Day only</span></button>
+                    <button class="option-btn" data-value="tent" data-price="40">🏕️ <span data-translate="tent">Tent camping</span></button>
+                    <button class="option-btn" data-value="origen-room" data-price="180">🛖 <span data-translate="room">Origen room</span></button>
+                </div>
+            </div>
+
+            <!-- activities -->
+            <div class="panel">
+                <h3>🌀 <span data-translate="activities_title">Choose your activities</span></h3>
+                <div id="activities-list"></div>
+            </div>
+        </div>
+
+        <!-- right: cart + whatsapp -->
+        <div class="cart">
+            <h3>📦 <span data-translate="cart_title">Your Adventure</span></h3>
+            <div id="cart-items"></div>
+            <div class="cart-total" id="cart-total">COP 0</div>
+            <button class="whatsapp-btn" id="whatsappBtn">📲 <span data-translate="whatsapp_btn">Reserve now · 10% deposit</span></button>
+            <div class="preview-message" id="previewMsg"></div>
+            <p style="font-size: 0.7rem; margin-top: 0.8rem;" data-translate="deposit_note">*10% non-refundable deposit via TripsToColombia.com. Remaining 90% paid at Origen.</p>
+        </div>
+    </div>
+    <div class="footer">
+        🌱 Origen Vive la Experiencia · Navarco trail · Salento → Origen · Colombia
+    </div>
+</div>
+
+<script>
+    // ---------- PRICES (COP) ----------
+    const prices = {
+        transport: { moto: 120000, atv: 250000, horse: 150000, "4x4": 300000 },
+        overnight: { none: 0, tent: 40000, "origen-room": 180000 },
+        activities: {
+            healing: 50000,
+            river: 30000,
+            vapor: 45000,
+            ice: 40000,
+            nature: 35000,
+            paragliding: 220000,
+            campingOrigen: 60000
+        }
+    };
+
+    const activityNames = {
+        healing: { en: "🌀 Healing circle", es: "🌀 Círculo de sanación" },
+        river: { en: "🌊 River trail", es: "🌊 Sendero al río" },
+        vapor: { en: "🔥 Body vaporizers", es: "🔥 Vaporizadores corporales" },
+        ice: { en: "❄️ Ice plunge bath", es: "❄️ Ice plunge bath" },
+        nature: { en: "🥾 Nature trail (summit)", es: "🥾 Sendero cumbre" },
+        paragliding: { en: "🪂 Paragliding", es: "🪂 Parapente" },
+        campingOrigen: { en: "🏕️ Camping at Origen (extra night)", es: "🏕️ Camping en Origen (noche extra)" }
+    };
+
+    // state
+    let selectedTransport = null;
+    let selectedOvernight = "none";
+    let activeActivities = {
+        healing: false, river: false, vapor: false, ice: false, nature: false, paragliding: false, campingOrigen: false
+    };
+    let currentLang = "en";
+
+    // translations mapping
+    const translations = {
+        en: {
+            badge: "🔥 NAVARCO TRAIL · REAL OFF-ROAD",
+            title: "Origen Salento",
+            route: "From Salento via the ancestral trail — no La Línea",
+            transport_title: "How do you want to get there?",
+            overnight_title: "Spending the night?",
+            day_only: "Day only",
+            tent: "Tent camping",
+            room: "Origen room",
+            activities_title: "Choose your activities",
+            cart_title: "Your Adventure",
+            whatsapp_btn: "Reserve now · 10% deposit",
+            deposit_note: "*10% non-refundable deposit via TripsToColombia.com. Remaining 90% paid at Origen.",
+            total: "Total"
+        },
+        es: {
+            badge: "🔥 RUTA NAVARCO · OFF-ROAD REAL",
+            title: "Origen Salento",
+            route: "Desde Salento por el camino ancestral — nada de La Línea",
+            transport_title: "¿Cómo quieres llegar?",
+            overnight_title: "¿Te quedas la noche?",
+            day_only: "Solo día",
+            tent: "Camping carpa",
+            room: "Habitación Origen",
+            activities_title: "Elige tus actividades",
+            cart_title: "Tu Aventura",
+            whatsapp_btn: "Reservar ahora · 10% apartado",
+            deposit_note: "*10% de depósito no reembolsable por TripsToColombia.com. El 90% restante se paga en Origen.",
+            total: "Total"
+        }
+    };
+
+    function updateLanguage() {
+        const t = translations[currentLang];
+        document.querySelectorAll("[data-translate]").forEach(el => {
+            const key = el.getAttribute("data-translate");
+            if (t[key]) el.innerText = t[key];
+        });
+        // update activity checkboxes text
+        renderActivitiesList();
+        renderCart();
+    }
+
+    function renderActivitiesList() {
+        const container = document.getElementById("activities-list");
+        container.innerHTML = "";
+        for (const [key, active] of Object.entries(activeActivities)) {
+            const nameObj = activityNames[key];
+            const displayName = currentLang === "en" ? nameObj.en : nameObj.es;
+            const div = document.createElement("div");
+            div.className = "activity-item";
+            div.innerHTML = `
+                <div class="activity-name">
+                    <span>${displayName}</span>
+                </div>
+                <div class="toggle-switch ${active ? 'active' : ''}" data-activity="${key}"></div>
+            `;
+            const toggle = div.querySelector(".toggle-switch");
+            toggle.addEventListener("click", (e) => {
+                e.stopPropagation();
+                activeActivities[key] = !activeActivities[key];
+                renderActivitiesList();
+                renderCart();
+            });
+            container.appendChild(div);
+        }
+    }
+
+    function renderCart() {
+        let total = 0;
+        let items = [];
+        
+        if (selectedTransport && prices.transport[selectedTransport]) {
+            const price = prices.transport[selectedTransport];
+            total += price;
+            let transportName = selectedTransport;
+            if (selectedTransport === "moto") transportName = "🏍️ Moto Marroko";
+            if (selectedTransport === "atv") transportName = "🚙 ATV DAMAFRE";
+            if (selectedTransport === "horse") transportName = "🐎 Horseback";
+            if (selectedTransport === "4x4") transportName = "🚐 4x4 privado";
+            items.push({ name: transportName, price: price });
+        }
+        
+        if (selectedOvernight && prices.overnight[selectedOvernight] && selectedOvernight !== "none") {
+            const price = prices.overnight[selectedOvernight];
+            total += price;
+            let overnightName = selectedOvernight === "tent" ? "🏕️ Tent camping" : "🛖 Origen room";
+            items.push({ name: overnightName, price: price });
+        }
+        
+        for (const [act, active] of Object.entries(activeActivities)) {
+            if (active && prices.activities[act]) {
+                const price = prices.activities[act];
+                total += price;
+                const nameObj = activityNames[act];
+                const actName = currentLang === "en" ? nameObj.en : nameObj.es;
+                items.push({ name: actName, price: price });
+            }
+        }
+        
+        const cartDiv = document.getElementById("cart-items");
+        if (items.length === 0) {
+            cartDiv.innerHTML = `<div style="color:#aaa;" data-translate="no_items">No selections yet</div>`;
+        } else {
+            cartDiv.innerHTML = items.map(item => `<div class="cart-item"><span>${item.name}</span><span>${item.price.toLocaleString()} COP</span></div>`).join("");
+        }
+        document.getElementById("cart-total").innerHTML = `<span data-translate="total">Total</span>: ${total.toLocaleString()} COP`;
+        
+        // build whatsapp message
+        let message = "";
+        if (currentLang === "en") {
+            message = "🌄 ORIGEN ADVENTURE REQUEST%0A";
+            if (selectedTransport) message += `🚗 Transport: ${items.find(i=>i.name.includes("Moto")||i.name.includes("ATV")||i.name.includes("Horse")||i.name.includes("4x4"))?.name || "Not selected"}%0A`;
+            if (selectedOvernight && selectedOvernight !== "none") message += `🏕️ Overnight: ${selectedOvernight === "tent" ? "Tent" : "Origen room"}%0A`;
+            const actItems = items.filter(i => i.name.includes("circle") || i.name.includes("river") || i.name.includes("vapor") || i.name.includes("ice") || i.name.includes("trail") || i.name.includes("Paragliding") || i.name.includes("Camping") );
+            if (actItems.length) {
+                message += `✨ Activities: ${actItems.map(i=>i.name).join(", ")}%0A`;
+            }
+            message += `💰 Total: ${total.toLocaleString()} COP%0A`;
+            message += `🔐 10% deposit via TripsToColombia.com. I'm ready to book!`;
+        } else {
+            message = "🌄 SOLICITUD AVENTURA ORIGEN%0A";
+            if (selectedTransport) message += `🚗 Transporte: ${items.find(i=>i.name.includes("Moto")||i.name.includes("ATV")||i.name.includes("Caballo")||i.name.includes("4x4"))?.name || "No seleccionado"}%0A`;
+            if (selectedOvernight && selectedOvernight !== "none") message += `🏕️ Pernocta: ${selectedOvernight === "tent" ? "Carpa" : "Habitación Origen"}%0A`;
+            const actItems = items.filter(i => i.name.includes("sanación") || i.name.includes("río") || i.name.includes("vaporizadores") || i.name.includes("ice") || i.name.includes("cumbre") || i.name.includes("Parapente") || i.name.includes("Camping") );
+            if (actItems.length) {
+                message += `✨ Actividades: ${actItems.map(i=>i.name).join(", ")}%0A`;
+            }
+            message += `💰 Total: ${total.toLocaleString()} COP%0A`;
+            message += `🔐 10% depósito no reembolsable por TripsToColombia.com. Listo para reservar.`;
+        }
+        document.getElementById("previewMsg").innerText = decodeURIComponent(message).replace(/\+/g, ' ');
+        
+        // store for whatsapp
+        window.whatsappMessage = message;
+    }
+    
+    // event handlers for options
+    function initOptionGroups() {
+        document.querySelectorAll("#transport-group .option-btn").forEach(btn => {
+            btn.addEventListener("click", () => {
+                document.querySelectorAll("#transport-group .option-btn").forEach(b => b.classList.remove("selected"));
+                btn.classList.add("selected");
+                selectedTransport = btn.getAttribute("data-value");
+                renderCart();
+            });
+        });
+        document.querySelectorAll("#overnight-group .option-btn").forEach(btn => {
+            btn.addEventListener("click", () => {
+                document.querySelectorAll("#overnight-group .option-btn").forEach(b => b.classList.remove("selected"));
+                btn.classList.add("selected");
+                selectedOvernight = btn.getAttribute("data-value");
+                renderCart();
+            });
+        });
+        // default overnight none
+        document.querySelector("#overnight-group .option-btn[data-value='none']").classList.add("selected");
+        selectedOvernight = "none";
+    }
+    
+    // whatsapp action
+    document.getElementById("whatsappBtn").addEventListener("click", () => {
+        if (!selectedTransport) {
+            alert(currentLang === "en" ? "Please select how you want to get there first" : "Primero elige cómo quieres llegar");
+            return;
+        }
+        const phone = "573233235532";
+        const url = `https://wa.me/${phone}?text=${window.whatsappMessage}`;
+        window.open(url, "_blank");
+    });
+    
+    // language switcher
+    document.querySelectorAll(".lang-btn").forEach(btn => {
+        btn.addEventListener("click", () => {
+            document.querySelectorAll(".lang-btn").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            currentLang = btn.getAttribute("data-lang");
+            updateLanguage();
+        });
+    });
+    
+    renderActivitiesList();
+    initOptionGroups();
+    updateLanguage();
+    renderCart();
+</script>
+</body>
+</html>
