@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, initial-scale=1.0, viewport-fit=cover">
+    <title>FORBIDDEN KNOWLEDGE · THE SURVIVAL MANUAL · TRANSMISSION READER</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #010005;
+            font-family: 'Segoe UI', 'Palatino', 'Georgia', 'Times New Roman', serif;
+            color: #ece3cf;
+            line-height: 1.6;
+            transition: background 0.3s ease;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+        }
+
+        /* header */
+        .header {
+            text-align: center;
+            border-bottom: 2px solid #c9a87b;
+            padding-bottom: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            background: linear-gradient(135deg, #ffdcaa, #c9a87b);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .sub {
+            color: #aa9a7a;
+            margin-top: 0.5rem;
+        }
+
+        /* control panel */
+        .control-panel {
+            background: #0a0508cc;
+            backdrop-filter: blur(10px);
+            border-radius: 1.5rem;
+            padding: 1rem 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid #c9a87b;
+        }
+
+        .controls-left {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+            align-items: center;
+        }
+
+        .controls-right {
+            display: flex;
+            gap: 0.8rem;
+        }
+
+        select, button {
+            background: #2a241a;
+            border: 1px solid #c9a87b;
+            padding: 0.5rem 1rem;
+            border-radius: 40px;
+            color: #ffefcf;
+            font-family: monospace;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        select:hover, button:hover {
+            background: #5a4a2a;
+            transform: scale(0.98);
+        }
+
+        button:active {
+            transform: scale(0.96);
+        }
+
+        .alert-btn {
+            background: #5a2a2a;
+            border-color: #ff8a6a;
+        }
+
+        /* chapter grid */
+        .chapter-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .chapter-card {
+            background: #0a0508cc;
+            backdrop-filter: blur(5px);
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            border-left: 6px solid #c9a87b;
+            transition: 0.2s;
+        }
+
+        .chapter-card:hover {
+            transform: translateX(8px);
+            background: #1a0f0fcc;
+        }
+
+        .chapter-title {
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .chapter-title span:first-child {
+            background: #c9a87b20;
+            padding: 0.2rem 0.8rem;
+            border-radius: 40px;
+            font-size: 0.8rem;
+        }
+
+        .chapter-content {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #c9a87b40;
+            font-size: 1rem;
+        }
+
+        .audio-row {
+            margin-top: 1rem;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        audio {
+            max-width: 300px;
+            width: 100%;
+            background: #2a241a;
+            border-radius: 40px;
+        }
+
+        /* konami overlay (hidden until code) */
+        .konami-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000000dd;
+            backdrop-filter: blur(20px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap: 1.5rem;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .konami-overlay.active {
+            display: flex;
+        }
+
+        .konami-box {
+            background: #0a0a0a;
+            border: 2px solid #ffdcaa;
+            border-radius: 2rem;
+            padding: 2rem;
+            max-width: 500px;
+        }
+
+        .konami-code {
+            font-size: 1.5rem;
+            letter-spacing: 6px;
+            font-family: monospace;
+            margin: 1rem 0;
+        }
+
+        /* footer */
+        .footer {
+            text-align: center;
+            margin-top: 3rem;
+            padding-top: 1rem;
+            border-top: 1px solid #6a5a3a;
+            font-size: 0.7rem;
+            opacity: 0.7;
+        }
+
+        @media (max-width: 680px) {
+            .chapter-title { font-size: 1.2rem; }
+            .control-panel { flex-direction: column; align-items: stretch; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>📡 FORBIDDEN KNOWLEDGE</h1>
+        <div class="sub">— THE SURVIVAL MANUAL · TRANSMISSION READER —<br>⚡ Select a chapter · Click “Read From Here” · Control the audio</div>
+    </div>
+
+    <div class="control-panel">
+        <div class="controls-left">
+            <label for="chapterSelect">📖 Choose Chapter:</label>
+            <select id="chapterSelect">
+                <option value="0">📜 Foreword / The Hidden Chapter</option>
+                <option value="1">🧪 CHAPTER 1 — THE FORBIDDEN DOWNLOAD</option>
+                <option value="2">📜 CHAPTER 2 — THE DOMINANCE ENGINE</option>
+                <option value="3">⚔️ CHAPTER 3 — THE SOVEREIGN ARSENAL</option>
+                <option value="4">📡 CHAPTER 4 — THE FREQUENCY TRANSMISSION</option>
+                <option value="5">🎮 CHAPTER 5 — THE CHEAT CODE (KONAMI)</option>
+            </select>
+            <button id="readFromHereBtn">🎧 Read From Here ➤</button>
+            <button id="stopAudioBtn">⏹️ Stop Audio</button>
+        </div>
+        <div class="controls-right">
+            <button id="langHintBtn">🌐 Browser Translation</button>
+            <button id="resetAudioBtn">⟳ Reset All Audio</button>
+        </div>
+    </div>
+
+    <div class="chapter-grid" id="chapterGrid">
+        <!-- chapters will be injected via js but we put raw editable structure with emoji placeholders for easy replacement -->
+    </div>
+
+    <div class="footer">
+        ✦ All apps free — because liberation cannot be monetized ✦<br>
+        📘 Forbidden Knowledge · Ramiro Ramirez · TripsToColombia.com<br>
+        ⚡ Always, always, always keep Jesus in your heart ✝️
+    </div>
+</div>
+
+<!-- Konami overlay -->
+<div id="konamiOverlay" class="konami-overlay">
+    <div class="konami-box">
+        <h2>🎮 KONAMI ACTIVATED</h2>
+        <div class="konami-code">⬆️ ⬆️ ⬇️ ⬇️ ⬅️ ➡️ ⬅️ ➡️ 🅱️ 🅰️</div>
+        <p>You have unlocked the <strong>censored archives</strong> — forbidden transmissions, unredacted testimonies, and the complete liberation grid.<br>
+        🌐 Visit <strong>TripsToColombia.com</strong> with this code.<br>
+        📡 The door was always open.<br>
+        ✝️ Keep Jesus in your heart.</p>
+        <button id="closeKonamiBtn">✖️ Seal & Return</button>
+    </div>
+</div>
+
+<script>
+    // --------------------------------------------------------------
+    // 📝 CONTENT PLACEHOLDERS — REPLACE TEXT BETWEEN THE EMOJIS
+    // Each chapter block: put your final text inside the template literals.
+    // Emojis like 🧪, 📜, ✨, ⚠️, 🎮 mark where content belongs.
+    // --------------------------------------------------------------
+    const chaptersData = [
+        { // chapter 0: Foreword / Hidden chapter
+            title: "📜 FOREWORD · THE HIDDEN CHAPTER",
+            content: `🧪 === INSERT YOUR FOREWORD / HIDDEN CHAPTER TEXT HERE === 
+The real text begins. This is the transmission you were meant to find. Replace this placeholder with the full foreword. Keep all formatting clean. The audio reader will read it exactly as written.`
+        },
+        { // chapter 1
+            title: "🧪 CHAPTER 1 — THE FORBIDDEN DOWNLOAD",
+            content: `🧪 === YOUR CHAPTER 1 TEXT HERE === 
+Paste the complete chapter. Include all warnings, stories, and forbidden knowledge. The reader will play from this point when "Read From Here" is clicked.`
+        },
+        { // chapter 2
+            title: "📜 CHAPTER 2 — THE DOMINANCE ENGINE",
+            content: `📜 === YOUR CHAPTER 2 TEXT HERE === 
+Add your full chapter 2 content. The engine of liberation. Deep strategies and hidden systems.`
+        },
+        { // chapter 3
+            title: "⚔️ CHAPTER 3 — THE SOVEREIGN ARSENAL",
+            content: `⚔️ === YOUR CHAPTER 3 TEXT HERE === 
+Weapons of freedom. Legal, financial, and spiritual warfare. Place the full arsenal chapter.`
+        },
+        { // chapter 4
+            title: "📡 CHAPTER 4 — THE FREQUENCY TRANSMISSION",
+            content: `📡 === YOUR CHAPTER 4 TEXT HERE === 
+Infrasound, frequencies, digital resistance. All the transmissions.`
+        },
+        { // chapter 5: Konami / Final
+            title: "🎮 CHAPTER 5 — THE CHEAT CODE (KONAMI)",
+            content: `🎮 === YOUR CHAPTER 5 TEXT HERE === 
+The Konami Code. The final door. The secret initiation. Insert the complete final transmission.`
+        }
+    ];
+
+    // Additional free resources and translation tip
+    const freeResources = `
+    🌐 FREE RESOURCES — ALWAYS ACCESSIBLE:
+    • Forbidden Knowledge Substack: https://ForbiddenKnowledge.substack.com
+    • TripsToColombia.com — The Door
+    • Amnesty Coalition: https://quantum-freedom-site.vercel.app/TheNationOfTheAmnestyCoalitionForUnity.html
+    • All apps are zero-cost. No signup. No paywall.
+    `;
+
+    // Append resource note to each chapter for visibility (optional)
+    for (let i = 0; i < chaptersData.length; i++) {
+        chaptersData[i].content += `\n\n📖 ${freeResources}`;
+    }
+
+    let currentSpeech = null;
+    let currentUtterance = null;
+    let isSpeaking = false;
+
+    // Helper: stop any ongoing speech
+    function stopSpeaking() {
+        if (window.speechSynthesis) {
+            window.speechSynthesis.cancel();
+        }
+        isSpeaking = false;
+        currentUtterance = null;
+    }
+
+    // read text from a specific index (start of chapter)
+    function readFromChapter(chapterIndex) {
+        stopSpeaking();
+        if (chapterIndex < 0 || chapterIndex >= chaptersData.length) return;
+
+        let fullText = chaptersData[chapterIndex].content;
+        // Optionally add title for context
+        fullText = chaptersData[chapterIndex].title + ". " + fullText;
+
+        if (!window.speechSynthesis) {
+            alert("Your browser does not support speech synthesis. Try Chrome, Edge, or Safari.");
+            return;
+        }
+        const utterance = new SpeechSynthesisUtterance(fullText);
+        utterance.lang = 'en-US';
+        utterance.rate = 0.9;
+        utterance.pitch = 1.0;
+        utterance.onend = () => { isSpeaking = false; currentUtterance = null; };
+        utterance.onerror = () => { isSpeaking = false; currentUtterance = null; };
+        currentUtterance = utterance;
+        isSpeaking = true;
+        window.speechSynthesis.speak(utterance);
+    }
+
+    // render chapters to DOM
+    const grid = document.getElementById('chapterGrid');
+    function renderChapters() {
+        grid.innerHTML = '';
+        chaptersData.forEach((ch, idx) => {
+            const card = document.createElement('div');
+            card.className = 'chapter-card';
+            card.setAttribute('data-chapter-idx', idx);
+            // title row
+            const titleDiv = document.createElement('div');
+            titleDiv.className = 'chapter-title';
+            titleDiv.innerHTML = `<span>${ch.title}</span><button class="readThisBtn" data-idx="${idx}">🔊 Read This Chapter</button>`;
+            // content row
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'chapter-content';
+            contentDiv.innerHTML = `<div>${ch.content.replace(/\n/g, '<br>')}</div>`;
+            // audio controls row (optional per chapter but we keep as a secondary "read from here" + stop)
+            const audioRow = document.createElement('div');
+            audioRow.className = 'audio-row';
+            const playFromHereBtn = document.createElement('button');
+            playFromHereBtn.textContent = '🎙️ Play From Beginning of This Chapter';
+            playFromHereBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                readFromChapter(idx);
+            });
+            const stopChapterBtn = document.createElement('button');
+            stopChapterBtn.textContent = '⏹️ Stop';
+            stopChapterBtn.addEventListener('click', () => stopSpeaking());
+            audioRow.appendChild(playFromHereBtn);
+            audioRow.appendChild(stopChapterBtn);
+            contentDiv.appendChild(audioRow);
+            card.appendChild(titleDiv);
+            card.appendChild(contentDiv);
+            grid.appendChild(card);
+        });
+
+        // attach event listeners to "Read This Chapter" buttons
+        document.querySelectorAll('.readThisBtn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const idx = parseInt(btn.getAttribute('data-idx'));
+                readFromChapter(idx);
+            });
+        });
+    }
+
+    renderChapters();
+
+    // main controls
+    const chapterSelect = document.getElementById('chapterSelect');
+    const readFromHereBtn = document.getElementById('readFromHereBtn');
+    const stopAudioBtn = document.getElementById('stopAudioBtn');
+    const resetAudioBtn = document.getElementById('resetAudioBtn');
+    const langHintBtn = document.getElementById('langHintBtn');
+
+    readFromHereBtn.addEventListener('click', () => {
+        const selectedIdx = parseInt(chapterSelect.value);
+        if (!isNaN(selectedIdx) && selectedIdx >=0 && selectedIdx < chaptersData.length) {
+            readFromChapter(selectedIdx);
+        } else {
+            alert("Select a valid chapter.");
+        }
+    });
+
+    stopAudioBtn.addEventListener('click', () => {
+        stopSpeaking();
+    });
+
+    resetAudioBtn.addEventListener('click', () => {
+        stopSpeaking();
+        alert("Audio reset. Any current speech stopped.");
+    });
+
+    // Browser translation hint - works with Chrome's built-in translate
+    langHintBtn.addEventListener('click', () => {
+        alert("🌐 To translate this page: Use your browser's built-in translate feature.\n\n• Chrome: Right-click → Translate to [Language]\n• Edge: Right-click → Translate\n• Firefox: Install translate add-on\n\nAll content can be translated to your local language easily.\nThe Forbidden Knowledge is for every nation.");
+    });
+
+    // --------------------------------------------------------------
+    // KONAMI CODE DETECTION (censored content)
+    let konamiSequence = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
+    let userInput = [];
+    const konamiOverlay = document.getElementById('konamiOverlay');
+    const closeKonamiBtn = document.getElementById('closeKonamiBtn');
+
+    window.addEventListener('keydown', (e) => {
+        let key = e.key === 'b' || e.key === 'a' ? e.key.toLowerCase() : e.key;
+        userInput.push(key);
+        if (userInput.length > konamiSequence.length) userInput.shift();
+        if (JSON.stringify(userInput) === JSON.stringify(konamiSequence)) {
+            // reveal hidden censored archives
+            konamiOverlay.classList.add('active');
+            userInput = [];
+        }
+    });
+
+    closeKonamiBtn.addEventListener('click', () => {
+        konamiOverlay.classList.remove('active');
+    });
+
+    // Also manual help for Konami: any click on the page won't interfere
+    console.log("📡 FORBIDDEN KNOWLEDGE READY — Use chapter selector, audio controls, and Konami code ↑↑↓↓←→←→BA");
+</script>
+</body>
+</html>
