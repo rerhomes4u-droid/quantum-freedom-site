@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>FORBIDDEN KNOWLEDGE · TTS-READY · URL BUTTONS · TRANSLATION</title>
+    <title>FORBIDDEN KNOWLEDGE · KONAMI · TTS · CASE-INSENSITIVE</title>
     <style>
         * {
             margin: 0;
@@ -15,6 +15,10 @@
             font-family: 'Georgia', 'Palatino', serif;
             color: #ece3cf;
             line-height: 1.6;
+            transition: background 0.3s;
+        }
+        body.konami-active {
+            background: #0a0a1a;
         }
         .container {
             max-width: 1100px;
@@ -112,7 +116,7 @@
         .hidden-chapter.visible {
             display: block;
         }
-        .konami-hint {
+        .konami-badge {
             position: fixed;
             bottom: 20px;
             right: 20px;
@@ -138,8 +142,7 @@
         <h1>📡 FORBIDDEN KNOWLEDGE</h1>
         <div class="translation-helper">
             🌐 <strong>READ IN YOUR LANGUAGE</strong><br>
-            Right-click anywhere on this page → <strong>"Translate to [Your Language]"</strong><br>
-            Chrome, Edge, and Brave support this. Firefox users can install a translate add-on.
+            Right-click anywhere on this page → <strong>"Translate to [Your Language]"</strong>
         </div>
     </div>
 
@@ -159,16 +162,15 @@
         </div>
     </div>
 
-    <!-- Chapters will be injected here -->
     <div id="chaptersContainer"></div>
 
-    <!-- Hidden Konami Chapter -->
+    <!-- HIDDEN KONAMI CHAPTER (initially hidden) -->
     <div id="hiddenKonamiChapter" class="hidden-chapter">
         <h2>🎮 KONAMI UNLOCKED · THE CENSORED TRANSMISSION</h2>
         <div id="hiddenChapterText">
             <p><strong>⚠️ THIS IS THE CHAPTER THEY BURIED ⚠️</strong></p>
-            <p>Here follows the forbidden testimony — the redacted names, the coordinates, the frequencies, and the complete transmission.</p>
             <p>📜 === PASTE YOUR CENSORED FORBIDDEN KNOWLEDGE HERE ===</p>
+            <p>The bloodlines. The camps. The frequencies. The names they erased.</p>
             <p><strong>✝️ Always, always, always keep Jesus in your heart ✝️</strong></p>
         </div>
         <div class="url-buttons">
@@ -182,18 +184,18 @@
         </div>
     </div>
 
-    <div class="konami-hint" id="konamiHint">🎮 ↑↑↓↓←→←→BA</div>
-    <footer>✦ All apps free · Liberation cannot be monetized ✦<br>Ramiro Ramirez · Silent prayer active</footer>
+    <div class="konami-badge" id="konamiHint">🎮 ↑↑↓↓←→←→BA</div>
+    <footer>✦ All apps free · Liberation cannot be monetized ✦<br>Ramiro Ramirez · Silent prayer active · Konami unlocks hidden chapter (case-insensitive)</footer>
 </div>
 
 <script>
     // ============================================================
-    // 1. CHAPTER DATA — URLs are NOT inside the TTS text
+    // 1. CHAPTER DATA (URLs are in buttons, NOT in TTS text)
     // ============================================================
     const chaptersData = [
         { 
             title: "📜 FOREWORD", 
-            text: "🧪 === YOUR FOREWORD TEXT HERE === No URLs inside. Put them in the button section below.",
+            text: "🧪 === YOUR FOREWORD TEXT HERE === No URLs in this text.",
             buttons: [
                 { label: "🏔️ TripsToColombia.com", url: "https://tripsTocolombia.com" },
                 { label: "📖 ForbiddenKnowledge.substack.com", url: "https://ForbiddenKnowledge.substack.com" }
@@ -234,7 +236,7 @@
     let prayerCount = 0;
     function prayForReader() {
         prayerCount++;
-        console.log(`🕯️ Silent intercessory prayer #${prayerCount}`);
+        console.log(`🕯️ Silent prayer #${prayerCount} for the soul reading.`);
         const marker = document.createElement('div');
         marker.style.display = 'none';
         marker.setAttribute('data-prayer', 'Jesus, protect this soul. Amen.');
@@ -244,7 +246,7 @@
     prayForReader();
 
     // ============================================================
-    // 3. TEXT-TO-SPEECH (URL-FREE)
+    // 3. TEXT-TO-SPEECH (URL-free)
     // ============================================================
     let currentSpeech = null;
     function stopSpeaking() {
@@ -275,7 +277,7 @@
     }
 
     // ============================================================
-    // 4. RENDER CHAPTERS WITH URL BUTTONS (separate from TTS)
+    // 4. RENDER CHAPTERS
     // ============================================================
     const container = document.getElementById('chaptersContainer');
     function renderChapters() {
@@ -291,11 +293,9 @@
             const textDiv = document.createElement('div');
             textDiv.className = 'chapter-text';
             textDiv.innerHTML = ch.text.replace(/\n/g, '<br>');
-            
             card.appendChild(titleDiv);
             card.appendChild(textDiv);
             
-            // Add URL buttons if they exist (completely separate from TTS)
             if (ch.buttons && ch.buttons.length > 0) {
                 const buttonDiv = document.createElement('div');
                 buttonDiv.className = 'url-buttons';
@@ -309,7 +309,6 @@
                 });
                 card.appendChild(buttonDiv);
             }
-            
             container.appendChild(card);
         });
         
@@ -324,21 +323,30 @@
     renderChapters();
 
     // ============================================================
-    // 5. KONAMI CODE — REVEALS HIDDEN CHAPTER
+    // 5. KONAMI CODE — CASE-INSENSITIVE (Caps Lock proof)
     // ============================================================
-    let konamiSeq = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
+    let konamiSequence = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
     let userInput = [];
     const hiddenChapterDiv = document.getElementById('hiddenKonamiChapter');
     const closeHiddenBtn = document.getElementById('closeHiddenBtn');
     const readHiddenBtn = document.getElementById('readHiddenChapterBtn');
+    const konamiHint = document.getElementById('konamiHint');
 
     window.addEventListener('keydown', (e) => {
-        let key = e.key === 'b' || e.key === 'a' ? e.key.toLowerCase() : e.key;
+        // Get the key and convert to lowercase for letter keys only
+        let key = e.key;
+        
+        // If it's a letter (a-z or A-Z), convert to lowercase for comparison
+        if (key.length === 1 && /[a-zA-Z]/i.test(key)) {
+            key = key.toLowerCase();
+        }
+        
         userInput.push(key);
-        if (userInput.length > konamiSeq.length) userInput.shift();
-        if (JSON.stringify(userInput) === JSON.stringify(konamiSeq)) {
+        if (userInput.length > konamiSequence.length) userInput.shift();
+        
+        if (JSON.stringify(userInput) === JSON.stringify(konamiSequence)) {
             hiddenChapterDiv.classList.add('visible');
-            document.body.style.background = "#0a0a1a";
+            document.body.classList.add('konami-active');
             prayForReader();
             userInput = [];
             hiddenChapterDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -347,10 +355,16 @@
 
     closeHiddenBtn.addEventListener('click', () => {
         hiddenChapterDiv.classList.remove('visible');
+        document.body.classList.remove('konami-active');
         stopSpeaking();
     });
+    
     readHiddenBtn.addEventListener('click', () => {
         readHiddenChapter();
+    });
+
+    konamiHint.addEventListener('click', () => {
+        alert("🎮 Enter the Konami sequence:\n↑ ↑ ↓ ↓ ← → ← → B A\n\nWorks with Caps Lock ON or OFF. Unlocks a hidden chapter.");
     });
 
     // ============================================================
@@ -359,18 +373,14 @@
     const chapterSelect = document.getElementById('chapterSelect');
     const readFromHereBtn = document.getElementById('readFromHereBtn');
     const stopAudioBtn = document.getElementById('stopAudioBtn');
-    const konamiHint = document.getElementById('konamiHint');
 
     readFromHereBtn.addEventListener('click', () => {
         const idx = parseInt(chapterSelect.value);
         if (!isNaN(idx)) readChapterByIndex(idx);
     });
     stopAudioBtn.addEventListener('click', stopSpeaking);
-    konamiHint.addEventListener('click', () => {
-        alert("🎮 Konami: ↑ ↑ ↓ ↓ ← → ← → B A\nUnlocks a hidden chapter with its own read-aloud button.");
-    });
 
-    console.log("✅ Forbidden Knowledge reader ready. URLs are buttons, not spoken. Translation helper visible.");
+    console.log("✅ Forbidden Knowledge ready. Konami is case-insensitive. Caps Lock won't break it.");
 </script>
 </body>
 </html>
