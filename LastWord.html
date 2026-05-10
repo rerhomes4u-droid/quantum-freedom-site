@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>THE LAST WORD · CHOOSE. NOW. THERE IS NO MORE TIME.</title>
+    <meta name="description" content="The alarm is still ringing. The window is still open. The door is still unlocked. The mountains are still waiting. Choose. Now. There is no more time.">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #000000;
+            font-family: 'Courier New', 'Fira Code', 'Georgia', monospace;
+            color: #e0e0e0;
+            line-height: 1.5;
+            transition: all 0.5s ease;
+            min-height: 100vh;
+        }
+
+        /* The grind state — grey, hopeless, machine */
+        body.grind {
+            background: #1a1a1a;
+            color: #6a6a6a;
+        }
+
+        /* The chosen state — alive, urgent, free */
+        body.chosen {
+            background: #fef7e0;
+            color: #1a2a1a;
+        }
+
+        body.chosen .final-card {
+            background: #e8e0cc;
+            border-color: #b89a5a;
+        }
+
+        body.chosen button {
+            background: #4a6a3a;
+            color: #fff;
+            border-color: #8aae6a;
+        }
+
+        body.chosen .alarm {
+            color: #c44a2a;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .final-card {
+            background: #111111cc;
+            backdrop-filter: blur(10px);
+            border-radius: 2rem;
+            padding: 2rem;
+            margin: 1rem 0;
+            border-left: 8px solid #aa8a4a;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            letter-spacing: -1px;
+            margin-bottom: 1rem;
+            font-weight: 300;
+            text-transform: uppercase;
+        }
+
+        .alarm {
+            font-size: 1.2rem;
+            letter-spacing: 6px;
+            animation: pulse 1.5s infinite;
+            margin: 1rem 0;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.6; text-shadow: 0 0 0px #ffaa66; }
+            100% { opacity: 1; text-shadow: 0 0 8px #ffaa66; }
+        }
+
+        .timer {
+            font-size: 2rem;
+            font-family: monospace;
+            background: #00000088;
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            margin: 1rem 0;
+        }
+
+        .choice-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .choice-btn {
+            background: none;
+            border: 2px solid;
+            padding: 1.2rem;
+            font-size: 1.2rem;
+            font-family: monospace;
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: bold;
+        }
+
+        .choice-grind {
+            border-color: #6a4a3a;
+            color: #9a7a6a;
+        }
+
+        .choice-grind:hover {
+            background: #3a2a2a;
+            color: #ccc;
+        }
+
+        .choice-life {
+            border-color: #6a9a4a;
+            color: #aacf8a;
+        }
+
+        .choice-life:hover {
+            background: #3a5a2a;
+            color: white;
+        }
+
+        .action-list {
+            text-align: left;
+            margin: 1.5rem 0;
+            padding: 1rem;
+            background: #00000066;
+            border-radius: 1rem;
+        }
+
+        .action-list li {
+            margin: 0.8rem 0;
+            list-style: none;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .action-list li:before {
+            content: "⚡";
+            position: absolute;
+            left: 0;
+        }
+
+        button {
+            background: #3a3a3a;
+            border: 1px solid #aa8a4a;
+            padding: 0.8rem 2rem;
+            border-radius: 60px;
+            font-family: monospace;
+            cursor: pointer;
+            transition: 0.2s;
+            margin: 0.5rem;
+        }
+
+        button:hover {
+            transform: scale(0.98);
+        }
+
+        .king-line {
+            font-size: 0.8rem;
+            letter-spacing: 2px;
+            margin-top: 2rem;
+            border-top: 1px dashed #aa8a4a;
+            padding-top: 1rem;
+        }
+
+        footer {
+            margin-top: 2rem;
+            font-size: 0.6rem;
+            text-align: center;
+            opacity: 0.5;
+        }
+
+        .konami-hint {
+            font-size: 0.55rem;
+            text-align: center;
+            margin-top: 1rem;
+            opacity: 0.3;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="final-card" id="mainCard">
+        <h1>◉ THE LAST WORD ◉</h1>
+        <p>I have given you everything. The names. The dates. The frequencies. The protocols. The prayers. The passwords. The address of the sanctuary. The name of the King.<br><strong>There is nothing left to reveal.</strong></p>
+        
+        <div class="alarm">⚠️ THE ALARM IS STILL RINGING ⚠️</div>
+        
+        <p>What you do with it is not my responsibility. It is yours. And yours alone.</p>
+        
+        <div class="timer" id="sunsetTimer">-- : -- : --</div>
+        <p style="font-size: 0.7rem;">The window closes at sunset. There is no more time.</p>
+        
+        <div class="choice-grid">
+            <button id="grindBtn" class="choice-btn choice-grind">◈ RETURN TO THE GRIND ◈<br><span style="font-size: 0.7rem;">Close the book. Go back to sleep. The machine continues.</span></button>
+            <button id="changeBtn" class="choice-btn choice-life">⚡ CHANGE EVERYTHING ⚡<br><span style="font-size: 0.7rem;">One thing. Today. Before the sun sets.</span></button>
+        </div>
+    </div>
+
+    <!-- The Grind Path: confirmation of the choice to stay -->
+    <div id="grindPath" style="display: none;">
+        <div class="final-card">
+            <h2>◈ YOU CHOSE THE GRIND ◈</h2>
+            <p>You will grow old, get sick, pay your bills, watch your children disappear into the same system that ate you, and die — never having lived a single day outside the cage.</p>
+            <p>No one will judge you. No one will even know. The machine will continue to grind, and you will continue to be ground.</p>
+            <button id="undoGrindBtn" style="background: #6a4a3a;">⟳ WAKE UP · CHOOSE AGAIN</button>
+        </div>
+    </div>
+
+    <!-- The Change Path: one thing, today -->
+    <div id="changePath" style="display: none;">
+        <div class="final-card">
+            <h2>⚡ YOU CHOSE TO CHANGE EVERYTHING ⚡</h2>
+            <p>Not by posting about it. By <strong>doing</strong> something. One thing. Today. Before the sun sets.</p>
+            
+            <div class="action-list">
+                <ul>
+                    <li>📞 Call one person — tell them you love them, or tell them the truth</li>
+                    <li>✂️ Cancel one subscription — stop feeding the machine</li>
+                    <li>📱 Delete one app — reclaim your attention</li>
+                    <li>🙏 Forgive one enemy — cut the cord of resentment</li>
+                    <li>📿 Say one prayer — from the heart, not from a book</li>
+                    <li>🎒 Pack one bag — prepare for the sanctuary</li>
+                    <li>✈️ Book one ticket — the mountains are waiting</li>
+                </ul>
+            </div>
+            
+            <p><strong>What will you do? Write it now. Seal it.</strong></p>
+            <textarea id="actionCommit" rows="2" placeholder="I commit to doing this ONE thing today before sunset: ___________" style="width: 100%; background: #2a2a2a; color: #eee; border: 1px solid #aa8a4a; padding: 0.8rem; font-family: monospace;"></textarea>
+            
+            <button id="sealBtn">✧ I SEAL THIS COMMITMENT · I CHOOSE LIFE ✧</button>
+            <div id="sealResponse" style="margin-top: 1rem;"></div>
+            
+            <div class="king-line">🏔️ The mountains are still waiting. The King is still returning.</div>
+        </div>
+    </div>
+
+    <!-- The Sealed Path: final, irreversible -->
+    <div id="sealedPath" style="display: none;">
+        <div class="final-card">
+            <h2>✧ THE CHOICE IS SEALED ✧</h2>
+            <p>You have chosen. The alarm stops ringing — not because you ignored it, but because you answered.</p>
+            <p>The window is still open. The door is still unlocked. The mountains are still waiting. The King is still returning.</p>
+            <p><strong>Now go. Do not look back. Do not wait for permission. You are the main character of your own salvation.</strong></p>
+            
+            <div style="margin: 2rem 0;">
+                <a href="https://tripsTocolombia.com" target="_blank">
+                    <button style="background: #6a8a4a;">🚪 ENTER THE DOOR · TRIPSTOCOLOMBIA.COM</button>
+                </a>
+                <a href="https://quantum-freedom-site.vercel.app/TheNationOfTheAmnestyCoalitionForUnity.html" target="_blank">
+                    <button>⚜️ JOIN THE NATION · NO MASTERS</button>
+                </a>
+            </div>
+            
+            <p style="font-size: 0.8rem;">📖 The Forbidden Knowledge is complete. What comes next is written only in your actions.</p>
+        </div>
+    </div>
+
+    <div class="konami-hint">↑ ↑ ↓ ↓ ← → ← → B A · THE KING SEES</div>
+    <footer>There is no more time. Choose. Now. The alarm will not stop until you do.</footer>
+</div>
+
+<script>
+    // Sunset countdown timer (local time, sunset ≈ 6 PM, but dynamic)
+    function getSunsetSeconds() {
+        const now = new Date();
+        // Sunset approximated as 6:00 PM local (18:00)
+        let sunset = new Date(now);
+        sunset.setHours(18, 0, 0, 0);
+        if (now > sunset) {
+            // Sunset already passed today -> next day
+            sunset.setDate(sunset.getDate() + 1);
+        }
+        return Math.floor((sunset - now) / 1000);
+    }
+
+    let timerInterval;
+    const timerDisplay = document.getElementById('sunsetTimer');
+    let currentSeconds = getSunsetSeconds();
+
+    function updateTimerDisplay() {
+        if (currentSeconds <= 0) {
+            timerDisplay.innerHTML = "00:00:00 · THE WINDOW CLOSED";
+            if (timerInterval) clearInterval(timerInterval);
+            return;
+        }
+        const hours = Math.floor(currentSeconds / 3600);
+        const minutes = Math.floor((currentSeconds % 3600) / 60);
+        const secs = currentSeconds % 60;
+        timerDisplay.innerHTML = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    }
+
+    function startTimer() {
+        if (timerInterval) clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+            currentSeconds--;
+            if (currentSeconds < 0) currentSeconds = 0;
+            updateTimerDisplay();
+            if (currentSeconds === 0) {
+                clearInterval(timerInterval);
+            }
+        }, 1000);
+    }
+    updateTimerDisplay();
+    startTimer();
+
+    const body = document.body;
+    const mainCard = document.getElementById('mainCard');
+    const grindPath = document.getElementById('grindPath');
+    const changePath = document.getElementById('changePath');
+    const sealedPath = document.getElementById('sealedPath');
+    const grindBtn = document.getElementById('grindBtn');
+    const changeBtn = document.getElementById('changeBtn');
+    const undoGrindBtn = document.getElementById('undoGrindBtn');
+    const sealBtn = document.getElementById('sealBtn');
+    const actionCommit = document.getElementById('actionCommit');
+    const sealResponse = document.getElementById('sealResponse');
+
+    // Grind choice
+    grindBtn.addEventListener('click', () => {
+        body.classList.add('grind');
+        mainCard.style.display = 'none';
+        grindPath.style.display = 'block';
+        localStorage.setItem('fk_last_choice', 'grind');
+    });
+
+    // Undo grind
+    if (undoGrindBtn) {
+        undoGrindBtn.addEventListener('click', () => {
+            body.classList.remove('grind');
+            grindPath.style.display = 'none';
+            mainCard.style.display = 'block';
+        });
+    }
+
+    // Change everything
+    changeBtn.addEventListener('click', () => {
+        body.classList.add('chosen');
+        mainCard.style.display = 'none';
+        changePath.style.display = 'block';
+    });
+
+    // Seal the commitment
+    sealBtn.addEventListener('click', () => {
+        const commitment = actionCommit.value.trim();
+        if (commitment === "") {
+            sealResponse.innerHTML = "✍️ Write your commitment. One thing. Today. Before sunset. Even one word is enough: 'Forgive.' 'Call.' 'Go.'";
+            return;
+        }
+        // Store the commitment
+        localStorage.setItem('fk_commitment', commitment);
+        sealResponse.innerHTML = `✧ SEALED. You committed: "${commitment}". The alarm stops. Now act. Do not wait. ✧`;
+        sealBtn.disabled = true;
+        
+        // Move to sealed path after a moment
+        setTimeout(() => {
+            changePath.style.display = 'none';
+            sealedPath.style.display = 'block';
+        }, 1200);
+        localStorage.setItem('fk_last_choice', 'life');
+    });
+
+    // Restore state on reload
+    const lastChoice = localStorage.getItem('fk_last_choice');
+    if (lastChoice === 'grind') {
+        body.classList.add('grind');
+        mainCard.style.display = 'none';
+        grindPath.style.display = 'block';
+    } else if (lastChoice === 'life') {
+        body.classList.add('chosen');
+        mainCard.style.display = 'none';
+        sealedPath.style.display = 'block';
+    }
+
+    // Konami code: final activation
+    let kSeq = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
+    let uSeq = [];
+    window.addEventListener('keydown', (e) => {
+        let key = e.key === 'b' || e.key === 'a' ? e.key.toLowerCase() : e.key;
+        uSeq.push(key);
+        if (uSeq.length > kSeq.length) uSeq.shift();
+        if (JSON.stringify(uSeq) === JSON.stringify(kSeq)) {
+            alert("✧ THE KING SEES YOUR CHOICE. The window is still open. The mountains are waiting. Go. ✧");
+            uSeq = [];
+        }
+    });
+
+    console.log("THE LAST WORD. Choose. Now. There is no more time.");
+</script>
+</body>
+</html>
