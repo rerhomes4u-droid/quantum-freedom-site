@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <title>FORBIDDEN KNOWLEDGE · COMPLETE EDITION</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -19,11 +20,8 @@
         .url-btn:hover { background: #5a6a4a; transform: scale(1.02); }
         .hidden-chapter { display: none; background: #1a0a0a; border: 2px solid #ffdcaa; border-radius: 1rem; padding: 1.5rem; margin-top: 2rem; }
         .hidden-chapter.visible { display: block; }
-        .konami-badge { position: fixed; bottom: 20px; right: 20px; background: #000000aa; padding: 0.3rem 0.8rem; border-radius: 40px; font-size: 0.6rem; cursor: pointer; z-index: 100; }
-        .mobile-konami-panel { display: none; position: fixed; bottom: 80px; right: 20px; background: #1a0a0a; border: 1px solid #ffdcaa; border-radius: 1rem; padding: 0.5rem; flex-direction: column; gap: 0.3rem; z-index: 101; }
-        .mobile-konami-panel.active { display: flex; }
-        .mobile-konami-panel button { background: #3a2a2a; border: 1px solid #c9a87b; padding: 0.3rem 0.6rem; font-size: 0.7rem; }
-        .konami-tap-area { position: fixed; bottom: 20px; left: 20px; background: #00000066; padding: 0.3rem 0.8rem; border-radius: 40px; font-size: 0.5rem; cursor: pointer; z-index: 100; }
+        .konami-badge { position: fixed; bottom: 20px; right: 20px; background: #000000aa; padding: 0.5rem 1rem; border-radius: 40px; font-size: 0.7rem; cursor: pointer; z-index: 100; font-family: monospace; transition: 0.1s; }
+        .konami-badge:active { background: #ffdcaa; color: #000; }
         footer { text-align: center; margin-top: 2rem; font-size: 0.7rem; opacity: 0.6; }
         @media (max-width: 600px) { body { padding: 1rem; } .chapter-title { flex-direction: column; } }
     </style>
@@ -69,19 +67,7 @@
     <div><button id="readHiddenBtn">🔊 Read Hidden Chapter</button> <button id="closeHiddenBtn">🔒 Close</button></div>
 </div>
 
-<!-- Mobile Konami Helper -->
-<div class="konami-badge" id="konamiHint">🎮 ↑↑↓↓←→←→BA</div>
-<div class="konami-tap-area" id="konamiTapArea">👆 Tap 9x for Konami</div>
-<div id="mobileKonamiPanel" class="mobile-konami-panel">
-    <button id="konamiUp">▲ Up</button>
-    <button id="konamiDown">▼ Down</button>
-    <button id="konamiLeft">◀ Left</button>
-    <button id="konamiRight">▶ Right</button>
-    <button id="konamiB">B</button>
-    <button id="konamiA">A</button>
-    <button id="konamiSubmit">🎮 Submit Sequence</button>
-    <button id="konamiReset">Reset</button>
-</div>
+<div class="konami-badge" id="konamiHint">🎮 KONAMI (Hold 3 sec or tap)</div>
 
 <footer>✦ All apps free · Liberation cannot be monetized ✦<br>Ramiro Ramirez · TripsToColombia.com</footer>
 
@@ -149,11 +135,10 @@
     }
 
     // ============================================
-    // 🔊 TEXT-TO-SPEECH (FIXED: no <br> reading!)
+    // 🔊 TEXT-TO-SPEECH (no <br> reading)
     // ============================================
     let utterance = null;
     function stripHtml(html) {
-        // Remove all HTML tags (including <br>, <p>, etc.)
         return html.replace(/<[^>]*>/g, ' ');
     }
     function stopReading() { if (window.speechSynthesis) window.speechSynthesis.cancel(); utterance = null; }
@@ -161,7 +146,6 @@
         stopReading();
         prayForReader();
         if (!chapters[index]) return;
-        // Clean the text by removing HTML tags before speaking
         const cleanText = stripHtml(chapters[index].title + ". " + chapters[index].text);
         const speak = new SpeechSynthesisUtterance(cleanText);
         speak.lang = 'en-US';
@@ -230,80 +214,63 @@
     const hiddenDiv = document.getElementById('hiddenChapter');
     const closeHidden = document.getElementById('closeHiddenBtn');
     const readHidden = document.getElementById('readHiddenBtn');
+    const konamiBadge = document.getElementById('konamiHint');
+    let longPressTimer = null;
 
-    // Desktop keyboard detection
+    // ========== DESKTOP: keyboard detection ==========
     window.addEventListener('keydown', (e) => {
         let key = e.key;
         if (key.length === 1 && /[a-zA-Z]/i.test(key)) key = key.toLowerCase();
         userInput.push(key);
         if (userInput.length > konamiSequence.length) userInput.shift();
         if (JSON.stringify(userInput) === JSON.stringify(konamiSequence)) {
-            hiddenDiv.classList.add('visible');
-            prayForReader();
+            unlockHiddenChapter();
             userInput = [];
-            hiddenDiv.scrollIntoView({ behavior: 'smooth' });
         }
     });
 
-    // ============================================
-    // 📱 MOBILE KONAMI: Tap 9 times on the tap area
-    // ============================================
-    let tapCount = 0;
-    let tapTimer = null;
-    const tapArea = document.getElementById('konamiTapArea');
-    const mobilePanel = document.getElementById('mobileKonamiPanel');
-    let mobileSequence = [];
-    
-    tapArea.addEventListener('click', () => {
-        tapCount++;
-        tapArea.style.opacity = '0.5';
-        setTimeout(() => { if (tapArea) tapArea.style.opacity = '1'; }, 200);
-        
-        if (tapTimer) clearTimeout(tapTimer);
-        tapTimer = setTimeout(() => {
-            if (tapCount >= 9) {
-                // 9 taps = show mobile Konami panel
-                mobilePanel.classList.add('active');
-                tapCount = 0;
+    // ========== MOBILE: Long press (3 seconds) on badge ==========
+    konamiBadge.addEventListener('touchstart', (e) => {
+        longPressTimer = setTimeout(() => {
+            unlockHiddenChapter();
+            longPressTimer = null;
+        }, 3000);
+    });
+    konamiBadge.addEventListener('touchend', () => {
+        if (longPressTimer) {
+            clearTimeout(longPressTimer);
+            longPressTimer = null;
+        }
+    });
+    // Also for mouse users: regular click (with confirmation)
+    konamiBadge.addEventListener('click', () => {
+        // On mobile, click also works but we don't want double-trigger
+        // We'll use a simple prompt backup for click
+        if (confirm("🎮 Konami Code required.\n\nOn desktop: type ↑ ↑ ↓ ↓ ← → ← → B A\nOn mobile: press and HOLD this badge for 3 seconds.\n\nWould you like to enter the Konami sequence manually instead?")) {
+            const manual = prompt("Enter the Konami sequence (U U D D L R L R B A):", "");
+            if (manual && manual.toUpperCase().replace(/\s/g, '') === "UUDDLRLRBA") {
+                unlockHiddenChapter();
+            } else {
+                alert("Invalid sequence. Try again or hold the badge for 3 seconds.");
             }
-            tapCount = 0;
-        }, 500);
+        }
     });
 
-    // Manual mobile Konami entry using buttons
-    const mobileKonami = ['up','up','down','down','left','right','left','right','b','a'];
-    let mobileUserInput = [];
-    
-    function checkMobileKonami() {
-        if (JSON.stringify(mobileUserInput) === JSON.stringify(mobileKonami)) {
-            hiddenDiv.classList.add('visible');
-            prayForReader();
-            mobileUserInput = [];
-            mobilePanel.classList.remove('active');
-            hiddenDiv.scrollIntoView({ behavior: 'smooth' });
-        }
+    function unlockHiddenChapter() {
+        hiddenDiv.classList.add('visible');
+        prayForReader();
+        hiddenDiv.scrollIntoView({ behavior: 'smooth' });
     }
-    
-    document.getElementById('konamiUp').onclick = () => { mobileUserInput.push('up'); checkMobileKonami(); };
-    document.getElementById('konamiDown').onclick = () => { mobileUserInput.push('down'); checkMobileKonami(); };
-    document.getElementById('konamiLeft').onclick = () => { mobileUserInput.push('left'); checkMobileKonami(); };
-    document.getElementById('konamiRight').onclick = () => { mobileUserInput.push('right'); checkMobileKonami(); };
-    document.getElementById('konamiB').onclick = () => { mobileUserInput.push('b'); checkMobileKonami(); };
-    document.getElementById('konamiA').onclick = () => { mobileUserInput.push('a'); checkMobileKonami(); };
-    document.getElementById('konamiReset').onclick = () => { mobileUserInput = []; alert("Konami sequence reset."); };
-    document.getElementById('konamiSubmit').onclick = () => { checkMobileKonami(); };
-    
+
     closeHidden.onclick = () => hiddenDiv.classList.remove('visible');
     readHidden.onclick = readHiddenChapter;
-    
-    document.getElementById('konamiHint').onclick = () => alert("🎮 Konami: ↑ ↑ ↓ ↓ ← → ← → B A\nOn mobile: Tap the '👆 Tap 9x for Konami' button 9 times, then enter the sequence using the on-screen buttons.");
 
     // ============================================
     // 🔥 INITIALIZE
     // ============================================
     offerHiddenBlessing();
     prayForReader();
-    console.log("✅ Forbidden Knowledge loaded. <br> no longer read aloud. Mobile Konami via 9-tap + panel.");
+    console.log("✅ Forbidden Knowledge loaded. Konami: keyboard OR long-press badge 3 sec OR manual entry.");
 </script>
 </body>
 </html>
