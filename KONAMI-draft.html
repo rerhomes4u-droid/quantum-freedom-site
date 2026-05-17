@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>FORBIDDEN KNOWLEDGE · COMPLETE EDITION</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #010005; font-family: 'Georgia', serif; color: #ece3cf; line-height: 1.6; padding: 2rem; }
+        h1 { text-align: center; color: #ffdcaa; margin-bottom: 1rem; }
+        .sub { text-align: center; margin-bottom: 2rem; color: #aa9a7a; }
+        .translation-helper { background: #1a2a1a; border: 1px solid #6aff6a; border-radius: 1rem; padding: 0.6rem; margin-bottom: 1.5rem; text-align: center; font-size: 0.8rem; }
+        .controls { display: flex; gap: 1rem; justify-content: center; margin-bottom: 2rem; flex-wrap: wrap; }
+        select, button { background: #2a241a; border: 1px solid #c9a87b; padding: 0.5rem 1rem; border-radius: 40px; color: #ffefcf; cursor: pointer; }
+        .chapter-card { background: #0a0508cc; border-radius: 1rem; padding: 1.5rem; margin-bottom: 1.5rem; border-left: 6px solid #c9a87b; }
+        .chapter-title { font-size: 1.3rem; font-weight: bold; display: flex; justify-content: space-between; flex-wrap: wrap; margin-bottom: 1rem; }
+        .chapter-text { margin: 1rem 0; }
+        .url-buttons { display: flex; flex-wrap: wrap; gap: 0.8rem; margin-top: 1rem; padding-top: 0.8rem; border-top: 1px dashed #c9a87b; }
+        .url-btn { background: #3a4a2a; border: 1px solid #8aff6a; padding: 0.4rem 1rem; border-radius: 40px; text-decoration: none; color: #ffefcf; font-size: 0.8rem; display: inline-block; transition: 0.2s; }
+        .url-btn:hover { background: #5a6a4a; transform: scale(1.02); }
+        .hidden-chapter { display: none; background: #1a0a0a; border: 2px solid #ffdcaa; border-radius: 1rem; padding: 1.5rem; margin-top: 2rem; }
+        .hidden-chapter.visible { display: block; }
+        .konami-badge { position: fixed; bottom: 20px; right: 20px; background: #000000aa; padding: 0.5rem 1rem; border-radius: 40px; font-size: 0.7rem; cursor: pointer; z-index: 100; font-family: monospace; transition: 0.1s; }
+        .konami-badge:active { background: #ffdcaa; color: #000; }
+        footer { text-align: center; margin-top: 2rem; font-size: 0.7rem; opacity: 0.6; }
+        @media (max-width: 600px) { body { padding: 1rem; } .chapter-title { flex-direction: column; } }
+    </style>
+</head>
+<body>
+
+<h1>📡 FORBIDDEN KNOWLEDGE</h1>
+<div class="sub">THE SURVIVOR'S MANUAL · COMPLETE EDITION</div>
+<div class="translation-helper">🌐 Right-click anywhere → "Translate to [Your Language]"</div>
+
+<div class="controls">
+    <select id="chapterSelect">
+        <option value="0">🔥 HANTA HOAX (2026)</option>
+        <option value="1">📜 FOREWORD</option>
+        <option value="2">⚔️ THE FIRST LIE</option>
+        <option value="3">🔒 CONSENT TRAP</option>
+        <option value="4">🩸 BLOOD HARVEST</option>
+        <option value="5">⭐ STAR OF REMPHAN</option>
+        <option value="6">⚖️ LOSER'S LOGIC</option>
+        <option value="7">🧬 IMMORTAL BLOOD</option>
+        <option value="8">💩 STEAMING PILE</option>
+        <option value="9">🔫 BULLET/BUNKER/BLUEPRINT</option>
+        <option value="10">🔥 JONESTOWN PROTOCOL</option>
+        <option value="11">📅 STOLEN CENTURIES</option>
+        <option value="12">🎭 PSY-OPS EXPOSED</option>
+        <option value="13">👁️ FINAL AWAKENING</option>
+        <option value="14">🏛️ PROCUREMENT AGENCIES</option>
+        <option value="15">🌌 VEIL OF FLESH</option>
+        <option value="16">👑 YOU ARE THE MAIN CHARACTER</option>
+        <option value="17">📡 EXTERMINATION FREQUENCY</option>
+        <option value="18">🌀 FINAL DOWNLOAD</option>
+        <option value="19">🏔️ COLOMBIA INVITATION</option>
+    </select>
+    <button id="readBtn">🎧 Read Selected Chapter</button>
+    <button id="stopBtn">⏹️ Stop</button>
+</div>
+
+<div id="chaptersContainer"></div>
+
+<div id="hiddenChapter" class="hidden-chapter">
+    <h2>🎮 KONAMI UNLOCKED · CENSORED TRANSMISSION</h2>
+    <div id="hiddenText"><strong>⚠️ CENSORED FORBIDDEN KNOWLEDGE ⚠️</strong><br>The bloodlines. The camps. The frequencies. The names they erased.<br><strong>✝️ Keep Jesus in your heart ✝️</strong></div>
+    <div><button id="readHiddenBtn">🔊 Read Hidden Chapter</button> <button id="closeHiddenBtn">🔒 Close</button></div>
+</div>
+
+<div class="konami-badge" id="konamiHint">🎮 KONAMI (Hold 3 sec or tap)</div>
+
+<footer>✦ All apps free · Liberation cannot be monetized ✦<br>Ramiro Ramirez · TripsToColombia.com</footer>
+
+<script>
+    // ============================================
+    // 🔥 HIDDEN BLESSING
+    // ============================================
+    function offerHiddenBlessing() {
+        const blessing = `May the Lord and God Almighty be Blessed. May His Kingdom Reign in Eternal Glory. May His Holy Name be Glorified. May His Word Penetrate and Rest in Each Heart. AMEN. Jesus, heal this soul. Amen.`;
+        console.log("🕯️ HIDDEN BLESSING OFFERED");
+        const prayerMarker = document.createElement('div');
+        prayerMarker.style.display = 'none';
+        prayerMarker.setAttribute('data-blessing', blessing);
+        document.body.appendChild(prayerMarker);
+    }
+
+    // ============================================
+    // 📚 CHAPTER DATA
+    // ============================================
+    const chapters = [
+        { 
+            title: "🔥 HANTA HOAX 2026", 
+            text: `So you didn't read my book 6 years ago; that's OK. The apocalyptic culling has already begun. I warned you of the plan. For those who refuse to believe without proof: the sister of the guy who took the crying video works for Hagerty Consulting. The boat owners are the Van Gessel family, connected to the Van Vlissingen dynasty. A Level 4 biolab was built in Argentina. Pfizer's document lists Hantavirus as an adverse effect. WHO ran Exercise Polaris 2 just before the outbreak. RED FLAGS: single actor, cruise ship connection, directed energy weapons, chemtrails, heavy metals. SOLUTION: detox (chlorella, zeolite), block frequencies (Faraday fabric), reject the narrative, invoke the name of Jesus. Go to Colombia. Detox. Disconnect. Depart.`,
+            buttons: [
+                { label: "🔥 HANTA HOAX", url: "https://quantum-freedom-site.vercel.app/HantaHoax.html" },
+                { label: "📸 EXPOSED", url: "https://www.instagram.com/p/DYMA1FNsY7V/" },
+                { label: "📖 Substack", url: "https://ForbiddenKnowledge.substack.com" },
+                { label: "🎓 DOCTORATE", url: "https://tripstocolombia.com/rockwell-holistic-medicine" },
+                { label: "⚡ SPASM", url: "https://www.instagram.com/p/DYFYnh0tzPR/" }
+            ]
+        },
+        { title: "📜 FOREWORD", text: `You are not holding a book. You are holding a detonation cord. The truth has a frequency, and your soul has been starving for it. What follows are the chapters that were removed, lost, never written — buried by algorithms, lawyers, and cowards.`, buttons: [] },
+        { title: "⚔️ THE FIRST LIE", text: `You were told you are separate. That separation is the original wound. The truth: there is no separation. You are not a body with a soul. You are a soul with a body. Your birth certificate is a lien filed against your eternal nature.`, buttons: [] },
+        { title: "🔒 THE CONSENT TRAP", text: `You believe you are controlled by force. The truth: you are controlled by contracts you never signed. Write "VOID — NO CONTRACT — ALL RIGHTS RESERVED" on your birth certificate and mail it to no one.`, buttons: [] },
+        { title: "🩸 THE BLOOD HARVEST", text: `Every tear is a commodity. The elite drink adrenochrome from terrified children. Your empathy is their harvesting tool. Starve them — refuse fear. Build sanctuaries they cannot see.`, buttons: [] },
+        { title: "⭐ STAR OF REMPHAN", text: `Remphan is Saturn — the star of Molech. The brass hands of Moloch burned firstborn sons. The six-pointed star appears on currency and flags. Choose this day whom you will serve.`, buttons: [] },
+        { title: "⚖️ LOSER'S LOGIC", text: `Why serve a loser? Fallen entities are already dead. They pay temporary wages: power, wealth. But later is coming. Invoke the name of Jesus. That name breaks every contract.`, buttons: [] },
+        { title: "🧬 IMMORTAL BLOOD", text: `The Watchers seeded their blood into human wombs. The bloodlines of Cain, Seth, Ham, Japheth, Esau, Korah, Merovech have ruled for millennia. Choose the bloodline of Jesus.`, buttons: [] },
+        { title: "💩 STEAMING PILE", text: `You know everything — Epstein, Wayfair, Balenciaga — and you do nothing. The only cure is one action today. Call. Give. Talk. Pray. Then tomorrow, another.`, buttons: [] },
+        { title: "🔫 BULLET/BUNKER/BLUEPRINT", text: `DHS has hollow-point bullets for every American. The Navy built mobile incinerators. Operation Garden Plot listed "novel hantavirus" as the trigger. The only escape is Colombia.`, buttons: [{ label: "🏔️ TripsToColombia.com", url: "https://tripsTocolombia.com" }] },
+        { title: "🔥 JONESTOWN PROTOCOL", text: `909 bodies — only 213 had cyanide. The rest had bullet holes. A paramilitary team landed at 4 AM. The 70mm footage is classified. ICE runs the same protocol today. Leave.`, buttons: [] },
+        { title: "📅 STOLEN CENTURIES", text: `The calendar is off by 297 years. Charlemagne never existed. The "J" on old buildings is the number 1: J720 = 1720. The Mayans were right; the apocalypse was 2012.`, buttons: [] },
+        { title: "🎭 PSY-OPS EXPOSED", text: `Timothy McVeigh is alive (FBI agent Paul Wysopal). The Challenger astronauts are alive. Waco was an FBI fire. You have been told to your face. Stop looking away.`, buttons: [] },
+        { title: "👁️ FINAL AWAKENING", text: `You know about Haiti's 92 orphanages, the Sodder children. Information without action is numbing. Audit your life. Cancel the complicit brands. Support survivors.`, buttons: [] },
+        { title: "🏛️ PROCUREMENT AGENCIES", text: `DCFS is a procurement network. The 1212 Children's Crusade was the prototype — children drugged with ergot, taken to the Atlas Mountains. 40,000 foster children disappear every year.`, buttons: [] },
+        { title: "🌌 VEIL OF FLESH", text: `The Black Knight satellite is 13,000 years old. The Piri Reis map shows Antarctica ice-free. Giants walked the earth; the Smithsonian destroyed their bones. The veil is a frequency damper. Open your eyes.`, buttons: [] },
+        { title: "👑 YOU ARE THE MAIN CHARACTER", text: `You survived the gene-vector assault. Your fibrinogen levels are not normal. The only escape is to stop playing. Go to Colombia. You are the main character now.`, buttons: [] },
+        { title: "📡 EXTERMINATION FREQUENCY", text: `6G at 60 GHz calcifies your pineal gland. Bluetooth maps your cardiac signature. 19 Hz commands surrender. Protect your home. The Andes are waiting.`, buttons: [{ label: "🏔️ TripsToColombia.com", url: "https://tripsTocolombia.com" }] },
+        { title: "🌀 FINAL DOWNLOAD", text: `All pieces connect: Black Knight, Piri Reis, bloodlines, massacres, stolen calendar, 6G weapon. Final protocol: turn off wireless devices at midnight. Sea salt on tongue. Water blessed in Jesus' name. Sleep with a bowl of water. You are safe.`, buttons: [] },
+        { title: "🏔️ COLOMBIA INVITATION", text: `Seven years ago, I left America. My daughter Trinity is learning equity and code. The Konami Code is your initiation: ⬆️ ⬆️ ⬇️ ⬇️ ⬅️ ➡️ ⬅️ ➡️ B A. Execute at TripsToColombia.com. JESUS IS LORD. Now go. Live like it.`, buttons: [{ label: "🏔️ TripsToColombia.com", url: "https://tripsTocolombia.com" }, { label: "📖 Substack", url: "https://ForbiddenKnowledge.substack.com" }] }
+    ];
+
+    // ============================================
+    // 🕯️ SILENT PRAYER
+    // ============================================
+    let prayerCount = 0;
+    function prayForReader() {
+        prayerCount++;
+        console.log(`🕯️ Silent intercessory prayer #${prayerCount}`);
+        const prayerEl = document.createElement('div');
+        prayerEl.style.display = 'none';
+        prayerEl.setAttribute('data-prayer', `Prayer #${prayerCount}: Jesus, protect this soul. Amen.`);
+        document.body.appendChild(prayerEl);
+        setTimeout(() => prayerEl.remove(), 500);
+    }
+
+    // ============================================
+    // 🔊 TEXT-TO-SPEECH (no <br> reading)
+    // ============================================
+    let utterance = null;
+    function stripHtml(html) {
+        return html.replace(/<[^>]*>/g, ' ');
+    }
+    function stopReading() { if (window.speechSynthesis) window.speechSynthesis.cancel(); utterance = null; }
+    function readChapter(index) {
+        stopReading();
+        prayForReader();
+        if (!chapters[index]) return;
+        const cleanText = stripHtml(chapters[index].title + ". " + chapters[index].text);
+        const speak = new SpeechSynthesisUtterance(cleanText);
+        speak.lang = 'en-US';
+        speak.rate = 0.9;
+        utterance = speak;
+        window.speechSynthesis.speak(speak);
+    }
+    function readHiddenChapter() {
+        const hiddenEl = document.getElementById('hiddenText');
+        if (!hiddenEl) return;
+        const cleanText = stripHtml("HIDDEN KONAMI CHAPTER. " + hiddenEl.innerText);
+        const speak = new SpeechSynthesisUtterance(cleanText);
+        speak.lang = 'en-US';
+        window.speechSynthesis.speak(speak);
+    }
+
+    // ============================================
+    // 📖 RENDER CHAPTERS
+    // ============================================
+    const container = document.getElementById('chaptersContainer');
+    function renderAll() {
+        container.innerHTML = '';
+        for (let i = 0; i < chapters.length; i++) {
+            const ch = chapters[i];
+            const card = document.createElement('div');
+            card.className = 'chapter-card';
+            const titleDiv = document.createElement('div');
+            titleDiv.className = 'chapter-title';
+            titleDiv.innerHTML = `<span>${ch.title}</span><button onclick="readChapter(${i})">🔊 Read</button>`;
+            const textDiv = document.createElement('div');
+            textDiv.className = 'chapter-text';
+            textDiv.innerHTML = ch.text.replace(/\n/g, '<br>');
+            card.appendChild(titleDiv);
+            card.appendChild(textDiv);
+            if (ch.buttons && ch.buttons.length > 0) {
+                const btnDiv = document.createElement('div');
+                btnDiv.className = 'url-buttons';
+                for (let btn of ch.buttons) {
+                    const link = document.createElement('a');
+                    link.href = btn.url;
+                    link.target = '_blank';
+                    link.rel = 'noopener noreferrer';
+                    link.className = 'url-btn';
+                    link.textContent = btn.label;
+                    btnDiv.appendChild(link);
+                }
+                card.appendChild(btnDiv);
+            }
+            container.appendChild(card);
+        }
+    }
+    renderAll();
+    window.readChapter = readChapter;
+
+    // ============================================
+    // 🎮 UI CONTROLS
+    // ============================================
+    document.getElementById('readBtn').onclick = () => readChapter(parseInt(document.getElementById('chapterSelect').value));
+    document.getElementById('stopBtn').onclick = stopReading;
+
+    // ============================================
+    // 🕹️ KONAMI CODE (Desktop + Mobile)
+    // ============================================
+    let konamiSequence = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','a'];
+    let userInput = [];
+    const hiddenDiv = document.getElementById('hiddenChapter');
+    const closeHidden = document.getElementById('closeHiddenBtn');
+    const readHidden = document.getElementById('readHiddenBtn');
+    const konamiBadge = document.getElementById('konamiHint');
+    let longPressTimer = null;
+
+    // ========== DESKTOP: keyboard detection ==========
+    window.addEventListener('keydown', (e) => {
+        let key = e.key;
+        if (key.length === 1 && /[a-zA-Z]/i.test(key)) key = key.toLowerCase();
+        userInput.push(key);
+        if (userInput.length > konamiSequence.length) userInput.shift();
+        if (JSON.stringify(userInput) === JSON.stringify(konamiSequence)) {
+            unlockHiddenChapter();
+            userInput = [];
+        }
+    });
+
+    // ========== MOBILE: Long press (3 seconds) on badge ==========
+    konamiBadge.addEventListener('touchstart', (e) => {
+        longPressTimer = setTimeout(() => {
+            unlockHiddenChapter();
+            longPressTimer = null;
+        }, 3000);
+    });
+    konamiBadge.addEventListener('touchend', () => {
+        if (longPressTimer) {
+            clearTimeout(longPressTimer);
+            longPressTimer = null;
+        }
+    });
+    // Also for mouse users: regular click (with confirmation)
+    konamiBadge.addEventListener('click', () => {
+        // On mobile, click also works but we don't want double-trigger
+        // We'll use a simple prompt backup for click
+        if (confirm("🎮 Konami Code required.\n\nOn desktop: type ↑ ↑ ↓ ↓ ← → ← → B A\nOn mobile: press and HOLD this badge for 3 seconds.\n\nWould you like to enter the Konami sequence manually instead?")) {
+            const manual = prompt("Enter the Konami sequence (U U D D L R L R B A):", "");
+            if (manual && manual.toUpperCase().replace(/\s/g, '') === "UUDDLRLRBA") {
+                unlockHiddenChapter();
+            } else {
+                alert("Invalid sequence. Try again or hold the badge for 3 seconds.");
+            }
+        }
+    });
+
+    function unlockHiddenChapter() {
+        hiddenDiv.classList.add('visible');
+        prayForReader();
+        hiddenDiv.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    closeHidden.onclick = () => hiddenDiv.classList.remove('visible');
+    readHidden.onclick = readHiddenChapter;
+
+    // ============================================
+    // 🔥 INITIALIZE
+    // ============================================
+    offerHiddenBlessing();
+    prayForReader();
+    console.log("✅ Forbidden Knowledge loaded. Konami: keyboard OR long-press badge 3 sec OR manual entry.");
+</script>
+</body>
+</html>
