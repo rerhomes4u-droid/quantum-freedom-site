@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+    <title>María Fernanda · Lectura del Tarot Conversacional</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #1a0f0f 0%, #0d0707 100%);
+            font-family: 'Segoe UI', 'Roboto', system-ui, -apple-system, sans-serif;
+            color: #f5e6d3;
+            padding: 1.2rem;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 650px;
+            margin: 0 auto;
+            padding-bottom: 4rem;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid #4a2e2e;
+        }
+        .candle {
+            font-size: 2.5rem;
+            filter: drop-shadow(0 0 8px #e08e3a);
+        }
+        h1 {
+            font-size: 1.8rem;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #f3d382, #d4a259);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin: 0.5rem 0 0.25rem;
+        }
+        .sub {
+            color: #c0a080;
+            font-size: 0.85rem;
+        }
+
+        /* Cards */
+        .card {
+            background: #1e1410cc;
+            backdrop-filter: blur(12px);
+            border-radius: 40px;
+            padding: 1.8rem 1.5rem;
+            margin: 1.5rem 0;
+            border: 1px solid #5a3a2a;
+            box-shadow: 0 12px 28px rgba(0,0,0,0.5);
+        }
+
+        .question {
+            font-size: 1.4rem;
+            font-weight: 500;
+            margin-bottom: 1.2rem;
+            text-align: center;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .option-btn {
+            background: #2d2018;
+            border: 1px solid #7a4a2e;
+            padding: 1rem;
+            border-radius: 60px;
+            font-size: 1rem;
+            color: #f0dbc0;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: normal;
+        }
+        .option-btn:hover {
+            background: #5a3624;
+            border-color: #e0a36c;
+            transform: scale(1.01);
+        }
+
+        input, textarea {
+            width: 100%;
+            background: #2a1c14;
+            border: 1px solid #7a4a2e;
+            border-radius: 60px;
+            padding: 1rem;
+            color: #f5e6d3;
+            font-size: 1rem;
+            margin: 0.5rem 0;
+        }
+
+        .btn-primary {
+            background: #b97f44;
+            border: none;
+            padding: 1rem;
+            border-radius: 60px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #0d0707;
+            width: 100%;
+            cursor: pointer;
+            transition: 0.2s;
+            text-align: center;
+        }
+
+        .btn-secondary {
+            background: #4a2a1a;
+            border: 1px solid #b97f44;
+            color: #f0dbc0;
+        }
+
+        .reading-box {
+            background: #0f0806;
+            border-left: 6px solid #e0a36c;
+            padding: 1.5rem;
+            border-radius: 24px;
+            margin: 1rem 0;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .progress {
+            background: #4a2a1a;
+            border-radius: 40px;
+            height: 6px;
+            width: 100%;
+            margin: 1rem 0;
+        }
+        .progress-fill {
+            background: #e0a36c;
+            width: 0%;
+            height: 6px;
+            border-radius: 40px;
+            transition: width 0.3s;
+        }
+
+        footer {
+            text-align: center;
+            font-size: 0.7rem;
+            color: #7a5a4a;
+            margin-top: 2rem;
+        }
+        .whatsapp-float {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #25D366;
+            border-radius: 60px;
+            padding: 0.8rem 1.2rem;
+            color: black;
+            font-weight: bold;
+            text-decoration: none;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 100;
+        }
+        @media (max-width: 550px) {
+            .question { font-size: 1.2rem; }
+            .option-btn { padding: 0.8rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container" id="app">
+    <div class="header">
+        <div class="candle">🕯️🔮</div>
+        <h1>María Fernanda</h1>
+        <div class="sub">lectura del tarot · conversacional</div>
+    </div>
+
+    <!-- pantalla de bienvenida -->
+    <div id="welcomeScreen" class="card">
+        <p style="text-align:center; font-size:1.2rem;">¿Estás buscando respuestas?</p>
+        <p style="margin-top:1rem; text-align:center;">No voy a adivinar tu futuro sin conocerte.<br>Voy a hacerte 7 preguntas.<br><strong>Tus respuestas crearán una lectura única para ti.</strong></p>
+        <button id="startBtn" class="btn-primary" style="margin-top:2rem;">✨ Comenzar lectura ✨</button>
+        <p style="font-size:0.75rem; text-align:center; margin-top:1rem;">💬 solo 3 minutos · completamente confidencial</p>
+    </div>
+
+    <!-- pantalla de preguntas dinámicas -->
+    <div id="quizScreen" class="hidden">
+        <div class="progress"><div class="progress-fill" id="progressFill"></div></div>
+        <div class="card">
+            <div class="question" id="questionText"></div>
+            <div class="options" id="optionsContainer"></div>
+            <div style="display: flex; justify-content: space-between; margin-top: 1rem;">
+                <button id="backBtn" class="btn-secondary" style="width:auto; padding:0.5rem 1.2rem;">← atrás</button>
+                <span id="qCounter" style="color:#a07a5a;">pregunta 1/7</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- pantalla de lectura generada -->
+    <div id="readingScreen" class="hidden">
+        <div class="card">
+            <h3 style="text-align:center;">🔮 tu lectura personalizada 🔮</h3>
+            <div id="personalizedReading" class="reading-box"></div>
+            <p style="font-style:italic; text-align:center; margin:1rem 0;">— "justo así me estaba sintiendo pero necesitaba escucharlo" —</p>
+            <hr style="border-color:#4a2e2e; margin:1rem 0;">
+            <p><strong>¿Resonó contigo?</strong><br>María Fernanda puede profundizar en tu caso y darte guía adicional.</p>
+            <input type="text" id="leadName" placeholder="Tu nombre" autocomplete="name">
+            <input type="email" id="leadEmail" placeholder="Correo electrónico" autocomplete="email">
+            <input type="tel" id="leadPhone" placeholder="WhatsApp (con código de país)" autocomplete="tel">
+            <button id="sendLeadBtn" class="btn-primary">📲 Enviar · quiero más guía</button>
+            <p id="leadMsg" style="font-size:0.75rem; margin-top:0.5rem; text-align:center;"></p>
+            <p style="font-size:0.7rem; text-align:center; margin-top:1rem;">🔒 tus datos solo serán vistos por María Fernanda. Sin spam, solo acompañamiento.</p>
+        </div>
+    </div>
+
+    <footer>
+        🌙 el tarot no se equivoca, te muestra la energía presente.<br>
+        Si algo cambió después, fue porque tomaste consciencia y elegiste otro rumbo.
+    </footer>
+</div>
+
+<!-- whatsapp flotante sutil -->
+<a href="https://wa.me/573106489132?text=Hola%20Mar%C3%ADa%20Fernanda%2C%20quiero%20una%20lectura%20personalizada" target="_blank" class="whatsapp-float">💬 WhatsApp</a>
+
+<script>
+    // ---------- PREGUNTAS Y LÓGICA DE LECTURA ----------
+    const questions = [
+        { text: "¿Cómo describirías tu situación amorosa actual?", options: ["Confusa, no sé qué siento", "Dolorosa, he sufrido hace poco", "Esperanzada, pero con miedo", "Vacía, como que algo falta"] },
+        { text: "¿Qué emoción te genera pensar en tu dinero y estabilidad?", options: ["Ansiedad, no llego a fin de mes", "Vergüenza, siento que no administro bien", "Impotencia, depende de otros", "Tranquilidad, aunque me gustaría más"] },
+        { text: "Cuando enfrentas una decisión importante, tú...", options: ["Lo pienso días sin actuar", "Pido consejo a otros", "Confío en mi instinto", "Lo evito hasta que sea urgente"] },
+        { text: "¿Con quién compartes lo que realmente sientes?", options: ["Mi pareja", "Una amiga muy cercana", "Nadie, prefiero guardarlo", "Un terapeuta o guía espiritual"] },
+        { text: "¿Has sentido que alguien en quien confiabas te falló?", options: ["Sí, profundamente", "Un poco, pero lo superé", "No, confío plenamente", "Prefiero no pensar en eso"] },
+        { text: "¿Sientes que estás en el lugar correcto en tu vida?", options: ["No, para nada", "A veces, pero algo falta", "Sí, aunque me gustaría un cambio", "Completamente, estoy en paz"] },
+        { text: "¿Qué papel juega lo espiritual en tu día a día?", options: ["Central, es mi guía", "A veces, cuando estoy mal", "Me gustaría más, pero no sé cómo", "No lo sé, estoy buscando"] }
+    ];
+
+    let currentQuestion = 0;
+    let answers = [];
+
+    // elementos del DOM
+    const welcome = document.getElementById('welcomeScreen');
+    const quizScreen = document.getElementById('quizScreen');
+    const readingScreen = document.getElementById('readingScreen');
+    const questionText = document.getElementById('questionText');
+    const optionsContainer = document.getElementById('optionsContainer');
+    const progressFill = document.getElementById('progressFill');
+    const qCounter = document.getElementById('qCounter');
+    const backBtn = document.getElementById('backBtn');
+
+    function updateProgress() {
+        let percent = ((currentQuestion) / questions.length) * 100;
+        progressFill.style.width = percent + '%';
+        qCounter.innerText = `pregunta ${currentQuestion+1}/${questions.length}`;
+    }
+
+    function renderQuestion() {
+        const q = questions[currentQuestion];
+        questionText.innerText = q.text;
+        optionsContainer.innerHTML = '';
+        q.options.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.innerText = opt;
+            btn.className = 'option-btn';
+            btn.addEventListener('click', () => {
+                answers[currentQuestion] = opt;
+                if (currentQuestion + 1 < questions.length) {
+                    currentQuestion++;
+                    renderQuestion();
+                    updateProgress();
+                } else {
+                    // finalizado, generar lectura
+                    generateReading();
+                }
+            });
+            optionsContainer.appendChild(btn);
+        });
+        updateProgress();
+    }
+
+    // Lógica avanzada de lectura basada en los patrones sicológicos
+    function generateReading() {
+        // analizar respuestas
+        const amor = answers[0] || "";
+        const dinero = answers[1] || "";
+        const decision = answers[2] || "";
+        const compañia = answers[3] || "";
+        const falla = answers[4] || "";
+        const lugar = answers[5] || "";
+        const espiritual = answers[6] || "";
+
+        let reading = "";
+
+        // Bloque 1: reconocimiento del dolor / estado actual
+        if (amor.includes("Dolorosa") || amor.includes("Vacía")) {
+            reading += "💔 Siento una tristeza reciente en tu corazón. No estás sola, aunque ahora lo parezca. ";
+            reading += "El tarot me muestra que alguien de tu pasado aún ocupa espacio que ya no merece. ";
+            reading += "No es que debas olvidar, sino que mereces soltar. ";
+        } else if (amor.includes("Confusa")) {
+            reading += "🌫️ Tu mente está nublada y eso está bien. No necesitas tener todas las respuestas hoy. ";
+            reading += "La confusión es el primer paso hacia la claridad, no el enemigo. ";
+        } else {
+            reading += "🕊️ En el amor hay esperanza, pero el miedo a repetir errores te frena. Date permiso para intentar otra vez. ";
+        }
+
+        // dinero / estabilidad
+        if (dinero.includes("Ansiedad") || dinero.includes("Impotencia")) {
+            reading += "\n\n💰 La ansiedad por el dinero está nublando tu creatividad. Hay una solución que no has visto porque el miedo te tiene enfocada en el problema. Respira. Este momento no es para siempre. ";
+        } else if (dinero.includes("Vergüenza")) {
+            reading += "\n\n💳 La vergüenza financiera es silenciosa pero pesada. No definió tu valor. El universo ya puso en tu camino una oportunidad que estabas minimizando. ";
+        } else {
+            reading += "\n\n✨ Económicamente hay estabilidad, pero tu alma pide abundar no solo en dinero sino en propósito. ";
+        }
+
+        // decisión y parálisis
+        if (decision.includes("Lo pienso días") || decision.includes("Lo evito")) {
+            reading += "\n\n⚖️ Tomas las decisiones con el freno de mano puesto. No es miedo a decidir mal, es miedo a arrepentirte. Pero el arrepentimiento de no haberlo intentado pesa más. ";
+        } else if (decision.includes("Pido consejo")) {
+            reading += "\n\n🗣️ Confías mucho en la opinión externa. Hoy el consejo que necesitas viene de adentro. Ese primer impulso es válido. ";
+        } else {
+            reading += "\n\n🔥 Tu instinto es certero, pero a veces lo ignoras. No fue casualidad que llegarás hasta acá. ";
+        }
+
+        // soledad / acompañamiento
+        if (compañia.includes("Nadie")) {
+            reading += "\n\n🦋 Llevas tus emociones a cuestas sin compartirlas. Ese peso no es tuyo por siempre. Buscar una mano no es debilidad. ";
+        }
+
+        // traición / falla
+        if (falla.includes("Sí, profundamente")) {
+            reading += "\n\n💔 La herida de la traición aún sangra en silencio. No necesitas venganza, necesitas cerrar ese ciclo con una decisión: quedarte o irte. Las dos son válidas. ";
+        }
+
+        // propósito
+        if (lugar.includes("No, para nada") || lugar.includes("A veces")) {
+            reading += "\n\n🧭 Sientes que perdiste el rumbo. No es cierto. Solo cambiaste de mapa y aún no lo reconoces. Estás más cerca de lo que crees. ";
+        }
+
+        // espiritual
+        if (espiritual.includes("Me gustaría más") || espiritual.includes("No lo sé")) {
+            reading += "\n\n🌙 Tu alma tiene hambre de algo que no encuentra en lo material. La espiritualidad no es religión, es conexión. Y esa conexión empieza cuando te permites preguntar sin miedo. ";
+        }
+
+        // cierre potente, validación
+        reading += "\n\n✨ Esta lectura no es magia: es un espejo. Si resonó contigo, es porque ya sabías todo esto, solo necesitabas escucharlo de alguien que no te juzga.";
+
+        // insertar algunas frases de los quotes del cliente
+        reading += "\n\n— “Justo así me estaba sintiendo pero necesitaba escucharlo” — dijeron muchas antes que tú.";
+
+        // añadir advertencia sobre porqué a veces no se cumple el tarot
+        reading += "\n\n📿 *¿Por qué a veces no se cumple lo que dice el tarot?* El tarot no se equivoca. Te mostró una energía que estaba presente al preguntar. Si actuaste distinto después, fue porque tomaste consciencia y elegiste otro rumbo.";
+
+        document.getElementById('personalizedReading').innerHTML = reading.replace(/\n/g, '<br>');
+        // pasar a pantalla de lectura
+        quizScreen.classList.add('hidden');
+        readingScreen.classList.remove('hidden');
+    }
+
+    // Navegación
+    document.getElementById('startBtn').addEventListener('click', () => {
+        welcome.classList.add('hidden');
+        quizScreen.classList.remove('hidden');
+        currentQuestion = 0;
+        answers = [];
+        renderQuestion();
+    });
+
+    backBtn.addEventListener('click', () => {
+        if (currentQuestion > 0) {
+            currentQuestion--;
+            renderQuestion();
+        } else {
+            // volver a welcome? opcional
+            if(confirm("¿Volver al inicio? perderás el progreso.")){
+                welcome.classList.remove('hidden');
+                quizScreen.classList.add('hidden');
+            }
+        }
+    });
+
+    // Envío de leads a whatsapp + ocultar precio, solo contacto
+    document.getElementById('sendLeadBtn').addEventListener('click', () => {
+        const name = document.getElementById('leadName').value.trim();
+        const email = document.getElementById('leadEmail').value.trim();
+        const phone = document.getElementById('leadPhone').value.trim();
+        if(!name || !phone) {
+            document.getElementById('leadMsg').innerText = "Por favor escribe tu nombre y whatsapp para que María Fernanda te contacte.";
+            document.getElementById('leadMsg').style.color = "#e0a36c";
+            return;
+        }
+
+        // Construir mensaje para WhatsApp de María Fernanda (+57 310 648 9132)
+        const readingPreview = document.getElementById('personalizedReading').innerText.slice(0, 300);
+        const msg = `NUEVA LEAD - LECTURA MARIPOSA 🦋\nNombre: ${name}\nEmail: ${email}\nWhatsApp: ${phone}\nResumen lectura:\n${readingPreview}\n\n🌙 Quiere profundizar. Por favor contactar.`;
+        const encodedMsg = encodeURIComponent(msg);
+        const url = `https://wa.me/573106489132?text=${encodedMsg}`;
+        window.open(url, '_blank');
+
+        // También guardar en localStorage (opcional)
+        const leadData = { name, email, phone, readingPreview, fecha: new Date().toISOString() };
+        let leads = JSON.parse(localStorage.getItem('maria_fernanda_leads') || '[]');
+        leads.push(leadData);
+        localStorage.setItem('maria_fernanda_leads', JSON.stringify(leads));
+
+        document.getElementById('leadMsg').innerHTML = "✅ Mensaje enviado. María Fernanda te escribirá en breve por WhatsApp. Revisa tu bandeja. 🌸";
+        document.getElementById('leadMsg').style.color = "#b9f5d8";
+        
+        // opcional: resetear campos
+        document.getElementById('leadName').value = '';
+        document.getElementById('leadEmail').value = '';
+        document.getElementById('leadPhone').value = '';
+    });
+
+    // tarifa introductoria: no aparece precio explícito pero mencionamos "introductorio" en el flujo
+    // se puede mostrar un mensaje sutil sin fijar precio.
+    setTimeout(() => {
+        if(!localStorage.getItem('intro_shown')) {
+            const introDiv = document.createElement('div');
+            introDiv.className = 'card';
+            introDiv.style.position = 'fixed';
+            introDiv.style.bottom = '80px';
+            introDiv.style.right = '16px';
+            introDiv.style.maxWidth = '260px';
+            introDiv.style.background = '#2d2018';
+            introDiv.style.padding = '0.8rem';
+            introDiv.style.fontSize = '0.8rem';
+            introDiv.innerHTML = "🎁 <strong>Tarifa introductoria</strong> · primeras 50 lecturas con descuento. Consulta a María Fernanda sin compromiso.";
+            document.body.appendChild(introDiv);
+            setTimeout(() => introDiv.remove(), 8000);
+            localStorage.setItem('intro_shown', 'true');
+        }
+    }, 3000);
+</script>
+</body>
+</html>
