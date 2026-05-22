@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+    <title>Mariposa App · Freedom in Your Pocket</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #0a0f1e 0%, #0c1222 100%);
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            color: #e2e8f0;
+            padding: 1rem;
+            min-height: 100vh;
+        }
+
+        /* MAIN LAYOUT */
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            padding-bottom: 5rem;
+        }
+
+        /* HEADER */
+        .header {
+            text-align: center;
+            padding: 1.5rem 0 1rem;
+            border-bottom: 1px solid #2d3a5e;
+            margin-bottom: 2rem;
+        }
+
+        .butterfly {
+            font-size: 3rem;
+            filter: drop-shadow(0 0 6px #f0b27a);
+        }
+
+        h1 {
+            font-size: 1.9rem;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #f5e6d3, #d4af7a);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin: 0.5rem 0 0.25rem;
+        }
+
+        .tagline {
+            color: #9ca3af;
+            font-size: 0.9rem;
+        }
+
+        /* BUTTERFLY MODE HIDE/REVEAL */
+        .calculator-mode .app-main {
+            display: none;
+        }
+        .calculator-mode .calc-fake {
+            display: block !important;
+        }
+
+        .calc-fake {
+            display: none;
+            background: #1e2a3a;
+            border-radius: 28px;
+            padding: 2rem;
+            text-align: center;
+            font-family: monospace;
+            font-size: 2rem;
+            color: #7dd3fc;
+        }
+        .calc-fake p {
+            font-size: 0.9rem;
+            margin-top: 1rem;
+            color: #94a3b8;
+        }
+
+        /* BUTTONS */
+        .btn {
+            display: block;
+            width: 100%;
+            background: #1e293b;
+            border: 1px solid #334155;
+            padding: 0.85rem 1rem;
+            border-radius: 20px;
+            color: #f1f5f9;
+            font-weight: 500;
+            text-align: center;
+            text-decoration: none;
+            margin: 0.75rem 0;
+            transition: all 0.2s ease;
+            font-size: 1rem;
+            cursor: pointer;
+        }
+        .btn-primary {
+            background: #b97f44;
+            border-color: #e2a76f;
+            color: #0a0f1e;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(185, 127, 68, 0.3);
+        }
+        .btn-secondary {
+            background: #2a3a5a;
+            border-color: #4c6a9e;
+        }
+        .btn-danger {
+            background: #7f1a1a;
+            border-color: #b91c1c;
+            color: #ffe4e4;
+        }
+        .btn-warning {
+            background: #854d0e;
+            border-color: #eab308;
+        }
+
+        /* CARDS & MODULES */
+        .card {
+            background: #111827cc;
+            backdrop-filter: blur(4px);
+            border-radius: 32px;
+            padding: 1.2rem;
+            margin: 1.2rem 0;
+            border: 1px solid #2d3a5e;
+        }
+        .tool-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            margin: 1rem 0;
+        }
+        .module-badge {
+            font-size: 0.7rem;
+            background: #2d3a5e;
+            display: inline-block;
+            padding: 0.2rem 0.7rem;
+            border-radius: 50px;
+            letter-spacing: 0.5px;
+        }
+        .sneakpeak {
+            background: #0f172a;
+            border-left: 4px solid #b97f44;
+            padding: 0.7rem;
+            margin-top: 0.6rem;
+            border-radius: 14px;
+            font-size: 0.8rem;
+        }
+        hr {
+            border-color: #2d3a5e;
+            margin: 1.2rem 0;
+        }
+        footer {
+            text-align: center;
+            font-size: 0.7rem;
+            color: #5b6e8c;
+            margin-top: 2rem;
+        }
+        textarea, input {
+            width: 100%;
+            background: #0f172a;
+            border: 1px solid #334155;
+            border-radius: 20px;
+            padding: 0.8rem;
+            color: white;
+            margin: 0.5rem 0;
+            font-family: monospace;
+        }
+        label {
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-top: 0.5rem;
+            display: block;
+        }
+        .hidden {
+            display: none;
+        }
+        .toast-msg {
+            background: #2e7d64;
+            color: white;
+            padding: 0.5rem;
+            border-radius: 40px;
+            text-align: center;
+            margin: 0.5rem 0;
+        }
+        .flex-btns {
+            display: flex;
+            gap: 12px;
+        }
+    </style>
+</head>
+<body>
+<div class="container" id="appRoot">
+    <div class="header">
+        <div class="butterfly">🦋</div>
+        <h1>MARIPOSA</h1>
+        <div class="tagline">freedom in your pocket · resistencia amorosa</div>
+        <div style="margin-top: 12px;">
+            <button id="butterflyModeBtn" class="btn" style="background:#2d3748; width:auto; display:inline-block; padding:6px 18px;">🦋 modo mariposa</button>
+        </div>
+    </div>
+
+    <!-- FAKE CALCULATOR (BUTTERFLY MODE) -->
+    <div id="calcFake" class="calc-fake" style="display:none;">
+        <div style="font-size:3rem;">🧮</div>
+        <div>0</div>
+        <div style="display:flex; gap:8px; margin-top:1rem; justify-content:center;">
+            <span style="background:#00000055; padding:6px 12px; border-radius:50px;">1</span>
+            <span>2</span> <span>3</span> <span>+</span>
+        </div>
+        <p>secure calculator · press 🦋 again to exit</p>
+    </div>
+
+    <!-- MAIN APP CONTENT -->
+    <div id="mainApp" class="app-main">
+        <!-- KONAMI CODE EASTER EGG TRIGGER -->
+        <div id="konamiMsg" class="toast-msg hidden" style="background:#b97f44;">⚓ CÓDIGO ACTIVADO · flotilla visible ⚓</div>
+
+        <!-- PANEL 1: HERramientas activas hoy -->
+        <div class="card">
+            <span class="module-badge">✅ HERRAMIENTAS ACTIVAS</span>
+            <h3 style="margin: 10px 0 4px;">🛡️ defiéndete ahora</h3>
+            <p style="font-size:0.85rem;">sin abogado · sin costo · imprime o copia</p>
+            <div class="tool-grid">
+                <button id="openTutelaBtn" class="btn btn-secondary">📜 TUTELA (Colombia) → generar</button>
+                <button id="openDebtBtn" class="btn btn-secondary">💸 DEBT VALIDATION (USA) → generar</button>
+                <button id="safeHouseBtn" class="btn btn-secondary">🏠 SOLICITUD CASA SEGURA → whatsapp</button>
+                <button id="businessBtn" class="btn btn-secondary">💼 80/20 BUSINESS BUILDER</button>
+                <button id="emergencyBtn" class="btn btn-danger">⚠️ BOTÓN DE EMERGENCIA</button>
+            </div>
+        </div>
+
+        <!-- PANEL 2: SNEAK PEAK DE LOS 7 MÓDULOS -->
+        <div class="card">
+            <span class="module-badge">🔮 PRÓXIMAMENTE · MARIPOSA APP nativa</span>
+            <h3 style="margin:12px 0 6px;">siete módulos que cambiaran todo</h3>
+            <div class="sneakpeak">📱 <strong>1. Tutela inteligente</strong> — genera documentos en 2 minutos, tracking de plazos.</div>
+            <div class="sneakpeak">⚖️ <strong>2. Eliminador de deudas</strong> — cartas FDCPA + estatuto de prescripción.</div>
+            <div class="sneakpeak">🏚️ <strong>3. Red de casas seguras</strong> — cifrada, un solo nodo a la vez.</div>
+            <div class="sneakpeak">📚 <strong>4. Biblioteca legal self-defense</strong> — 50+ documentos listos para rellenar.</div>
+            <div class="sneakpeak">📈 <strong>5. Constructor de negocio 80/20</strong> — catálogo + qr + whatsapp en 5 minutos.</div>
+            <div class="sneakpeak">🕊️ <strong>6. Coalición amnistía</strong> — chat cifrado, botón pánico, testigo digital.</div>
+            <div class="sneakpeak">🚢 <strong>7. Freedom Flotilla integration</strong> — aplicación encriptada, dead man’s switch, stream vivo.</div>
+            <p style="margin-top:12px; font-size:0.75rem;">⚡ desarrollaremos juntos la app nativa (iOS/android). Esto es el centro de mando interino.</p>
+        </div>
+
+        <!-- PANEL 3: UNIRSE / PMA / TRINITY -->
+        <div class="card">
+            <span class="module-badge">🦋 ÚNETE AL MOVIMIENTO</span>
+            <a href="https://quantum-freedom-site.vercel.app/Trinitys-Secret-Drawer.html" target="_blank" class="btn btn-primary">👗 TRINITY'S SECRET DRAWER · lencería</a>
+            <a href="https://quantum-freedom-site.vercel.app/" target="_blank" class="btn btn-secondary">🌐 QUANTUM FREEDOM · hub</a>
+            <a href="#" id="pmaLink" class="btn btn-secondary">💰 PMA · membresía $1 (acceso catálogo + curso)</a>
+            <div style="background:#00000044; border-radius: 24px; padding: 0.7rem; margin-top: 0.5rem;">
+                <p style="font-size:0.8rem;">📱 <strong>WhatsApp business:</strong> +57 323 323 5532 (trinity) · +1 (815) 555-8858 (modelos)</p>
+                <p style="font-size:0.7rem;">✉️ después de unirte te llega el catálogo, el curso y el acceso a la red.</p>
+            </div>
+        </div>
+
+        <!-- PANEL 4: KONAMI + FREEDOM FLOTILLA -->
+        <div class="card" id="flotillaSection" style="border-color:#b97f44;">
+            <span class="module-badge">⚓ MISIÓN ACTIVA</span>
+            <p><strong>🌊 FREEDOM FLOTILLA</strong> — necesitamos voluntarios para romper el asedio.</p>
+            <p style="font-size:0.8rem;">Ejecuta el <strong>código KONAMI</strong> (↑ ↑ ↓ ↓ ← → ← → B A) en cualquier parte de esta página para desbloquear la aplicación y el enlace de reclutamiento.</p>
+            <div id="flotillaReveal" class="hidden" style="margin-top: 16px; background:#1e2a3a; border-radius: 24px; padding: 1rem;">
+                <p>⚓ ACCESO AUTORIZADO ⚓</p>
+                <a href="https://tripsotocolombia.com" target="_blank" class="btn btn-primary" style="background:#6b2e5e;">🚢 TRIPS TO COLOMBIA · flotilla hub</a>
+                <button id="konamiAppBtn" class="btn btn-secondary">📋 APLICAR PARA MISIÓN (formulario vetting)</button>
+                <p style="font-size:0.7rem; margin-top:8px;">* solo voluntarios verificados recibirán coordenadas. el código Konami abre la puerta.</p>
+            </div>
+        </div>
+
+        <footer>
+            Mariposa App · beta offline · ningún dato se almacena en servidores · diseñado para la resistencia amorosa.<br>
+            <button id="clearStorageBtn" style="background:none; border:none; color:#6b7c9e; text-decoration:underline; cursor:pointer;">🧹 borrar datos locales</button>
+        </footer>
+    </div>
+</div>
+
+<script>
+    // ------------------------------
+    // MARIPOSA APP – TOOLBOX (offline first)
+    // ------------------------------
+    const konamiCode = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'KeyB', 'KeyA'];
+    let konamiIndex = 0;
+    const flotillaDiv = document.getElementById('flotillaReveal');
+    const konamiMsgDiv = document.getElementById('konamiMsg');
+
+    document.addEventListener('keydown', (e) => {
+        const key = e.code;
+        const expected = konamiCode[konamiIndex];
+        if (key === expected) {
+            konamiIndex++;
+            if (konamiIndex === konamiCode.length) {
+                // Konami activado
+                if (flotillaDiv) flotillaDiv.classList.remove('hidden');
+                konamiMsgDiv.classList.remove('hidden');
+                setTimeout(() => konamiMsgDiv.classList.add('hidden'), 4000);
+                localStorage.setItem('konami_unlocked', 'true');
+                konamiIndex = 0;
+            }
+        } else {
+            konamiIndex = 0;
+        }
+    });
+
+    // chequear si ya estaba desbloqueado
+    if (localStorage.getItem('konami_unlocked') === 'true') {
+        if (flotillaDiv) flotillaDiv.classList.remove('hidden');
+    }
+
+    // ----- BUTTERFLY MODE (hide app behind calculator)
+    let butterflyActive = false;
+    const calcDiv = document.getElementById('calcFake');
+    const mainAppDiv = document.getElementById('mainApp');
+    const butterflyBtn = document.getElementById('butterflyModeBtn');
+
+    function toggleButterflyMode() {
+        butterflyActive = !butterflyActive;
+        if (butterflyActive) {
+            calcDiv.style.display = 'block';
+            mainAppDiv.style.display = 'none';
+        } else {
+            calcDiv.style.display = 'none';
+            mainAppDiv.style.display = 'block';
+        }
+        localStorage.setItem('butterfly_mode', butterflyActive ? '1' : '0');
+    }
+    if (localStorage.getItem('butterfly_mode') === '1') toggleButterflyMode();
+    butterflyBtn.addEventListener('click', toggleButterflyMode);
+
+    // ----- HERRAMIENTAS ACTIVAS -----
+    // 1. TUTELA GENERATOR (Colombia)
+    function generateTutela() {
+        const nombre = prompt("Nombre completo (puede ser seudónimo para borrador):", "María Protectora");
+        const ciudad = prompt("Ciudad (ej. Armenia, Pereira, Medellín):", "Armenia");
+        const derecho = prompt("Derecho violado? (salud, vivienda, debido proceso, educación, trabajo, familia, seguridad):", "salud");
+        const accion = prompt("¿Qué necesita? (detener acción, iniciar servicio, protección):", "protección");
+        const entidad = prompt("Entidad o persona que viola el derecho:", "EPS / Alcaldía");
+        const tutelaText = `ACCIÓN DE TUTELA\n\n${nombre} identificado(a) como persona natural, actuando en nombre propio, solicito AMPARO CONSTITUCIONAL ante la vulneración del derecho fundamental a: ${derecho}.\n\nHechos:\n1. La entidad ${entidad} ha vulnerado mi derecho al ${derecho}.\n2. Necesito que se ${accion} de manera inmediata.\n3. Me encuentro en ${ciudad} y no cuento con otro recurso judicial eficaz.\n\nPretensiones:\n- Que se ${accion} la vulneración.\n- Se me brinde protección inmediata.\n\nAnexo: este escrito, copia de identificación (si se tiene).\n\n${ciudad}, ${new Date().toLocaleDateString()}\nFirma: ___________________\n\n--- NOTA: presente en cualquier Palacio de Justicia o a través de correo electrónico del juzgado. La tutela debe fallarse en 10 días.`;
+        const textarea = document.createElement('textarea');
+        textarea.value = tutelaText;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        alert("✅ Tutela copiada al portapapeles. Pégala en un documento, imprime y presenta en cualquier juzgado de tu ciudad. ¡Tienes 10 días para respuesta!");
+    }
+    document.getElementById('openTutelaBtn').addEventListener('click', generateTutela);
+
+    // 2. DEBT VALIDATION LETTER (USA)
+    function generateDebtLetter() {
+        const creditor = prompt("Nombre del acreedor (ej. Midland Credit, Portfolio Recovery):", "Acreedor XYZ");
+        const amount = prompt("Monto de la deuda reclamada:", "$1,234.56");
+        const letter = `[FECHA]\n\nASUNTO: Solicitud de validación de deuda\nCuenta #: _________\n\nEstimados ${creditor}:\n\nEn virtud de la Fair Debt Collection Practices Act (FDCPA 15 USC § 1692g), solicito que proporcione validación de la deuda que afirma que debo por el monto de ${amount}.\n\nDebe incluir:\n1. Copia del contrato original firmado.\n2. Historial completo de pagos.\n3. Cálculo detallado del saldo.\n\nMientras no proporcionen la validación, cesen toda comunicación de cobro. Atentamente,\n\n[Su nombre]\n\n--- ENVÍE POR CORREO CERTIFICADO. Si no responden en 30 días, la deuda se presume inválida.`;
+        const textarea = document.createElement('textarea');
+        textarea.value = letter;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        alert("✅ Carta de validación copiada. Envíe por correo certificado (USPS Certified). Si no responden en 30 días, puede disputar ante burós.");
+    }
+    document.getElementById('openDebtBtn').addEventListener('click', generateDebtLetter);
+
+    // 3. SAFE HOUSE REQUEST (WhatsApp)
+    document.getElementById('safeHouseBtn').addEventListener('click', () => {
+        const msg = encodeURIComponent("🦋 MARIPOSA NETWORK: necesito una noche segura. ¿Hay disponibilidad en la red de casas seguras? Soy miembro de la coalición.");
+        window.open(`https://wa.me/573233235532?text=${msg}`, '_blank');
+    });
+
+    // 4. 80/20 BUSINESS BUILDER
+    document.getElementById('businessBtn').addEventListener('click', () => {
+        const negocio = prompt("¿Qué vendes o qué servicio ofreces? (masajes, lencería, comidas, renta de motos):", "Lencería");
+        const ciudadNeg = prompt("Ciudad donde operarás:", "Salento");
+        const catalogLink = `https://quantum-freedom-site.vercel.app/Trinitys-Secret-Drawer.html`;
+        const whatsappMsg = `Hola! Soy emprendedora 80/20, ofrezco ${negocio} en ${ciudadNeg}. Escanea mi código QR o contáctame para pedidos. 📦 80% para mí, 20% para el movimiento.`;
+        alert(`✅ TU NEGOCIO: ${negocio} en ${ciudadNeg}\n📱 WhatsApp preconfigurado: "${whatsappMsg}"\n📷 Crea QR: copia ese mensaje y úsalo para redes.\n🎯 Catálogo afiliado: ${catalogLink}\n👉 Conservas 80% de cada venta.`);
+        localStorage.setItem('mariposa_business', JSON.stringify({negocio, ciudadNeg, whatsappMsg}));
+    });
+
+    // 5. BOTÓN DE EMERGENCIA (limpieza local + instrucciones)
+    document.getElementById('emergencyBtn').addEventListener('click', () => {
+        if(confirm("⚠️ BOTÓN DE EMERGENCIA ⚠️\nEsto borrará los datos locales de la app y mostrará instrucciones para desaparecer digitalmente. ¿Continuar?")) {
+            localStorage.clear();
+            sessionStorage.clear();
+            alert("✅ DATOS LOCALES BORRADOS.\n\nINSTRUCCIONES DE SEGURIDAD:\n1. Apaga el teléfono por 10 min.\n2. Retira la SIM si es posible.\n3. Ve a un lugar público con cámaras (centro comercial, aeropuerto).\n4. Contacta a la línea de emergencia de la Coalición: +57 3233235532 (señal: 'mariposa rota').\n5. No uses redes sociales por 24h.");
+            window.location.reload();
+        }
+    });
+
+    // PMA Link con $1 (simbolico)
+    document.getElementById('pmaLink').addEventListener('click', (e) => {
+        e.preventDefault();
+        alert("🔐 PMA – MEMBRESÍA $1\n✅ Acceso a: catálogo Trinity, Contract Killer Course, Red Mariposa.\n📲 Escribe 'PMA' al +57 323 323 5532 para recibir enlace de pago (Mercado Pago).");
+        window.open("https://wa.me/573233235532?text=PMA%20%241%20membership", "_blank");
+    });
+
+    // Konami form application (simula)
+    document.getElementById('konamiAppBtn')?.addEventListener('click', () => {
+        alert("⚓ FORMULARIO DE VETTING FLOTILLA ⚓\n\nEnvía tu nombre, experiencia (médico, marinero, documentalista) y disponibilidad al correo: flotilla@tripsotocolombia.com\n\nO whatsapp: +57 3233235532 con la palabra 'KONAMI'.\n\nLos comandos de misión se entregarán después de verificación.");
+        window.open("https://wa.me/573233235532?text=KONAMI%20-%20solicito%20informaci%C3%B3n%20flotilla", "_blank");
+    });
+
+    // Clear storage manually
+    document.getElementById('clearStorageBtn').addEventListener('click', () => {
+        if(confirm("Borrar toda la configuración local de la app? (no afecta tu dispositivo, solo preferencias)")) {
+            localStorage.clear();
+            sessionStorage.clear();
+            alert("Datos locales eliminados.");
+            window.location.reload();
+        }
+    });
+
+    // mostrar link a trips to colombia con konami incluido
+    const footerLink = document.createElement('div');
+    footerLink.style.marginTop = '1rem';
+    footerLink.innerHTML = `<a href="https://tripsotocolombia.com" target="_blank" style="color:#d4af7a;">✈️ TripsToColombia.com · ejecuta Konami allí también</a>`;
+    document.querySelector('footer').appendChild(footerLink);
+    
+    console.log("🦋 Mariposa App – Centro de mando operativo. Resistencia amorosa activada.");
+</script>
+</body>
+</html>
