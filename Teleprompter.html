@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Exponential Teleprompter | Ultra-smooth script reader</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none; /* avoid accidental text selection while reading, but can be overridden */
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: radial-gradient(circle at 20% 30%, #0a0f1e, #03060c);
+            font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, 'Roboto', monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        /* main prompter card */
+        .prompter-container {
+            max-width: 1300px;
+            width: 100%;
+            background: rgba(10, 15, 30, 0.65);
+            backdrop-filter: blur(12px);
+            border-radius: 2.5rem;
+            box-shadow: 0 25px 45px rgba(0,0,0,0.5), 0 0 0 1px rgba(80, 180, 255, 0.2);
+            overflow: hidden;
+            transition: all 0.2s;
+        }
+
+        /* toolbar — all controls */
+        .toolbar {
+            background: #11151f;
+            padding: 0.9rem 1.5rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            align-items: center;
+            border-bottom: 1px solid #2a3346;
+            justify-content: space-between;
+        }
+
+        .controls-left, .controls-center, .controls-right {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        button {
+            background: #1e2a3a;
+            border: none;
+            color: #eef4ff;
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: monospace;
+            letter-spacing: 0.3px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        button i { font-style: normal; font-weight: bold; font-size: 1.1rem; }
+
+        button:hover {
+            background: #2e4a6e;
+            transform: scale(1.02);
+            box-shadow: 0 4px 12px rgba(0,160,255,0.2);
+        }
+
+        button:active { transform: scale(0.98); }
+
+        .danger-btn {
+            background: #631d2c;
+            color: #ffcfcf;
+        }
+        .danger-btn:hover { background: #a12538; }
+
+        .primary-btn {
+            background: #0f5b8c;
+            color: white;
+            box-shadow: 0 0 4px #2f9eff;
+        }
+        .primary-btn:hover { background: #187bb8; }
+
+        .speed-control {
+            background: #0a0f18;
+            padding: 0.2rem 0.9rem;
+            border-radius: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: bold;
+            color: #bbd9ff;
+        }
+
+        .speed-value {
+            font-size: 1.2rem;
+            font-weight: 800;
+            font-family: monospace;
+            min-width: 55px;
+            text-align: center;
+            background: #00000055;
+            padding: 0.1rem 0.4rem;
+            border-radius: 20px;
+        }
+
+        textarea {
+            width: 100%;
+            background: #fef7e6;
+            border: none;
+            padding: 1rem;
+            font-family: 'Courier New', 'Fira Code', monospace;
+            font-size: 1rem;
+            resize: vertical;
+            outline: none;
+            border-radius: 1rem;
+            margin-bottom: 0.75rem;
+            color: #1e2a2f;
+        }
+
+        /* teleprompter viewport */
+        .prompter-stage {
+            background: #0b0f17;
+            padding: 2rem 1.5rem 3rem 1.5rem;
+            position: relative;
+        }
+
+        .scroll-window {
+            background: #01050ecc;
+            border-radius: 2rem;
+            backdrop-filter: blur(4px);
+            height: 65vh;
+            min-height: 400px;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+            padding: 1.8rem 2rem;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.6), 0 4px 14px rgba(0,0,0,0.3);
+            border: 1px solid #2a3a55;
+        }
+
+        /* actual text content */
+        .prompter-text {
+            font-family: 'Segoe UI', 'SF Pro Text', 'Inter', system-ui;
+            font-size: 2rem;
+            line-height: 1.55;
+            color: #f0f3fa;
+            text-shadow: 0 1px 2px black;
+            font-weight: 450;
+            white-space: pre-wrap;
+            word-break: break-word;
+            transition: font-size 0.1s;
+        }
+
+        /* paragraph marker highlight when skip */
+        .para-marker {
+            transition: background 0.2s;
+        }
+
+        /* status bar */
+        .info-bar {
+            background: #060b12;
+            padding: 0.5rem 1.5rem;
+            font-size: 0.8rem;
+            color: #85a9cf;
+            display: flex;
+            justify-content: space-between;
+            font-family: monospace;
+            border-top: 1px solid #1f2a3a;
+        }
+
+        .word-count {
+            font-weight: bold;
+            color: #bbd9ff;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            100% { opacity: 1; }
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            transform: none;
+            cursor: not-allowed;
+        }
+
+        /* responsive text size */
+        @media (max-width: 700px) {
+            .prompter-text { font-size: 1.4rem; }
+            button { padding: 0.35rem 0.8rem; font-size: 0.75rem; }
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1a1f2a;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3e5a7c;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="prompter-container">
+    <div class="toolbar">
+        <div class="controls-left">
+            <button id="playPauseBtn" class="primary-btn">⏸️ Pause</button>
+            <button id="slowerBtn">🐢 Slower</button>
+            <button id="fasterBtn">🐇 Faster</button>
+            <div class="speed-control">
+                <span>⚡ speed</span>
+                <span id="speedIndicator" class="speed-value">1.00x</span>
+            </div>
+        </div>
+        <div class="controls-center">
+            <button id="skipBackParaBtn">↩️ Skip back ¶</button>
+            <button id="skipForwardParaBtn">⏩ Skip fwd ¶</button>
+            <button id="resetToTopBtn">🔝 Reset / Top</button>
+        </div>
+        <div class="controls-right">
+            <button id="fontLargerBtn">🔍 A+</button>
+            <button id="fontSmallerBtn">🔍 A-</button>
+            <button id="toggleScrollBtn" class="danger-btn">⏹️ Stop Scroll</button>
+        </div>
+    </div>
+
+    <div style="padding: 1rem 1.5rem 0 1.5rem; background: #0b0f17;">
+        <textarea id="scriptInput" rows="4" placeholder="📝 PASTE YOUR LARGE SCRIPT HERE (thousands of lines)&#10;&#10;Example: Start with any speech, monologue, or article. The teleprompter will scroll automatically while you control speed, paragraph jumps, pause, etc.&#10;&#10;✨ Pro tip: Double click on text in prompter to instantly jump scroll to that paragraph!"></textarea>
+        <button id="loadTextBtn" style="width:100%; margin-bottom: 0.5rem; background:#1869a8;">⟳ Load & Start Teleprompter</button>
+    </div>
+
+    <div class="prompter-stage">
+        <div class="scroll-window" id="scrollWindow">
+            <div id="prompterTextDisplay" class="prompter-text"></div>
+        </div>
+    </div>
+    <div class="info-bar">
+        <span>📜 <span id="paraCount">0</span> paragraphs • <span id="wordCountSpan">0</span> words</span>
+        <span id="scrollState">🟢 scrolling active</span>
+        <span>⌨️ [Space] pause/play | [↑] faster [↓] slower | [PgUp] skip back ¶ | [PgDn] skip fwd ¶</span>
+    </div>
+</div>
+
+<script>
+    // ---------- DOM elements ----------
+    const textarea = document.getElementById('scriptInput');
+    const loadBtn = document.getElementById('loadTextBtn');
+    const displayDiv = document.getElementById('prompterTextDisplay');
+    const scrollWindow = document.getElementById('scrollWindow');
+    const playPauseBtn = document.getElementById('playPauseBtn');
+    const slowerBtn = document.getElementById('slowerBtn');
+    const fasterBtn = document.getElementById('fasterBtn');
+    const skipBackParaBtn = document.getElementById('skipBackParaBtn');
+    const skipForwardParaBtn = document.getElementById('skipForwardParaBtn');
+    const resetToTopBtn = document.getElementById('resetToTopBtn');
+    const fontLargerBtn = document.getElementById('fontLargerBtn');
+    const fontSmallerBtn = document.getElementById('fontSmallerBtn');
+    const toggleScrollBtn = document.getElementById('toggleScrollBtn');
+    const speedIndicator = document.getElementById('speedIndicator');
+    const paraCountSpan = document.getElementById('paraCount');
+    const wordCountSpan = document.getElementById('wordCountSpan');
+    const scrollStateSpan = document.getElementById('scrollState');
+
+    // ---------- State ----------
+    let paragraphs = [];          // array of cleaned paragraphs (non-empty)
+    let currentSpeed = 1.0;      // base scrolling speed (px per frame factor)
+    let isPlaying = true;         // scrolling active
+    let scrollInterval = null;    // interval id
+    let baseScrollStep = 1.2;     // step in pixels per frame (base speed at 1.0x = 1.2px)
+    let currentFontSize = 32;      // in px, default 2rem = 32px base
+    let isScrollEnabled = true;     // master toggle "stop scroll"
+    let lastScrollTop = 0;
+
+    // Helper: update UI font size
+    function updateFontSizeUI() {
+        displayDiv.style.fontSize = currentFontSize + 'px';
+    }
+
+    // parse text into paragraphs (double newline or standalone paragraphs)
+    function parseParagraphs(rawText) {
+        // split by double newline, then filter, but also keep single newlines? better: split by \n\s*\n or just \n for robust
+        // For teleprompter: treat each block separated by blank line as a paragraph.
+        let blocks = rawText.split(/\n\s*\n/);
+        // also split very long single line? not needed, but ensures meaningful paragraphs
+        let result = [];
+        for (let block of blocks) {
+            let trimmed = block.trim();
+            if (trimmed.length === 0) continue;
+            // If block still huge without line breaks inside, we treat whole as one paragraph (good for readability)
+            result.push(trimmed);
+        }
+        // fallback: if no double line break, treat line breaks as paragraphs
+        if (result.length === 0 && rawText.trim().length > 0) {
+            let lines = rawText.split(/\r?\n/);
+            for(let line of lines) {
+                if(line.trim().length) result.push(line.trim());
+            }
+        }
+        return result;
+    }
+
+    // Render paragraphs into displayDiv with data-para attributes (allow para jumps)
+    function renderTeleprompter() {
+        if (!paragraphs.length) {
+            displayDiv.innerHTML = '<div style="opacity:0.7; text-align:center;">✨ Paste your script above and click "Load" — smooth teleprompter ready ✨</div>';
+            paraCountSpan.innerText = '0';
+            wordCountSpan.innerText = '0';
+            return;
+        }
+        let html = '';
+        for (let i = 0; i < paragraphs.length; i++) {
+            // add paragraph markers with ID and click-to-jump support
+            html += `<div class="para-marker" data-para-index="${i}" style="margin-bottom: 1.2rem; border-left: 3px solid #3c7eb0; padding-left: 1rem;">${escapeHtml(paragraphs[i])}</div>`;
+        }
+        displayDiv.innerHTML = html;
+        const totalWords = paragraphs.reduce((sum, p) => sum + p.split(/\s+/).filter(w => w.length).length, 0);
+        paraCountSpan.innerText = paragraphs.length;
+        wordCountSpan.innerText = totalWords;
+
+        // attach click event listeners to each paragraph block for instant navigation (handy feature)
+        document.querySelectorAll('.para-marker').forEach(el => {
+            el.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const idx = parseInt(el.getAttribute('data-para-index'));
+                if (!isNaN(idx)) {
+                    jumpToParagraph(idx);
+                }
+            });
+        });
+    }
+
+    // simple escape to avoid injection
+    function escapeHtml(str) {
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
+            return c;
+        });
+    }
+
+    // Core scrolling mechanism: incremental scroll based on speed & framerate (requestAnimationFrame style but interval robust)
+    let animFrame = null;
+    let lastTimestamp = 0;
+    
+    function startScrolling() {
+        if (scrollInterval) clearInterval(scrollInterval);
+        if (!isPlaying || !isScrollEnabled) return;
+        // using setInterval with dynamic step adaptation based on speed
+        // 60fps like smoothness: 16ms per frame
+        scrollInterval = setInterval(() => {
+            if (!isPlaying || !isScrollEnabled) return;
+            if (!scrollWindow) return;
+            // compute dynamic scroll step = baseScrollStep * currentSpeed
+            let step = baseScrollStep * currentSpeed;
+            let newScrollTop = scrollWindow.scrollTop + step;
+            // max scroll limit
+            const maxScroll = scrollWindow.scrollHeight - scrollWindow.clientHeight;
+            if (newScrollTop >= maxScroll) {
+                // reached end: pause elegantly
+                if (maxScroll > 0 && scrollWindow.scrollTop < maxScroll) {
+                    scrollWindow.scrollTop = maxScroll;
+                }
+                if (scrollWindow.scrollTop >= maxScroll - 1) {
+                    // auto-pause at end to prevent overflow
+                    if (isPlaying) {
+                        isPlaying = false;
+                        updatePlayPauseUI();
+                    }
+                }
+            } else {
+                scrollWindow.scrollTop = newScrollTop;
+            }
+        }, 16); // ~60fps
+    }
+
+    function stopScrollingInterval() {
+        if (scrollInterval) {
+            clearInterval(scrollInterval);
+            scrollInterval = null;
+        }
+    }
+
+    function updateScrolling() {
+        stopScrollingInterval();
+        if (isPlaying && isScrollEnabled) {
+            startScrolling();
+        }
+    }
+
+    // toggle play/pause
+    function togglePlayPause() {
+        if (!paragraphs.length) return;
+        isPlaying = !isPlaying;
+        updatePlayPauseUI();
+        updateScrolling();
+    }
+
+    function updatePlayPauseUI() {
+        if (isPlaying) {
+            playPauseBtn.innerHTML = '⏸️ Pause';
+            playPauseBtn.classList.add('primary-btn');
+        } else {
+            playPauseBtn.innerHTML = '▶️ Play';
+            playPauseBtn.classList.remove('primary-btn');
+        }
+        updateScrollStateText();
+    }
+
+    function updateScrollStateText() {
+        if (!isScrollEnabled) scrollStateSpan.innerText = '⛔ scroll stopped';
+        else if (isPlaying) scrollStateSpan.innerText = '🟢 scrolling active';
+        else scrollStateSpan.innerText = '⏸️ paused';
+    }
+
+    // speed changes
+    function changeSpeed(delta) {
+        let newSpeed = currentSpeed + delta;
+        if (newSpeed < 0.2) newSpeed = 0.2;
+        if (newSpeed > 5.0) newSpeed = 5.0;
+        currentSpeed = parseFloat(newSpeed.toFixed(2));
+        speedIndicator.innerText = currentSpeed.toFixed(2) + 'x';
+        // no need to restart interval, next step will reflect
+        if (isPlaying && isScrollEnabled) {
+            // restart to apply new step
+            stopScrollingInterval();
+            startScrolling();
+        }
+    }
+
+    // paragraph navigation (skip back / forward)
+    function getCurrentVisibleParagraphIndex() {
+        if (!paragraphs.length) return -1;
+        const windowTop = scrollWindow.scrollTop;
+        const paras = document.querySelectorAll('.para-marker');
+        if (paras.length === 0) return -1;
+        let bestIndex = 0;
+        for (let i = 0; i < paras.length; i++) {
+            const rect = paras[i].getBoundingClientRect();
+            const containerRect = scrollWindow.getBoundingClientRect();
+            const offset = rect.top - containerRect.top;
+            if (offset <= 150) {   // if paragraph top is near upper area consider as current
+                bestIndex = i;
+            } else {
+                break;
+            }
+        }
+        return bestIndex;
+    }
+
+    function jumpToParagraph(index) {
+        if (!paragraphs.length) return;
+        if (index < 0) index = 0;
+        if (index >= paragraphs.length) index = paragraphs.length - 1;
+        const paraElements = document.querySelectorAll('.para-marker');
+        if (paraElements[index]) {
+            paraElements[index].scrollIntoView({ behavior: 'smooth', block: 'start' });
+            // tiny highlight effect
+            const originalBg = paraElements[index].style.background;
+            paraElements[index].style.transition = 'background 0.2s';
+            paraElements[index].style.background = '#2e5f8e55';
+            setTimeout(() => { paraElements[index].style.background = ''; }, 400);
+        }
+    }
+
+    function skipBackParagraph() {
+        if (!paragraphs.length) return;
+        let currentIdx = getCurrentVisibleParagraphIndex();
+        if (currentIdx === -1) currentIdx = 0;
+        let targetIdx = currentIdx - 1;
+        if (targetIdx < 0) targetIdx = 0;
+        jumpToParagraph(targetIdx);
+    }
+
+    function skipForwardParagraph() {
+        if (!paragraphs.length) return;
+        let currentIdx = getCurrentVisibleParagraphIndex();
+        if (currentIdx === -1) currentIdx = 0;
+        let targetIdx = currentIdx + 1;
+        if (targetIdx >= paragraphs.length) targetIdx = paragraphs.length - 1;
+        jumpToParagraph(targetIdx);
+    }
+
+    function resetToTop() {
+        if (!paragraphs.length) return;
+        scrollWindow.scrollTo({ top: 0, behavior: 'smooth' });
+        if (!isPlaying && isScrollEnabled) {
+            // resume auto if at top? optional but keep paused state
+        }
+    }
+
+    // master toggle scroll (stop all movement)
+    function toggleScrollMaster() {
+        isScrollEnabled = !isScrollEnabled;
+        if (!isScrollEnabled) {
+            // stop scrolling instantly
+            stopScrollingInterval();
+            scrollStateSpan.innerText = '⛔ scroll stopped';
+            toggleScrollBtn.innerHTML = '▶️ Resume Scroll';
+            toggleScrollBtn.classList.remove('danger-btn');
+            toggleScrollBtn.classList.add('primary-btn');
+        } else {
+            scrollStateSpan.innerText = isPlaying ? '🟢 scrolling active' : '⏸️ paused';
+            toggleScrollBtn.innerHTML = '⏹️ Stop Scroll';
+            toggleScrollBtn.classList.remove('primary-btn');
+            toggleScrollBtn.classList.add('danger-btn');
+            updateScrolling();
+        }
+    }
+
+    // font adjustments
+    function changeFontSize(delta) {
+        let newSize = currentFontSize + delta;
+        if (newSize < 18) newSize = 18;
+        if (newSize > 64) newSize = 64;
+        currentFontSize = newSize;
+        updateFontSizeUI();
+    }
+
+    // load text from textarea
+    function loadAndRender() {
+        const rawText = textarea.value;
+        if (!rawText.trim()) {
+            alert("Please paste some text / script first!");
+            return;
+        }
+        paragraphs = parseParagraphs(rawText);
+        if (paragraphs.length === 0) {
+            displayDiv.innerHTML = '<div style="color: #ffaa88;">⚠️ No valid paragraphs found. Please paste text with content.</div>';
+            return;
+        }
+        renderTeleprompter();
+        // reset scroll position
+        scrollWindow.scrollTop = 0;
+        // reset scroll flags: ensure playing, scroll enabled
+        if (!isScrollEnabled) {
+            isScrollEnabled = true;
+            toggleScrollMaster(); // re-enable properly
+        }
+        isPlaying = true;
+        updatePlayPauseUI();
+        updateScrollStateText();
+        // reset speed indicator but not overriding
+        stopScrollingInterval();
+        startScrolling();
+    }
+
+    // keyboard shortcuts
+    function handleKeydown(e) {
+        // avoid interfering with textarea when focused
+        if (document.activeElement === textarea) {
+            // optional: still allow global shortcuts? Better allow Ctrl+ but for simplicity allow if not typing?
+            // but we'll allow only if not typing inside textarea? Space would add space inside textarea, we want command.
+            if (e.code === 'Space') {
+                e.preventDefault();
+                togglePlayPause();
+            } else if (e.code === 'ArrowUp') {
+                e.preventDefault();
+                changeSpeed(0.1);
+            } else if (e.code === 'ArrowDown') {
+                e.preventDefault();
+                changeSpeed(-0.1);
+            } else if (e.code === 'PageUp') {
+                e.preventDefault();
+                skipBackParagraph();
+            } else if (e.code === 'PageDown') {
+                e.preventDefault();
+                skipForwardParagraph();
+            } else if (e.code === 'Home') {
+                e.preventDefault();
+                resetToTop();
+            }
+            return;
+        }
+        // global shortcuts
+        switch(e.code) {
+            case 'Space':
+                e.preventDefault();
+                togglePlayPause();
+                break;
+            case 'ArrowUp':
+                e.preventDefault();
+                changeSpeed(0.1);
+                break;
+            case 'ArrowDown':
+                e.preventDefault();
+                changeSpeed(-0.1);
+                break;
+            case 'PageUp':
+                e.preventDefault();
+                skipBackParagraph();
+                break;
+            case 'PageDown':
+                e.preventDefault();
+                skipForwardParagraph();
+                break;
+            case 'Home':
+                e.preventDefault();
+                resetToTop();
+                break;
+            default: break;
+        }
+    }
+
+    // initial demo text (big script snippet to show feature)
+    function setDemoText() {
+        const demo = `Welcome to the Exponential Teleprompter.
+
+This powerful tool lets you paste massive scripts, speeches, or manuscripts. 
+
+✨ FEATURES:
+• Auto-smooth scroll with real-time speed adjustment (0.2x to 5.0x)
+• Pause/Resume anytime
+• Skip back or forward a paragraph instantly (great for rehearsals)
+• Resize text (A+ / A-) for comfortable reading
+• Master STOP scroll toggle — freeze movement while reading
+• Click any paragraph block to instantly jump to that section
+• Keyboard shortcuts: SPACE (play/pause), UP/DOWN arrows (speed), PGUP/PGDN (skip paragraph), HOME (reset to top)
+
+How to use:
+Paste your long script in the text area above, then click "Load & Start Teleprompter".
+
+The prompter will scroll seamlessly. Adjust speed as you speak. Need to repeat a paragraph? Hit "Skip back ¶". If you need to temporarily freeze scrolling but keep reading, click "Stop Scroll" — then resume anytime.
+
+Extra: Paragraphs are automatically split by double line breaks. Each block is individually clickable.
+
+Go ahead, paste your speech and deliver like a pro! 🎤
+
+(second paragraph example) This is another block. Teleprompter helps maintain eye contact while staying on script. Use it for YouTube, live events, or voiceover.`;
+        textarea.value = demo;
+        loadAndRender();
+    }
+
+    // initialization event listeners
+    function init() {
+        loadBtn.addEventListener('click', loadAndRender);
+        playPauseBtn.addEventListener('click', togglePlayPause);
+        slowerBtn.addEventListener('click', () => changeSpeed(-0.1));
+        fasterBtn.addEventListener('click', () => changeSpeed(0.1));
+        skipBackParaBtn.addEventListener('click', skipBackParagraph);
+        skipForwardParaBtn.addEventListener('click', skipForwardParagraph);
+        resetToTopBtn.addEventListener('click', resetToTop);
+        fontLargerBtn.addEventListener('click', () => changeFontSize(2));
+        fontSmallerBtn.addEventListener('click', () => changeFontSize(-2));
+        toggleScrollBtn.addEventListener('click', toggleScrollMaster);
+        window.addEventListener('keydown', handleKeydown);
+        // set default demo for immediate delight
+        setDemoText();
+        updateFontSizeUI();
+        currentSpeed = 1.0;
+        speedIndicator.innerText = '1.00x';
+        isScrollEnabled = true;
+        isPlaying = true;
+        updatePlayPauseUI();
+        baseScrollStep = 1.25; // smooth reading
+    }
+
+    init();
+</script>
+</body>
+</html>
