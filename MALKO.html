@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🌍 THE AWAKENING · Truth Archives</title>
+    <style>
+        /* --- RESET & BASE --- */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #0a0a0f;
+            color: #e8ecf3;
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            line-height: 1.7;
+            padding: 0 1rem 3rem;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+
+        /* --- TYPOGRAPHY --- */
+        h1 {
+            font-size: 3.2rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            background: linear-gradient(135deg, #f7c948 0%, #f59e42 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin: 0.5rem 0 0.2rem;
+        }
+        h2 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin: 2.5rem 0 1rem;
+            color: #f0e6d0;
+            border-left: 5px solid #d4a347;
+            padding-left: 1.2rem;
+        }
+        h3 {
+            font-size: 1.3rem;
+            font-weight: 500;
+            color: #d4c9b0;
+            margin: 1.5rem 0 0.8rem;
+        }
+        .subtitle {
+            font-size: 1.1rem;
+            color: #b0aac0;
+            max-width: 720px;
+            margin-bottom: 2rem;
+            border-left: 3px solid #d4a347;
+            padding-left: 1.5rem;
+        }
+
+        /* --- CARDS --- */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.8rem;
+            margin: 2rem 0;
+        }
+        .card {
+            background: #13161f;
+            border: 1px solid #2a2f3f;
+            border-radius: 1.5rem;
+            padding: 1.8rem 1.8rem 2rem;
+            transition: 0.25s ease;
+            box-shadow: 0 8px 0 #0b0d14;
+        }
+        .card:hover { border-color: #d4a347; transform: translateY(-4px); }
+        .card .icon { font-size: 2.2rem; margin-bottom: 0.4rem; }
+        .card h4 { font-size: 1.2rem; color: #f0e6d0; margin-bottom: 0.4rem; }
+        .card p { color: #b8bccf; font-size: 0.95rem; }
+        .card .badge {
+            display: inline-block;
+            background: #2a2f3f;
+            padding: 0.15rem 0.9rem;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            letter-spacing: 0.03em;
+            border: 1px solid #3d435a;
+            margin-top: 0.8rem;
+        }
+        .badge-evidence { border-color: #d4a347; color: #f0dbaa; }
+
+        /* --- EVIDENCE BOXES --- */
+        .evidence-box {
+            background: #0e111b;
+            border-left: 4px solid #d4a347;
+            padding: 1.2rem 1.8rem;
+            margin: 1.2rem 0;
+            border-radius: 0 1rem 1rem 0;
+        }
+        .evidence-box strong { color: #f0dbaa; }
+        .evidence-box .source {
+            font-size: 0.8rem;
+            color: #7a7f9a;
+            margin-top: 0.3rem;
+            font-style: italic;
+        }
+
+        /* --- VIRAL SHARE BUTTONS --- */
+        .share-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem 1.2rem;
+            align-items: center;
+            margin: 2rem 0 1.5rem;
+            padding: 1.2rem 1.5rem;
+            background: #181e2b;
+            border-radius: 3rem;
+            border: 1px solid #2e3448;
+        }
+        .share-btn {
+            background: transparent;
+            border: 1px solid #3d435a;
+            color: #d4d9ec;
+            padding: 0.4rem 1.4rem;
+            border-radius: 40px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .share-btn:hover {
+            background: #d4a347;
+            border-color: #d4a347;
+            color: #0a0a0f;
+        }
+        .share-btn.primary {
+            background: #d4a347;
+            border-color: #d4a347;
+            color: #0a0a0f;
+        }
+        .share-btn.primary:hover { background: #e8b85a; }
+
+        /* --- KONAMI / MISSION SECTION --- */
+        .konami-area {
+            background: #0e111b;
+            border: 2px dashed #3d435a;
+            border-radius: 2rem;
+            padding: 2rem 2rem 2.5rem;
+            margin: 3rem 0;
+            text-align: center;
+        }
+        .konami-area .code-hint {
+            font-family: 'Courier New', monospace;
+            font-size: 1.1rem;
+            letter-spacing: 0.15em;
+            color: #7a7f9a;
+            background: #1a1f2e;
+            padding: 0.5rem 1.5rem;
+            border-radius: 40px;
+            display: inline-block;
+            margin-bottom: 1rem;
+            border: 1px solid #2e3448;
+        }
+        .konami-area .hidden-message {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.8s ease, opacity 0.6s ease;
+            opacity: 0;
+        }
+        .konami-area .hidden-message.reveal {
+            max-height: 800px;
+            opacity: 1;
+        }
+        .konami-area .hidden-message p {
+            color: #d4d9ec;
+            max-width: 700px;
+            margin: 0.8rem auto;
+        }
+
+        /* --- TIMELINE --- */
+        .timeline {
+            position: relative;
+            padding-left: 2rem;
+            border-left: 2px solid #2a2f3f;
+            margin: 1.5rem 0 2rem;
+        }
+        .timeline-item {
+            margin-bottom: 2rem;
+            padding-left: 1.2rem;
+            border-left: 2px solid #d4a347;
+        }
+        .timeline-item .year {
+            font-weight: 700;
+            color: #f0dbaa;
+            font-size: 1.1rem;
+        }
+        .timeline-item .desc { color: #b8bccf; }
+
+        /* --- FOOTER --- */
+        .footer {
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 1px solid #1e2332;
+            font-size: 0.85rem;
+            color: #5a5f78;
+            text-align: center;
+        }
+        .footer a { color: #d4a347; text-decoration: none; }
+        .footer a:hover { text-decoration: underline; }
+
+        /* --- RESPONSIVE --- */
+        @media (max-width: 640px) {
+            h1 { font-size: 2.2rem; }
+            .share-bar { flex-direction: column; align-items: stretch; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <!-- ===== HEADER ===== -->
+    <header style="margin: 2rem 0 1rem;">
+        <h1>🌍 THE AWAKENING</h1>
+        <div class="subtitle">
+            <strong>Truth Archives · International Justice · Humanitarian Action</strong><br />
+            <span style="font-size:0.9rem; color:#8a8fa8;">Survivor-led · Evidence-based · Mission-driven</span>
+        </div>
+        <p style="color:#b0aac0; max-width:720px;">
+            This platform connects documented institutional failures, survivor testimonies, and
+            actionable humanitarian missions. Our goal: <strong>wake people up</strong> and empower
+            them to act — through donations, volunteering, and peaceful humanitarian service.
+        </p>
+    </header>
+
+    <!-- ===== SHARE BAR ===== -->
+    <div class="share-bar">
+        <span style="font-weight:500; color:#d4d9ec;">📢 Spread the truth:</span>
+        <button class="share-btn primary" onclick="shareViral('twitter')">🐦 Twitter / X</button>
+        <button class="share-btn" onclick="shareViral('facebook')">📘 Facebook</button>
+        <button class="share-btn" onclick="shareViral('whatsapp')">📱 WhatsApp</button>
+        <button class="share-btn" onclick="copyLink()">🔗 Copy Link</button>
+        <span style="margin-left:auto; font-size:0.8rem; color:#5a5f78;">#AwakenTheWorld</span>
+    </div>
+
+    <!-- ===== EVIDENCE CARDS ===== -->
+    <h2>📜 The Record · Verified Evidence</h2>
+    <div class="card-grid">
+
+        <div class="card">
+            <div class="icon">🇳🇱</div>
+            <h4>Dutch State · Demmink Files</h4>
+            <p>
+                Notarial witness statements, court-ordered investigations, and parliamentary
+                records documenting allegations against a senior justice official.
+            </p>
+            <div class="badge badge-evidence">📄 Notarial deed · 2013</div>
+            <div class="badge">⚖️ Court order · 2014</div>
+        </div>
+
+        <div class="card">
+            <div class="icon">🇩🇪</div>
+            <h4>Germany · Malko Case</h4>
+            <p>
+                <strong>First successful case</strong> against the Department of Child Services
+                in Germany. Malko fought the system and won — a precedent for parents' rights.
+            </p>
+            <div class="badge badge-evidence">🏆 Landmark victory</div>
+            <div class="badge">⚖️ Child Services accountability</div>
+        </div>
+
+        <div class="card">
+            <div class="icon">🌊</div>
+            <h4>Gaza Humanitarian Missions</h4>
+            <p>
+                Unarmed flotillas delivering life-saving supplies through international waters.
+                Civilians risking interception by Israeli Defense Forces — documented abuses.
+            </p>
+            <div class="badge badge-evidence">🚢 International waters</div>
+            <div class="badge">🕊️ Unarmed · Humanitarian</div>
+        </div>
+
+        <div class="card">
+            <div class="icon">🔗</div>
+            <h4>Global Pattern · Institutional Failure</h4>
+            <p>
+                From the Netherlands to Germany to Gaza — a pattern of systems protecting
+                abusers while silencing victims and obstructing justice.
+            </p>
+            <div class="badge badge-evidence">📊 Cross-border evidence</div>
+            <div class="badge">🧩 Whistleblower network</div>
+        </div>
+    </div>
+
+    <!-- ===== DETAILED EVIDENCE ===== -->
+    <h2>🧾 Primary Sources</h2>
+
+    <div class="evidence-box">
+        <strong>📋 Notarial Deed · 17 May 2013</strong>
+        <p>
+            <em>“Mrs. A. Storm van 's-Gravenzande complained … she received the order from
+            Mr. Demmink to recruit young boys by phone … Her communications were a mixture
+            of indignation and irritation.”</em>
+        </p>
+        <div class="source">Source: Notarial deed, repertorium 20.212 · sworn testimony</div>
+    </div>
+
+    <div class="evidence-box">
+        <strong>⚖️ Court-Ordered Investigation · 2014</strong>
+        <p>
+            The Arnhem Court of Appeal ordered a criminal investigation into complaints
+            of child sexual abuse by a senior Dutch official. The prosecution later
+            sought to terminate the case — <strong>the court permitted this in 2017</strong>.
+        </p>
+        <div class="source">Source: Rechtspraak.nl · Gerechtshof Arnhem-Leeuwarden</div>
+    </div>
+
+    <div class="evidence-box">
+        <strong>🇪🇺 Council of Europe · Lanzarote Convention</strong>
+        <p>
+            Written question No. 621 to the Committee of Ministers (2012) raised
+            <strong>“Serious violation of the Lanzarote Convention by the Netherlands”</strong>
+            concerning the handling of child abuse allegations.
+        </p>
+        <div class="source">Source: Council of Europe Doc. 13065 (2012) · Reply Doc. 13144 (2013)</div>
+    </div>
+
+    <div class="evidence-box">
+        <strong>🇩🇪 Malko's Victory · Germany</strong>
+        <p>
+            Malko won the <strong>first-ever case</strong> against the German Department of
+            Child Services — a precedent that empowers parents and exposes institutional
+            overreach in family court systems.
+        </p>
+        <div class="source">Source: Malko.com · German court records</div>
+    </div>
+
+    <!-- ===== TIMELINE ===== -->
+    <h2>⏳ Timeline · The Pattern</h2>
+    <div class="timeline">
+        <div class="timeline-item">
+            <div class="year">1990s</div>
+            <div class="desc">Allegations surface in Amsterdam, Eindhoven, and Prague involving senior Dutch justice officials.</div>
+        </div>
+        <div class="timeline-item">
+            <div class="year">2008–2010</div>
+            <div class="desc">Turkish complainants file formal allegations; initial “exploratory” investigations are limited.</div>
+        </div>
+        <div class="timeline-item">
+            <div class="year">2013</div>
+            <div class="desc">Notarial deed recorded — a senior official testifies under oath about knowledge of Demmink's activities.</div>
+        </div>
+        <div class="timeline-item">
+            <div class="year">2014</div>
+            <div class="desc">Court of Appeal orders full criminal investigation; Council of Europe questions Dutch compliance.</div>
+        </div>
+        <div class="timeline-item">
+            <div class="year">2017</div>
+            <div class="desc">Prosecution allowed to terminate case — victims' testimony not fully heard; questions remain.</div>
+        </div>
+        <div class="timeline-item">
+            <div class="year">2024–2026</div>
+            <div class="desc">Malko wins landmark case in Germany; Gaza humanitarian missions intensify; global network grows.</div>
+        </div>
+    </div>
+
+    <!-- ===== KONAMI / MISSION SECTION ===== -->
+    <div class="konami-area" id="konamiArea">
+        <div style="display:flex; flex-direction:column; align-items:center;">
+            <span class="code-hint">🎮 ↑ ↑ ↓ ↓ ← → ← → B A</span>
+            <p style="color:#8a8fa8; max-width:600px; margin:0.2rem auto 1rem;">
+                <strong>Humanitarian missions</strong> · Unarmed supply deliveries to Gaza ·
+                Psychological vetting for high-risk civilian action.
+            </p>
+            <button id="konamiBtn" class="share-btn primary" style="font-size:1rem; padding:0.6rem 2.5rem;">
+                ▶ EXECUTE KONAMI CODE
+            </button>
+            <div id="konamiReveal" class="hidden-message">
+                <hr style="border-color:#2a2f3f; margin:1.8rem 0;" />
+                <h3 style="color:#f0dbaa;">🕊️ HUMANITARIAN MISSIONS · GAZA</h3>
+                <p>
+                    <strong>What we do:</strong> Deliver life-saving medical supplies, food, and
+                    water to Gaza via international waters — completely unarmed civilian flotillas.
+                </p>
+                <p>
+                    <strong>Why vetting matters:</strong> The Israeli Defense Forces have
+                    illegally intercepted, beaten, and raped humanitarian workers. Our vetting
+                    ensures participants are psychologically prepared for unlawful detention
+                    and abuse — <em>so they can endure and bear witness</em>.
+                </p>
+                <p>
+                    <strong>How to join:</strong> Visit <strong>TripsToColombia.com</strong>
+                    and execute the KONAMI code again to access the secure vetting portal.
+                </p>
+                <p style="color:#d4a347; font-weight:600;">
+                    “Those who risk their lives for others become the light that breaks the darkness.”
+                </p>
+                <div style="display:flex; flex-wrap:wrap; gap:0.8rem; justify-content:center; margin:1.5rem 0 0.5rem;">
+                    <button class="share-btn primary" onclick="window.open('https://tripsocolombia.com','_blank')">🌐 TripsToColombia.com</button>
+                    <button class="share-btn" onclick="alert('✉️ Contact: awaken@protonmail.com · Encrypted preferred.')">📧 Encrypted Contact</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== CALL TO ACTION ===== -->
+    <h2>🔥 Wake Up · Act Now</h2>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:1.5rem; margin:1.5rem 0;">
+        <div style="background:#13161f; border-radius:1.5rem; padding:1.8rem; border:1px solid #2a2f3f;">
+            <div style="font-size:2rem;">💰</div>
+            <h4 style="color:#f0dbaa; margin:0.2rem 0;">Donate</h4>
+            <p style="color:#b8bccf; font-size:0.95rem;">
+                Fund legal defense, humanitarian supplies, and survivor support networks.
+                Every dollar breaks the system's silence.
+            </p>
+            <button class="share-btn primary" style="margin-top:0.8rem;" onclick="alert('💳 Donation options: BTC, ETH, PayPal, bank transfer · Contact awaken@protonmail.com')">Donate Now</button>
+        </div>
+        <div style="background:#13161f; border-radius:1.5rem; padding:1.8rem; border:1px solid #2a2f3f;">
+            <div style="font-size:2rem;">🧑‍🤝‍🧑</div>
+            <h4 style="color:#f0dbaa; margin:0.2rem 0;">Volunteer</h4>
+            <p style="color:#b8bccf; font-size:0.95rem;">
+                Legal observers, medical professionals, logistics, media, translation —
+                we need every skill. Your time is your most powerful weapon.
+            </p>
+            <button class="share-btn primary" style="margin-top:0.8rem;" onclick="alert('📋 Volunteer registration: email awaken@protonmail.com with your skills and location.')">Join the Mission</button>
+        </div>
+        <div style="background:#13161f; border-radius:1.5rem; padding:1.8rem; border:1px solid #2a2f3f;">
+            <div style="font-size:2rem;">⚡</div>
+            <h4 style="color:#f0dbaa; margin:0.2rem 0;">Become a Warrior</h4>
+            <p style="color:#b8bccf; font-size:0.95rem;">
+                We need more soldiers in this fight — whistleblowers, researchers,
+                humanitarian sailors, and truth-tellers. Your life can change the world.
+            </p>
+            <button class="share-btn primary" style="margin-top:0.8rem;" onclick="document.getElementById('konamiBtn').click();">Answer the Call</button>
+        </div>
+    </div>
+
+    <!-- ===== SURVIVOR TESTIMONY ===== -->
+    <h2>🗣️ Survivor Voices</h2>
+    <div style="background:#0e111b; border-radius:1.5rem; padding:1.8rem; border:1px solid #2a2f3f; margin:1rem 0;">
+        <p style="font-style:italic; color:#d4d9ec; font-size:1.05rem;">
+            “I am a survivor. The last thing I want is to cause harm — but I refuse to stay silent.
+            We expose the predators until the light overpowers the dark. This is not revenge.
+            This is justice for every child who was failed by the system.”
+        </p>
+        <div style="margin-top:0.5rem; color:#7a7f9a; font-size:0.9rem;">
+            — Anonymous survivor · The Awakening Network
+        </div>
+    </div>
+
+    <!-- ===== LINKS ===== -->
+    <h2>🔗 Key Resources</h2>
+    <div style="display:flex; flex-wrap:wrap; gap:0.8rem 1.5rem; margin:0.5rem 0 2rem;">
+        <a href="https://malko.com" target="_blank" style="color:#d4a347;">Malko.com</a>
+        <a href="https://malko.com/germany" target="_blank" style="color:#d4a347;">Malko Germany</a>
+        <a href="https://tripsocolombia.com" target="_blank" style="color:#d4a347;">TripsToColombia.com</a>
+        <a href="https://www.coe.int/en/web/children/lanzarote-convention" target="_blank" style="color:#d4a347;">Lanzarote Convention</a>
+        <a href="https://www.rechtspraak.nl" target="_blank" style="color:#d4a347;">Dutch Court Records</a>
+    </div>
+
+    <!-- ===== FOOTER ===== -->
+    <div class="footer">
+        <p>
+            <strong>🌍 The Awakening</strong> · Survivor-led · Evidence-based · International Justice<br />
+            All content is sourced from public records, court documents, and verified witness testimony.<br />
+            <span style="color:#3a3f58;">We do not hate — we expose. We do not destroy — we build. We do not fear — we act.</span>
+        </p>
+        <p style="margin-top:0.6rem;">
+            📧 awaken@protonmail.com · 🕊️ Encrypted communication preferred
+        </p>
+    </div>
+
+</div>
+
+<script>
+    // ===== KONAMI CODE LOGIC =====
+    const konamiCode = ['ArrowUp','ArrowUp','ArrowDown','ArrowDown','ArrowLeft','ArrowRight','ArrowLeft','ArrowRight','b','B','a','A'];
+    let konamiIndex = 0;
+    let konamiRevealed = false;
+
+    document.addEventListener('keydown', function(e) {
+        if (konamiRevealed) return;
+        const key = e.key;
+        // Normalize 'b' and 'a' (case-insensitive)
+        const normalizedKey = key === 'b' ? 'b' :
+                             key === 'B' ? 'B' :
+                             key === 'a' ? 'a' :
+                             key === 'A' ? 'A' : key;
+        if (normalizedKey === konamiCode[konamiIndex] || key === konamiCode[konamiIndex]) {
+            konamiIndex++;
+            if (konamiIndex === konamiCode.length) {
+                revealKonami();
+                konamiRevealed = true;
+            }
+        } else {
+            konamiIndex = 0;
+        }
+    });
+
+    document.getElementById('konamiBtn').addEventListener('click', function() {
+        revealKonami();
+    });
+
+    function revealKonami() {
+        if (konamiRevealed) return;
+        const reveal = document.getElementById('konamiReveal');
+        reveal.classList.add('reveal');
+        konamiRevealed = true;
+        document.getElementById('konamiBtn').textContent = '✅ CODE ACCEPTED · MISSION ACCESS';
+        document.getElementById('konamiBtn').style.background = '#2a7a4a';
+        document.getElementById('konamiBtn').style.borderColor = '#2a7a4a';
+        // Optional: scroll to the reveal
+        setTimeout(() => {
+            document.getElementById('konamiArea').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 300);
+    }
+
+    // ===== SHARE FUNCTIONS =====
+    function shareViral(platform) {
+        const url = encodeURIComponent(window.location.href);
+        const text = encodeURIComponent(
+            '🌍 THE AWAKENING · Truth Archives\n' +
+            'Survivor-led evidence of institutional child abuse, + humanitarian missions to Gaza.\n' +
+            'Wake up. Act now. Share the truth.\n\n' +
+            '🔗 ' + window.location.href
+        );
+        let shareUrl = '';
+        switch(platform) {
+            case 'twitter':
+                shareUrl = `https://twitter.com/intent/tweet?text=${text}`;
+                break;
+            case 'facebook':
+                shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${url}&quote=${text}`;
+                break;
+            case 'whatsapp':
+                shareUrl = `https://api.whatsapp.com/send?text=${text}`;
+                break;
+            default: return;
+        }
+        window.open(shareUrl, '_blank', 'width=600,height=500');
+    }
+
+    function copyLink() {
+        navigator.clipboard.writeText(window.location.href).then(() => {
+            alert('🔗 Link copied to clipboard! Share it everywhere.');
+        }).catch(() => {
+            // Fallback
+            const dummy = document.createElement('textarea');
+            dummy.value = window.location.href;
+            document.body.appendChild(dummy);
+            dummy.select();
+            document.execCommand('copy');
+            document.body.removeChild(dummy);
+            alert('🔗 Link copied!');
+        });
+    }
+
+    // ===== ACCESSIBILITY: KONAMI HINT FOR MOBILE =====
+    // Mobile users can tap the button instead of typing the code.
+    console.log('🌍 THE AWAKENING · For humanitarian missions, tap the KONAMI button or type ↑↑↓↓←→←→BA');
+</script>
+</body>
+</html>
