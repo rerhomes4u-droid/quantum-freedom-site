@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>María Fernanda · Tarot Raider</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <style>
+        /* ---------- RESET & BASE ---------- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #0e0a0c;
+            background-image: radial-gradient(circle at 70% 20%, #2d1a25, #0e0a0c 85%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            color: #f2e6ed;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            padding: 2rem 1.2rem 3rem;
+            line-height: 1.5;
+        }
+
+        .app {
+            max-width: 1180px;
+            width: 100%;
+        }
+
+        /* ---------- GLOW DECOR ---------- */
+        .glow-orb {
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.2;
+            pointer-events: none;
+            z-index: 0;
+        }
+        .glow-orb--1 {
+            width: 500px;
+            height: 500px;
+            top: -180px;
+            right: -100px;
+            background: #a86b8a;
+        }
+        .glow-orb--2 {
+            width: 550px;
+            height: 550px;
+            bottom: -200px;
+            left: -120px;
+            background: #5a3d4e;
+        }
+
+        /* ---------- HEADER ---------- */
+        header {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            padding: 2rem 0 1.8rem;
+            border-bottom: 1px solid rgba(255, 200, 200, 0.06);
+        }
+
+        .badge {
+            display: inline-block;
+            background: rgba(200, 150, 175, 0.12);
+            backdrop-filter: blur(6px);
+            padding: 0.3rem 1.4rem;
+            border-radius: 60px;
+            font-size: 0.7rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #dbb8cc;
+            border: 1px solid rgba(200, 150, 175, 0.12);
+            margin-bottom: 1rem;
+        }
+
+        h1 {
+            font-size: 4.2rem;
+            font-weight: 500;
+            letter-spacing: -0.02em;
+            background: linear-gradient(135deg, #f5e3ed, #dbb8cc 70%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 0.2rem;
+        }
+
+        .subhead {
+            font-size: 1.2rem;
+            font-weight: 300;
+            color: #d0bcc8;
+            max-width: 620px;
+            margin: 0.4rem auto 0;
+        }
+        .subhead i {
+            color: #c28baa;
+            margin: 0 0.4rem;
+        }
+
+        /* ---------- CARD SECTIONS ---------- */
+        .section {
+            position: relative;
+            z-index: 2;
+            background: rgba(24, 16, 20, 0.55);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 44px;
+            padding: 2.5rem 2.8rem;
+            margin-top: 2.8rem;
+            border: 1px solid rgba(255, 200, 200, 0.05);
+            box-shadow: 0 30px 50px -16px rgba(0, 0, 0, 0.7);
+        }
+
+        .section-title {
+            font-size: 1.6rem;
+            font-weight: 400;
+            letter-spacing: -0.01em;
+            margin-bottom: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            color: #f0dfe9;
+        }
+        .section-title i {
+            color: #c28baa;
+            font-size: 1.4rem;
+            width: 2rem;
+        }
+
+        /* ---------- HERO ---------- */
+        .hero-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2.2rem;
+            align-items: center;
+        }
+
+        .hero-text {
+            flex: 2;
+            min-width: 250px;
+        }
+        .hero-text p {
+            font-size: 1.05rem;
+            color: #e0d0db;
+            margin-bottom: 1rem;
+            font-weight: 300;
+        }
+        .hero-text strong {
+            color: #f0dce6;
+            font-weight: 400;
+        }
+
+        .hero-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.8rem 2.5rem;
+            margin-top: 1.2rem;
+        }
+        .hero-stats span {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.95rem;
+            color: #dac4d2;
+        }
+        .hero-stats i {
+            color: #c28baa;
+            font-size: 1.1rem;
+        }
+
+        .hero-quote {
+            flex: 1.2;
+            min-width: 200px;
+            background: rgba(200, 150, 175, 0.06);
+            border-radius: 28px;
+            padding: 1.6rem 2rem;
+            border-left: 4px solid #a86b8a;
+            font-style: italic;
+            color: #ecdce5;
+            font-size: 1rem;
+            line-height: 1.6;
+            backdrop-filter: blur(4px);
+        }
+        .hero-quote i {
+            color: #a86b8a;
+            margin-right: 0.4rem;
+        }
+        .hero-quote .autor {
+            display: block;
+            margin-top: 0.6rem;
+            font-style: normal;
+            font-size: 0.8rem;
+            color: #b79dad;
+        }
+
+        /* ---------- SERVICES ---------- */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1.8rem;
+        }
+
+        .service-card {
+            background: rgba(255, 240, 245, 0.02);
+            border-radius: 30px;
+            padding: 1.8rem 1.6rem 2rem;
+            border: 1px solid rgba(255, 200, 200, 0.04);
+            transition: all 0.25s ease;
+        }
+        .service-card:hover {
+            background: rgba(255, 240, 245, 0.06);
+            border-color: rgba(200, 150, 175, 0.2);
+            transform: translateY(-4px);
+        }
+        .service-card .icon {
+            font-size: 2.2rem;
+            color: #c28baa;
+            margin-bottom: 0.6rem;
+        }
+        .service-card h3 {
+            font-size: 1.25rem;
+            font-weight: 400;
+            color: #f0dfe9;
+            margin-bottom: 0.3rem;
+        }
+        .service-card p {
+            font-size: 0.9rem;
+            color: #ccbac5;
+            font-weight: 300;
+            line-height: 1.5;
+        }
+        .service-card .price-tag {
+            display: inline-block;
+            margin-top: 0.8rem;
+            background: rgba(200, 150, 175, 0.1);
+            padding: 0.2rem 1.2rem;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            color: #e2c4d6;
+            letter-spacing: 0.02em;
+        }
+
+        /* ---------- PRICING ---------- */
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+            gap: 1rem;
+        }
+        .pricing-item {
+            background: rgba(255, 240, 245, 0.02);
+            border-radius: 20px;
+            padding: 1.2rem 1.2rem;
+            border: 1px solid rgba(255, 200, 200, 0.04);
+            display: flex;
+            flex-direction: column;
+        }
+        .pricing-item .name {
+            font-weight: 400;
+            color: #f0dfe9;
+            font-size: 0.95rem;
+        }
+        .pricing-item .detail {
+            font-size: 0.75rem;
+            color: #b79dad;
+            margin: 0.2rem 0 0.5rem;
+        }
+        .pricing-item .price {
+            font-size: 1.1rem;
+            font-weight: 400;
+            color: #e8d0de;
+            margin-top: auto;
+        }
+        .pricing-item .price small {
+            font-size: 0.7rem;
+            color: #b79dad;
+            font-weight: 300;
+        }
+
+        /* ---------- FEATURES ---------- */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1rem;
+            margin-top: 0.8rem;
+        }
+        .feature-item {
+            background: rgba(255, 240, 245, 0.02);
+            border-radius: 20px;
+            padding: 1rem 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            border: 1px solid rgba(255, 200, 200, 0.03);
+        }
+        .feature-item i {
+            color: #c28baa;
+            font-size: 1.2rem;
+            width: 1.8rem;
+            text-align: center;
+        }
+        .feature-item span {
+            font-size: 0.9rem;
+            color: #dcc4d2;
+        }
+
+        /* ---------- WHATSAPP BUTTON ---------- */
+        .whatsapp-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.7rem;
+            background: #25D366;
+            color: #0e0a0c;
+            padding: 0.9rem 2.6rem;
+            border-radius: 60px;
+            font-weight: 500;
+            font-size: 1.05rem;
+            text-decoration: none;
+            transition: all 0.25s;
+            border: none;
+            cursor: pointer;
+            margin-top: 0.2rem;
+        }
+        .whatsapp-btn:hover {
+            background: #20b85a;
+            transform: scale(1.02);
+            box-shadow: 0 10px 40px rgba(37, 211, 102, 0.25);
+        }
+        .whatsapp-btn i {
+            font-size: 1.4rem;
+        }
+
+        .btn-outline {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: transparent;
+            border: 1px solid rgba(200, 150, 175, 0.2);
+            color: #e2c4d6;
+            padding: 0.7rem 1.8rem;
+            border-radius: 60px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: 0.2s;
+        }
+        .btn-outline:hover {
+            background: rgba(200, 150, 175, 0.08);
+            border-color: rgba(200, 150, 175, 0.35);
+        }
+
+        .actions {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 1.2rem;
+            margin-top: 1rem;
+        }
+
+        /* ---------- FOOTER ---------- */
+        footer {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            margin-top: 4rem;
+            padding-top: 1.8rem;
+            border-top: 1px solid rgba(255, 200, 200, 0.04);
+            font-size: 0.8rem;
+            color: #9a8793;
+            letter-spacing: 0.02em;
+        }
+        footer i {
+            color: #b47b9b;
+            margin: 0 0.2rem;
+        }
+
+        /* ---------- RESPONSIVE ---------- */
+        @media (max-width: 700px) {
+            h1 {
+                font-size: 3rem;
+            }
+            .section {
+                padding: 1.8rem 1.2rem;
+            }
+            .hero-quote {
+                padding: 1.2rem;
+            }
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+            .pricing-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        @media (max-width: 480px) {
+            .pricing-grid {
+                grid-template-columns: 1fr;
+            }
+            .hero-stats {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ---------- UTILITY ---------- */
+        .text-center {
+            text-align: center;
+        }
+        .mt-1 {
+            margin-top: 1rem;
+        }
+        .mt-2 {
+            margin-top: 2rem;
+        }
+        .gap-1 {
+            gap: 0.8rem;
+        }
+        .flex-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .muted {
+            color: #b79dad;
+            font-weight: 300;
+        }
+        .highlight {
+            color: #e2c4d6;
+            font-weight: 400;
+        }
+    </style>
+</head>
+<body>
+    <!-- decoración glow -->
+    <div class="glow-orb glow-orb--1"></div>
+    <div class="glow-orb glow-orb--2"></div>
+
+    <div class="app">
+        <!-- HEADER -->
+        <header>
+            <div class="badge"><i class="fas fa-moon" style="margin-right:6px;"></i> tarot Raider · lectura consciente</div>
+            <h1>María Fernanda</h1>
+            <p class="subhead">
+                <i class="fas fa-star"></i> el tarot que te habla al alma <i class="fas fa-star"></i>
+            </p>
+            <p style="font-weight:300; color:#c2aebb; max-width:550px; margin:0.6rem auto 0; font-size:0.95rem;">
+                No adivino el futuro sin conocerte. Te hago 7 preguntas, y con tus respuestas
+                creamos una lectura única con el <strong style="color:#e2c4d6;">Tarot Raider</strong>.
+            </p>
+        </header>
+
+        <!-- PRESENTACIÓN -->
+        <section class="section">
+            <div class="hero-grid">
+                <div class="hero-text">
+                    <p>
+                        <strong>Hola, soy María Fernanda.</strong> Acompaño almas a recordar quiénes son,
+                        a sanar desde el corazón y reconectar con su sabiduría interior.
+                        Canalizo mensajes de la Fuente, guiada por el <strong>Tarot Raider</strong> y la energía de los ciclos.
+                    </p>
+                    <p style="font-size:0.95rem; color:#ccbac5;">
+                        El Raider Tarot es una herramienta ancestral que combina simbología mística y arquetipos para desbloquear verdades profundas. No es un tarot adivinatorio, es un espejo para tu alma.
+                    </p>
+                    <div class="hero-stats">
+                        <span><i class="fas fa-clock"></i> sesión 30 min · 60 min</span>
+                        <span><i class="fas fa-video"></i> videollamada o grabada</span>
+                        <span><i class="fas fa-lock"></i> 100% confidencial</span>
+                    </div>
+                </div>
+                <div class="hero-quote">
+                    <i class="fas fa-quote-left"></i> "Justo así me estaba sintiendo,
+                    pero necesitaba escucharlo"
+                    <span class="autor">— testimonio de una consultante</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- SERVICIOS -->
+        <section class="section">
+            <div class="section-title">
+                <i class="fas fa-hand-sparkles"></i> formatos de lectura · Raider Tarot
+            </div>
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="icon"><i class="fas fa-video"></i></div>
+                    <h3>En vivo · videollamada</h3>
+                    <p>Lectura general + preguntas específicas. Conexión en tiempo real por WhatsApp.</p>
+                    <span class="price-tag">30 min · $58 USD</span>
+                    <span class="price-tag" style="margin-left:0.3rem;">60 min · $98 USD</span>
+                </div>
+                <div class="service-card">
+                    <div class="icon"><i class="fas fa-microphone-alt"></i></div>
+                    <h3>Grabada · por WhatsApp</h3>
+                    <p>Envías tus preguntas, canalizo y te respondo con un audio personalizado.</p>
+                    <span class="price-tag">1 pregunta · $15 USD</span>
+                    <span class="price-tag" style="margin-left:0.3rem;">2 preg. · $24 USD</span>
+                </div>
+                <div class="service-card">
+                    <div class="icon"><i class="fas fa-heart"></i></div>
+                    <h3>Mándala del amor</h3>
+                    <p>Lectura profunda enfocada en relaciones, vínculos y apertura del corazón.</p>
+                    <span class="price-tag">$39 USD</span>
+                </div>
+                <div class="service-card">
+                    <div class="icon"><i class="fas fa-crown"></i></div>
+                    <h3>Raider completo</h3>
+                    <p>Tirada de 7 cartas del Raider Tarot + interpretación detallada de cada arquetipo.</p>
+                    <span class="price-tag">$75 USD</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- PRICING -->
+        <section class="section">
+            <div class="section-title">
+                <i class="fas fa-coins"></i> inversión consciente
+            </div>
+            <div class="pricing-grid">
+                <div class="pricing-item">
+                    <span class="name">📹 30 min · 1:1</span>
+                    <span class="detail">videollamada · sesión profunda</span>
+                    <span class="price">$58 USD <small>| $235.000 COP</small></span>
+                </div>
+                <div class="pricing-item">
+                    <span class="name">📹 60 min · 1:1</span>
+                    <span class="detail">recomendada para procesos importantes</span>
+                    <span class="price">$98 USD <small>| $395.000 COP</small></span>
+                </div>
+                <div class="pricing-item">
+                    <span class="name">🎙️ 1 pregunta</span>
+                    <span class="detail">respuesta clara y directa</span>
+                    <span class="price">$15 USD <small>| $62.000 COP</small></span>
+                </div>
+                <div class="pricing-item">
+                    <span class="name">🎙️ 2 preguntas</span>
+                    <span class="detail">respuesta + orientación</span>
+                    <span class="price">$24 USD <small>| $98.000 COP</small></span>
+                </div>
+                <div class="pricing-item">
+                    <span class="name">🎙️ 3 preguntas</span>
+                    <span class="detail">claridad sobre tu situación</span>
+                    <span class="price">$33 USD <small>| $134.000 COP</small></span>
+                </div>
+                <div class="pricing-item">
+                    <span class="name">🎙️ 4 preguntas</span>
+                    <span class="detail">desbloqueo y dirección</span>
+                    <span class="price">$44 USD <small>| $178.000 COP</small></span>
+                </div>
+                <div class="pricing-item">
+                    <span class="name">🎙️ 5 preguntas</span>
+                    <span class="detail">visión total + guía clara</span>
+                    <span class="price">$55 USD <small>| $222.000 COP</small></span>
+                </div>
+                <div class="pricing-item">
+                    <span class="name">❤️ Mándala del amor</span>
+                    <span class="detail">lectura especializada en vínculos</span>
+                    <span class="price">$39 USD <small>| $158.000 COP</small></span>
+                </div>
+                <div class="pricing-item">
+                    <span class="name">👑 Raider completo</span>
+                    <span class="detail">7 cartas + arquetipos + guía</span>
+                    <span class="price">$75 USD <small>| $305.000 COP</small></span>
+                </div>
+            </div>
+            <p style="margin-top:1.2rem; font-size:0.8rem; color:#b79dad;">
+                <i class="fas fa-info-circle"></i> 50% del importe al momento de reservar · el resto antes de la sesión
+            </p>
+        </section>
+
+        <!-- FEATURES -->
+        <section class="section">
+            <div class="section-title">
+                <i class="fas fa-gem"></i> más que una lectura
+            </div>
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <i class="fas fa-crystal-ball"></i>
+                    <span>Tirada con <strong>Raider Tarot</strong> (7 arquetipos)</span>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-pen-fancy"></i>
+                    <span>Resumen escrito de tu lectura</span>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-headphones-alt"></i>
+                    <span>Audio guía para integrar el mensaje</span>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-book-open"></i>
+                    <span>Acceso a meditaciones exclusivas</span>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-user-astronaut"></i>
+                    <span>Sesiones de seguimiento (15% dto.)</span>
+                </div>
+                <div class="feature-item">
+                    <i class="fas fa-calendar-check"></i>
+                    <span>Recordatorio automático de tu sesión</span>
+                </div>
+            </div>
+            <p style="margin-top:1.2rem; font-size:0.85rem; color:#b79dad;">
+                <i class="fas fa-star" style="color:#c28baa;"></i>  cada experiencia es única, diseñada para tu proceso
+            </p>
+        </section>
+
+        <!-- CTA + WHATSAPP -->
+        <section class="section" style="text-align:center;">
+            <div style="max-width:540px; margin:0 auto;">
+                <p style="font-size:1.1rem; color:#f0dfe9; font-weight:300; margin-bottom:0.2rem;">
+                    ¿Sentís el llamado?
+                </p>
+                <p style="color:#ccbac5; margin-bottom:1.2rem; font-weight:300;">
+                    Tu alma ya está lista. Escribime por WhatsApp y comenzamos.
+                </p>
+                <div class="actions" style="justify-content:center;">
+                    <a href="https://wa.me/573106489132?text=Hola%20Mar%C3%ADa%20Fernanda%2C%20quiero%20agendar%20una%20lectura%20con%20el%20Tarot%20Raider" 
+                       target="_blank" class="whatsapp-btn">
+                        <i class="fab fa-whatsapp"></i> Consultar vía WhatsApp
+                    </a>
+                    <span style="color:#9a8793; font-size:0.8rem;">+57 310 648 9132</span>
+                </div>
+                <p style="margin-top:1rem; font-size:0.7rem; color:#9a8793;">
+                    <i class="fas fa-shield-alt"></i> tus datos son confidenciales · sin spam, solo acompañamiento
+                </p>
+            </div>
+        </section>
+
+        <!-- FOOTER -->
+        <footer>
+            <i class="fas fa-crescent-moon"></i> María Fernanda · Tarot Raider 
+            <span style="margin:0 0.4rem;">·</span> 
+            <i class="fas fa-star"></i> 
+            <span style="display:inline-block; margin-left:0.3rem;">espacio sagrado para tu alma</span>
+        </footer>
+    </div>
+
+    <!-- self-executing script -->
+    <script>
+        (function() {
+            const footer = document.querySelector('footer');
+            if (footer) {
+                const year = new Date().getFullYear();
+                const span = document.createElement('span');
+                span.style.margin = '0 0.6rem';
+                span.style.color = '#6d5a64';
+                span.textContent = `· ${year}`;
+                footer.appendChild(span);
+            }
+
+            console.log('🌙 María Fernanda · Tarot Raider');
+            console.log('✨ "Tu alma ya está lista."');
+            console.log('📞 +57 310 648 9132');
+        })();
+    </script>
+</body>
+</html>
