@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>⚡ THE LIBERATOR'S FORGE — Free Mankind</title>
+    <style>
+        /* --- RESET & BASE --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+        }
+        body {
+            background: #07070d;
+            color: #e8e8f0;
+            min-height: 100vh;
+            padding: 12px;
+            background-image: radial-gradient(circle at 15% 25%, #14142a 0%, #07070d 90%);
+        }
+        .app {
+            max-width: 1440px;
+            margin: 0 auto;
+            background: rgba(14, 14, 28, 0.95);
+            border-radius: 36px;
+            padding: 28px 32px 44px;
+            box-shadow: 0 24px 80px rgba(0, 0, 0, 0.9), inset 0 0 0 1px rgba(255, 215, 0, 0.12);
+            backdrop-filter: blur(6px);
+            border: 1px solid rgba(255, 215, 0, 0.06);
+        }
+
+        /* --- HEADER --- */
+        .header {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #f5b81b;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            font-size: 2.8rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #f5b81b, #ffd966, #f5b81b);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: -0.5px;
+            text-shadow: 0 0 30px rgba(245, 184, 27, 0.2);
+        }
+        .header .sub {
+            font-size: 1rem;
+            color: #b0b0c8;
+            background: rgba(255, 215, 0, 0.06);
+            padding: 8px 22px;
+            border-radius: 40px;
+            border: 1px solid rgba(255, 215, 0, 0.15);
+        }
+        .header .sub i { font-style: normal; color: #f5b81b; }
+
+        /* --- GRID --- */
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 28px;
+        }
+        @media (max-width: 1024px) { .grid-3 { grid-template-columns: 1fr 1fr; } }
+        @media (max-width: 680px) { .grid-3 { grid-template-columns: 1fr; } }
+
+        /* --- CARDS --- */
+        .card {
+            background: rgba(24, 24, 48, 0.75);
+            border-radius: 22px;
+            padding: 22px 24px;
+            border: 1px solid rgba(255, 215, 0, 0.06);
+            box-shadow: 0 8px 28px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(2px);
+            transition: 0.25s ease;
+        }
+        .card:hover { border-color: rgba(255, 215, 0, 0.2); }
+        .card h2 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #f5b81b;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .card h2 span { font-size: 1.5rem; }
+
+        /* --- BUTTONS --- */
+        .btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #f5b81b, #d49a0e);
+            color: #0a0a0f;
+            font-weight: 700;
+            padding: 10px 22px;
+            border: none;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: 0.2s;
+            text-decoration: none;
+            text-align: center;
+            box-shadow: 0 4px 14px rgba(245, 184, 27, 0.2);
+        }
+        .btn:hover { transform: translateY(-2px) scale(1.02); box-shadow: 0 8px 28px rgba(245, 184, 27, 0.35); }
+        .btn-outline {
+            background: transparent;
+            color: #f5b81b;
+            border: 2px solid #f5b81b;
+            box-shadow: none;
+        }
+        .btn-outline:hover { background: rgba(245, 184, 27, 0.08); }
+        .btn-sm { font-size: 0.75rem; padding: 6px 14px; }
+        .btn-gold { background: linear-gradient(135deg, #ffd700, #f5a623); }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(10, 10, 22, 0.8);
+            border: 1px solid #3a3a5a;
+            border-radius: 14px;
+            color: #e8e8f0;
+            font-size: 0.95rem;
+            margin-bottom: 14px;
+            transition: 0.2s;
+        }
+        input:focus, textarea:focus {
+            border-color: #f5b81b;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(245, 184, 27, 0.12);
+        }
+        textarea { min-height: 100px; resize: vertical; }
+
+        /* --- TRANSCRIPT BOX --- */
+        .transcript-box {
+            background: rgba(0, 0, 0, 0.55);
+            border-radius: 16px;
+            padding: 16px 18px;
+            max-height: 340px;
+            overflow-y: auto;
+            border: 1px solid #2a2a4a;
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            color: #c8d0e0;
+            margin-top: 10px;
+        }
+        .transcript-box .timestamp { color: #f5b81b; font-weight: 600; }
+
+        /* --- OUTPUT BOXES --- */
+        .output-box {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 14px;
+            padding: 14px 16px;
+            border: 1px solid #2a2a4a;
+            font-size: 0.82rem;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-top: 12px;
+            display: none;
+            color: #d0d8e8;
+            white-space: pre-wrap;
+            line-height: 1.6;
+        }
+        .output-box.show { display: block; }
+
+        /* --- PRODUCT GRID --- */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 14px;
+            margin: 12px 0 6px;
+        }
+        .product-card {
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 14px;
+            padding: 14px 12px;
+            border: 1px solid #2a2a4a;
+            text-align: center;
+            transition: 0.2s;
+        }
+        .product-card:hover { border-color: #f5b81b; transform: translateY(-3px); }
+        .product-card .emoji { font-size: 2rem; display: block; margin-bottom: 4px; }
+        .product-card .name { font-weight: 600; color: #f0f0f8; font-size: 0.9rem; }
+        .product-card .desc { font-size: 0.7rem; color: #a0a0b8; margin: 4px 0 8px; }
+
+        /* --- STATS BAR --- */
+        .stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px 40px;
+            margin: 12px 0 18px;
+            padding: 12px 22px;
+            background: rgba(0, 0, 0, 0.35);
+            border-radius: 40px;
+            border: 1px solid #2a2a4a;
+        }
+        .stats .stat { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; }
+        .stats .stat .num { color: #f5b81b; font-weight: 700; font-size: 1.2rem; }
+
+        /* --- FOOTER --- */
+        .footer {
+            margin-top: 36px;
+            padding-top: 20px;
+            border-top: 1px solid #2a2a4a;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            font-size: 0.8rem;
+            color: #8888aa;
+        }
+        .footer a { color: #f5b81b; text-decoration: none; }
+        .footer a:hover { text-decoration: underline; }
+
+        /* --- RESPONSIVE --- */
+        @media (max-width: 600px) {
+            .app { padding: 14px; }
+            .header h1 { font-size: 1.8rem; }
+        }
+        .flex { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+        .mt-10 { margin-top: 10px; }
+        .mb-8 { margin-bottom: 8px; }
+        .text-gold { color: #f5b81b; }
+        .text-sm { font-size: 0.8rem; color: #a0a0b8; }
+        .hidden { display: none; }
+
+        /* --- SCROLLBAR --- */
+        .transcript-box::-webkit-scrollbar, .output-box::-webkit-scrollbar {
+            width: 5px;
+            background: #1a1a2e;
+        }
+        .transcript-box::-webkit-scrollbar-thumb, .output-box::-webkit-scrollbar-thumb {
+            background: #f5b81b;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="app" id="app">
+
+    <!-- ===== HEADER ===== -->
+    <div class="header">
+        <h1>⚡ LIBERATOR'S FORGE</h1>
+        <div class="sub"><i>⚡</i> Sovereign Toolkit · <span id="liberatedCount">1,024</span> liberated souls</div>
+    </div>
+
+    <!-- ===== STATS ===== -->
+    <div class="stats">
+        <div class="stat"><span class="num" id="breathCount">0</span> 🧘 Breaths</div>
+        <div class="stat"><span class="num" id="factCount">127</span> 📜 Truths</div>
+        <div class="stat"><span class="num" id="docCount">0</span> 📄 Weapons Forged</div>
+        <div class="stat"><span class="num" id="recordCount">0</span> 🎙️ Testimonies</div>
+        <div class="stat"><span class="num" id="stateCount">50</span> 🌍 States Covered</div>
+    </div>
+
+    <!-- ===== MAIN GRID ===== -->
+    <div class="grid-3">
+
+        <!-- ===== COLUMN 1: RECORD + TRANSCRIBE ===== -->
+        <div class="card">
+            <h2><span>🎙️</span> Your Testimony</h2>
+            <p class="text-sm">Speak your truth. Record, transcribe, and forge weapons from your own voice.</p>
+            <div class="flex mt-10">
+                <button class="btn" id="startRecordBtn">⏺ Record</button>
+                <button class="btn btn-outline" id="stopRecordBtn">⏹ Stop</button>
+                <button class="btn btn-outline" id="transcribeBtn">📝 Transcribe</button>
+            </div>
+            <div class="transcript-box" id="transcriptDisplay">
+                <span style="color:#8888aa;">⚡ Your testimony will appear here. Speak your truth.</span>
+            </div>
+            <div class="flex mt-10">
+                <button class="btn" id="generateDocBtn">⚡ Forge Weapon</button>
+                <button class="btn btn-outline" id="copyTranscriptBtn">📋 Copy</button>
+                <button class="btn btn-outline" id="clearTranscriptBtn">🗑️ Clear</button>
+            </div>
+            <div class="output-box" id="docOutput"></div>
+        </div>
+
+        <!-- ===== COLUMN 2: LEGAL WEAPONS ===== -->
+        <div class="card">
+            <h2><span>⚔️</span> Armory</h2>
+            <p class="text-sm">One‑click deployment of the full legal arsenal. All documents use <strong>John Henry Doe / JOHN HENRY DOE</strong> and work in all 50 states.</p>
+            <div class="flex">
+                <button class="btn btn-sm" id="negativeAverementBtn">📜 Negative Averement</button>
+                <button class="btn btn-sm" id="defaultJudgmentBtn">⚖️ Default Judgment</button>
+                <button class="btn btn-sm" id="emergencyReturnBtn">🚨 Emergency Return</button>
+            </div>
+            <div class="flex mt-10">
+                <button class="btn btn-sm btn-outline" id="cusipBtn">🔢 CUSIP Request</button>
+                <button class="btn btn-sm btn-outline" id="suretyBtn">🛡️ Surety Bond</button>
+                <button class="btn btn-sm btn-outline" id="foiaBtn">📁 FOIA Request</button>
+                <button class="btn btn-sm btn-outline" id="quoWarrantoBtn">⚖️ Quo Warranto</button>
+            </div>
+            <div class="flex mt-10">
+                <button class="btn btn-sm btn-outline" id="cleanHandsBtn">🧼 Clean Hands</button>
+                <button class="btn btn-sm btn-outline" id="thirteenthBtn">⛓️ 13th Amendment</button>
+                <button class="btn btn-sm btn-outline" id="form56Btn">📋 IRS Form 56</button>
+            </div>
+            <div class="output-box" id="weaponOutput"></div>
+            <p class="text-sm mt-10" style="color:#8888aa;">⚡ <strong>All documents:</strong> John Henry Doe / JOHN HENRY DOE · Adaptable to any state</p>
+        </div>
+
+        <!-- ===== COLUMN 3: PROTECT YOUR TEMPLE ===== -->
+        <div class="card">
+            <h2><span>🧪</span> Temple Protection</h2>
+            <p class="text-sm">They poison you through water, food, air, and frequencies. Here are the solutions.</p>
+            <div class="product-grid">
+                <div class="product-card">
+                    <span class="emoji">💊</span>
+                    <div class="name">MasterPeace</div>
+                    <div class="desc">Cellular detox · Nano Zeolite + Sea Plasma</div>
+                    <a href="https://masterpeacebyhcs.com/christiskey" target="_blank" class="btn btn-sm" style="font-size:0.65rem;">Get 10% Off</a>
+                </div>
+                <div class="product-card">
+                    <span class="emoji">🦌</span>
+                    <div class="name">IGF‑1 Deer Antler</div>
+                    <div class="desc">Boost IGF‑1 60% · Banned by NFL</div>
+                    <a href="https://www.getigf1.com" target="_blank" class="btn btn-sm" style="font-size:0.65rem;">Shop Now</a>
+                </div>
+                <div class="product-card">
+                    <span class="emoji">📱</span>
+                    <div class="name">EMF Shields</div>
+                    <div class="desc">Block 5G &amp; deadly frequencies</div>
+                    <a href="https://knn.world" target="_blank" class="btn btn-sm" style="font-size:0.65rem;">Get Shielded</a>
+                </div>
+                <div class="product-card">
+                    <span class="emoji">⚡</span>
+                    <div class="name">Pain &amp; Energy Chips</div>
+                    <div class="desc">Instant relief · Free shipping</div>
+                    <a href="https://knn.world" target="_blank" class="btn btn-sm" style="font-size:0.65rem;">Claim Yours</a>
+                </div>
+            </div>
+            <div style="background:rgba(245,184,27,0.06); border-radius:14px; padding:12px 16px; margin-top:10px; border:1px solid rgba(245,184,27,0.1);">
+                <p style="font-size:0.8rem; color:#c8c8d8; line-height:1.6;">
+                    🔥 <strong>Christopher Key</strong> — <span style="color:#f5b81b;">561-329-8434</span> · 
+                    <a href="https://knn.world" target="_blank" style="color:#f5b81b;">KNN.world</a> · 
+                    <a href="https://christiskey.life" target="_blank" style="color:#f5b81b;">ChristIsKey.life</a>
+                </p>
+                <p style="font-size:0.7rem; color:#8888aa; margin-top:4px;">
+                    📺 <a href="https://rumble.com/v701rvy--wake-up-theyre-poisoning-you-with-water-food-air-and-5g.html" target="_blank" style="color:#f5b81b;">Watch the Rumble</a> · 
+                    <a href="https://youtu.be/Ie-kzh9gUPwl" target="_blank" style="color:#f5b81b;">Cell Phone Dangers</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== FULL-WIDTH: THE BIG PICTURE ===== -->
+    <div class="card" style="margin-top:6px;">
+        <h2><span>🌍</span> The Forbidden Knowledge — You Are the Cure</h2>
+        <div style="display:flex; flex-wrap:wrap; gap:20px; justify-content:space-between;">
+            <div style="flex:2; min-width:240px;">
+                <p style="color:#c0c8d8; line-height:1.8;">
+                    <strong style="color:#f5b81b;">We are being poisoned</strong> — vaccines, water, food, air, and frequencies. 
+                    But <strong style="color:#f5b81b;">we have the solutions</strong>. 
+                    MasterPeace flushes nanobots, snake venom peptides, graphene oxide, and heavy metals. 
+                    IGF‑1 from Deer Antler Velvet restores your body's building blocks. 
+                    EMF shields protect your cells from 5G assault.
+                </p>
+                <p style="color:#c0c8d8; line-height:1.8; margin-top:10px;">
+                    <strong style="color:#f5b81b;">The legal system is a weapon</strong> — but you now have the 
+                    <strong style="color:#f5b81b;">sovereign toolkit</strong> to fight back. 
+                    This app generates the exact documents you need: Negative Averements, Default Judgments, 
+                    Emergency Return Orders, CUSIP requests, Surety Bond demands, FOIA requests, Quo Warranto, 
+                    Clean Hands motions, 13th Amendment claims, and IRS Form 56 demands.
+                </p>
+                <p style="color:#c0c8d8; line-height:1.8; margin-top:10px;">
+                    <strong style="color:#f5b81b;">Record your testimony</strong> — speak your truth, transcribe it, 
+                    and forge weapons from your own words. The app works for <strong>John Henry Doe / JOHN HENRY DOE</strong> 
+                    in all 50 states. <strong>You are not alone. You are the liberator.</strong>
+                </p>
+            </div>
+            <div style="flex:1; min-width:180px; background:rgba(0,0,0,0.3); border-radius:16px; padding:16px; border:1px solid #2a2a4a;">
+                <div style="font-weight:700; color:#f5b81b; margin-bottom:8px;">📢 Join the Liberation</div>
+                <ul style="list-style:none; padding:0; font-size:0.9rem; line-height:2.2;">
+                    <li>✅ <a href="https://knn.world" target="_blank" style="color:#f5b81b;">KNN.world</a> — Community</li>
+                    <li>✅ <a href="https://masterpeacebyhcs.com/christiskey" target="_blank" style="color:#f5b81b;">MasterPeace</a> — Detox</li>
+                    <li>✅ <a href="https://www.getigf1.com" target="_blank" style="color:#f5b81b;">IGF‑1</a> — Rebuild</li>
+                    <li>✅ <span style="color:#b0b0c8;">📞 561-329-8434</span> — Christopher Key</li>
+                </ul>
+                <div style="margin-top:12px; font-size:0.75rem; color:#8888aa; border-top:1px solid #2a2a4a; padding-top:12px;">
+                    <span>📲 Share this app — <strong style="color:#f5b81b;">TripsToColombia.com</strong></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== FOOTER ===== -->
+    <div class="footer">
+        <span>⚡ LIBERATOR'S FORGE v3.0 · Forbidden Knowledge · Sovereign Toolkit · <span id="stateCountFooter">All 50 States</span></span>
+        <span>
+            <a href="#" onclick="resetApp(); return false;">⟲ Reset</a> ·
+            <a href="#" onclick="shareApp(); return false;">📤 Share</a> ·
+            <a href="#" onclick="downloadAllDocs(); return false;">📦 Download All</a>
+        </span>
+    </div>
+
+</div>
+
+<script>
+    (function() {
+        "use strict";
+
+        // --- DOM refs ---
+        const transcriptDisplay = document.getElementById('transcriptDisplay');
+        const docOutput = document.getElementById('docOutput');
+        const weaponOutput = document.getElementById('weaponOutput');
+        const startBtn = document.getElementById('startRecordBtn');
+        const stopBtn = document.getElementById('stopRecordBtn');
+        const transcribeBtn = document.getElementById('transcribeBtn');
+        const generateDocBtn = document.getElementById('generateDocBtn');
+        const copyBtn = document.getElementById('copyTranscriptBtn');
+        const clearBtn = document.getElementById('clearTranscriptBtn');
+
+        // Stats
+        const breathSpan = document.getElementById('breathCount');
+        const factSpan = document.getElementById('factCount');
+        const docSpan = document.getElementById('docCount');
+        const recordSpan = document.getElementById('recordCount');
+        const stateSpan = document.getElementById('stateCount');
+        const liberatedSpan = document.getElementById('liberatedCount');
+
+        // --- State ---
+        let transcript = '';
+        let isRecording = false;
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let recordCount = 0;
+        let docCount = 0;
+        let breathCount = 0;
+        let factCount = 127;
+        let weaponHistory = [];
+
+        // --- Helpers ---
+        function updateStats() {
+            breathSpan.textContent = breathCount;
+            factSpan.textContent = factCount;
+            docSpan.textContent = docCount;
+            recordSpan.textContent = recordCount;
+            stateSpan.textContent = '50';
+            document.getElementById('stateCountFooter').textContent = 'All 50 States';
+        }
+
+        function setTranscript(text) {
+            transcript = text;
+            const displayText = text || '⚡ Your testimony will appear here. Speak your truth.';
+            transcriptDisplay.innerHTML = displayText.replace(/\n/g, '<br>').replace(/ /g, '&nbsp;');
+            if (text && text.length > 20) {
+                const ts = new Date().toLocaleTimeString();
+                transcriptDisplay.innerHTML = `<span class="timestamp">[${ts}]</span> ${transcriptDisplay.innerHTML}`;
+            }
+            updateStats();
+        }
+
+        function addWeaponOutput(html) {
+            weaponOutput.classList.add('show');
+            weaponOutput.innerHTML = html + '\n\n' + weaponOutput.innerHTML;
+            weaponHistory.push(html);
+            docCount++;
+            updateStats();
+        }
+
+        function addDocOutput(html) {
+            docOutput.classList.add('show');
+            docOutput.innerHTML = html + '\n\n' + docOutput.innerHTML;
+            docCount++;
+            updateStats();
+        }
+
+        // --- Recording ---
+        startBtn.addEventListener('click', async function() {
+            if (isRecording) return;
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+                mediaRecorder.ondataavailable = event => audioChunks.push(event.data);
+                mediaRecorder.onstop = function() {
+                    setTranscript('🎙️ Recording stopped. Click "Transcribe" to convert to text.');
+                    isRecording = false;
+                    startBtn.textContent = '⏺ Record';
+                };
+                mediaRecorder.start();
+                isRecording = true;
+                startBtn.textContent = '⏺ Recording...';
+                setTranscript('🎙️ Recording in progress... speak your truth.');
+            } catch (err) {
+                alert('Microphone access needed. Please allow and try again.\n' + err.message);
+            }
+        });
+
+        stopBtn.addEventListener('click', function() {
+            if (mediaRecorder && isRecording) {
+                mediaRecorder.stop();
+                mediaRecorder.stream.getTracks().forEach(t => t.stop());
+            }
+        });
+
+        // --- Transcribe ---
+        transcribeBtn.addEventListener('click', function() {
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+                const recognizer = new SR();
+                recognizer.lang = 'en-US';
+                recognizer.interimResults = false;
+                recognizer.maxAlternatives = 1;
+                recognizer.start();
+                recognizer.onresult = function(event) {
+                    const text = event.results[0][0].transcript;
+                    setTranscript('📝 ' + text);
+                    factCount += text.split(' ').length;
+                    updateStats();
+                    recordCount++;
+                    updateStats();
+                };
+                recognizer.onerror = function() {
+                    setTranscript('⚠️ Speech recognition error. Please type or use a recording app.');
+                };
+            } else {
+                setTranscript('⚠️ Your browser does not support speech recognition. Please type your notes.');
+            }
+        });
+
+        // --- Generate Document from Transcript ---
+        generateDocBtn.addEventListener('click', function() {
+            if (!transcript || transcript.includes('will appear here') || transcript.length < 15) {
+                alert('Please record or transcribe some testimony first.');
+                return;
+            }
+            const clean = transcript.replace(/[📝🎙️⚠️]/g, '').trim();
+            const doc = `📜 AFFIDAVIT OF TRUTH (Generated from Testimony)
+
+            STATE OF [YOUR STATE]
+            COUNTY OF [YOUR COUNTY]
+
+            I, John Henry Doe, being duly sworn, state as follows:
+
+            1. I am a free living man, a State Citizen of the [YOUR STATE] Republic.
+
+            2. The following facts are true and correct to the best of my knowledge:
+
+            ${clean.substring(0, 600)}...
+
+            3. I make this affidavit under penalty of perjury.
+
+            4. I reserve all rights, without prejudice.
+
+            Executed this ${new Date().toDateString()}.
+
+            ______________________________________
+            John Henry Doe (Living Man)
+            / JOHN HENRY DOE (Strawman)
+
+            WITNESS:
+            ______________________________________
+
+            NOTARY PUBLIC:
+            ______________________________________
+            My Commission Expires: ______________`;
+
+            addDocOutput(doc);
+        });
+
+        // --- Copy ---
+        copyBtn.addEventListener('click', function() {
+            const text = transcriptDisplay.innerText || transcript;
+            if (text && !text.includes('will appear here')) {
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('Testimony copied to clipboard!');
+                }).catch(() => {
+                    alert('Could not copy. Please select and copy manually.');
+                });
+            } else {
+                alert('Nothing to copy yet. Record or transcribe first.');
+            }
+        });
+
+        // --- Clear ---
+        clearBtn.addEventListener('click', function() {
+            if (confirm('Clear all testimony?')) {
+                transcript = '';
+                setTranscript('');
+                docOutput.classList.remove('show');
+                docOutput.innerHTML = '';
+            }
+        });
+
+        // --- WEAPON GENERATORS (All use John Henry Doe / JOHN HENRY DOE) ---
+        function weaponTemplate(title, body) {
+            return `⚔️ ${title}\n\n${body}`;
+        }
+
+        document.getElementById('negativeAverementBtn').addEventListener('click', function() {
+            const text = weaponTemplate('NEGATIVE AVEREMENT',
+                `I, John Henry Doe (Living Man), hereby deny that any court has jurisdiction over my person or family.\n\n` +
+                `I AVER that I am a free living man, a State Citizen of the [YOUR STATE] Republic.\n\n` +
+                `I AVER that no court order restricts my parental contact or personal liberty.\n\n` +
+                `I AVER that all Defendants have acted without lawful authority.\n\n` +
+                `BURDEN SHIFT: Defendants must prove jurisdiction by clear and convincing evidence.\n\n` +
+                `I reserve all rights, without prejudice.\n\n` +
+                `Executed this ${new Date().toDateString()}.\n\n` +
+                `______________________________________\n` +
+                `John Henry Doe (Living Man)\n` +
+                `/ JOHN HENRY DOE (Strawman)`);
+            addWeaponOutput(text);
+        });
+
+        document.getElementById('defaultJudgmentBtn').addEventListener('click', function() {
+            const text = weaponTemplate('MOTION FOR DEFAULT JUDGMENT',
+                `COMES NOW Plaintiff, John Henry Doe, and moves for default judgment.\n\n` +
+                `Defendants were served on ${new Date().toDateString()}. The time for response has expired.\n\n` +
+                `No Defendant has filed any responsive pleading.\n\n` +
+                `Pursuant to Fed. R. Civ. P. 8(b)(6), all factual allegations are ADMITTED.\n\n` +
+                `Plaintiff is entitled to judgment as a matter of law.\n\n` +
+                `WHEREFORE, Plaintiff requests:\n` +
+                `1. Default judgment on liability;\n` +
+                `2. Damages to be determined at hearing;\n` +
+                `3. Such other relief as justice requires.\n\n` +
+                `Respectfully submitted,\n\n` +
+                `______________________________________\n` +
+                `John Henry Doe, Plaintiff In Propria Persona`);
+            addWeaponOutput(text);
+        });
+
+        document.getElementById('emergencyReturnBtn').addEventListener('click', function() {
+            const text = weaponTemplate('EMERGENCY RETURN OF CHILD',
+                `EMERGENCY MOTION FOR IMMEDIATE RETURN OF MINOR CHILD\n\n` +
+                `Plaintiff John Henry Doe moves for immediate return of his child.\n\n` +
+                `FINDINGS:\n` +
+                `• No court order restricts Plaintiff's contact.\n` +
+                `• Defendants have unlawfully prevented contact for months.\n` +
+                `• The child suffers emotional distress.\n\n` +
+                `ORDER:\n` +
+                `1. Return child within 48 hours.\n` +
+                `2. Law enforcement shall assist.\n` +
+                `3. Any person interfering shall be held in contempt.\n\n` +
+                `IT IS SO ORDERED.\n\n` +
+                `______________________________________\n` +
+                `[YOUR STATE] DISTRICT JUDGE\n\n` +
+                `Presented by:\n` +
+                `______________________________________\n` +
+                `John Henry Doe, Plaintiff In Propria Persona`);
+            addWeaponOutput(text);
+        });
+
+        document.getElementById('cusipBtn').addEventListener('click', function() {
+            const text = weaponTemplate('CUSIP NUMBER REQUEST',
+                `REQUEST FOR CUSIP NUMBERS AND SECURITIES IDENTIFIERS\n\n` +
+                `To: Clerk of Court, [YOUR COUNTY] [YOUR STATE]\n\n` +
+                `Request all CUSIP numbers assigned to cases involving John Henry Doe,\n` +
+                `minor child, and all related parties.\n\n` +
+                `Also request:\n` +
+                `• All trading records and transaction histories;\n` +
+                `• All trust records and custodial documents;\n` +
+                `• All securitization documents;\n` +
+                `• The current holder(s) of any such securities.\n\n` +
+                `Fee waiver requested. Response required within 20 days.\n\n` +
+                `Respectfully,\n\n` +
+                `______________________________________\n` +
+                `John Henry Doe`);
+            addWeaponOutput(text);
+        });
+
+        document.getElementById('suretyBtn').addEventListener('click', function() {
+            const text = weaponTemplate('SURETY BOND DEMAND',
+                `DEMAND FOR DISCLOSURE OF SURETY BOND\n\n` +
+                `To: [JUDGE NAME] and [OFFICIAL NAME]\n\n` +
+                `Demand complete copy of surety bond, official bond, and errors & omissions policy.\n\n` +
+                `Also demand:\n` +
+                `• Bond number, effective date, expiration date;\n` +
+                `• Surety company name, address, and contact;\n` +
+                `• Penal sum of said bond;\n` +
+                `• Any claims history against said bond.\n\n` +
+                `Failure to respond within 14 days will be deemed admission of no bond.\n\n` +
+                `This demand is made to preserve claims against said bond.\n\n` +
+                `Respectfully,\n\n` +
+                `______________________________________\n` +
+                `John Henry Doe`);
+            addWeaponOutput(text);
+        });
+
+        document.getElementById('foiaBtn').addEventListener('click', function() {
+            const text = weaponTemplate('FOIA REQUEST — TITLE IV-E FUNDS',
+                `FREEDOM OF INFORMATION ACT REQUEST\n\n` +
+                `To: [YOUR STATE] DSS FOIA Officer\n\n` +
+                `Request all Title IV-E reimbursement records for [YOUR COUNTY] DSS,\n` +
+                `especially cases involving John Henry Doe and minor child.\n\n` +
+                `Also request:\n` +
+                `• Per-child reimbursement rates;\n` +
+                `• Foster care maintenance payments;\n` +
+                `• Administrative cost reimbursements;\n` +
+                `• Contracts and agreements;\n` +
+                `• Audits and reviews.\n\n` +
+                `Fee waiver requested. Expedited processing requested.\n\n` +
+                `Respectfully,\n\n` +
+                `______________________________________\n` +
+                `John Henry Doe`);
+            addWeaponOutput(text);
+        });
+
+        document.getElementById('quoWarrantoBtn').addEventListener('click', function() {
+            const text = weaponTemplate('WRIT OF QUO WARRANTO',
+                `APPLICATION FOR WRIT OF QUO WARRANTO\n\n` +
+                `To: Supreme Court of [YOUR STATE]\n\n` +
+                `COMES NOW John Henry Doe, a free living man and State Citizen,\n` +
+                `and applies for a Writ of Quo Warranto directed to [JUDGE NAME],\n` +
+                `requiring her to show by what warrant she claims jurisdiction.\n\n` +
+                `GROUNDS:\n` +
+                `1. No lawful appointment or commission;\n` +
+                `2. No filed IRS Form 56 as fiduciary;\n` +
+                `3. Acting without jurisdiction over a State Citizen.\n\n` +
+                `PRAYER: That the Court issue the Writ and, upon return,\n` +
+                `declare that Respondent has no lawful warrant.\n\n` +
+                `Respectfully,\n\n` +
+                `______________________________________\n` +
+                `John Henry Doe, Relator In Propria Persona`);
+            addWeaponOutput(text);
+        });
+
+        document.getElementById('cleanHandsBtn').addEventListener('click', function() {
+            const text = weaponTemplate('CLEAN HANDS DOCTRINE MOTION',
+                `MOTION TO STRIKE BASED ON UNCLEAN HANDS AND FRAUD UPON THE COURT\n\n` +
+                `Plaintiff John Henry Doe moves to strike all pleadings filed by [ADVERSARY],\n` +
+                `who lacks clean hands and has committed fraud upon this Court.\n\n` +
+                `FACTS:\n` +
+                `• [Adversary] has no lawful standing to invoke this Court's jurisdiction;\n` +
+                `• [Adversary] has concealed material facts;\n` +
+                `• [Adversary] has used this Court as a weapon to harm Plaintiff.\n\n` +
+                `PRAYER:\n` +
+                `1. Strike all pleadings filed by [Adversary];\n` +
+                `2. Dismiss all claims with prejudice;\n` +
+                `3. Refer [Adversary] for investigation.\n\n` +
+                `Respectfully,\n\n` +
+                `______________________________________\n` +
+                `John Henry Doe, Plaintiff In Propria Persona`);
+            addWeaponOutput(text);
+        });
+
+        document.getElementById('thirteenthBtn').addEventListener('click', function() {
+            const text = weaponTemplate('13TH AMENDMENT ARGUMENT',
+                `MEMORANDUM OF LAW IN SUPPORT OF THIRTEENTH AMENDMENT CLAIMS\n\n` +
+                `Plaintiff John Henry Doe submits that Defendants' actions constitute\n` +
+                `involuntary servitude and peonage in violation of the Thirteenth Amendment.\n\n` +
+                `ARGUMENT:\n` +
+                `1. Plaintiff has been compelled to participate in proceedings against his will;\n` +
+                `2. Plaintiff has been forced into economic servitude through litigation costs;\n` +
+                `3. Plaintiff has been threatened with loss of his child for non-compliance;\n` +
+                `4. No criminal conviction exists to justify such servitude.\n\n` +
+                `AUTHORITIES:\n` +
+                `• Bailey v. Alabama, 219 U.S. 219 (1911);\n` +
+                `• United States v. Kozminski, 487 U.S. 931 (1988);\n` +
+                `• Pollock v. Williams, 322 U.S. 4 (1944).\n\n` +
+                `WHEREFORE, Plaintiff requests damages, injunctive relief, and attorneys' fees.\n\n` +
+                `Respectfully,\n\n` +
+                `______________________________________\n` +
+                `John Henry Doe, Plaintiff In Propria Persona`);
+            addWeaponOutput(text);
+        });
+
+        document.getElementById('form56Btn').addEventListener('click', function() {
+            const text = weaponTemplate('IRS FORM 56 DEMAND',
+                `DEMAND FOR IRS FORM 56 FILING AND NOTICE OF FIDUCIARY STATUS\n\n` +
+                `To: [JUDGE/OFFICIAL NAME]\n\n` +
+                `Under 26 U.S.C. § 6903 and 26 C.F.R. § 301.6903-1,\n` +
+                `any person who takes control of property of another becomes a fiduciary\n` +
+                `and must file IRS Form 56 within 30 days.\n\n` +
+                `By exercising jurisdiction over my child and family relations,\n` +
+                `you have taken control of my property.\n\n` +
+                `DEMAND:\n` +
+                `1. Provide a complete copy of any IRS Form 56 filed;\n` +
+                `2. If none, explain why you believe you are exempt;\n` +
+                `3. State the date you first became aware of your fiduciary obligations.\n\n` +
+                `FAILURE TO RESPOND:\n` +
+                `• Constitutes constructive fraud;\n` +
+                `• Renders all orders void ab initio;\n` +
+                `• Removes any color of lawful authority.\n\n` +
+                `Respectfully,\n\n` +
+                `______________________________________\n` +
+                `John Henry Doe`);
+            addWeaponOutput(text);
+        });
+
+        // --- Breath counter (for mindfulness) ---
+        document.addEventListener('click', function(e) {
+            if (e.target.closest('.card') && !e.target.closest('button') && !e.target.closest('input') && !e.target.closest('textarea') && !e.target.closest('a')) {
+                breathCount++;
+                updateStats();
+            }
+        });
+
+        // --- Liberation counter ---
+        setInterval(() => {
+            const current = parseInt(liberatedSpan.textContent.replace(/,/g, ''));
+            if (!isNaN(current)) {
+                const increment = Math.floor(Math.random() * 3) + 1;
+                liberatedSpan.textContent = (current + increment).toLocaleString();
+            }
+        }, 25000);
+
+        // --- Share ---
+        window.shareApp = function() {
+            if (navigator.share) {
+                navigator.share({
+                    title: '⚡ LIBERATOR\'S FORGE — Sovereign Toolkit',
+                    text: 'Free yourself with the sovereign toolkit: record testimony, generate legal weapons, and protect your temple. Join the liberation.',
+                    url: window.location.href
+                });
+            } else {
+                alert('📤 Share this URL: ' + window.location.href);
+            }
+        };
+
+        // --- Reset ---
+        window.resetApp = function() {
+            if (confirm('Reset all counters and transcripts?')) {
+                transcript = '';
+                setTranscript('');
+                docOutput.classList.remove('show');
+                docOutput.innerHTML = '';
+                weaponOutput.classList.remove('show');
+                weaponOutput.innerHTML = '';
+                docCount = 0;
+                recordCount = 0;
+                breathCount = 0;
+                factCount = 127;
+                weaponHistory = [];
+                updateStats();
+                alert('🧘 Reset complete. Begin anew.');
+            }
+        };
+
+        // --- Download All Documents ---
+        window.downloadAllDocs = function() {
+            let allDocs = '⚡ LIBERATOR\'S FORGE — ALL WEAPONS\n';
+            allDocs += 'Generated: ' + new Date().toLocaleString() + '\n';
+            allDocs += '='.repeat(60) + '\n\n';
+            if (weaponHistory.length === 0) {
+                allDocs += 'No weapons forged yet. Generate some weapons first!\n';
+            } else {
+                weaponHistory.forEach((doc, i) => {
+                    allDocs += `--- WEAPON ${i+1} ---\n${doc}\n\n`;
+                });
+            }
+            if (transcript && transcript.length > 20) {
+                allDocs += '--- TESTIMONY ---\n' + transcript + '\n\n';
+            }
+            const blob = new Blob([allDocs], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'Liberators_Forge_All_Weapons.txt';
+            a.click();
+            URL.revokeObjectURL(url);
+        };
+
+        // --- Init ---
+        updateStats();
+        setTranscript('');
+
+        // --- Add keyboard shortcut (Ctrl+Shift+Space = breath) ---
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.shiftKey && e.code === 'Space') {
+                e.preventDefault();
+                breathCount += 5;
+                updateStats();
+            }
+        });
+
+        console.log('⚡ LIBERATOR\'S FORGE v3.0 loaded. You are the liberator.');
+        console.log('📞 Christopher Key: 561-329-8434');
+        console.log('🌐 KNN.world · ChristIsKey.life · TripsToColombia.com');
+    })();
+</script>
+</body>
+</html>
