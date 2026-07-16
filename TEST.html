@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>⚕️ DocTrin 2.0 – The Forbidden Trinity</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800;900&family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        /* ─── RESET & BASE ─── */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at 10% 20%, #0a0c12, #010101);
+            color: #ece9e0;
+            min-height: 100vh;
+            line-height: 1.6;
+            padding: 1.5rem 1rem;
+            scroll-behavior: smooth;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+
+        /* ─── TYPOGRAPHY ─── */
+        .glow-text { text-shadow: 0 0 20px rgba(212, 175, 55, 0.3); }
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.4rem, 6vw, 4.2rem);
+            font-weight: 700;
+            background: linear-gradient(135deg, #f5e7b2, #d4af37, #b8860b, #d4af37);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-align: center;
+            animation: goldPulse 4s ease-in-out infinite;
+        }
+        @keyframes goldPulse {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+        .subtitle {
+            text-align: center;
+            font-size: clamp(0.95rem, 1.5vw, 1.3rem);
+            color: #d4af37cc;
+            border-bottom: 1px solid #d4af3740;
+            padding-bottom: 1.5rem;
+            margin-bottom: 2rem;
+            letter-spacing: 1px;
+        }
+        h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.4rem, 2.5vw, 2.2rem);
+            color: #f3d382;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        h3 {
+            font-size: clamp(1.05rem, 1.4vw, 1.3rem);
+            color: #e9d294;
+            margin: 1.2rem 0 0.6rem 0;
+        }
+
+        /* ─── LANG TOGGLE ─── */
+        .top-bar {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .lang-btn {
+            background: rgba(255,215,0,0.08);
+            border: 1px solid #d4af37;
+            padding: 0.5rem 1.2rem;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            backdrop-filter: blur(4px);
+            transition: 0.3s;
+            color: #f5e7b2;
+            font-size: 0.85rem;
+        }
+        .lang-btn.active {
+            background: #d4af37;
+            color: #0a0c12;
+            border-color: #d4af37;
+            box-shadow: 0 0 20px rgba(212,175,55,0.4);
+        }
+        .lang-btn:hover { background: #d4af37; color: #000; transform: scale(0.97); }
+
+        /* ─── CARDS ─── */
+        .card {
+            background: rgba(10, 14, 23, 0.82);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            border-radius: 2rem;
+            padding: 1.8rem 2rem;
+            margin-bottom: 1.8rem;
+            transition: border-color 0.4s, box-shadow 0.4s, transform 0.3s;
+            box-shadow: 0 20px 40px -16px rgba(0,0,0,0.7);
+        }
+        .card:hover {
+            border-color: rgba(212, 175, 55, 0.6);
+            box-shadow: 0 24px 48px -12px rgba(0,0,0,0.9), 0 0 30px rgba(212,175,55,0.05);
+            transform: translateY(-2px);
+        }
+        .card-gold {
+            border-color: #d4af37;
+            background: linear-gradient(135deg, rgba(212,175,55,0.08), rgba(10,14,23,0.9));
+        }
+        .card-gold:hover { border-color: #f5e7b2; box-shadow: 0 0 40px rgba(212,175,55,0.15); }
+
+        /* ─── BADGES ─── */
+        .badge {
+            display: inline-block;
+            background: #d4af3722;
+            border: 1px solid #d4af37;
+            border-radius: 60px;
+            padding: 0.15rem 0.9rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #d4af37;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+            margin: 0.2rem 0.2rem 0.2rem 0;
+        }
+        .badge-red { border-color: #ff4444; color: #ff6666; background: #ff444422; }
+        .badge-green { border-color: #44ff88; color: #44ff88; background: #44ff8822; }
+
+        /* ─── GRID ─── */
+        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+
+        .benefit-item {
+            background: rgba(212,175,55,0.06);
+            border-radius: 1.2rem;
+            padding: 1rem 0.8rem;
+            text-align: center;
+            border: 1px solid rgba(212,175,55,0.1);
+            transition: background 0.3s, transform 0.3s;
+        }
+        .benefit-item:hover { background: rgba(212,175,55,0.15); transform: scale(1.02); }
+        .benefit-item .icon { font-size: 2rem; display: block; margin-bottom: 0.3rem; }
+        .benefit-item .label { font-weight: 700; font-size: 0.9rem; color: #f3d382; }
+        .benefit-item .desc { font-size: 0.78rem; opacity: 0.7; margin-top: 0.2rem; }
+
+        /* ─── TIMELINE ─── */
+        .timeline {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            margin: 1rem 0;
+        }
+        .timeline-row {
+            display: flex;
+            align-items: baseline;
+            gap: 0.8rem;
+            padding: 0.4rem 0.8rem;
+            border-left: 3px solid #d4af37;
+            background: rgba(212,175,55,0.04);
+            border-radius: 0 0.8rem 0.8rem 0;
+            flex-wrap: wrap;
+        }
+        .timeline-row .period {
+            font-weight: 700;
+            color: #d4af37;
+            min-width: 85px;
+            font-size: 0.85rem;
+        }
+        .timeline-row .effect { font-size: 0.92rem; opacity: 0.9; }
+
+        /* ─── BUTTONS ─── */
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.8rem;
+            background: linear-gradient(135deg, #d4af37, #b8860b);
+            border: none;
+            padding: 1rem 2.4rem;
+            border-radius: 60px;
+            font-size: clamp(1rem, 1.2vw, 1.2rem);
+            font-weight: 700;
+            color: #0a0c12;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            font-family: 'Inter', sans-serif;
+            text-decoration: none;
+            box-shadow: 0 8px 24px rgba(212,175,55,0.3);
+            width: 100%;
+            max-width: 380px;
+            text-align: center;
+        }
+        .btn-primary:hover {
+            transform: scale(1.03);
+            box-shadow: 0 12px 32px rgba(212,175,55,0.5);
+        }
+        .btn-whatsapp {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.8rem;
+            background: linear-gradient(135deg, #25D366, #128C7E);
+            border: none;
+            padding: 1rem 2.4rem;
+            border-radius: 60px;
+            font-size: clamp(1rem, 1.2vw, 1.2rem);
+            font-weight: 700;
+            color: #fff;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            font-family: 'Inter', sans-serif;
+            text-decoration: none;
+            box-shadow: 0 8px 24px rgba(37,211,102,0.3);
+            width: 100%;
+            max-width: 380px;
+            text-align: center;
+        }
+        .btn-whatsapp:hover { transform: scale(1.03); box-shadow: 0 12px 32px rgba(37,211,102,0.5); }
+        .btn-donate {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            box-shadow: 0 8px 24px rgba(238,90,36,0.3);
+        }
+        .btn-donate:hover { box-shadow: 0 12px 32px rgba(238,90,36,0.5); }
+        .btn-scholarship {
+            background: linear-gradient(135deg, #4a90d9, #2d6da8);
+            box-shadow: 0 8px 24px rgba(74,144,217,0.3);
+        }
+        .btn-scholarship:hover { box-shadow: 0 12px 32px rgba(74,144,217,0.5); }
+
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: center;
+            margin: 1rem 0;
+        }
+        .btn-group .btn-primary,
+        .btn-group .btn-whatsapp,
+        .btn-group .btn-donate,
+        .btn-group .btn-scholarship {
+            max-width: 320px;
+            margin: 0;
+        }
+
+        /* ─── LIST ─── */
+        .list-styled { padding-left: 1.4rem; margin: 0.5rem 0; }
+        .list-styled li { margin: 0.4rem 0; opacity: 0.9; }
+
+        /* ─── DIVIDER ─── */
+        .divider { border: none; border-top: 1px dashed #d4af3740; margin: 1.5rem 0; }
+
+        /* ─── PRESCRIPTION BOX ─── */
+        .prescription-box {
+            background: #0f111ae0;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+            border-left: 6px solid #d4af37;
+            font-family: 'JetBrains Mono', monospace;
+            white-space: pre-wrap;
+            font-size: 0.85rem;
+            line-height: 1.7;
+            display: none;
+        }
+        .prescription-box.show { display: block; }
+
+        /* ─── SEARCH / PLANT FINDER ─── */
+        .search-box {
+            display: flex;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+            margin: 1rem 0;
+        }
+        .search-box input {
+            flex: 1;
+            min-width: 200px;
+            padding: 0.8rem 1.2rem;
+            border-radius: 60px;
+            border: 1px solid #d4af3740;
+            background: rgba(10,14,23,0.8);
+            color: #ece9e0;
+            font-size: 1rem;
+            font-family: 'Inter', sans-serif;
+            transition: border-color 0.3s;
+        }
+        .search-box input:focus {
+            outline: none;
+            border-color: #d4af37;
+            box-shadow: 0 0 20px rgba(212,175,55,0.1);
+        }
+        .search-box input::placeholder { color: #888; }
+
+        /* ─── PLANT RESULTS ─── */
+        .plant-result {
+            background: rgba(212,175,55,0.04);
+            border-radius: 1rem;
+            padding: 0.8rem 1.2rem;
+            margin: 0.5rem 0;
+            border-left: 3px solid #d4af37;
+            transition: background 0.3s;
+        }
+        .plant-result:hover { background: rgba(212,175,55,0.1); }
+        .plant-result .plant-name { font-weight: 700; color: #f3d382; }
+        .plant-result .plant-use { font-size: 0.85rem; opacity: 0.8; }
+
+        /* ─── FOOTER ─── */
+        footer {
+            text-align: center;
+            margin-top: 3rem;
+            font-size: 0.8rem;
+            opacity: 0.5;
+            padding: 1rem 0;
+            border-top: 1px solid #ffffff08;
+        }
+
+        /* ─── RESPONSIVE ─── */
+        @media (max-width: 680px) {
+            .container { padding: 0.5rem; }
+            .card { padding: 1.2rem 1rem; }
+            .timeline-row { flex-direction: column; gap: 0.1rem; padding: 0.6rem 0.8rem; }
+            .timeline-row .period { min-width: auto; }
+            .btn-group .btn-primary,
+            .btn-group .btn-whatsapp,
+            .btn-group .btn-donate,
+            .btn-group .btn-scholarship { max-width: 100%; }
+            .top-bar { justify-content: center; }
+        }
+
+        /* ─── SCROLL ANIMATION ─── */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeIn 0.8s ease forwards;
+        }
+        @keyframes fadeIn {
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .delay-1 { animation-delay: 0.1s; }
+        .delay-2 { animation-delay: 0.2s; }
+        .delay-3 { animation-delay: 0.3s; }
+        .delay-4 { animation-delay: 0.4s; }
+        .delay-5 { animation-delay: 0.5s; }
+
+        /* ─── DONATION BAR ─── */
+        .donation-bar {
+            background: linear-gradient(90deg, rgba(212,175,55,0.1), rgba(212,175,55,0.02));
+            border: 1px solid #d4af3740;
+            border-radius: 1.5rem;
+            padding: 1.5rem 2rem;
+            margin: 1.5rem 0;
+            text-align: center;
+        }
+        .donation-bar .amount {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #d4af37;
+            display: block;
+        }
+        .donation-bar .goal {
+            font-size: 0.85rem;
+            opacity: 0.6;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 10px;
+            margin: 0.8rem 0;
+            overflow: hidden;
+        }
+        .progress-bar .fill {
+            height: 100%;
+            width: 47%;
+            background: linear-gradient(90deg, #d4af37, #f5e7b2);
+            border-radius: 10px;
+            transition: width 1s ease;
+        }
+
+        /* ─── TOOLTIP ─── */
+        .info-tip {
+            display: inline-block;
+            background: rgba(212,175,55,0.15);
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            text-align: center;
+            line-height: 22px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #d4af37;
+            cursor: help;
+            margin-left: 0.4rem;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <!-- ═══ TOP BAR ═══ -->
+    <div class="top-bar">
+        <button class="lang-btn active" data-lang="es">🇪🇸 ESPAÑOL</button>
+        <button class="lang-btn" data-lang="en">🇬🇧 ENGLISH</button>
+    </div>
+
+    <!-- ═══ HEADER ═══ -->
+    <div style="text-align: center;">
+        <h1>⚕️ DOC TRIN</h1>
+        <div class="subtitle" id="mainSubtitle">El Protocolo Reina · Medicina Prohibida · Escuela de Sanación</div>
+        <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap; margin-bottom: 1.5rem;">
+            <span class="badge">🔥 Prohibido</span>
+            <span class="badge badge-green">🌿 300+ Plantas</span>
+            <span class="badge badge-red">⚡ X39 Activación</span>
+            <span class="badge">📜 Ayuno Intermitente</span>
+        </div>
+    </div>
+
+    <!-- ═══ CARD 1: TRINITY'S MISSION + DONATIONS ═══ -->
+    <div class="card card-gold fade-in delay-1" id="missionCard">
+        <h2>🙏 <span class="sectionTitleKey">La Misión de Trinity</span></h2>
+        <div id="missionContent">
+            <p><strong>Trinity está en las montañas de Colombia</strong>, en la Escuela de Medicina Rockwell, aprendiendo medicina natural, homeopática, y también <strong>EQUIDAD y DERECHO COMÚN</strong> para liberar a la humanidad de la esclavitud farmacéutica y legal.</p>
+            <p style="margin-top: 0.6rem;">Ella está estudiando el <strong>Manuscrito Bandianus</strong> y el <strong>Libro Perdido de Remedios Herbales</strong> para traer de vuelta el conocimiento que la élite enterró en 1910 con el <strong>Informe Flexner</strong>.</p>
+            <p style="margin-top: 0.6rem; font-style: italic; opacity: 0.85;">"El conocimiento es poder, pero el conocimiento compartido es libertad. Trinity está aprendiendo para que <strong>tú</strong> puedas sanar."</p>
+            <div class="donation-bar" style="margin-top: 1.2rem;">
+                <span class="amount" id="donationAmount">$3,847</span>
+                <span class="goal">💰 Recaudado de <strong>$8,200</strong> para el año escolar de Trinity</span>
+                <div class="progress-bar"><div class="fill" id="progressFill" style="width:47%;"></div></div>
+                <div style="display: flex; gap: 0.5rem; justify-content: center; flex-wrap: wrap;">
+                    <span class="badge">📚 Libros</span>
+                    <span class="badge">🏥 Equipamiento</span>
+                    <span class="badge">🌱 Huerta Medicinal</span>
+                    <span class="badge">⚖️ Clínicas Legales</span>
+                </div>
+                <p style="font-size: 0.8rem; opacity: 0.7; margin-top: 0.5rem;">Tu donación apoya directamente la educación de Trinity y la construcción de clínicas gratuitas en Colombia.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══ CARD 2: FASTING BREAKDOWN ═══ -->
+    <div class="card fade-in delay-2" id="fastingCard">
+        <h2>⏳ <span class="sectionTitleKey">Ayuno Intermitente · El Interruptor Biológico</span></h2>
+        <div id="fastingContent"></div>
+    </div>
+
+    <!-- ═══ CARD 3: X39 + ROYAL JELLY ═══ -->
+    <div class="card fade-in delay-3" id="x39Card">
+        <h2>👑 <span class="sectionTitleKey">X39 · Jalea Real · Protocolo Reina</span></h2>
+        <div id="x39Content"></div>
+    </div>
+
+    <!-- ═══ CARD 4: FORBIDDEN ARSENAL ═══ -->
+    <div class="card fade-in delay-4" id="arsenalCard">
+        <h2>⚔️ <span class="sectionTitleKey">El Arsenal Prohibido</span></h2>
+        <div id="arsenalContent"></div>
+    </div>
+
+    <!-- ═══ CARD 5: PLANT FINDER (300+ herbs) ═══ -->
+    <div class="card fade-in delay-4" id="plantFinder">
+        <h2>🌿 <span class="sectionTitleKey">Buscador de Plantas Medicinales</span></h2>
+        <p id="plantDesc">Busca entre más de 300 plantas del Libro Perdido de Remedios Herbales.</p>
+        <div class="search-box">
+            <input type="text" id="plantSearch" placeholder="Ej: diente de león, ajo, jalea real..." />
+            <button class="btn-primary" id="searchBtn" style="max-width:200px; padding:0.8rem 1.5rem;">🔍 Buscar</button>
+        </div>
+        <div id="plantResults"></div>
+    </div>
+
+    <!-- ═══ CARD 6: SCHOLARSHIP + ROCKWELL ═══ -->
+    <div class="card card-gold fade-in delay-5" id="scholarshipCard">
+        <h2>🎓 <span class="sectionTitleKey">Beca · Escuela de Medicina Rockwell</span></h2>
+        <div id="scholarshipContent">
+            <p><strong>La Escuela de Medicina Rockwell</strong> está formando a la próxima generación de sanadores que rechazan el sistema farmacéutico y abrazan la medicina natural, la equidad y el derecho común.</p>
+            <p style="margin-top:0.6rem;">📍 Ubicada en las <strong>montañas de Colombia</strong>, la escuela ofrece:</p>
+            <ul class="list-styled">
+                <li>📜 <strong>Manuscrito Bandianus</strong> – El texto prohibido de remedios ancestrales</li>
+                <li>🌿 <strong>Medicina Herbolaria</strong> – 300+ plantas medicinales</li>
+                <li>⚖️ <strong>Derecho Común y Equidad</strong> – Conocimiento legal para la soberanía</li>
+                <li>🧬 <strong>Tecnología de Activación Celular</strong> – X39 y más</li>
+            </ul>
+            <div class="btn-group">
+                <a href="https://TripsToColombia.com" target="_blank" class="btn-primary btn-scholarship">
+                    🎓 Solicitar Beca
+                </a>
+                <a href="https://TripsToColombia.com" target="_blank" class="btn-primary">
+                    🌍 Visitar TripsToColombia.com
+                </a>
+            </div>
+            <p style="font-size:0.8rem; opacity:0.6; margin-top:0.5rem;">Las becas cubren matrícula, alojamiento y materiales. Aplica ahora.</p>
+        </div>
+    </div>
+
+    <!-- ═══ CARD 7: HEALING PRESCRIPTION ═══ -->
+    <div class="card fade-in delay-5" id="rxCard">
+        <h2>📜 <span class="sectionTitleKey">Tu Prescripción de Sanación</span></h2>
+        <p id="rxDesc">100% gratuita · basada en escrituras LXX, Etiopes y medicina natural.</p>
+        <button class="btn-primary" id="generateRxBtn" style="max-width:100%;">
+            ✨ GENERAR MI PRESCRIPCIÓN ✨
+        </button>
+        <div id="rxOutput" class="prescription-box"></div>
+        <div class="small-note" id="rxDisclaimer" style="font-size:0.7rem; opacity:0.4; margin-top:1rem;">⚠️ Educativo · Consulta a un profesional · La Jalea Real puede causar alergias.</div>
+    </div>
+
+    <!-- ═══ CARD 8: WHATSAPP LEAD GEN ═══ -->
+    <div class="card fade-in delay-5" style="border-color:#25D36655; background:rgba(37,211,102,0.04);">
+        <h2 style="color:#25D366;">📱 Activa tu Protocolo Reina</h2>
+        <p style="margin-bottom:0.8rem; opacity:0.85;">
+            ¿Listo para sanar, aprender y liberarte? <strong>Escríbenos por WhatsApp</strong> para recibir asesoría personalizada, acceso a la comunidad y más.
+        </p>
+        <div style="display:flex; flex-wrap:wrap; gap:1rem; justify-content:center;">
+            <a href="https://wa.me/573233235532?text=Hola%20Trinity%20-%20Quiero%20activar%20mi%20Protocolo%20Reina%20y%20aprender%20medicina%20ancestral.%20%F0%9F%92%AA" target="_blank" class="btn-whatsapp">
+                <span>💬</span> <span>WhatsApp +57 3233235532</span>
+            </a>
+            <a href="https://wa.me/573233235532?text=Hola%20Trinity%2C%20quiero%20donar%20para%20tu%20educaci%C3%B3n%20y%20las%20cl%C3%ADnicas%20en%20Colombia.%20%F0%9F%8C%8D" target="_blank" class="btn-whatsapp btn-donate">
+                <span>❤️</span> <span>Donar por WhatsApp</span>
+            </a>
+        </div>
+        <p style="font-size:0.75rem; opacity:0.5; text-align:center; margin-top:0.6rem;">
+            📲 Responde en 24 horas · Confidencial · Sin costo
+        </p>
+    </div>
+
+    <!-- ═══ FOOTER ═══ -->
+    <footer>
+        ⚕️ DocTrin 2.0 · El Protocolo Reina · Conocimiento Prohibido para la Humanidad Libre<br>
+        📍 Trinity está en las montañas de Colombia · Escuela de Medicina Rockwell · Equidad y Derecho Común<br>
+        🙏 <strong>Dona hoy</strong> · Cada contribución construye clínicas gratuitas y forma sanadores
+    </footer>
+</div>
+
+<script>
+// ============================================================
+//  BILINGUAL DATA
+// ============================================================
+const DATA = {
+    es: {
+        fasting: `<p><strong>Cómo funciona el ayuno intermitente:</strong> Activa la <strong>autofagia</strong> (limpieza celular profunda) y la flexibilidad metabólica. La insulina baja → el cuerpo quema grasa → reduce inflamación, mejora el cerebro y extiende la vida.</p>
+        <h3>📘 PROTOCOLO EXACTO</h3>
+        <p><strong>16:8 (ventana de 8h):</strong> El más sostenible. Ayuno 16h, 2-3 comidas en 8h. Ej: 12pm–8pm. Beneficios: pérdida de peso, sensibilidad a insulina, autofagia.</p>
+        <p><strong>18:6 (ventana 6h):</strong> Cetosis más profunda, claridad mental. Mayor autofagia. Ideal para reinicio metabólico.</p>
+        <p><strong>20:4 (ventana 4h):</strong> Autofagia máxima y hormona de crecimiento. Reparación celular extrema. Para ayunadores experimentados.</p>
+        <div class="grid-3">
+            <div class="benefit-item"><span class="icon">📊</span><div class="label">8 HORAS</div><div class="desc">✅ Fácil adherencia<br>✅ Equilibrio hormonal<br>✅ Salud cardiovascular</div></div>
+            <div class="benefit-item"><span class="icon">⚡</span><div class="label">6 HORAS</div><div class="desc">✅ Quema grasa profunda<br>✅ Aumento BDNF<br>✅ Claridad cognitiva</div></div>
+            <div class="benefit-item"><span class="icon">🔥</span><div class="label">4 HORAS</div><div class="desc">✅ Autofagia máxima<br>✅ Mitofagia extrema<br>✅ Cambio de longevidad</div></div>
+        </div>
+        <p><strong>Cómo empezar:</strong> Hidrata con agua y sal de mar. Rompe el ayuno con proteína + grasa saludable. Extiende gradualmente. Escucha a tu cuerpo — las mujeres pueden ajustar la ventana.</p>`,
+
+        x39: `<p><strong>EL INFORME FLEXNER (1910):</strong> Financiado por Rockefeller/Carnegie — desmanteló la medicina natural. Enterró la curación nutricional. Pero no pudieron esconder la <strong>Jalea Real</strong> ni el <strong>X39</strong>.</p>
+        <p>🐝 <strong>La paradoja Reina/Obrera:</strong> mismo ADN, pero la obrera come miel/polen → vive 45 días; la Reina come <strong>JALEA REAL CRUDA</strong> → vive 7 años, 60 veces más. La Royalactina activa 500+ genes de juventud y fertilidad.</p>
+        <p>🔬 <strong>X39 - Activación de Células Madre:</strong> Parche de fototerapia que refleja tu luz infrarroja para activar el péptido GHK-Cu. Despierta células madre dormidas, repara tejidos y rejuvenece.</p>
+        <p>📖 <strong>Datos humanos (PubMed):</strong> Antienvejecimiento, inmunidad [33491244]; Antioxidante [40656618]; Reduce riesgo cardíaco [39296128]; Fortalece huesos [38892209]; <strong>MATA células de cáncer de pulmón</strong> (apoptosis A549).</p>
+        <p>⚠️ <strong>IMPERATIVO CRUDO:</strong> El calor destruye la Royalactina. Solo Jalea Real cruda y congelada funciona. Las cápsulas son veneno muerto.</p>
+        <p><em>"La diferencia entre una obrera y una monarca es la nutrición — y ahora, la fototerapia."</em> — Activa el Protocolo Reina con X39.</p>`,
+
+        arsenal: `<div class="grid-2">
+            <div class="benefit-item"><span class="icon">🧂</span><div class="label">SAL DE MAR</div><div class="desc">Reemplaza sal de mesa (aluminio+cianuro) por Himalaya/Redmond con 84 minerales.</div></div>
+            <div class="benefit-item"><span class="icon">☕</span><div class="label">ENEMAS DE CAFÉ</div><div class="desc">Terapia Gerson — eleva glutatión 600%, desintoxica hígado.</div></div>
+            <div class="benefit-item"><span class="icon">🧪</span><div class="label">DIÓXIDO DE CLORO</div><div class="desc">Mata patógenos selectivamente. No es lejía industrial.</div></div>
+            <div class="benefit-item"><span class="icon">💊</span><div class="label">IVERMECTINA</div><div class="desc">Cura suprimida, genérica, segura. Bloquea replicación viral.</div></div>
+            <div class="benefit-item"><span class="icon">⚡</span><div class="label">CÁNCER = METABÓLICO</div><div class="desc">Efecto Warburg — elimina azúcar, dieta keto, oxígeno hiperbárico.</div></div>
+            <div class="benefit-item"><span class="icon">💧</span><div class="label">FLÚOR</div><div class="desc">Calcifica la pineal, baja el CI. Instala ósmosis inversa.</div></div>
+        </div>
+        <p class="divider"></p>
+        <p><strong>Clave maestra:</strong> Esconden las curas para lucrar con la enfermedad crónica. Tú tienes el kit de rebelión.</p>`,
+
+        rxScriptures: ["Sirácida 38:1-8: 'Honra al médico... El Señor creó los medicamentos de la tierra.'", "Tobías 6: hiel de pescado para sanar ojos (DHA ciencia moderna).", "Ezequiel 47:12: 'Sus frutos servirán de alimento y sus hojas de medicina.'", "1 Enoc 7: conocimiento herbal ancestral preservado en canon etíope."],
+        rxRemedies: ["🌿 Jalea Real CRUDA 1g diario – activación epigenética", "🧂 Sal de mar y cóctel adrenal", "☕ Enema de café 2x/semana para desintoxicar hígado", "🍽️ Ayuno intermitente 16:8 o 18:6", "🧴 Vitamina C liposomal + zinc", "📖 Meditación en escrituras + conexión con tierra"],
+        rxHeader: "📜 PRESCRIPCIÓN DE SANACIÓN",
+        rxFooter: "⚡ 'El Señor creó los medicamentos de la tierra' — Sirácida 38:4. Sánate a ti mismo. Comparte este conocimiento."
+    },
+    en: {
+        fasting: `<p><strong>How intermittent fasting works:</strong> It triggers <strong>autophagy</strong> (deep cellular cleanup) and metabolic flexibility. Low insulin → body burns fat → reduces inflammation, boosts brain, extends lifespan.</p>
+        <h3>📘 EXACT PROTOCOL</h3>
+        <p><strong>16:8 (8h window):</strong> Most sustainable. Fast 16h, 2-3 meals within 8h. Example: 12pm–8pm. Benefits: weight loss, insulin sensitivity, autophagy.</p>
+        <p><strong>18:6 (6h window):</strong> Deeper ketosis, enhanced mental clarity. More autophagy. Ideal for metabolic reset.</p>
+        <p><strong>20:4 (4h window):</strong> Peak autophagy & human growth hormone. Extreme cellular repair. For experienced fasters.</p>
+        <div class="grid-3">
+            <div class="benefit-item"><span class="icon">📊</span><div class="label">8 HOUR</div><div class="desc">✅ Easy compliance<br>✅ Hormone balance<br>✅ Cardiovascular benefits</div></div>
+            <div class="benefit-item"><span class="icon">⚡</span><div class="label">6 HOUR</div><div class="desc">✅ Deeper fat burn<br>✅ Higher BDNF<br>✅ Faster cognitive gains</div></div>
+            <div class="benefit-item"><span class="icon">🔥</span><div class="label">4 HOUR</div><div class="desc">✅ Max autophagy<br>✅ Extreme mitophagy<br>✅ Longevity switch</div></div>
+        </div>
+        <p><strong>How to start:</strong> Hydrate with sea salt water. Break fast with protein + healthy fat. Gradually extend window. Listen to your body — women may adjust window length.</p>`,
+
+        x39: `<p><strong>THE FLEXNER REPORT (1910):</strong> Funded by Rockefeller/Carnegie — dismantled natural medicine. Buried nutritional healing. But they couldn't hide <strong>Royal Jelly</strong> or <strong>X39</strong>.</p>
+        <p>🐝 <strong>The Queen/Worker paradox:</strong> identical DNA, but worker eats honey/pollen → lives 45 days; Queen eats <strong>RAW ROYAL JELLY</strong> → lives 7 years, 60x longer. Royalactin activates 500+ genes of youth and fertility.</p>
+        <p>🔬 <strong>X39 - Stem Cell Activation:</strong> Phototherapy patch that reflects your infrared light to activate GHK-Cu peptide. Awakens dormant stem cells, repairs tissue, rejuvenates.</p>
+        <p>📖 <strong>Human data (PubMed):</strong> Anti-aging, immunity [33491244]; Antioxidant [40656618]; Slashes heart disease [39296128]; Strengthens bones [38892209]; <strong>KILLS lung cancer cells</strong> (A549 apoptosis).</p>
+        <p>⚠️ <strong>RAW IMPERATIVE:</strong> Heat destroys Royalactin. Only raw, frozen unprocessed Royal Jelly works. Capsules are dead.</p>
+        <p><em>"The difference between a worker and a monarch is nutrition — and now, phototherapy."</em> — Activate the Queen Protocol with X39.</p>`,
+
+        arsenal: `<div class="grid-2">
+            <div class="benefit-item"><span class="icon">🧂</span><div class="label">SEA SALT</div><div class="desc">Replace table salt (aluminum+cyanide) with 84+ mineral Himalayan/Redmond.</div></div>
+            <div class="benefit-item"><span class="icon">☕</span><div class="label">COFFEE ENEMAS</div><div class="desc">Gerson therapy — boosts glutathione 600%, unclogs liver bile.</div></div>
+            <div class="benefit-item"><span class="icon">🧪</span><div class="label">CHLORINE DIOXIDE</div><div class="desc">Selective pathogen killer. Not industrial bleach.</div></div>
+            <div class="benefit-item"><span class="icon">💊</span><div class="label">IVERMECTIN</div><div class="desc">Suppressed cure, off-patent, safe. Viral replication blockade.</div></div>
+            <div class="benefit-item"><span class="icon">⚡</span><div class="label">CANCER = METABOLIC</div><div class="desc">Warburg effect — starve sugar, keto diet, hyperbaric oxygen.</div></div>
+            <div class="benefit-item"><span class="icon">💧</span><div class="label">FLUORIDE</div><div class="desc">Pineal calcifier, IQ lowering. Install reverse osmosis.</div></div>
+        </div>
+        <p class="divider"></p>
+        <p><strong>Master key:</strong> They hide cures to profit from chronic sickness. You hold the rebellion toolkit.</p>`,
+
+        rxScriptures: ["Sirach 38:1-8: 'Honor the physician... The Lord created medicines from the earth.'", "Tobit 6: Ethiopian canon: fish gall for eye healing (DHA modern science).", "Ezekiel 47:12: 'Their fruit for food, leaves for healing.' – 3000 medicinal plants.", "1 Enoch 7: ancient herbal knowledge preserved in Ethiopian Bible."],
+        rxRemedies: ["🌿 Royal Jelly (RAW) 1g daily – epigenetic activation", "🧂 Sea salt sole & adrenal cocktail", "☕ Coffee enema 2x/week for liver detox", "🍽️ Intermittent fasting 16:8 or 18:6", "🧴 Vitamin C IV / Liposomal + zinc", "📖 Daily scripture meditation + grounding"],
+        rxHeader: "📜 HEALING PRESCRIPTION",
+        rxFooter: "⚡ 'The Lord created medicines from the earth' — Sirach 38:4. Heal thyself. Share this knowledge."
+    }
+};
+
+// ============================================================
+//  PLANT DATABASE (300+ from The Lost Book of Herbal Remedies)
+// ============================================================
+const PLANTS = [
+    { name: "Agrimonia", uses: "Antiinflamatorio, cura heridas, detiene hemorragias, trata migrañas." },
+    { name: "Aloe Vera", uses: "Quemaduras, piel, estreñimiento, diabetes, encías sangrantes." },
+    { name: "Anís Hyssop", uses: "Corazón, angina, herpes, hongos, digestión, ansiedad." },
+    { name: "Ashwagandha", uses: "Estrés, ansiedad, depresión, cortisol, cáncer, memoria, testosterona." },
+    { name: "Black-Eyed Susan", uses: "Resfriados, gripe, parásitos, mordeduras de serpiente, oídos." },
+    { name: "Boneset", uses: "Fiebres, dengue, malaria, bronquitis, mucosidad." },
+    { name: "Borage", uses: "Hormonas, PMS, estrés, antioxidante, neumonía, artritis." },
+    { name: "Bottle Gourd", uses: "Diabetes, dolores de cabeza, infecciones de piel, memoria." },
+    { name: "Cabbage", uses: "Mastitis, úlceras, artritis, cáncer de piel, diabetes, estreñimiento." },
+    { name: "Calendula", uses: "Piel, heridas, quemaduras, herpes, acné, úlceras, sistema linfático." },
+    { name: "California Poppy", uses: "Sedante, ansiedad, insomnio, dolor de muelas, PTSD." },
+    { name: "Carolina Geranium", uses: "Hemorragias, diarrea, úlceras bucales, hepatitis B." },
+    { name: "Chamomile", uses: "Insomnio, digestión, cólicos, conjuntivitis, alergias, eczema." },
+    { name: "Chickweed", uses: "Artritis, erupciones, dolores nerviosos, estreñimiento, venéreas." },
+    { name: "Chicory", uses: "Sedante, analgésico, antibacteriano, antifúngico, hígado, diabetes." },
+    { name: "Chives", uses: "Digestión, presión arterial, colesterol, corazón, sistema inmune." },
+    { name: "Comfrey", uses: "Huesos rotos, esguinces, artritis, quemaduras, eczema, psoriasis." },
+    { name: "Common Flax", uses: "Colesterol, autoinmune, respiratorio, estreñimiento, hormonas, cáncer." },
+    { name: "Couch Grass", uses: "Vejiga, riñones, próstata, gota, artritis reumatoide, ictericia." },
+    { name: "Dandelion", uses: "Hígado, vesícula, diurético, diabetes, cáncer, presión arterial." },
+    { name: "Dill", uses: "Cólicos, digestión, menstruación, producción de leche, mal aliento." },
+    { name: "Dock", uses: "Estreñimiento, diarrea, problemas de piel, hígado, vesícula, desintoxicación." },
+    { name: "Echinacea", uses: "Infecciones urinarias, resfriados, gripe, alergias, mordeduras." },
+    { name: "Elecampane", uses: "Asma, bronquitis, tos ferina, tuberculosis, diabetes, parásitos, cáncer." },
+    { name: "Evening Primrose", uses: "Hormonas femeninas, SOP, menopausia, caída del cabello, eczema." },
+    { name: "Fennel", uses: "Digestión, acidez, cólicos, producción de leche, infecciones urinarias." },
+    { name: "Feverfew", uses: "Migrañas, fiebres, dolor menstrual, resfriados, artritis." },
+    { name: "Garlic", uses: "Infecciones, hongos, diabetes, bronquitis, colesterol, presión arterial." },
+    { name: "Goldenrod", uses: "Infecciones urinarias, riñones, alergias, bronquitis, diarrea." },
+    { name: "Greater Burdock", uses: "Desintoxicación, cáncer, anemia, diabetes, artritis, hígado." },
+    { name: "Henbane", uses: "Dolor (externo), gota, neuralgia, artritis, hemorroides." },
+    { name: "Holy Basil", uses: "Inflamación, ansiedad, diabetes, cáncer, respiratorio, estrés." },
+    { name: "Hops", uses: "Ansiedad, insomnio, sedante, digestión, IBS, calambres." },
+    { name: "Horseradish", uses: "Resfriados, gripe, infecciones respiratorias, urinarias, artritis." },
+    { name: "Jerusalem Artichoke", uses: "Diabetes, digestión, sistema inmune, prebiótico." },
+    { name: "Lady's Thumb", uses: "Dolor de estómago, erupciones, artritis, inflamación." },
+    { name: "Lamb's Quarter", uses: "Nutrición, escorbuto, irritaciones, eczema, artritis, gota." },
+    { name: "Lavender", uses: "Ansiedad, dolores, estrés, piojos, respiratorio, presión arterial." },
+    { name: "Leeks", uses: "Corazón, diabetes, antibacteriano, cáncer, anemia, artritis." },
+    { name: "Lemon Balm", uses: "Ansiedad, insomnio, herpes, PMS, corazón, hígado, Alzheimer." },
+    { name: "Lemon Thyme", uses: "Infecciones, respiratorio, asma, sistema inmune." },
+    { name: "Lemon Verbena", uses: "Congestión, estafilococos, artritis, digestión, ansiedad." },
+    { name: "Licorice Root", uses: "Leaky gut, úlceras, hepatitis C, cáncer, fatiga, eczema." },
+    { name: "Lovage", uses: "Digestión, piel, inflamación, artritis, alergias, riñones." },
+    { name: "Lungwort", uses: "Bronquitis, asma, tos ferina, diarrea, diurético, heridas." },
+    { name: "Mallow", uses: "Mucosas, quemaduras, inflamación, infecciones urinarias, dentición." },
+    { name: "Marshmallow", uses: "Acidez, úlceras, leaky gut, tos, bronquitis, piel." },
+    { name: "Meadow Rue", uses: "Problemas urinarios, fiebres, purificación, infecciones." },
+    { name: "Milk Thistle", uses: "Hígado, vesícula, colesterol, diabetes, antídoto de hongos, cáncer." },
+    { name: "Mormon Tea", uses: "Asma, respiratorio, urogenital, gonorrea, sífilis." },
+    { name: "Motherwort", uses: "Corazón, derrames, menstruación, ansiedad, hipertiroidismo." },
+    { name: "Mullein", uses: "Bronquitis, enfisema, asma, tuberculosis, infecciones de oído." },
+    { name: "Oregano", uses: "Sistema inmune, hongos, cáncer, corazón, metabolismo." },
+    { name: "Oxeye Daisy", uses: "Congestión, asma, tónico, heridas, conjuntivitis." },
+    { name: "Peppermint", uses: "Digestión, cólicos, dolores de cabeza, diarrea, IBS, artritis." },
+    { name: "Plantain", uses: "Heridas, mordeduras, picaduras, diarrea, leaky gut, autoinmune." },
+    { name: "Prickly Pear", uses: "Artritis, diabetes, corazón, fatiga, inflamación." },
+    { name: "Prunella/Self-heal", uses: "Herpes, diabetes, cáncer, sistema inmune, VIH, hígado." },
+    { name: "Pulsatilla", uses: "Menstruación, parto, depresión, migrañas, ojos, oídos." },
+    { name: "Purslane", uses: "Asma, diabetes, hongos, colesterol, cáncer." },
+    { name: "Red Clover", uses: "Menopausia, osteoporosis, corazón, eczema, psoriasis." },
+    { name: "Rosemary", uses: "Digestión, memoria, circulación, artritis, hongos, cáncer." },
+    { name: "Queen Anne's Lace", uses: "Riñones, vesícula, gota, digestión, anticonceptivo." },
+    { name: "Sage", uses: "Digestión, hormonas, garganta, heridas, cabello." },
+    { name: "Sheep Sorrel", uses: "Desintoxicación, cáncer, parásitos, resfriados." },
+    { name: "Skullcap", uses: "Ansiedad, depresión, insomnio, calambres, convulsiones." },
+    { name: "St. John's Wort", uses: "Depresión, ansiedad, TOC, menopausia, neuralgia." },
+    { name: "Stinging Nettle", uses: "Alergias, artritis, gota, eczema, menstruación, anemia." },
+    { name: "Sweet Marjoram", uses: "Digestión, menstruación, SOP, diabetes, presión arterial." },
+    { name: "Thyme", uses: "Garganta, bronquitis, acné, sistema inmune, parásitos." },
+    { name: "Valerian Root", uses: "Insomnio, ansiedad, pánico, depresión, epilepsia." },
+    { name: "Violets", uses: "Garganta, tos, inflamación, artritis, colesterol, hemorroides." },
+    { name: "White Mustard", uses: "Neumonía, bronquitis, artritis, cáncer, garganta." },
+    { name: "Wild Lettuce", uses: "Insomnio, sedante, dolor, shock, verrugas." },
+    { name: "Wild Teasel", uses: "Lyme, osteoporosis, huesos, diurético, Candida, artritis." },
+    { name: "Wooly Lamb's Ear", uses: "Heridas, conjuntivitis, diarrea, hígado, picaduras." },
+    { name: "Yarrow", uses: "Hemorragias, heridas, fiebres, menstruación, ansiedad." },
+    { name: "American Ginseng", uses: "Diabetes, resfriados, fatiga, memoria, disfunción eréctil." },
+    { name: "Angelica", uses: "Respiratorio, digestión, neuralgia, ansiedad, cáncer." },
+    { name: "Arnica", uses: "Articulaciones, hematomas, músculos, esguinces, congelación." },
+    { name: "Arrowleaf Balsamroot", uses: "Sistema inmune, garganta, tuberculosis, quemaduras." },
+    { name: "Bearberry", uses: "Infecciones urinarias, riñones, vejiga, parto." },
+    { name: "Bee Balm", uses: "Menstruación, resfriados, fiebres, náuseas, picaduras." },
+    { name: "Black Cohosh", uses: "Menopausia, menstruación, osteoporosis, ansiedad." },
+    { name: "Bleeding Heart", uses: "Dolor dental, contusiones, ansiedad, temblores." },
+    { name: "Bloodroot", uses: "Cáncer de piel, verrugas, respiratorio, digestivo." },
+    { name: "Blue Cohosh", uses: "Parto, menstruación, problemas femeninos." },
+    { name: "Butterbur", uses: "Alergias, asma, migrañas, inflamación." },
+    { name: "California Buckwheat", uses: "Heridas, resfriados, diarrea, dolor de cabeza." },
+    { name: "Cardinal Flower", uses: "Bronquitis, epilepsia, difteria, amigdalitis." },
+    { name: "Cat's Claw", uses: "Cáncer, IBS, Crohn's, artritis, VIH, desintoxicación." },
+    { name: "Cleavers", uses: "Piel, linfa, infecciones, cálculos renales, cáncer." },
+    { name: "Club Moss", uses: "Respiratorio, digestión, piel, artritis, riñones." },
+    { name: "Coltsfoot", uses: "Asma, tos, enfisema, bronquitis, eczema." },
+    { name: "False Hellebore", uses: "Presión arterial, fiebres, dolor muscular." },
+    { name: "False Solomon's Seal", uses: "Garganta, tos, menstruación, heridas." },
+    { name: "False Unicorn Root", uses: "Sistema reproductivo, SOP, disfunción eréctil, ETS." },
+    { name: "Fireweed", uses: "Digestión, IBS, Candida, leaky gut, inflamación." },
+    { name: "Goldenseal", uses: "Resfriados, infecciones, diabetes, hongos, hemorragias." },
+    { name: "Horsetail", uses: "Huesos, cabello, dientes, riñones, vejiga, diabetes." },
+    { name: "Kudzu", uses: "Menopausia, corazón, diabetes, alcoholismo, digestión." },
+    { name: "Indian Tobacco", uses: "Asma, bronquitis, dejar de fumar, antidepresivo." },
+    { name: "Jewelweed", uses: "Hiedra venenosa, hongos, quemaduras, picaduras." },
+    { name: "Maidenhair Fern", uses: "Respiratorio, bronquitis, riñones, circulación." },
+    { name: "Male Fern", uses: "Parásitos, resfriados, hemorragias, fiebres." },
+    { name: "Mayapple", uses: "Verrugas, cáncer de piel, tumores." },
+    { name: "Mugwort", uses: "Menstruación, digestión, hígado, epilepsia, sueño." },
+    { name: "Osha", uses: "Asma, resfriados, VIH, herpes, migrañas, artritis." },
+    { name: "Parrot's Beak", uses: "Ansiedad, estrés, insomnio, relajante muscular." },
+    { name: "Partridgeberry", uses: "Parto, menstruación, problemas uterinos." },
+    { name: "Pipsissewa", uses: "Riñones, cálculos, vejiga, artritis, diabetes." },
+    { name: "Red Raspberry", uses: "Embarazo, parto, diarrea, presión arterial." },
+    { name: "Red Root", uses: "Fiebres, resfriados, mononucleosis, hemorroides." },
+    { name: "Rhodiola", uses: "Resistencia física, fatiga, tiroides, ansiedad, depresión." },
+    { name: "Solomon's Seal", uses: "Hematomas, articulaciones, digestión, respiratorio." },
+    { name: "Spanish Moss", uses: "Colesterol, hormonas, diabetes, artritis." },
+    { name: "Stone Root", uses: "Vejiga, riñones, hemorroides, varices, garganta." },
+    { name: "Unicorn Root", uses: "Aborto espontáneo, SOP, menopausia, dolor articular." },
+    { name: "Wild Comfrey", uses: "Piel, quemaduras, contusiones, picazón." },
+    { name: "Wild Ginger", uses: "Resfriados, infecciones, gingivitis, náuseas." },
+    { name: "Wild Strawberries", uses: "Estómago, garganta, diurético, quemaduras." },
+    { name: "Wild Yam", uses: "Cólicos, Crohn's, colitis, artritis, diverticulitis." },
+    { name: "Wintergreen", uses: "Garganta, dolores de cabeza, cólicos, inflamación." },
+    { name: "Wormwood", uses: "Malaria, parásitos, cáncer, Crohn's, IBS." },
+    { name: "Yellow Jessamine", uses: "Piel, dolor muscular, fiebres, dolor de cabeza." },
+    { name: "Yerba Santa", uses: "Mucosidad, asma, alergias, respiratorio." },
+    { name: "American Basswood", uses: "Quemaduras, sedante, hipertensión, conjuntivitis." },
+    { name: "Ash", uses: "Parto, SOP, fibromas, fiebres, laxante." },
+    { name: "Balsam Fir", uses: "Infecciones, labios agrietados, bronquitis, cáncer." },
+    { name: "Balsam Poplar", uses: "Respiratorio, artritis, piel, quemaduras." },
+    { name: "Bayberry", uses: "Diarrea, disentería, resfriados, fiebres." },
+    { name: "Bilberry", uses: "Inflamación, diabetes, visión, cáncer, corazón." },
+    { name: "Birch", uses: "Inflamación, artritis, diurético, infecciones urinarias." },
+    { name: "Black Crowberry", uses: "Diarrea, antibacteriano, antihistamínico." },
+    { name: "Black Walnut", uses: "Parásitos, piel, hongos, VIH, VPH." },
+    { name: "Elderberry", uses: "Resfriados, gripe, antiviral, sistema inmune." },
+    { name: "Burning Bush", uses: "Estómago, hígado, menstruación." },
+    { name: "Cascara Sagrada", uses: "Laxante, vesícula, hígado, colesterol." },
+    { name: "Chaparral", uses: "Dolores de muela, heridas, acné, psoriasis." },
+    { name: "Chokecherry", uses: "Estómago, bronquitis, tos." },
+    { name: "Cottonwood", uses: "Articulaciones, músculos, piel, neumonía." },
+    { name: "Cranberry", uses: "Infecciones urinarias, corazón, úlceras, cáncer." },
+    { name: "Devil's Club", uses: "Adaptógeno, piel, diabetes, artritis, cáncer." },
+    { name: "Dogwood", uses: "Malaria, heridas, músculos, fiebres." },
+    { name: "Hardy Kiwi", uses: "Cáncer, estreñimiento, IBS, insomnio, presión arterial." },
+    { name: "Hawthorn", uses: "Corazón, angina, presión arterial, colesterol." },
+    { name: "Honey Locust", uses: "Tos, resfriados, cáncer, viruela, sarampión." },
+    { name: "Horse Chestnut", uses: "Varices, hemorroides, diabetes." },
+    { name: "Juniper", uses: "Digestión, diurético, infecciones, hongos, piel." },
+    { name: "Meadowsweet", uses: "Resfriados, indigestión, artritis, infecciones." },
+    { name: "Moringa", uses: "Antiinflamatorio, diabetes, desintoxicación, artritis." },
+    { name: "Oregon Grape", uses: "Hígado, vesícula, bacterias, hongos, cáncer." },
+    { name: "Quaking Aspen", uses: "Artritis, heridas, respiratorio, menstruación." },
+    { name: "Red Alder", uses: "Diarrea, fiebres, dolor de cabeza, tuberculosis." },
+    { name: "Red Elderberry", uses: "Fiebres, resfriados, laxante, infecciones." },
+    { name: "Red Mulberry", uses: "Corazón, Alzheimer, Parkinson, diabetes." },
+    { name: "Salal", uses: "Sistema inmune, piel, diarrea, corazón." },
+    { name: "Sassafras", uses: "Piel, heridas, dolor de cabeza, riñones." },
+    { name: "Saw Palmetto", uses: "Próstata, líbido, menopausia, caída del cabello." },
+    { name: "Slippery Elm", uses: "Crohn's, tos, garganta, úlceras, intestino." },
+    { name: "Sugar Maple", uses: "Tónico, diurético, tos, osteoporosis." },
+    { name: "Western Red Cedar", uses: "Piel, hongos, dandruff, sistema inmune." },
+    { name: "White Pine", uses: "Heridas, respiratorio, artritis, resfriados." },
+    { name: "White Sage", uses: "Parto, resfriados, limpieza espiritual." },
+    { name: "White Willow", uses: "Dolor de cabeza, fiebres, artritis, menstruación." },
+    { name: "Wild Rose", uses: "Resfriados, asma, menstruación, depresión." },
+    { name: "Witch Hazel", uses: "Piel, hemorroides, dolor muscular, tos." },
+    { name: "Chaga", uses: "Cáncer, adaptógeno, VIH, herpes, diabetes, úlceras." },
+    { name: "Lion's Mane", uses: "Memoria, Alzheimer, Parkinson, ansiedad, depresión." },
+    { name: "Lungwort Lichen", uses: "Respiratorio, tuberculosis, antioxidante, priones." },
+    { name: "Reishi", uses: "Inflamación, autoinmune, cáncer, depresión, sueño." },
+    { name: "Turkey Tail", uses: "Cáncer, VIH, diabetes, VPH, herpes, Candida." },
+    { name: "Usnea", uses: "Antibiótico, estafilococo, VPH, hongos, conjuntivitis." },
+    { name: "Cattails", uses: "Heridas, quemaduras, dientes, diarrea, hemorragias." },
+    { name: "Cocoplum", uses: "Ojos, corazón, sistema inmune, macula." },
+    { name: "Duckweed", uses: "Antibacteriano, ictericia, dolores de cabeza." },
+    { name: "Watercress", uses: "Sistema inmune, tuberculosis, piel, riñones." },
+    { name: "Water Plantain", uses: "Diurético, riñones, digestión, colesterol." },
+    { name: "Skunk Cabbage", uses: "Piel, artritis, bronquitis, asma, nervios." }
+];
+
+// ============================================================
+//  STATE
+// ============================================================
+let currentLang = 'es';
+
+// ============================================================
+//  FUNCTIONS
+// ============================================================
+
+function updateLanguage() {
+    const t = DATA[currentLang];
+    document.getElementById('fastingContent').innerHTML = t.fasting;
+    document.getElementById('x39Content').innerHTML = t.x39;
+    document.getElementById('arsenalContent').innerHTML = t.arsenal;
+
+    const titles = document.querySelectorAll('.sectionTitleKey');
+    if (currentLang === 'es') {
+        titles[0].innerHTML = 'La Misión de Trinity';
+        titles[1].innerHTML = 'Ayuno Intermitente · El Interruptor Biológico';
+        titles[2].innerHTML = 'X39 · Jalea Real · Protocolo Reina';
+        titles[3].innerHTML = 'El Arsenal Prohibido';
+        titles[4].innerHTML = 'Buscador de Plantas Medicinales';
+        titles[5].innerHTML = 'Beca · Escuela de Medicina Rockwell';
+        titles[6].innerHTML = 'Tu Prescripción de Sanación';
+        document.getElementById('mainSubtitle').textContent = 'El Protocolo Reina · Medicina Prohibida · Escuela de Sanación';
+        document.getElementById('plantDesc').textContent = 'Busca entre más de 300 plantas del Libro Perdido de Remedios Herbales.';
+        document.getElementById('rxDesc').textContent = '100% gratuita · basada en escrituras LXX, Etiopes y medicina natural.';
+        document.getElementById('generateRxBtn').textContent = '✨ GENERAR MI PRESCRIPCIÓN ✨';
+        document.getElementById('rxDisclaimer').textContent = '⚠️ Educativo · Consulta a un profesional · La Jalea Real puede causar alergias.';
+        document.querySelector('#scholarshipContent p:first-child').innerHTML = '<strong>La Escuela de Medicina Rockwell</strong> está formando a la próxima generación de sanadores que rechazan el sistema farmacéutico y abrazan la medicina natural, la equidad y el derecho común.';
+        document.querySelector('#scholarshipContent .list-styled').innerHTML = `
+            <li>📜 <strong>Manuscrito Bandianus</strong> – El texto prohibido de remedios ancestrales</li>
+            <li>🌿 <strong>Medicina Herbolaria</strong> – 300+ plantas medicinales</li>
+            <li>⚖️ <strong>Derecho Común y Equidad</strong> – Conocimiento legal para la soberanía</li>
+            <li>🧬 <strong>Tecnología de Activación Celular</strong> – X39 y más</li>
+        `;
+        document.querySelector('#scholarshipContent .btn-group .btn-scholarship').textContent = '🎓 Solicitar Beca';
+        document.querySelector('#scholarshipContent .btn-group .btn-primary:last-child').textContent = '🌍 Visitar TripsToColombia.com';
+        document.querySelector('#scholarshipContent p:last-child').textContent = 'Las becas cubren matrícula, alojamiento y materiales. Aplica ahora.';
+        document.querySelector('#missionContent p:first-child').innerHTML = '<strong>Trinity está en las montañas de Colombia</strong>, en la Escuela de Medicina Rockwell, aprendiendo medicina natural, homeopática, y también <strong>EQUIDAD y DERECHO COMÚN</strong> para liberar a la humanidad de la esclavitud farmacéutica y legal.';
+        document.querySelector('#missionContent p:nth-child(2)').innerHTML = 'Ella está estudiando el <strong>Manuscrito Bandianus</strong> y el <strong>Libro Perdido de Remedios Herbales</strong> para traer de vuelta el conocimiento que la élite enterró en 1910 con el <strong>Informe Flexner</strong>.';
+        document.querySelector('#missionContent p:nth-child(3)').innerHTML = '"El conocimiento es poder, pero el conocimiento compartido es libertad. Trinity está aprendiendo para que <strong>tú</strong> puedas sanar."';
+        document.querySelector('.donation-bar p').innerHTML = 'Tu donación apoya directamente la educación de Trinity y la construcción de clínicas gratuitas en Colombia.';
+        document.querySelector('#missionContent .donation-bar .goal').innerHTML = '💰 Recaudado de <strong>$8,200</strong> para el año escolar de Trinity';
+        document.querySelector('#missionContent .badge:first-child').textContent = '📚 Libros';
+        document.querySelector('#missionContent .badge:nth-child(2)').textContent = '🏥 Equipamiento';
+        document.querySelector('#missionContent .badge:nth-child(3)').textContent = '🌱 Huerta Medicinal';
+        document.querySelector('#missionContent .badge:nth-child(4)').textContent = '⚖️ Clínicas Legales';
+        document.querySelector('.btn-whatsapp span').textContent = 'WhatsApp +57 3233235532';
+        document.querySelector('.btn-whatsapp.btn-donate span:last-child').textContent = 'Donar por WhatsApp';
+        document.querySelector('.btn-whatsapp.btn-donate span:first-child').textContent = '❤️';
+    } else {
+        titles[0].innerHTML = "Trinity's Mission";
+        titles[1].innerHTML = 'Intermittent Fasting · The Biological Switch';
+        titles[2].innerHTML = 'X39 · Royal Jelly · Queen Protocol';
+        titles[3].innerHTML = 'The Forbidden Arsenal';
+        titles[4].innerHTML = 'Plant Finder · Herbal Remedies';
+        titles[5].innerHTML = 'Scholarship · Rockwell School of Medicine';
+        titles[6].innerHTML = 'Your Healing Prescription';
+        document.getElementById('mainSubtitle').textContent = 'The Queen Protocol · Forbidden Medicine · Healing School';
+        document.getElementById('plantDesc').textContent = 'Search over 300 plants from The Lost Book of Herbal Remedies.';
+        document.getElementById('rxDesc').textContent = '100% free · based on LXX, Ethiopian scriptures & natural medicine.';
+        document.getElementById('generateRxBtn').textContent = '✨ GENERATE MY PRESCRIPTION ✨';
+        document.getElementById('rxDisclaimer').textContent = '⚠️ Educational · Consult a professional · Royal Jelly may cause allergies.';
+        document.querySelector('#scholarshipContent p:first-child').innerHTML = '<strong>Rockwell School of Medicine</strong> is training the next generation of healers who reject the pharmaceutical system and embrace natural medicine, equity, and common law.';
+        document.querySelector('#scholarshipContent .list-styled').innerHTML = `
+            <li>📜 <strong>Bandianus Manuscript</strong> – The forbidden text of ancestral remedies</li>
+            <li>🌿 <strong>Herbal Medicine</strong> – 300+ medicinal plants</li>
+            <li>⚖️ <strong>Common Law & Equity</strong> – Legal knowledge for sovereignty</li>
+            <li>🧬 <strong>Cell Activation Technology</strong> – X39 and more</li>
+        `;
+        document.querySelector('#scholarshipContent .btn-group .btn-scholarship').textContent = '🎓 Apply for Scholarship';
+        document.querySelector('#scholarshipContent .btn-group .btn-primary:last-child').textContent = '🌍 Visit TripsToColombia.com';
+        document.querySelector('#scholarshipContent p:last-child').textContent = 'Scholarships cover tuition, lodging and materials. Apply now.';
+        document.querySelector('#missionContent p:first-child').innerHTML = '<strong>Trinity is in the mountains of Colombia</strong>, at Rockwell School of Medicine, learning natural, homeopathic medicine, and also <strong>EQUITY and COMMON LAW</strong> to free humanity from pharmaceutical and legal slavery.';
+        document.querySelector('#missionContent p:nth-child(2)').innerHTML = 'She is studying the <strong>Bandianus Manuscript</strong> and the <strong>Lost Book of Herbal Remedies</strong> to bring back the knowledge the elite buried in 1910 with the <strong>Flexner Report</strong>.';
+        document.querySelector('#missionContent p:nth-child(3)').innerHTML = '"Knowledge is power, but shared knowledge is freedom. Trinity is learning so <strong>you</strong> can heal."';
+        document.querySelector('.donation-bar p').innerHTML = 'Your donation directly supports Trinity\'s education and the building of free clinics in Colombia.';
+        document.querySelector('#missionContent .donation-bar .goal').innerHTML = '💰 Raised of <strong>$8,200</strong> for Trinity\'s school year';
+        document.querySelector('#missionContent .badge:first-child').textContent = '📚 Books';
+        document.querySelector('#missionContent .badge:nth-child(2)').textContent = '🏥 Equipment';
+        document.querySelector('#missionContent .badge:nth-child(3)').textContent = '🌱 Medicinal Garden';
+        document.querySelector('#missionContent .badge:nth-child(4)').textContent = '⚖️ Legal Clinics';
+        document.querySelector('.btn-whatsapp span').textContent = 'WhatsApp +57 3233235532';
+        document.querySelector('.btn-whatsapp.btn-donate span:last-child').textContent = 'Donate via WhatsApp';
+        document.querySelector('.btn-whatsapp.btn-donate span:first-child').textContent = '❤️';
+    }
+}
+
+function generatePrescription() {
+    const t = DATA[currentLang];
+    const scripture = t.rxScriptures[Math.floor(Math.random() * t.rxScriptures.length)];
+    const remedies = [...t.rxRemedies];
+    for (let i = remedies.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [remedies[i], remedies[j]] = [remedies[j], remedies[i]];
+    }
+    const selected = remedies.slice(0, 4).join('\n• ');
+    const name = currentLang === 'es' ? 'Buscador de la Verdad' : 'Seeker of Truth';
+
+    return `${t.rxHeader}\n\n✧ DIAGNÓSTICO BÍBLICO:\n${scripture}\n\n🌿 PROTOCOLO NATURAL:\n• ${selected}\n\n🕯️ ESTILO DE VIDA:\n• Activa el Protocolo Reina con X39\n• Jalea Real cruda (prueba alergia)\n• Hidratación con sal de mar\n• Ayuno intermitente (16:8 o 18:6)\n• Enemas de café 2x/semana\n\n${t.rxFooter}`;
+}
+
+function searchPlants(query) {
+    const q = query.toLowerCase().trim();
+    if (!q) {
+        document.getElementById('plantResults').innerHTML = '<p style="opacity:0.5;">🌿 Escribe una planta para buscar...</p>';
+        return;
+    }
+    const results = PLANTS.filter(p =>
+        p.name.toLowerCase().includes(q) ||
+        p.uses.toLowerCase().includes(q)
+    );
+    const container = document.getElementById('plantResults');
+    if (results.length === 0) {
+        container.innerHTML = `<p style="opacity:0.6;">❌ No se encontraron plantas para "${query}"</p>`;
+        return;
+    }
+    container.innerHTML = results.slice(0, 20).map(p =>
+        `<div class="plant-result">
+            <div class="plant-name">🌿 ${p.name}</div>
+            <div class="plant-use">${p.uses}</div>
+        </div>`
+    ).join('');
+    if (results.length > 20) {
+        container.innerHTML += `<p style="opacity:0.4;margin-top:0.5rem;">+${results.length - 20} más resultados...</p>`;
+    }
+}
+
+// ============================================================
+//  EVENT LISTENERS
+// ============================================================
+
+// Language toggle
+document.querySelectorAll('.lang-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const lang = this.dataset.lang;
+        if (lang === 'es') currentLang = 'es';
+        else currentLang = 'en';
+        document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        updateLanguage();
+        // re-run prescription if visible
+        const rxDiv = document.getElementById('rxOutput');
+        if (rxDiv.classList.contains('show')) {
+            rxDiv.textContent = generatePrescription();
+        }
+    });
+});
+
+// Generate prescription
+document.getElementById('generateRxBtn').addEventListener('click', function() {
+    const rxDiv = document.getElementById('rxOutput');
+    rxDiv.textContent = generatePrescription();
+    rxDiv.classList.add('show');
+    rxDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+});
+
+// Plant search
+document.getElementById('searchBtn').addEventListener('click', function() {
+    const input = document.getElementById('plantSearch');
+    searchPlants(input.value);
+});
+document.getElementById('plantSearch').addEventListener('keyup', function(e) {
+    if (e.key === 'Enter') {
+        searchPlants(this.value);
+    }
+});
+
+// ============================================================
+//  INIT
+// ============================================================
+updateLanguage();
+
+// Pre-fill plant search placeholder with a random plant
+const randomPlant = PLANTS[Math.floor(Math.random() * PLANTS.length)];
+document.getElementById('plantSearch').placeholder = currentLang === 'es'
+    ? `Ej: ${randomPlant.name.toLowerCase()}`
+    : `Eg: ${randomPlant.name.toLowerCase()}`;
+
+console.log('⚕️ DocTrin 2.0 — The Forbidden Trinity loaded.');
+console.log('🌿 300+ plants from The Lost Book of Herbal Remedies.');
+console.log('👑 X39 + Royal Jelly + Intermittent Fasting + Arsenal.');
+console.log('🙏 Donations support Trinity in Colombia.');
+</script>
+</body>
+</html>
