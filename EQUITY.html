@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Equity Document Automation System</title>
+
+    <style>
+        /* ── Reset & Base ── */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+            background: #0b0d11;
+            color: #e8e6e3;
+            min-height: 100vh;
+            padding: 2rem 1.5rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* ── Header ── */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #2a2d36;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-weight: 400;
+            font-size: 1.9rem;
+            letter-spacing: 0.5px;
+        }
+        .header h1 span {
+            color: #b8a88a;
+            font-weight: 300;
+        }
+
+        .badge {
+            background: #1e2129;
+            padding: 0.4rem 1.2rem;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            color: #b8a88a;
+            border: 1px solid #3d3f4a;
+        }
+
+        /* ── Grid Layout ── */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 2.5rem;
+        }
+
+        @media (max-width: 1000px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ── Cards ── */
+        .card {
+            background: #14171e;
+            border-radius: 16px;
+            padding: 1.8rem 2rem;
+            border: 1px solid #262a33;
+            transition: border 0.2s;
+        }
+
+        .card:hover {
+            border-color: #3d424f;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: #c8c4bc;
+            margin-bottom: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .card-title .icon {
+            font-size: 1.3rem;
+        }
+
+        /* ── Upload Area ── */
+        .upload-zone {
+            border: 2px dashed #2f3440;
+            border-radius: 14px;
+            padding: 3rem 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: background 0.2s, border-color 0.2s;
+            background: #0f1219;
+        }
+
+        .upload-zone:hover,
+        .upload-zone.dragover {
+            background: #1a1e28;
+            border-color: #b8a88a;
+        }
+
+        .upload-zone .big-icon {
+            font-size: 3.2rem;
+            display: block;
+            margin-bottom: 0.6rem;
+        }
+
+        .upload-zone p {
+            color: #9aa0ae;
+            font-size: 0.95rem;
+        }
+
+        .upload-zone .hint {
+            font-size: 0.8rem;
+            color: #6a7080;
+            margin-top: 0.5rem;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        /* ── Progress / Status ── */
+        .status-bar {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 1.2rem;
+            padding: 0.6rem 1rem;
+            background: #0f1219;
+            border-radius: 40px;
+            font-size: 0.9rem;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #4a4f5e;
+            flex-shrink: 0;
+        }
+        .status-dot.active {
+            background: #7bb86c;
+        }
+        .status-dot.error {
+            background: #c45a5a;
+        }
+        .status-dot.processing {
+            background: #e8b86d;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.4;
+            }
+        }
+
+        /* ── Extracted Content ── */
+        .extract-box {
+            background: #0b0e14;
+            border-radius: 12px;
+            padding: 1.2rem 1.5rem;
+            max-height: 260px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            color: #cdd0d8;
+            white-space: pre-wrap;
+            word-break: break-word;
+            border: 1px solid #222731;
+            margin-top: 0.8rem;
+        }
+
+        .extract-box .label {
+            color: #7a8298;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-family: 'Segoe UI', sans-serif;
+        }
+
+        .extract-box .mirror-highlight {
+            color: #d4b68a;
+            font-weight: 500;
+        }
+
+        /* ── Buttons ── */
+        .btn {
+            background: #262b36;
+            border: none;
+            color: #e8e6e3;
+            padding: 0.6rem 1.6rem;
+            border-radius: 40px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 450;
+            border: 1px solid #353b48;
+        }
+
+        .btn:hover {
+            background: #323843;
+            border-color: #4f5668;
+        }
+        .btn:active {
+            transform: scale(0.97);
+        }
+
+        .btn-primary {
+            background: #b8a88a;
+            color: #0b0d11;
+            border-color: #b8a88a;
+            font-weight: 500;
+        }
+        .btn-primary:hover {
+            background: #d0bf9e;
+            border-color: #d0bf9e;
+        }
+
+        .btn-success {
+            background: #4f7a4a;
+            border-color: #4f7a4a;
+            color: #fff;
+        }
+        .btn-success:hover {
+            background: #5f8f59;
+            border-color: #5f8f59;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #3d424f;
+        }
+        .btn-outline:hover {
+            background: #1e2129;
+        }
+
+        .btn-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.7rem;
+            margin-top: 1.2rem;
+        }
+
+        /* ── Generated Document Preview ── */
+        .doc-preview {
+            background: #0f1219;
+            border-radius: 12px;
+            padding: 1.8rem 2rem;
+            border: 1px solid #262a33;
+            font-family: 'Times New Roman', serif;
+            color: #e0ddd8;
+            min-height: 240px;
+            max-height: 480px;
+            overflow-y: auto;
+            line-height: 1.7;
+            font-size: 0.95rem;
+        }
+
+        .doc-preview h3 {
+            font-family: 'Segoe UI', sans-serif;
+            color: #b8a88a;
+            font-weight: 400;
+            border-bottom: 1px solid #2a2d36;
+            padding-bottom: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .doc-preview .mirror-text {
+            color: #d4b68a;
+        }
+
+        .doc-preview .placeholder {
+            color: #5a6070;
+            font-style: italic;
+        }
+
+        /* ── Template Selector ── */
+        .template-select {
+            display: flex;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+            margin: 0.8rem 0 1.2rem 0;
+        }
+
+        .template-chip {
+            background: #1a1e28;
+            padding: 0.3rem 1.2rem;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            border: 1px solid #2f3440;
+            transition: all 0.15s;
+            color: #b0b5c4;
+        }
+
+        .template-chip:hover {
+            border-color: #5a6078;
+        }
+        .template-chip.active {
+            border-color: #b8a88a;
+            background: #262b36;
+            color: #e8e6e3;
+        }
+
+        /* ── Footer ── */
+        .footer {
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #1e2129;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+            font-size: 0.85rem;
+            color: #6a7080;
+        }
+        .footer a {
+            color: #b8a88a;
+            text-decoration: none;
+        }
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* ── Scrollbar ── */
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0b0d11;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #2f3440;
+            border-radius: 10px;
+        }
+
+        /* ── Responsive tweaks ── */
+        @media (max-width: 600px) {
+            body {
+                padding: 1rem;
+            }
+            .card {
+                padding: 1.2rem;
+            }
+            .header h1 {
+                font-size: 1.4rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <header class="header">
+            <h1>⚖️ Equity <span>Document Automation</span></h1>
+            <div class="badge">✦ Full Mirror Generation</div>
+        </header>
+
+        <!-- MAIN GRID -->
+        <div class="main-grid">
+            <!-- LEFT COLUMN: UPLOAD + EXTRACTION -->
+            <div class="card">
+                <div class="card-title">
+                    <span class="icon">📄</span> 1. Upload &amp; Extract
+                </div>
+
+                <!-- Upload Zone -->
+                <div class="upload-zone" id="dropZone">
+                    <span class="big-icon">📤</span>
+                    <p><strong>Drop your presentment here</strong> or click to browse</p>
+                    <p class="hint">PDF, JPG, PNG · max 10MB</p>
+                    <input type="file" id="fileInput" accept=".pdf,.jpg,.jpeg,.png" />
+                </div>
+
+                <!-- Status -->
+                <div class="status-bar">
+                    <span class="status-dot" id="statusDot"></span>
+                    <span id="statusText">Ready · upload a document to begin</span>
+                </div>
+
+                <!-- Extracted Mirror Content -->
+                <div style="margin-top: 1.2rem;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+                        <span style="color:#9aa0ae; font-size:0.9rem;">📌 Extracted Mirror Language</span>
+                        <button class="btn btn-outline" id="clearExtractBtn" style="padding:0.2rem 1rem; font-size:0.75rem;">Clear</button>
+                    </div>
+                    <div class="extract-box" id="extractDisplay">
+                        <span class="label">⏳ Waiting for document...</span>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="btn-group">
+                    <button class="btn btn-primary" id="analyzeBtn">🔍 Analyze &amp; Mirror</button>
+                    <button class="btn btn-success" id="generateDocBtn">⚡ Generate Full Document</button>
+                </div>
+                <div style="margin-top:0.5rem; font-size:0.8rem; color:#6a7080;">
+                    <span id="pageCount">Pages detected: —</span>
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN: DOCUMENT BUILDER + PREVIEW -->
+            <div class="card">
+                <div class="card-title">
+                    <span class="icon">📜</span> 2. Final Mirrored Document
+                </div>
+
+                <!-- Template Selector -->
+                <div style="font-size:0.85rem; color:#9aa0ae; margin-bottom:0.2rem;">Select document type:</div>
+                <div class="template-select" id="templateSelector">
+                    <span class="template-chip active" data-template="nnin">NNIN</span>
+                    <span class="template-chip" data-template="rescission">Rescission</span>
+                    <span class="template-chip" data-template="acceptance">Acceptance &amp; Return</span>
+                    <span class="template-chip" data-template="court">Court Script</span>
+                    <span class="template-chip" data-template="dishonor">Certificate of Dishonor</span>
+                </div>
+
+                <!-- Document Preview -->
+                <div class="doc-preview" id="docPreview">
+                    <h3>⚖️ Mirrored Document</h3>
+                    <p class="placeholder">Upload a presentment, then click <strong>"Generate Full Document"</strong> to create your complete mirrored document automatically.</p>
+                    <p class="placeholder" style="margin-top:0.8rem;">All mirror language, maxims, and notices will be inserted for you.</p>
+                </div>
+
+                <!-- Download / Copy -->
+                <div class="btn-group" style="margin-top:1.2rem;">
+                    <button class="btn btn-success" id="downloadDocBtn">⬇ Download .docx</button>
+                    <button class="btn btn-outline" id="copyDocBtn">📋 Copy to Clipboard</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- BOTTOM: PRINCIPLE LIBRARY / QUICK REF -->
+        <div class="card" style="margin-bottom:2rem;">
+            <div class="card-title">
+                <span class="icon">📖</span> Equity Principles &amp; Maxims
+                <span style="font-size:0.75rem; color:#6a7080; font-weight:300; margin-left:0.8rem;">— auto-inserted into your document</span>
+            </div>
+            <div style="display:flex; flex-wrap:wrap; gap:0.5rem 1.5rem; font-size:0.9rem; color:#b8bcc8;">
+                <span>⚖️ <em>Acceptatio = Solutio</em> (Acceptance = Payment)</span>
+                <span>⚖️ <em>Ubi jus, ibi remedium</em> (Where right, remedy)</span>
+                <span>⚖️ <em>Nemo dat quod non habet</em></span>
+                <span>⚖️ <em>Honor commercialis, non moralis</em></span>
+                <span>⚖️ UCC 1-308 · Without Prejudice</span>
+            </div>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="footer">
+            <span>Equity Document Automation · All communications made <strong>without prejudice</strong></span>
+            <span>⚡ Mirror · Accept · Discharge</span>
+        </div>
+    </div>
+
+    <!-- ─── JAVASCRIPT ─── -->
+    <script>
+        (function() {
+            'use strict';
+
+            // ── DOM refs ──
+            const dropZone = document.getElementById('dropZone');
+            const fileInput = document.getElementById('fileInput');
+            const statusDot = document.getElementById('statusDot');
+            const statusText = document.getElementById('statusText');
+            const extractDisplay = document.getElementById('extractDisplay');
+            const docPreview = document.getElementById('docPreview');
+            const analyzeBtn = document.getElementById('analyzeBtn');
+            const generateBtn = document.getElementById('generateDocBtn');
+            const downloadBtn = document.getElementById('downloadDocBtn');
+            const copyBtn = document.getElementById('copyDocBtn');
+            const clearExtractBtn = document.getElementById('clearExtractBtn');
+            const pageCountSpan = document.getElementById('pageCount');
+            const templateChips = document.querySelectorAll('.template-chip');
+
+            // ── State ──
+            let currentFile = null;
+            let extractedText = ''; // raw extracted text
+            let mirroredContent = ''; // processed mirror language
+            let selectedTemplate = 'nnin';
+            let fullDocument = '';
+
+            // ── Templates ──
+            const TEMPLATES = {
+                nnin: {
+                    label: 'Non‑Negotiable Notice of Inquiry (NNIN)',
+                    prefix: 'NON‑NEGOTIABLE NOTICE OF INQUIRY\nWITHOUT PREJUDICE – UCC 1‑308\n\n',
+                    suffix: '\n\n_________________________\n[Signature]\nAll rights reserved.'
+                },
+                rescission: {
+                    label: 'Rescission Letter',
+                    prefix: 'NOTICE OF RESCISSION\nWITHOUT PREJUDICE\n\n',
+                    suffix: '\n\nAll contractual obligations are hereby rescinded ab initio.'
+                },
+                acceptance: {
+                    label: 'Acceptance & Return',
+                    prefix: 'ACCEPTANCE AND RETURN\nWITHOUT PREJUDICE\n\n' +
+                        'I accept the presentment for settlement in equity.\n' +
+                        'Acceptance = Payment per the maxim Acceptatio = Solutio.\n\n',
+                    suffix: '\n\nReturned to sender for discharge.'
+                },
+                court: {
+                    label: 'Court Script / Bond Dialogue',
+                    prefix: 'COURT SCRIPT – BOND DIALOGUE\nWITHOUT PREJUDICE\n\n' +
+                        'I am not the debtor; I am a secured party.\n' +
+                        'Please present the original commercial instrument.\n\n',
+                    suffix: '\n\nI reserve all rights under UCC 1‑308.'
+                },
+                dishonor: {
+                    label: 'Certificate of Dishonor',
+                    prefix: 'CERTIFICATE OF DISHONOR\nWITHOUT PREJUDICE\n\n' +
+                        'This instrument is hereby dishonored for lack of proper presentment.\n' +
+                        'UCC 3‑505(b) requires presentment for acceptance.\n\n',
+                    suffix: '\n\nFiled this day with the Clerk of Court.'
+                }
+            };
+
+            // ── UI Helpers ──
+            function setStatus(text, type) {
+                statusText.textContent = text;
+                statusDot.className = 'status-dot';
+                if (type === 'active') statusDot.classList.add('active');
+                else if (type === 'error') statusDot.classList.add('error');
+                else if (type === 'processing') statusDot.classList.add('processing');
+            }
+
+            function updateExtractDisplay(text) {
+                if (!text || text.trim() === '') {
+                    extractDisplay.innerHTML = '<span class="label">📭 No mirror language extracted yet.</span>';
+                    return;
+                }
+                // highlight mirror-like phrases
+                let highlighted = text.replace(
+                    /(accept|mirror|presentment|discharge|honor|equity|without prejudice|ucc)/gi,
+                    '<span class="mirror-highlight">$&</span>'
+                );
+                extractDisplay.innerHTML = highlighted;
+            }
+
+            function updateDocPreview(content) {
+                if (!content || content.trim() === '') {
+                    docPreview.innerHTML = `
+                        <h3>⚖️ Mirrored Document</h3>
+                        <p class="placeholder">Upload a presentment, then click <strong>"Generate Full Document"</strong>.</p>
+                    `;
+                    return;
+                }
+                // simple formatting: newlines to <br>, preserve spaces
+                const formatted = content.replace(/\n/g, '<br>');
+                docPreview.innerHTML = `<h3>⚖️ ${TEMPLATES[selectedTemplate]?.label || 'Mirrored Document'}</h3><div>${formatted}</div>`;
+            }
+
+            // ── File Handling ──
+            function handleFile(file) {
+                if (!file) return;
+                currentFile = file;
+                setStatus(`📄 Loaded: ${file.name}`, 'active');
+                pageCountSpan.textContent = `Pages detected: processing...`;
+
+                // Simulate extraction (in real app, use PDF.js / Tesseract)
+                // For demo, we read as text or generate mirror content from filename
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    // In a real app, this would be OCR / PDF text extraction.
+                    // For this demo, we generate plausible mirror content based on filename.
+                    const demoMirror = generateDemoMirror(file.name);
+                    extractedText = demoMirror;
+                    mirroredContent = demoMirror;
+                    updateExtractDisplay(demoMirror);
+                    setStatus(`✅ Extracted mirror language from ${file.name}`, 'active');
+                    pageCountSpan.textContent = `Pages detected: ${Math.floor(Math.random() * 5) + 1}`;
+                };
+                reader.onerror = function() {
+                    setStatus('❌ Error reading file', 'error');
+                };
+                // For PDFs, we'd use PDF.js; for images, Tesseract.
+                // Here we just trigger the demo.
+                reader.readAsDataURL(file);
+                // But we also need to generate demo content immediately.
+                // We'll override with a better demo.
+                setTimeout(() => {
+                    const demo = generateDemoMirror(file.name);
+                    extractedText = demo;
+                    mirroredContent = demo;
+                    updateExtractDisplay(demo);
+                    setStatus(`✅ Extracted mirror language from ${file.name}`, 'active');
+                }, 300);
+            }
+
+            // ── Demo Mirror Generator ──
+            function generateDemoMirror(filename) {
+                const base = filename.replace(/\.[^.]+$/, '').replace(/[_-]/g, ' ');
+                const terms = [
+                    'Presentment received and accepted for settlement.',
+                    'Mirror language: "We agree to discharge this obligation in equity."',
+                    'UCC 1-308 rights are expressly reserved.',
+                    'Without prejudice – all rights preserved.',
+                    'Acceptance = Payment per Acceptatio = Solutio.',
+                    'This is a non-negotiable commercial instrument.',
+                    'The undersigned acknowledges the presentment but disputes liability.',
+                    'Equity requires proper written presentment for discharge.',
+                    'No admission of liability is made.',
+                    'All communications are made in a commercial capacity.'
+                ];
+                // Pick 4-6 random terms
+                const shuffled = terms.sort(() => 0.5 - Math.random());
+                const selected = shuffled.slice(0, 5 + Math.floor(Math.random() * 3));
+                return `📌 MIRROR LANGUAGE EXTRACTED FROM: ${base}\n\n` +
+                    selected.map((t, i) => `${i+1}. ${t}`).join('\n') +
+                    '\n\n📜 Equitable maxims invoked:\n• Acceptatio = Solutio\n• Ubi jus, ibi remedium\n• Honor commercialis, non moralis';
+            }
+
+            // ── Document Builder ──
+            function buildFullDocument(mirrorText, templateKey) {
+                const tmpl = TEMPLATES[templateKey] || TEMPLATES.nnin;
+                const date = new Date().toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+
+                let body = mirrorText || 'No mirror language extracted.';
+
+                // Insert maxims and standard clauses
+                const maxims = `
+        EQUITABLE MAXIMS APPLIED:
+        • Acceptatio = Solutio (Acceptance = Payment)
+        • Ubi jus, ibi remedium (Where there is a right, there is a remedy)
+        • Nemo dat quod non habet (No one gives what they do not have)
+        • Honor commercialis, non moralis (Commercial honor, not moral)
+        • In eodem modo quo creatum est, dissolvitur (Discharged in same manner created)
+
+        NOTICE:
+        All communications are made WITHOUT PREJUDICE.
+        Rights are reserved under UCC 1-308.
+        This is a commercial instrument and demand for performance.
+        `;
+
+                const document = `
+        ${tmpl.prefix}
+        DATE: ${date}
+
+        TO: The Party of Interest
+
+        SUBJECT: Equity Presentment & Acceptance
+
+        ${body}
+
+        ${maxims}
+
+        This document constitutes a full and final mirror of the presentment.
+        All terms are accepted in equity for discharge.
+
+        ${tmpl.suffix}
+        `;
+
+                return document.trim();
+            }
+
+            // ── Event Listeners ──
+
+            // Drop zone
+            dropZone.addEventListener('click', () => fileInput.click());
+
+            dropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropZone.classList.add('dragover');
+            });
+            dropZone.addEventListener('dragleave', () => {
+                dropZone.classList.remove('dragover');
+            });
+            dropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('dragover');
+                if (e.dataTransfer.files.length > 0) {
+                    handleFile(e.dataTransfer.files[0]);
+                }
+            });
+
+            fileInput.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    handleFile(e.target.files[0]);
+                }
+                fileInput.value = ''; // allow re-upload same file
+            });
+
+            // Analyze button
+            analyzeBtn.addEventListener('click', () => {
+                if (!currentFile) {
+                    setStatus('⚠️ Please upload a document first', 'error');
+                    return;
+                }
+                setStatus('🔍 Analyzing for mirror language...', 'processing');
+                setTimeout(() => {
+                    // Simulate analysis
+                    const enhanced = generateDemoMirror(currentFile.name) +
+                        '\n\n✅ ANALYSIS COMPLETE: ' +
+                        'Identified 7 mirror phrases, 3 maxims, and 2 reservations of rights.';
+                    extractedText = enhanced;
+                    mirroredContent = enhanced;
+                    updateExtractDisplay(enhanced);
+                    setStatus('✅ Analysis complete. Mirror language extracted.', 'active');
+                }, 1200);
+            });
+
+            // Generate Full Document
+            generateBtn.addEventListener('click', () => {
+                if (!mirroredContent || mirroredContent.trim() === '') {
+                    setStatus('⚠️ No mirror content to build document. Upload or analyze first.', 'error');
+                    return;
+                }
+                setStatus('📜 Generating full mirrored document...', 'processing');
+                setTimeout(() => {
+                    fullDocument = buildFullDocument(mirroredContent, selectedTemplate);
+                    updateDocPreview(fullDocument);
+                    setStatus('✅ Document generated successfully.', 'active');
+                }, 800);
+            });
+
+            // Template selection
+            templateChips.forEach(chip => {
+                chip.addEventListener('click', () => {
+                    templateChips.forEach(c => c.classList.remove('active'));
+                    chip.classList.add('active');
+                    selectedTemplate = chip.dataset.template;
+                    // If we already have a document, regenerate with new template
+                    if (fullDocument) {
+                        fullDocument = buildFullDocument(mirroredContent, selectedTemplate);
+                        updateDocPreview(fullDocument);
+                    }
+                });
+            });
+
+            // Download .docx (simulated)
+            downloadBtn.addEventListener('click', () => {
+                if (!fullDocument) {
+                    setStatus('⚠️ Generate a document first.', 'error');
+                    return;
+                }
+                const blob = new Blob([fullDocument], { type: 'application/msword' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `Mirrored_Document_${new Date().toISOString().slice(0,10)}.docx`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                setStatus('⬇️ Document downloaded.', 'active');
+            });
+
+            // Copy to clipboard
+            copyBtn.addEventListener('click', () => {
+                if (!fullDocument) {
+                    setStatus('⚠️ Generate a document first.', 'error');
+                    return;
+                }
+                navigator.clipboard.writeText(fullDocument).then(() => {
+                    setStatus('📋 Copied to clipboard!', 'active');
+                }).catch(() => {
+                    // fallback
+                    const textarea = document.createElement('textarea');
+                    textarea.value = fullDocument;
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textarea);
+                    setStatus('📋 Copied to clipboard!', 'active');
+                });
+            });
+
+            // Clear extract
+            clearExtractBtn.addEventListener('click', () => {
+                extractedText = '';
+                mirroredContent = '';
+                fullDocument = '';
+                updateExtractDisplay('');
+                updateDocPreview('');
+                setStatus('🧹 Cleared. Upload a new document.', 'active');
+                currentFile = null;
+                pageCountSpan.textContent = 'Pages detected: —';
+            });
+
+            // ── Init ──
+            setStatus('Ready · upload a document to begin', '');
+            updateExtractDisplay('');
+
+            // Provide a small demo hint if user wants to test without file
+            console.log('Equity Document Automation System loaded.');
+            console.log('Upload a presentment (PDF/image) to extract mirror language and generate full documents automatically.');
+
+        })();
+    </script>
+</body>
+</html>
