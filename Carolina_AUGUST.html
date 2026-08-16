@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Carolina's Ultimate Courtroom Companion</title>
+    <style>
+        /* ----- RESET & BASE ----- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background: #0b1a2f;
+            color: #e8edf5;
+            min-height: 100vh;
+            padding: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .app-container {
+            max-width: 800px;
+            width: 100%;
+            background: linear-gradient(145deg, #122b44, #0a1a2b);
+            border-radius: 36px;
+            box-shadow: 0 25px 50px -8px rgba(0,0,0,0.8), inset 0 1px 2px rgba(255,255,255,0.06);
+            padding: 20px 18px 30px;
+            border: 1px solid #2d4a66;
+            transition: all 0.2s;
+        }
+
+        /* ----- HEADER ----- */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 14px;
+            border-bottom: 2px solid #2e577a;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            background: linear-gradient(135deg, #e2c28b, #f3d9a4);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        }
+
+        .badge {
+            background: #1d3b55;
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: #b6d0e8;
+            border: 1px solid #3c6a8a;
+        }
+
+        /* ----- TABS (main navigation) ----- */
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 18px 0 16px;
+            justify-content: center;
+        }
+
+        .tab-btn {
+            background: #1a334a;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: #aec5db;
+            cursor: pointer;
+            transition: all 0.15s;
+            flex: 1 0 auto;
+            min-width: 70px;
+            border: 1px solid #2d4f6b;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            letter-spacing: 0.3px;
+        }
+
+        .tab-btn.active {
+            background: #d4a75b;
+            color: #0b1a2f;
+            border-color: #eac284;
+            box-shadow: 0 0 15px #d4a75b55;
+        }
+
+        .tab-btn:active { transform: scale(0.96); }
+
+        /* ----- PANELS ----- */
+        .panel {
+            display: none;
+            background: #0f2338;
+            border-radius: 24px;
+            padding: 18px 16px 22px;
+            margin-top: 8px;
+            border: 1px solid #2a4a63;
+            box-shadow: inset 0 4px 12px rgba(0,0,0,0.4);
+            animation: fadePanel 0.25s ease;
+        }
+
+        .panel.active { display: block; }
+
+        @keyframes fadePanel {
+            0% { opacity: 0.4; transform: translateY(6px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .panel h2 {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #f0dbb0;
+            border-left: 6px solid #d4a75b;
+            padding-left: 12px;
+            margin-bottom: 18px;
+        }
+
+        .panel h3 {
+            font-size: 1rem;
+            color: #cfb07c;
+            margin: 18px 0 8px;
+        }
+
+        /* ----- SCRIPTS & CARDS ----- */
+        .script-card {
+            background: #162f45;
+            border-radius: 16px;
+            padding: 14px 16px;
+            margin-bottom: 14px;
+            border-left: 5px solid #d4a75b;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .script-card strong {
+            color: #f3d9a4;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .script-card .en {
+            color: #d6e5f5;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        .script-card .es {
+            color: #b8cfec;
+            font-size: 0.9rem;
+            margin-top: 6px;
+            border-top: 1px dashed #3d607a;
+            padding-top: 6px;
+        }
+
+        .btn-copy {
+            background: #1f3f59;
+            border: none;
+            color: #e8edf5;
+            padding: 4px 16px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-top: 8px;
+            cursor: pointer;
+            border: 1px solid #3b6a87;
+            transition: 0.1s;
+        }
+
+        .btn-copy:active { background: #3d6b8a; }
+
+        /* ----- JURY SELECTION ----- */
+        .jury-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 12px 0;
+        }
+
+        .jury-card {
+            background: #132b40;
+            border-radius: 16px;
+            padding: 14px;
+            border: 1px solid #2c5779;
+        }
+
+        .jury-card .title {
+            font-weight: 700;
+            color: #e2c28b;
+            font-size: 0.85rem;
+        }
+
+        .jury-card .desc {
+            font-size: 0.8rem;
+            color: #bdd6ed;
+            margin-top: 4px;
+        }
+
+        /* ----- RECORD / TRANSCRIBE (self-contained) ----- */
+        .recorder-box {
+            background: #0d1f31;
+            border-radius: 20px;
+            padding: 18px;
+            border: 1px solid #325十六进制;
+            margin: 16px 0;
+        }
+
+        .recorder-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .rec-btn {
+            background: #1f405c;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: #eef4fa;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid #3b6f91;
+            cursor: pointer;
+            transition: 0.15s;
+            flex: 1 0 auto;
+            justify-content: center;
+        }
+
+        .rec-btn.recording {
+            background: #b13e3e;
+            border-color: #d46a6a;
+            box-shadow: 0 0 18px #b13e3e77;
+        }
+
+        .rec-btn:active { transform: scale(0.94); }
+
+        .transcript-box {
+            background: #0a1826;
+            border-radius: 16px;
+            padding: 14px;
+            margin-top: 16px;
+            max-height: 180px;
+            overflow-y: auto;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            border: 1px solid #27445b;
+            color: #caddf0;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        /* ----- PHONE DEFENSE ----- */
+        .defense-banner {
+            background: #2f1e2a;
+            border: 2px solid #b8865b;
+            border-radius: 20px;
+            padding: 16px 18px;
+            margin: 18px 0 10px;
+            box-shadow: 0 0 24px #b8865b33;
+        }
+
+        .defense-banner .title {
+            color: #eac284;
+            font-weight: 700;
+            font-size: 1.05rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .defense-banner .script {
+            margin-top: 10px;
+            background: #1f2d3f;
+            padding: 14px;
+            border-radius: 14px;
+            font-size: 0.9rem;
+            border-left: 5px solid #c29a5e;
+        }
+
+        /* ----- UTILITY ----- */
+        .note-area {
+            background: #0f1f30;
+            border-radius: 16px;
+            padding: 14px;
+            margin-top: 16px;
+            border: 1px solid #2e4f69;
+        }
+
+        textarea {
+            width: 100%;
+            background: #07131f;
+            border: 1px solid #2d4f6b;
+            border-radius: 14px;
+            padding: 14px;
+            color: #e0edfa;
+            font-size: 0.9rem;
+            resize: vertical;
+            min-height: 90px;
+        }
+
+        textarea:focus { outline: 2px solid #d4a75b; border-color: transparent; }
+
+        .btn-secondary {
+            background: #1e3d58;
+            border: none;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: 0.75rem;
+            border: 1px solid #3d6d8a;
+            cursor: pointer;
+        }
+
+        .flex-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            margin: 8px 0;
+        }
+
+        .tag {
+            background: #1e3f59;
+            padding: 2px 12px;
+            border-radius: 30px;
+            font-size: 0.7rem;
+            color: #b0cee8;
+            display: inline-block;
+        }
+
+        /* responsive */
+        @media (max-width: 500px) {
+            .header h1 { font-size: 1.2rem; }
+            .tab-btn { font-size: 0.7rem; padding: 8px 10px; }
+            .jury-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="app-container" id="app">
+
+    <!-- HEADER -->
+    <div class="header">
+        <h1>⚖️ Carolina's Shield</h1>
+        <span class="badge">State Citizen · sui juris</span>
+    </div>
+
+    <!-- TABS -->
+    <div class="tabs" id="tabContainer">
+        <button class="tab-btn active" data-tab="tabScripts">📜 Scripts</button>
+        <button class="tab-btn" data-tab="tabJury">🧑‍⚖️ Jury</button>
+        <button class="tab-btn" data-tab="tabRecord">🎙️ Record</button>
+        <button class="tab-btn" data-tab="tabDefense">🛡️ Phone Defense</button>
+        <button class="tab-btn" data-tab="tabStrategy">⚡ Strategy</button>
+    </div>
+
+    <!-- ========== PANEL: SCRIPTS ========== -->
+    <div id="tabScripts" class="panel active">
+        <h2>📜 Courtroom Scripts</h2>
+
+        <div class="script-card">
+            <strong>🔹 Jurisdictional Challenge (Opening)</strong>
+            <div class="en">"Your Honor, I appear specially, without submitting to jurisdiction. I am a free living white woman, a State Citizen of the South Carolina Republic, owing allegiance to God and no corporate government. I have never consented to the jurisdiction of this court."</div>
+            <div class="es">"Su Señoría, comparezco de manera especial, sin someterme a la jurisdicción. Soy una mujer blanca libre, ciudadana del estado de la República de Carolina del Sur, debiendo lealtad a Dios y a ningún gobierno corporativo. Nunca he consentido la jurisdicción de este tribunal."</div>
+            <button class="btn-copy" onclick="copyText(this)">📋 Copy</button>
+        </div>
+
+        <div class="script-card">
+            <strong>🔹 When they ask for ID / Name</strong>
+            <div class="en">"I am the beneficial owner of that name. I am the beneficial owner of [YOUR NAME]. I am not the corporate fiction, I am the living woman."</div>
+            <div class="es">"Soy la propietaria beneficiaria de ese nombre. Soy la propietaria beneficiaria de [SU NOMBRE]. No soy la ficción corporativa, soy la mujer viva."</div>
+            <button class="btn-copy" onclick="copyText(this)">📋 Copy</button>
+        </div>
+
+        <div class="script-card">
+            <strong>🔹 Civil or Criminal? (the trap)</strong>
+            <div class="en">"I don't know how to plead yet because I have to ask a couple of questions. Is this under civil or criminal? Under the Constitution there are two types of criminal jurisdiction: common law and maritime admiralty. Under which do you intend to try me?"</div>
+            <div class="es">"Aún no sé cómo declararme porque debo hacer un par de preguntas. ¿Esto es civil o penal? Bajo la Constitución hay dos tipos de jurisdicción penal: common law y almirantazgo. ¿Bajo cuál piensa juzgarme?"</div>
+            <button class="btn-copy" onclick="copyText(this)">📋 Copy</button>
+        </div>
+
+        <div class="script-card">
+            <strong>🔹 When they threaten contempt</strong>
+            <div class="en">"I understand the Court's position, but I must follow federal law. This matter has been removed to the United States District Court. Proceeding further is a deprivation of rights under color of law, 42 U.S.C. § 1983 and 18 U.S.C. § 242."</div>
+            <div class="es">"Entiendo la postura del Tribunal, pero debo seguir la ley federal. Este asunto ha sido removido al Tribunal de Distrito de los Estados Unidos. Continuar es una privación de derechos bajo color de ley."</div>
+            <button class="btn-copy" onclick="copyText(this)">📋 Copy</button>
+        </div>
+
+        <div class="script-card">
+            <strong>🔹 Bernal's Perjury & Fraud (motion to vacate)</strong>
+            <div class="en">"Christian Camilo Bernal Ortiz has committed perjury, filed four false police reports, and obtained orders through fraud. Fraud vitiates everything. All orders are void ab initio. I request referral for criminal prosecution."</div>
+            <div class="es">"Christian Camilo Bernal Ortiz ha cometido perjurio, presentó cuatro denuncias policiales falsas y obtuvo órdenes mediante fraude. El fraude vicia todo. Todas las órdenes son nulas de pleno derecho."</div>
+            <button class="btn-copy" onclick="copyText(this)">📋 Copy</button>
+        </div>
+
+        <div class="script-card">
+            <strong>🔹 Negative Averement (closing)</strong>
+            <div class="en">"I file this Negative Averement: I deny jurisdiction, I deny consent, I deny the validity of orders obtained by fraud. The burden is on the party asserting jurisdiction. He who does not deny, admits."</div>
+            <div class="es">"Presento esta Negativa: niego jurisdicción, niego consentimiento, niego la validez de órdenes obtenidas por fraude. La carga recae sobre quien afirma jurisdicción. Quien no niega, admite."</div>
+            <button class="btn-copy" onclick="copyText(this)">📋 Copy</button>
+        </div>
+    </div>
+
+    <!-- ========== PANEL: JURY SELECTION ========== -->
+    <div id="tabJury" class="panel">
+        <h2>🧑‍⚖️ Jury Selection · State Citizens</h2>
+        <p style="color:#b6d0e8; font-size:0.9rem; margin-bottom:12px;">Your peers are <strong>white State Citizens</strong> of the South Carolina Republic, not 14th Amendment corporate citizens. Use these questions to qualify.</p>
+
+        <div class="jury-grid">
+            <div class="jury-card"><span class="title">1. Citizenship</span><div class="desc">"Are you a State Citizen of South Carolina, or a United States citizen? Do you understand the difference?"</div></div>
+            <div class="jury-card"><span class="title">2. Allegiance</span><div class="desc">"Do you owe allegiance to any corporate government, or to God and the Republic?"</div></div>
+            <div class="jury-card"><span class="title">3. Consent</span><div class="desc">"Have you ever consented to the jurisdiction of a statutory court? Do you know that consent is required?"</div></div>
+            <div class="jury-card"><span class="title">4. Gold Fringe</span><div class="desc">"Do you know the meaning of the gold-fringed flag? Does it indicate admiralty jurisdiction?"</div></div>
+            <div class="jury-card"><span class="title">5. Strawman</span><div class="desc">"Do you understand the difference between a living woman and the corporate fiction created by a birth certificate?"</div></div>
+            <div class="jury-card"><span class="title">6. Perjury</span><div class="desc">"If a party has committed perjury, can they receive equitable relief? Do you know the Clean Hands Doctrine?"</div></div>
+        </div>
+
+        <div class="script-card" style="margin-top:10px;">
+            <strong>⚡ Challenge for Cause (script)</strong>
+            <div class="en">"I challenge this juror for cause. They are a 14th Amendment citizen, a corporate fiction, not a State Citizen. They cannot be my peer. I request a jury of my peers — free white State Citizens."</div>
+            <div class="es">"Recuso a este jurado por causa. Es un ciudadano de la 14ª Enmienda, una ficción corporativa, no un Ciudadano del Estado. No puede ser mi par. Solicito un jurado de mis pares: Ciudadanos del Estado blancos libres."</div>
+            <button class="btn-copy" onclick="copyText(this)">📋 Copy</button>
+        </div>
+    </div>
+
+    <!-- ========== PANEL: RECORD & TRANSCRIBE ========== -->
+    <div id="tabRecord" class="panel">
+        <h2>🎙️ Audio Recorder & Transcript</h2>
+        <div class="recorder-box">
+            <div class="recorder-row">
+                <button class="rec-btn" id="recordBtn">🎤 Start Recording</button>
+                <button class="rec-btn" id="stopBtn" style="background:#5f3a3a;">⏹ Stop</button>
+                <button class="rec-btn" id="transcribeBtn" style="background:#2c5a4a;">📝 Transcribe (mock)</button>
+            </div>
+            <div class="transcript-box" id="transcriptDisplay">[Your transcript will appear here. Also saves locally.]</div>
+            <div class="flex-row" style="justify-content:space-between; margin-top:8px;">
+                <span class="tag">🎯 auto-saves every 10s</span>
+                <button class="btn-secondary" id="clearTranscriptBtn">🗑️ Clear</button>
+            </div>
+        </div>
+        <p style="font-size:0.8rem; color:#8aaac0;">* Transcript is stored in your browser. Use it as notes. If the judge takes your phone, this data is still yours.</p>
+    </div>
+
+    <!-- ========== PANEL: PHONE DEFENSE ========== -->
+    <div id="tabDefense" class="panel">
+        <h2>🛡️ Device Confiscation Defense</h2>
+        <div class="defense-banner">
+            <div class="title">⚔️ PRE-BUILT DEFENSE</div>
+            <div class="script">
+                <strong>If the judge tries to take your phone:</strong><br>
+                <span style="color:#e8d5b0;">"Your Honor, I object. This device contains my legal notes, case strategy, and evidence. I am a free State Citizen, not a 14th Amendment citizen. I have not consented to search or seizure. Taking my device is a violation of my rights under the 4th and 9th Amendments, and a deprivation under color of law (42 U.S.C. § 1983). I am willing to place it on the table in plain view, but I do not consent to its removal or search. If you take it, I will hold you personally liable."</span>
+                <div style="margin-top:8px; color:#b6cfe5; font-size:0.9rem; border-top:1px solid #3d5f7a; padding-top:8px;">
+                    <strong>En español:</strong> "Su Señoría, me opongo. Este dispositivo contiene mis notas legales, estrategia y evidencia. Soy una Ciudadana del Estado libre, no una ciudadana de la 14ª Enmienda. No he consentido registro ni incautación. Tomar mi dispositivo es una violación de mis derechos bajo la 4ª y 9ª Enmienda, y una privación bajo color de ley. Estoy dispuesta a colocarlo sobre la mesa a la vista, pero no consiento su remoción o registro."
+                </div>
+            </div>
+            <div style="margin-top:14px; background:#122433; padding:14px; border-radius:14px;">
+                <strong>📌 What to do if they persist:</strong>
+                <ul style="margin-left:18px; margin-top:6px; color:#caddf0; font-size:0.9rem;">
+                    <li>Say: "I note your objection on the record."</li>
+                    <li>"I do not waive my rights. I reserve all rights without prejudice."</li>
+                    <li>"This is a continuing objection."</li>
+                </ul>
+            </div>
+        </div>
+        <div class="note-area">
+            <strong>📓 Quick Note (also saved)</strong>
+            <textarea id="defenseNote" placeholder="Add notes about the device incident..."></textarea>
+        </div>
+    </div>
+
+    <!-- ========== PANEL: STRATEGY ========== -->
+    <div id="tabStrategy" class="panel">
+        <h2>⚡ Mega Strategy · Blitzkrieg</h2>
+        <div style="background:#102433; border-radius:16px; padding:16px; border:1px solid #2f5a78;">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; font-size:0.8rem;">
+                <div><span class="tag">1</span> File Notice of Removal → Federal Court</div>
+                <div><span class="tag">2</span> Negative Averement + Affidavit</div>
+                <div><span class="tag">3</span> Motion to Vacate (perjury/fraud)</div>
+                <div><span class="tag">4</span> Writ of Quo Warranto → SC Supreme</div>
+                <div><span class="tag">5</span> Criminal Referral (AG, DA, DOJ)</div>
+                <div><span class="tag">6</span> Common Law Court Petition</div>
+                <div><span class="tag">7</span> IRS Form 56 Demand (Judge Tiffany)</div>
+                <div><span class="tag">8</span> UCC-1 Financing Statement</div>
+            </div>
+            <div style="margin-top:16px; background:#0c1b2c; padding:14px; border-radius:14px; border-left:6px solid #d4a75b;">
+                <strong style="color:#e2c28b;">🎯 Bernal's Criminal Exposure:</strong>
+                <div style="font-size:0.85rem; color:#bdd6ed;">Perjury (5 yrs) + False Reports (4x) + Fraud + Domestic Violence + Deprivation of Custody (Cal. Penal §278.5: each filing = additional felony). <span style="color:#f3d9a4;">He faces decades.</span></div>
+            </div>
+            <div style="margin-top:14px; background:#1a2d41; border-radius:14px; padding:14px;">
+                <strong>📌 Key Doctrine:</strong> "Fraud vitiates everything" – Harron v. Dyslin. All orders obtained by Bernal's perjury are <strong>void ab initio</strong>.
+            </div>
+        </div>
+        <div class="note-area" style="margin-top:16px;">
+            <strong>📓 Strategy Notes</strong>
+            <textarea id="strategyNote" placeholder="Your battle notes..."></textarea>
+        </div>
+    </div>
+
+    <!-- ========== FOOTER ========== -->
+    <div style="margin-top:24px; text-align:center; font-size:0.7rem; color:#4d738d; border-top:1px solid #1f3a4f; padding-top:14px;">
+        <span>⚡ Carolina's Shield v3.0 · All rights reserved · sui juris · State Citizen</span><br>
+        <span style="display:flex; justify-content:center; gap:16px; margin-top:6px;">
+            <span>📋 All scripts copyable</span>
+            <span>🎙️ Audio transcript saves locally</span>
+            <span>🛡️ Phone defense built-in</span>
+        </span>
+    </div>
+
+</div> <!-- end app-container -->
+
+<script>
+    (function() {
+        "use strict";
+
+        // ---------- TAB SWITCH ----------
+        const tabs = document.querySelectorAll('.tab-btn');
+        const panels = {
+            tabScripts: document.getElementById('tabScripts'),
+            tabJury: document.getElementById('tabJury'),
+            tabRecord: document.getElementById('tabRecord'),
+            tabDefense: document.getElementById('tabDefense'),
+            tabStrategy: document.getElementById('tabStrategy')
+        };
+
+        tabs.forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                tabs.forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                const target = this.dataset.tab;
+                Object.keys(panels).forEach(key => {
+                    panels[key].classList.toggle('active', key === target);
+                });
+            });
+        });
+
+        // ---------- COPY SCRIPTS ----------
+        window.copyText = function(btn) {
+            const parent = btn.closest('.script-card');
+            if (!parent) return;
+            const enDiv = parent.querySelector('.en');
+            if (!enDiv) return;
+            const text = enDiv.innerText.trim();
+            navigator.clipboard.writeText(text).then(() => {
+                const orig = btn.innerText;
+                btn.innerText = '✅ Copied!';
+                setTimeout(() => btn.innerText = orig, 1500);
+            }).catch(() => {
+                // fallback
+                const textarea = document.createElement('textarea');
+                textarea.value = text;
+                document.body.appendChild(textarea);
+                textarea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textarea);
+                const orig = btn.innerText;
+                btn.innerText = '✅ Copied!';
+                setTimeout(() => btn.innerText = orig, 1500);
+            });
+        };
+
+        // ---------- RECORDER (mock + transcript save) ----------
+        const recordBtn = document.getElementById('recordBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const transcribeBtn = document.getElementById('transcribeBtn');
+        const transcriptDisplay = document.getElementById('transcriptDisplay');
+        const clearTranscriptBtn = document.getElementById('clearTranscriptBtn');
+
+        let isRecording = false;
+        let recordingInterval = null;
+        let transcriptHistory = [];
+
+        // Load saved transcript
+        try {
+            const saved = localStorage.getItem('carolina_transcript');
+            if (saved) {
+                transcriptHistory = JSON.parse(saved);
+                transcriptDisplay.innerText = transcriptHistory.join('\n') || '[Your transcript will appear here. Also saves locally.]';
+            }
+        } catch(e) {}
+
+        function saveTranscript() {
+            try {
+                localStorage.setItem('carolina_transcript', JSON.stringify(transcriptHistory));
+            } catch(e) {}
+        }
+
+        function addTranscriptLine(line) {
+            if (!line.trim()) return;
+            transcriptHistory.push(line);
+            if (transcriptHistory.length > 200) transcriptHistory.shift();
+            transcriptDisplay.innerText = transcriptHistory.join('\n');
+            saveTranscript();
+        }
+
+        // Mock recording: adds a timestamp line every 10 seconds
+        recordBtn.addEventListener('click', function() {
+            if (isRecording) return;
+            isRecording = true;
+            this.classList.add('recording');
+            this.innerText = '🔴 Recording...';
+            addTranscriptLine('--- Recording started ---');
+
+            // also add a note that it's a mock
+            recordingInterval = setInterval(() => {
+                const now = new Date();
+                const ts = now.toLocaleTimeString();
+                addTranscriptLine(`[${ts}] Audio captured (mock). Speak clearly.`);
+            }, 10000);
+        });
+
+        stopBtn.addEventListener('click', function() {
+            if (!isRecording) return;
+            isRecording = false;
+            clearInterval(recordingInterval);
+            recordingInterval = null;
+            recordBtn.classList.remove('recording');
+            recordBtn.innerText = '🎤 Start Recording';
+            addTranscriptLine('--- Recording stopped ---');
+        });
+
+        // Mock transcribe: adds a dummy transcription line
+        transcribeBtn.addEventListener('click', function() {
+            const dummyLines = [
+                'Judge: "How do you plead?"',
+                'Carolina: "I don\'t know how to plead yet. Is this civil or criminal?"',
+                'Judge: "You need an attorney."',
+                'Carolina: "I will take that under advisement. But I need to know jurisdiction."',
+                'Carolina: "Under common law or maritime admiralty?"',
+                'Judge: "Have a seat."',
+                'Carolina: "I object. I have not consented to jurisdiction."'
+            ];
+            const random = dummyLines[Math.floor(Math.random() * dummyLines.length)];
+            addTranscriptLine(`[Transcribe] ${random}`);
+            // also save to local
+        });
+
+        clearTranscriptBtn.addEventListener('click', function() {
+            transcriptHistory = [];
+            transcriptDisplay.innerText = '[Your transcript will appear here. Also saves locally.]';
+            saveTranscript();
+        });
+
+        // ---------- SAVE NOTES (defense & strategy) ----------
+        const defenseNote = document.getElementById('defenseNote');
+        const strategyNote = document.getElementById('strategyNote');
+
+        function saveNote(key, el) {
+            try {
+                localStorage.setItem(key, el.value);
+            } catch(e) {}
+        }
+
+        defenseNote.addEventListener('input', function() { saveNote('carolina_defense_note', this); });
+        strategyNote.addEventListener('input', function() { saveNote('carolina_strategy_note', this); });
+
+        // Load notes
+        try {
+            const d = localStorage.getItem('carolina_defense_note');
+            if (d) defenseNote.value = d;
+            const s = localStorage.getItem('carolina_strategy_note');
+            if (s) strategyNote.value = s;
+        } catch(e) {}
+
+        // ---------- AUTO-SAVE TRANSCRIPT every 15s (extra) ----------
+        setInterval(() => {
+            if (transcriptHistory.length > 0) saveTranscript();
+        }, 15000);
+
+        // ---------- PHONE DEFENSE QUICK COPY (extra) ----------
+        // add copy to the defense script
+        const defenseScript = document.querySelector('.defense-banner .script');
+        if (defenseScript) {
+            const copyDefenseBtn = document.createElement('button');
+            copyDefenseBtn.className = 'btn-copy';
+            copyDefenseBtn.innerText = '📋 Copy Defense';
+            copyDefenseBtn.style.marginTop = '10px';
+            copyDefenseBtn.addEventListener('click', function() {
+                const text = defenseScript.innerText.trim();
+                navigator.clipboard.writeText(text).then(() => {
+                    this.innerText = '✅ Copied!';
+                    setTimeout(() => this.innerText = '📋 Copy Defense', 1500);
+                }).catch(() => {
+                    const ta = document.createElement('textarea');
+                    ta.value = text;
+                    document.body.appendChild(ta);
+                    ta.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(ta);
+                    this.innerText = '✅ Copied!';
+                    setTimeout(() => this.innerText = '📋 Copy Defense', 1500);
+                });
+            });
+            defenseScript.appendChild(copyDefenseBtn);
+        }
+
+        console.log('⚖️ Carolina\'s Ultimate Companion loaded. All rights reserved.');
+    })();
+</script>
+</body>
+</html>
