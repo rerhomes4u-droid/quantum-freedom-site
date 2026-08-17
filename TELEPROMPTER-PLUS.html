@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Voice Teleprompter · TripsToColombia</title>
+  <!-- Font & minimal style -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      background: #0d1c26;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 12px;
+      color: #f0f7fc;
+    }
+    .app-container {
+      max-width: 780px;
+      width: 100%;
+      background: #152b36;
+      border-radius: 3rem;
+      padding: 1.5rem 1.2rem 1.8rem;
+      box-shadow: 0 25px 50px -10px rgba(0,0,0,0.7), inset 0 1px 2px rgba(255,255,255,0.06);
+      border: 1px solid #2b4d5c;
+    }
+    /* header */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem 0.8rem;
+      margin-bottom: 1rem;
+      padding: 0 0.25rem;
+    }
+    .header h1 {
+      font-size: 1.6rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #b3e4f0, #7fc1d4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.2rem;
+    }
+    .header h1 small {
+      font-size: 0.9rem;
+      font-weight: 400;
+      background: #1f4050;
+      padding: 0.15rem 0.9rem;
+      border-radius: 40px;
+      color: #cbe3ed;
+      -webkit-text-fill-color: #cbe3ed;
+      letter-spacing: 0.2px;
+    }
+    .badge-trips {
+      background: #1f4d5e;
+      color: #d4ecf5;
+      font-weight: 500;
+      font-size: 0.8rem;
+      padding: 0.3rem 1.2rem;
+      border-radius: 40px;
+      box-shadow: 0 4px 10px rgba(0,20,30,0.4);
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+    }
+
+    /* teleprompter display */
+    .teleprompter {
+      background: #0b1b24;
+      border-radius: 2.5rem;
+      padding: 2rem 1.5rem;
+      min-height: 280px;
+      max-height: 480px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid #2d5568;
+      box-shadow: inset 0 8px 20px rgba(0,0,0,0.6);
+      margin-bottom: 1.5rem;
+      position: relative;
+      transition: all 0.1s;
+    }
+    .teleprompter-text {
+      font-size: 3.2rem;
+      font-weight: 600;
+      line-height: 1.3;
+      text-align: center;
+      word-break: break-word;
+      letter-spacing: -0.01em;
+      color: #f0faff;
+      text-shadow: 0 2px 8px rgba(0,20,30,0.6);
+      max-height: 400px;
+      overflow-y: auto;
+      scroll-behavior: smooth;
+      width: 100%;
+      padding: 0.2rem;
+      transition: font-size 0.1s;
+    }
+    @media (max-width: 500px) {
+      .teleprompter-text { font-size: 2.4rem; }
+      .teleprompter { min-height: 200px; padding: 1.5rem 1rem; }
+    }
+    .word-highlight {
+      background: #3f8ba0;
+      color: #ffffff;
+      padding: 0.1rem 0.2rem;
+      border-radius: 12px;
+      box-shadow: 0 0 0 1px #6ab3cc;
+    }
+
+    /* control panel */
+    .control-panel {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 0.7rem 1rem;
+      background: #1c3a48;
+      padding: 0.8rem 1.2rem;
+      border-radius: 4rem;
+      margin-bottom: 1rem;
+      border: 1px solid #325a6b;
+    }
+    .btn {
+      background: #264f60;
+      border: none;
+      padding: 0.6rem 1.4rem;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #eaf3f8;
+      cursor: pointer;
+      transition: 0.12s;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      border: 1px solid #3f7488;
+      flex: 0 1 auto;
+    }
+    .btn-primary {
+      background: #2d7a92;
+      border-color: #4f9bb3;
+      color: white;
+      box-shadow: 0 6px 12px rgba(0,40,60,0.4);
+    }
+    .btn-primary:active { transform: scale(0.96); }
+    .btn-secondary {
+      background: #1d4353;
+      border-color: #2f6377;
+    }
+    .btn-secondary:active { transform: scale(0.96); }
+    .btn-danger {
+      background: #8f3d3d;
+      border-color: #b35151;
+    }
+    .btn-danger:active { transform: scale(0.96); }
+    .btn:disabled {
+      opacity: 0.4;
+      pointer-events: none;
+      filter: grayscale(0.4);
+    }
+    .slide-controls {
+      display: flex;
+      gap: 0.5rem;
+      margin-left: auto;
+    }
+    .slide-btn {
+      background: #1e4050;
+      border: 1px solid #3b6f82;
+      border-radius: 40px;
+      padding: 0.3rem 1.2rem;
+      font-size: 1.6rem;
+      font-weight: 300;
+      color: #d6ecf5;
+      cursor: pointer;
+      line-height: 1.2;
+      user-select: none;
+      transition: 0.08s;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    }
+    .slide-btn:active {
+      background: #356f84;
+      transform: scale(0.92);
+    }
+    .word-counter {
+      font-size: 0.9rem;
+      background: #0b212b;
+      padding: 0.2rem 1rem;
+      border-radius: 40px;
+      color: #b3dae7;
+      font-weight: 500;
+      letter-spacing: 0.2px;
+    }
+
+    /* video preview */
+    .video-section {
+      margin-top: 1.2rem;
+      background: #0d202b;
+      border-radius: 2rem;
+      padding: 0.6rem;
+      border: 1px solid #2f5a6b;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .video-wrapper {
+      width: 100%;
+      border-radius: 1.8rem;
+      overflow: hidden;
+      background: #051016;
+      position: relative;
+      aspect-ratio: 16/9;
+      max-height: 220px;
+    }
+    .video-wrapper video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      background: #0a1922;
+    }
+    .video-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem 1rem;
+      padding: 0.6rem 0.2rem 0.1rem;
+    }
+    .video-btn {
+      background: #1a3b49;
+      border: 1px solid #3c6f82;
+      padding: 0.3rem 1.2rem;
+      border-radius: 40px;
+      color: #ddf0f7;
+      font-weight: 500;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: 0.1s;
+    }
+    .video-btn:active { transform: scale(0.94); }
+    .video-btn.recording {
+      background: #b13e3e;
+      border-color: #d66a6a;
+      animation: pulse-red 1.2s infinite;
+    }
+    @keyframes pulse-red {
+      0% { opacity: 0.8; }
+      50% { opacity: 1; background: #c54a4a; }
+      100% { opacity: 0.8; }
+    }
+
+    .footer {
+      margin-top: 0.8rem;
+      font-size: 0.75rem;
+      color: #548396;
+      text-align: right;
+      padding-right: 0.5rem;
+      letter-spacing: 0.2px;
+    }
+    .footer span {
+      background: #1b3846;
+      padding: 0.1rem 1rem;
+      border-radius: 40px;
+    }
+  </style>
+</head>
+<body>
+<div class="app-container" role="main">
+  <div class="header">
+    <h1>
+      📜 Teleprompter
+      <small>voice</small>
+    </h1>
+    <span class="badge-trips">✈️ TripsToColombia.com</span>
+  </div>
+
+  <!-- Teleprompter display -->
+  <div class="teleprompter" id="teleprompterDisplay">
+    <div class="teleprompter-text" id="prompterText">
+      <span style="color:#7ba9be;">👋 Click "Start" & speak the words</span>
+    </div>
+  </div>
+
+  <!-- Controls -->
+  <div class="control-panel">
+    <button class="btn btn-primary" id="startBtn">▶ Start</button>
+    <button class="btn btn-secondary" id="resetBtn">⟲ Reset</button>
+    <div class="slide-controls">
+      <button class="slide-btn" id="slideUpBtn" aria-label="slide up (previous)">⤴</button>
+      <button class="slide-btn" id="slideDownBtn" aria-label="slide down (next)">⤵</button>
+    </div>
+    <span class="word-counter" id="wordCounter">0 / 0</span>
+  </div>
+
+  <!-- Video recorder -->
+  <div class="video-section">
+    <div class="video-wrapper">
+      <video id="videoPreview" autoplay muted playsinline></video>
+    </div>
+    <div class="video-controls">
+      <button class="video-btn" id="videoToggleBtn">🎥 Start Camera</button>
+      <button class="video-btn" id="recordBtn" disabled>⏺ Record</button>
+      <button class="video-btn" id="downloadBtn" disabled>⬇ Download</button>
+    </div>
+  </div>
+  <div class="footer"><span>👆 slide controls · manual override</span></div>
+</div>
+
+<script>
+  (function() {
+    "use strict";
+
+    // ----- DOM refs -----
+    const prompterText = document.getElementById('prompterText');
+    const startBtn = document.getElementById('startBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const slideUpBtn = document.getElementById('slideUpBtn');
+    const slideDownBtn = document.getElementById('slideDownBtn');
+    const wordCounter = document.getElementById('wordCounter');
+
+    // video elements
+    const videoPreview = document.getElementById('videoPreview');
+    const videoToggleBtn = document.getElementById('videoToggleBtn');
+    const recordBtn = document.getElementById('recordBtn');
+    const downloadBtn = document.getElementById('downloadBtn');
+
+    // ----- SCRIPT (sample text) -----
+    const SCRIPT = [
+      "Welcome to TripsToColombia.com",
+      "Your journey starts here.",
+      "Explore vibrant cities,",
+      "breathtaking landscapes,",
+      "and the warmth of Colombian culture.",
+      "From the Andes to the Caribbean,",
+      "every moment is an adventure.",
+      "Let this voice prompter guide you.",
+      "Speak clearly and the words will follow.",
+      "Thank you for choosing us."
+    ];
+
+    // state
+    let currentWordIndex = 0;            // 0-based index into SCRIPT
+    let isActive = false;               // listening mode on/off
+    let recognition = null;
+    let isPaused = false;               // internal (not used directly but for clarity)
+    let expectedWord = '';              // current word to match (trimmed lowercase)
+    let manualOverride = false;         // flag to prevent voice from advancing right after manual slide
+
+    // video state
+    let cameraStream = null;
+    let mediaRecorder = null;
+    let recordedChunks = [];
+    let isRecording = false;
+    let isCameraOn = false;
+
+    // ----- helper: update display & counter -----
+    function renderPrompter() {
+      if (!SCRIPT.length) {
+        prompterText.innerHTML = `<span style="color:#7ba9be;">📄 No script</span>`;
+        wordCounter.textContent = `0 / 0`;
+        return;
+      }
+      // clamp index
+      if (currentWordIndex >= SCRIPT.length) currentWordIndex = SCRIPT.length - 1;
+      if (currentWordIndex < 0) currentWordIndex = 0;
+
+      const currentWord = SCRIPT[currentWordIndex];
+      // highlight current word (bold + background)
+      let html = '';
+      SCRIPT.forEach((word, idx) => {
+        if (idx === currentWordIndex) {
+          html += `<span class="word-highlight">${escapeHtml(word)}</span>`;
+        } else {
+          html += escapeHtml(word);
+        }
+        if (idx < SCRIPT.length - 1) html += ' ';
+      });
+      prompterText.innerHTML = html;
+      wordCounter.textContent = `${currentWordIndex + 1} / ${SCRIPT.length}`;
+      // scroll into view (smooth)
+      const highlight = prompterText.querySelector('.word-highlight');
+      if (highlight) {
+        highlight.scrollIntoView({ block: 'center', behavior: 'smooth' });
+      }
+    }
+
+    // simple escape
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    // ----- word matching (fuzzy trim) -----
+    function normalize(str) {
+      return str.trim().toLowerCase().replace(/\s+/g, ' ');
+    }
+
+    function matchSpoken(spoken, expected) {
+      if (!spoken || !expected) return false;
+      const normSpoken = normalize(spoken);
+      const normExpected = normalize(expected);
+      // allow partial match: spoken contains expected OR expected contains spoken (for short words)
+      // but we require at least 70% of expected word length match
+      if (normSpoken === normExpected) return true;
+      // check if spoken starts with expected or vice versa (common mispronunciation)
+      if (normSpoken.length >= 3 && normExpected.length >= 3) {
+        if (normSpoken.includes(normExpected) || normExpected.includes(normSpoken)) {
+          return true;
+        }
+        // additional: levenshtein? skip for performance, use simple ratio
+        const shorter = normSpoken.length < normExpected.length ? normSpoken : normExpected;
+        const longer = normSpoken.length < normExpected.length ? normExpected : normSpoken;
+        if (longer.includes(shorter) && shorter.length >= 3) return true;
+      }
+      return false;
+    }
+
+    // ----- advance to next word (voice or manual) -----
+    function advanceWord() {
+      if (currentWordIndex < SCRIPT.length - 1) {
+        currentWordIndex++;
+        renderPrompter();
+        return true;
+      }
+      return false; // at end
+    }
+
+    function retreatWord() {
+      if (currentWordIndex > 0) {
+        currentWordIndex--;
+        renderPrompter();
+        return true;
+      }
+      return false;
+    }
+
+    // ----- reset prompter -----
+    function resetPrompter() {
+      currentWordIndex = 0;
+      renderPrompter();
+    }
+
+    // ----- speech recognition setup -----
+    function initRecognition() {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        alert('Speech recognition not supported in this browser.');
+        return null;
+      }
+      const rec = new SpeechRecognition();
+      rec.continuous = true;
+      rec.interimResults = true;
+      rec.lang = 'en-US';
+      rec.maxAlternatives = 1;
+
+      rec.onresult = (event) => {
+        if (!isActive) return;
+        if (manualOverride) {
+          // if user just used manual slide, ignore a few results to avoid jamming
+          return;
+        }
+        // get latest interim / final
+        let spoken = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const result = event.results[i];
+          if (result.isFinal) {
+            const transcript = result[0]?.transcript?.trim() || '';
+            if (transcript) spoken = transcript;
+            break; // use first final
+          } else {
+            // interim: use only if no final yet
+            if (!spoken) {
+              spoken = result[0]?.transcript?.trim() || '';
+            }
+          }
+        }
+        if (!spoken) return;
+
+        // match against current word
+        const expected = SCRIPT[currentWordIndex] || '';
+        if (matchSpoken(spoken, expected)) {
+          // advance
+          const moved = advanceWord();
+          if (!moved) {
+            // at end: keep but maybe stop? we just stay.
+          }
+          // small cooldown to prevent double advance
+          manualOverride = true;
+          setTimeout(() => { manualOverride = false; }, 400);
+        }
+      };
+
+      rec.onerror = (event) => {
+        console.warn('Speech error:', event.error);
+        if (event.error === 'not-allowed') {
+          alert('Microphone access denied. Please allow microphone.');
+          stopListening();
+        }
+        // if error, attempt restart if active
+        if (isActive && recognition) {
+          setTimeout(() => {
+            if (isActive && recognition) {
+              try { recognition.start(); } catch (_) {}
+            }
+          }, 300);
+        }
+      };
+
+      rec.onend = () => {
+        if (isActive) {
+          // restart if still active
+          try {
+            if (recognition) recognition.start();
+          } catch (_) {}
+        }
+      };
+
+      return rec;
+    }
+
+    // ----- start listening -----
+    function startListening() {
+      if (isActive) {
+        // toggle off
+        stopListening();
+        return;
+      }
+
+      if (!SCRIPT.length) {
+        alert('No script loaded.');
+        return;
+      }
+
+      if (!recognition) {
+        recognition = initRecognition();
+        if (!recognition) return;
+      }
+
+      try {
+        recognition.start();
+        isActive = true;
+        startBtn.textContent = '⏹ Stop';
+        startBtn.classList.add('btn-danger');
+        startBtn.classList.remove('btn-primary');
+        // enable slide controls always
+        renderPrompter();
+      } catch (e) {
+        console.warn('start error:', e);
+        // try to recover
+        setTimeout(() => {
+          if (!isActive) {
+            try { recognition.start(); isActive = true; startBtn.textContent = '⏹ Stop'; } catch (_) {}
+          }
+        }, 300);
+      }
+    }
+
+    function stopListening() {
+      isActive = false;
+      if (recognition) {
+        try { recognition.abort(); } catch (_) {}
+      }
+      startBtn.textContent = '▶ Start';
+      startBtn.classList.remove('btn-danger');
+      startBtn.classList.add('btn-primary');
+      renderPrompter();
+    }
+
+    // ----- manual slide (with override) -----
+    function manualSlideUp() {
+      if (!isActive) {
+        // if not active, just move
+        retreatWord();
+        return;
+      }
+      manualOverride = true;
+      retreatWord();
+      setTimeout(() => { manualOverride = false; }, 300);
+    }
+
+    function manualSlideDown() {
+      if (!isActive) {
+        advanceWord();
+        return;
+      }
+      manualOverride = true;
+      advanceWord();
+      setTimeout(() => { manualOverride = false; }, 300);
+    }
+
+    // ----- VIDEO RECORDER -----
+    async function toggleCamera() {
+      if (isCameraOn) {
+        // turn off
+        if (cameraStream) {
+          cameraStream.getTracks().forEach(t => t.stop());
+          cameraStream = null;
+        }
+        videoPreview.srcObject = null;
+        isCameraOn = false;
+        videoToggleBtn.textContent = '🎥 Start Camera';
+        recordBtn.disabled = true;
+        downloadBtn.disabled = true;
+        if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+          mediaRecorder.stop();
+        }
+        return;
+      }
+
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+        cameraStream = stream;
+        videoPreview.srcObject = stream;
+        isCameraOn = true;
+        videoToggleBtn.textContent = '📷 Stop Camera';
+        recordBtn.disabled = false;
+        downloadBtn.disabled = true;
+        // reset recorded chunks
+        recordedChunks = [];
+      } catch (e) {
+        alert('Camera/microphone access denied: ' + e.message);
+      }
+    }
+
+    function toggleRecording() {
+      if (!isCameraOn || !cameraStream) {
+        alert('Please start camera first.');
+        return;
+      }
+
+      if (isRecording) {
+        // stop recording
+        if (mediaRecorder && mediaRecorder.state === 'recording') {
+          mediaRecorder.stop();
+        }
+        isRecording = false;
+        recordBtn.textContent = '⏺ Record';
+        recordBtn.classList.remove('recording');
+        downloadBtn.disabled = false;
+        return;
+      }
+
+      // start recording
+      if (!MediaRecorder.isTypeSupported('video/webm;codecs=vp9')) {
+        alert('Video recording not supported in this browser.');
+        return;
+      }
+
+      recordedChunks = [];
+      const options = { mimeType: 'video/webm;codecs=vp9' };
+      try {
+        mediaRecorder = new MediaRecorder(cameraStream, options);
+      } catch (e) {
+        alert('Could not start recording: ' + e.message);
+        return;
+      }
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data && event.data.size > 0) {
+          recordedChunks.push(event.data);
+        }
+      };
+
+      mediaRecorder.onstop = () => {
+        if (recordedChunks.length) {
+          const blob = new Blob(recordedChunks, { type: 'video/webm' });
+          const url = URL.createObjectURL(blob);
+          downloadBtn.dataset.url = url;
+          downloadBtn.disabled = false;
+        } else {
+          downloadBtn.disabled = true;
+        }
+        isRecording = false;
+        recordBtn.textContent = '⏺ Record';
+        recordBtn.classList.remove('recording');
+      };
+
+      mediaRecorder.start(200);
+      isRecording = true;
+      recordBtn.textContent = '⏹ Stop';
+      recordBtn.classList.add('recording');
+      downloadBtn.disabled = true;
+    }
+
+    function downloadVideo() {
+      const url = downloadBtn.dataset.url;
+      if (!url) return;
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `prompter-recording-${Date.now()}.webm`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    // ----- event listeners -----
+    startBtn.addEventListener('click', startListening);
+    resetBtn.addEventListener('click', resetPrompter);
+    slideUpBtn.addEventListener('click', manualSlideUp);
+    slideDownBtn.addEventListener('click', manualSlideDown);
+
+    videoToggleBtn.addEventListener('click', toggleCamera);
+    recordBtn.addEventListener('click', toggleRecording);
+    downloadBtn.addEventListener('click', downloadVideo);
+
+    // ----- init -----
+    renderPrompter();
+    // pre-warm speech recognition
+    if (window.SpeechRecognition || window.webkitSpeechRecognition) {
+      recognition = initRecognition();
+    } else {
+      startBtn.disabled = true;
+      startBtn.textContent = '⚠️ No Speech';
+    }
+
+    // clean up on page unload
+    window.addEventListener('beforeunload', () => {
+      if (recognition) try { recognition.abort(); } catch (_) {}
+      if (cameraStream) {
+        cameraStream.getTracks().forEach(t => t.stop());
+      }
+      if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.stop();
+      }
+    });
+
+  })();
+</script>
+</body>
+</html>
