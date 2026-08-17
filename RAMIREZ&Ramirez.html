@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAMIREZ &amp; Ramírez · Sovereign Representation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: #0b0a0f;
+            color: #e2dcd0;
+            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+            padding: 1.5rem 1rem;
+            line-height: 1.5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #6f5f48;
+            padding-bottom: 1rem;
+            margin-bottom: 2rem;
+        }
+        .header h1 {
+            font-weight: 600;
+            font-size: 2rem;
+            letter-spacing: -0.02em;
+            background: linear-gradient(145deg, #d4c9b0, #b8a88a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .header small {
+            color: #b8aa92;
+            background: #1f1c26;
+            padding: 0.3rem 1.2rem;
+            border-radius: 40px;
+            border: 1px solid #4f4538;
+            font-size: 0.8rem;
+        }
+        .badge {
+            display: inline-block;
+            background: #2f2a23;
+            padding: 0.2rem 1rem;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            color: #cbc1ae;
+            border: 1px solid #4f4538;
+        }
+        .forge-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        .weapon-card {
+            background: #16131e;
+            border: 1px solid #3f382e;
+            border-radius: 24px;
+            padding: 1.5rem 1.2rem;
+            transition: 0.1s ease;
+            cursor: pointer;
+        }
+        .weapon-card:hover {
+            background: #201d2b;
+            border-color: #8f7b5d;
+            box-shadow: 0 0 20px #2f2a2340;
+        }
+        .weapon-card h3 {
+            color: #d4c9b0;
+            font-weight: 500;
+            margin-bottom: 0.3rem;
+        }
+        .weapon-card p {
+            font-size: 0.85rem;
+            color: #a39681;
+            margin-bottom: 0.6rem;
+        }
+        .doc-creator {
+            background: #1b1822;
+            border-radius: 28px;
+            padding: 1.8rem 2rem;
+            border: 1px solid #4c4032;
+            margin: 2rem 0;
+        }
+        .doc-creator h2 {
+            font-size: 1.6rem;
+            font-weight: 500;
+            color: #d4c9b0;
+            margin-bottom: 0.2rem;
+        }
+        .doc-creator .sub {
+            color: #a39681;
+            margin-bottom: 1.2rem;
+            border-left: 3px solid #6f604b;
+            padding-left: 1rem;
+            font-size: 0.9rem;
+        }
+        .form-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem 2rem;
+            margin: 1rem 0 1.5rem;
+        }
+        .form-group {
+            flex: 1 0 180px;
+        }
+        .form-group label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            color: #b8aa92;
+            letter-spacing: 0.5px;
+            display: block;
+            margin-bottom: 0.2rem;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 0.6rem 0.8rem;
+            border-radius: 16px;
+            border: 1px solid #3f382e;
+            background: #121016;
+            color: #f0ebe2;
+            font-size: 0.9rem;
+        }
+        .form-group input:focus {
+            outline: 2px solid #8f7b5d;
+            border-color: transparent;
+        }
+        .btn {
+            background: #3d3447;
+            border: none;
+            color: #f0ebe2;
+            font-weight: 500;
+            padding: 0.6rem 2rem;
+            border-radius: 60px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border: 1px solid #5f5340;
+            transition: 0.1s;
+            margin-right: 0.4rem;
+            margin-top: 0.4rem;
+        }
+        .btn-outline {
+            background: transparent;
+            color: #b8aa92;
+            border: 1px solid #4f4538;
+        }
+        .btn:hover {
+            background: #53485f;
+            transform: scale(0.97);
+        }
+        .output-box {
+            background: #0d0b12;
+            border-radius: 24px;
+            padding: 1.6rem 2rem;
+            border: 1px solid #3f382e;
+            margin-top: 1.8rem;
+            white-space: pre-wrap;
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 0.8rem;
+            line-height: 1.7;
+            max-height: 550px;
+            overflow-y: auto;
+            color: #dfd9ce;
+            box-shadow: inset 0 2px 12px rgba(0,0,0,0.6);
+        }
+        .output-box h4 {
+            font-family: 'Inter', sans-serif;
+            color: #b8aa92;
+            margin-bottom: 0.4rem;
+        }
+        .library {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.3rem 0.8rem;
+            margin: 1rem 0;
+        }
+        .library span {
+            background: #1f1c26;
+            padding: 0.1rem 0.9rem;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            border: 1px solid #3f382e;
+            color: #cbc1ae;
+        }
+        .footer {
+            font-size: 0.75rem;
+            color: #7a6f5e;
+            border-top: 1px solid #2f2a23;
+            padding-top: 1.5rem;
+            margin-top: 2.5rem;
+            text-align: center;
+        }
+        .footer a {
+            color: #b8aa92;
+            text-decoration: none;
+        }
+        @media (max-width: 600px) {
+            .header h1 { font-size: 1.4rem; }
+            .doc-creator { padding: 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <h1>⚔️ RAMIREZ &amp; Ramírez</h1>
+        <small>attorneys in fact · NOT FICTION</small>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; margin-bottom: 1.5rem; background: #16131e; padding: 0.6rem 1.5rem; border-radius: 60px; border: 1px solid #3f382e;">
+        <span><span style="font-weight:500;">⚡</span> Sovereign Representation</span>
+        <span><span style="font-weight:500;">📜</span> 9th &amp; 10th · State Citizen</span>
+        <span><span style="font-weight:500;">🧬</span> Dred Scott · Slaughter-House</span>
+        <span class="badge">Practice Law without License</span>
+    </div>
+
+    <!-- Weapon Cards (templates) -->
+    <div class="forge-grid" id="weaponGrid">
+        <div class="weapon-card" data-doc="sovereignDeclaration">
+            <h3>🧬 Sovereign Citizen Declaration</h3>
+            <p>Declare your State citizenship, rebut the "sovereign citizen" term, and establish your standing.</p>
+            <span class="badge">Dred Scott · Bradwell</span>
+        </div>
+        <div class="weapon-card" data-doc="practiceLawNoLicense">
+            <h3>📜 Practice Law without License</h3>
+            <p>Full template asserting your right to represent yourself and your legal fictions without a BAR card.</p>
+            <span class="badge">C.J.S. · 14th Amendment</span>
+        </div>
+        <div class="weapon-card" data-doc="powerOfAttorney">
+            <h3>📄 Durable Power of Attorney</h3>
+            <p>Appoint your sole proprietorship as your attorney-in-fact for all commercial and legal matters.</p>
+            <span class="badge">UCC 3-603</span>
+        </div>
+        <div class="weapon-card" data-doc="trustCertificate">
+            <h3>📜 Private Trust + Certificate</h3>
+            <p>Create a private irrevocable trust and certificate of trust for asset protection and sovereignty.</p>
+            <span class="badge">separate person</span>
+        </div>
+        <div class="weapon-card" data-doc="complaint">
+            <h3>⚡ Verified Complaint</h3>
+            <p>Build a complaint with causes of action under UCC and State Constitution against any opponent.</p>
+            <span class="badge">UCC 1-305</span>
+        </div>
+        <div class="weapon-card" data-doc="demurrerKiller">
+            <h3>🛡️ Demurrer Killer</h3>
+            <p>Opposition to demurrer using Barlow principle and procedural defects.</p>
+            <span class="badge">Barlow v. 85 Hogheads</span>
+        </div>
+        <div class="weapon-card" data-doc="mandamus">
+            <h3>⚖️ Mandamus / Grievance</h3>
+            <p>Compel a ruling or file a judicial grievance for delay or impartiality.</p>
+            <span class="badge">Ind. Trial Rule 53.1</span>
+        </div>
+        <div class="weapon-card" data-doc="rebuttalVapor">
+            <h3>💸 Rebuttal: Vapor Money</h3>
+            <p>Rebut the "vapor money theory" presumption with UCC 3-603 and tender of payment.</p>
+            <span class="badge">UCC 3-603</span>
+        </div>
+    </div>
+
+    <!-- Document Forge -->
+    <div class="doc-creator">
+        <h2>📄 Forge Your Document</h2>
+        <div class="sub">Enter your details — the app will fill out the templates exactly as described in the Ramirez &amp; Ramírez methodology.</div>
+        <div class="form-row">
+            <div class="form-group">
+                <label>Full Name (natural person)</label>
+                <input type="text" id="userName" value="John Doe">
+            </div>
+            <div class="form-group">
+                <label>Sole Proprietorship</label>
+                <input type="text" id="businessName" value="JD Sole Prop">
+            </div>
+            <div class="form-group">
+                <label>State of Birth / Citizenship</label>
+                <input type="text" id="userState" value="California">
+            </div>
+            <div class="form-group">
+                <label>Opposing Party</label>
+                <input type="text" id="defendantName" value="CITY OF GLENDALE">
+            </div>
+            <div class="form-group">
+                <label>Date</label>
+                <input type="text" id="docDate" value="17/08/2026">
+            </div>
+        </div>
+        <div style="display: flex; flex-wrap: wrap; gap: 0.6rem;">
+            <button class="btn" id="generateBtn">⚡ FORGE DOCUMENT</button>
+            <button class="btn btn-outline" id="copyBtn">📋 COPY</button>
+            <button class="btn btn-outline" id="clearBtn">✖ CLEAR</button>
+        </div>
+        <div class="output-box" id="outputDisplay">
+            <h4>⚔️ Ready</h4>
+            <span style="color: #8f8470;">Select a weapon card above or click FORGE to generate the document based on your input.</span>
+        </div>
+    </div>
+
+    <!-- Library -->
+    <div style="background: #16131e; border-radius: 28px; padding: 1.2rem 1.8rem; border: 1px solid #3f382e; margin: 1.5rem 0;">
+        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem 1.5rem; align-items: center;">
+            <span style="font-weight:600; color:#d4c9b0;">📚 FORBIDDEN KNOWLEDGE LIBRARY</span>
+            <span class="badge">C.J.S. · Dred Scott · Slaughter-House</span>
+        </div>
+        <div class="library">
+            <span>Dred Scott v. Sandford</span><span>Slaughter-House Cases</span><span>Bradwell v. State</span>
+            <span>Ex Parte Knowles</span><span>Yick Wo v. Hopkins</span><span>Van Valkenburg v. Brown</span>
+            <span>UCC 1-305</span><span>UCC 3-603</span><span>9th Amendment</span><span>10th Amendment</span>
+            <span>Article I §10</span><span>Corpus Juris Secundum</span><span>Vattel · Law of Nations</span>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>❤️ Nation of the Amnesty Coalition · For the Liberation of Mankind · Brought to you by <a href="#">TripsToColombia.com</a></p>
+        <p style="margin-top:0.3rem;">“All people are by nature free and independent.” — California Constitution Art. I §1</p>
+    </div>
+</div>
+
+<script>
+    (function() {
+        // DOM refs
+        const userName = document.getElementById('userName');
+        const businessName = document.getElementById('businessName');
+        const userState = document.getElementById('userState');
+        const defendantName = document.getElementById('defendantName');
+        const docDate = document.getElementById('docDate');
+        const outputDisplay = document.getElementById('outputDisplay');
+
+        // ---- MASTER GENERATOR - based on Ramirez & Ramírez methodology ----
+        function generateDocument(type) {
+            const name = userName.value.trim() || 'John Doe';
+            const biz = businessName.value.trim() || 'Sole Proprietorship';
+            const state = userState.value.trim() || 'California';
+            const defendant = defendantName.value.trim() || 'DEFENDANT';
+            const date = docDate.value.trim() || '17/08/2026';
+
+            let output = '';
+
+            // ----- SOVEREIGN CITIZEN DECLARATION (rebuttal) -----
+            if (type === 'sovereignDeclaration') {
+                output = `🧬 DECLARATION OF SOVEREIGN CITIZEN STATUS & REBUTTAL\n\n`;
+                output += `I, ${name}, being duly sworn, declare under penalty of perjury under the laws of ${state}:\n\n`;
+                output += `1. I am a white citizen of ${state}, born in the United States, and subject to their jurisdiction.\n`;
+                output += `2. I am not a citizen of the United States for purposes of the 14th Amendment, but rather a sovereign citizen of ${state} as defined in Dred Scott v. Sandford, 60 U.S. 393 (1857).\n`;
+                output += `3. The term "sovereign citizen" is legally undefined except in Dred Scott, which describes the collective sovereignty of the people.\n`;
+                output += `4. I have direct access to the Bill of Rights, including the 9th and 10th Amendments, without the need for Incorporation Doctrine.\n`;
+                output += `5. All commercial activities are conducted through my Sole Proprietorship (${biz}) under the UCC.\n`;
+                output += `6. I am not a "resident" as defined in the Law of Nations, but a citizen of ${state} with all inherent, inalienable rights.\n\n`;
+                output += `I demand all courts and public entities recognize my status and afford me all rights, privileges, and immunities.\n`;
+                output += `Dated: ${date} · ${state}\n`;
+                output += `/s/ ${name}, white citizen of ${state}\n`;
+                output += `❤️ Nation of the Amnesty Coalition · Liberation`;
+                return output;
+            }
+
+            // ----- PRACTICE LAW WITHOUT LICENSE (full template from file) -----
+            if (type === 'practiceLawNoLicense') {
+                output = `📜 TEMPLATE TO PRACTICE LAW WITHOUT A LICENSE (represent your own trusts and corporations)\n\n`;
+                output += `Background between State and Federal citizenship:\n\n`;
+                output += `In Dred Scott v. Sandford, 60 U.S. 393 (1857), the Honorable Roger B. Taney defines "sovereign citizen":\n`;
+                output += `"The words 'people of the United States' and 'citizens' are synonymous terms... they describe the political body who form the sovereignty."\n\n`;
+                output += `This definition applies ONLY to State citizenship, not US citizenship.\n\n`;
+                output += `I, ${name}, am a white citizen of ${state}. I have no rights or obligations under the 14th Amendment.\n`;
+                output += `See Bradwell v. State, 83 U.S. 130 (1873): "The rights of citizens of the state, as such, are not under consideration in the fourteenth amendment."\n\n`;
+                output += `The right to practice law without a license:\n\n`;
+                output += `As established in Corpus Juris Secundum, 16B C.J.S. Constitutional Law § 1207, the following cases hold:\n`;
+                output += `- State ex rel. Ralston v. Turner, 141 Neb. 556 (1942): "The Fourteenth Amendment does not grant the right to practice law."\n`;
+                output += `- Baker v. Varser, 240 N.C. 260 (1954): "The right to practise law in the State Courts is not a privilege or immunity of a citizen of the United States."\n`;
+                output += `- Ruckenbrod v. Mullins, 102 Utah 548 (1943): "An attorney's right to practice law in the state courts is not a 'privilege' or an 'immunity' of a United States citizen."\n\n`;
+                output += `CONCLUSION:\n\n`;
+                output += `Due to myself not having any rights or obligations under the 14th Amendment, as well as having the full rights and protections of the 9th Amendment,\n`;
+                output += `I do not need a license to practice law and will hereby be representing my client (${biz}) in this case.\n`;
+                output += `I was born a white citizen of ${state} and am currently a white citizen of ${state} due to a change in domicile.\n`;
+                output += `I gain nothing from, nor do I have access to anything involved with the 14th Amendment.\n\n`;
+                output += `I do not need to have any sort of membership into the Bar, nor do I have a contractual obligation to follow the Rules of Professional Conduct.\n`;
+                output += `Dated: ${date} · ${state}\n`;
+                output += `/s/ ${name}, Sovereign Citizen · Attorney in Fact\n`;
+                output += `❤️ Amnesty Coalition · For the Liberation of Mankind`;
+                return output;
+            }
+
+            // ----- POWER OF ATTORNEY (durable) -----
+            if (type === 'powerOfAttorney') {
+                output = `📄 DURABLE POWER OF ATTORNEY (natural person ↔ sole proprietorship)\n\n`;
+                output += `KNOW ALL MEN BY THESE PRESENTS:\n\n`;
+                output += `I, ${name}, white citizen of ${state}, as Principal, do hereby appoint ${biz} (Sole Proprietorship)\n`;
+                output += `as my Attorney-in-Fact, to act in all commercial and legal matters, including but not limited to:\n`;
+                output += `- Negotiating and indorsing instruments under UCC\n`;
+                output += `- Managing assets, contracts, and filings\n`;
+                output += `- Representing the Principal in all matters before courts and agencies.\n\n`;
+                output += `This Power of Attorney is durable and shall not be affected by my subsequent incapacity.\n`;
+                output += `It is executed pursuant to the laws of ${state}.\n\n`;
+                output += `IN WITNESS WHEREOF, I have hereunto set my hand this ${date}.\n\n`;
+                output += `/s/ ${name}, Principal\n`;
+                output += `❤️ Nation of the Amnesty Coalition · Unity`;
+                return output;
+            }
+
+            // ----- TRUST + CERTIFICATE -----
+            if (type === 'trustCertificate') {
+                output = `📜 PRIVATE IRREVOCABLE TRUST & CERTIFICATE OF TRUST\n\n`;
+                output += `GRANTOR: ${name}, white citizen of ${state}\n`;
+                output += `TRUSTEE: ${biz} (Sole Proprietorship)\n`;
+                output += `BENEFICIARY: ${name} (natural person)\n`;
+                output += `RES: All assets, rights, and interests of the Grantor.\n\n`;
+                output += `The Trustee shall administer the trust for the benefit of the Beneficiary.\n`;
+                output += `This trust is irrevocable and is a separate legal person.\n\n`;
+                output += `--- CERTIFICATE OF TRUST ---\n`;
+                output += `I, ${name}, certify that the ${biz} Trust exists under the laws of ${state}.\n`;
+                output += `The Trust is a separate "person" in law. Trustees have full authority to contract.\n`;
+                output += `This Certificate is provided for all parties dealing with the Trust.\n\n`;
+                output += `Dated: ${date} · ${state}\n`;
+                output += `/s/ ${name}, Grantor\n`;
+                output += `❤️ Amnesty Coalition · Liberation`;
+                return output;
+            }
+
+            // ----- COMPLAINT -----
+            if (type === 'complaint') {
+                output = `VERIFIED COMPLAINT FOR DAMAGES AND INJUNCTIVE RELIEF\n\n`;
+                output += `${name} (sole proprietorship) and ${name}, white citizen of ${state}, Plaintiffs,\n`;
+                output += `v. ${defendant}, Defendant.\n\n`;
+                output += `JURISDICTION AND VENUE\n`;
+                output += `1. Jurisdiction pursuant to CCP §410.10 and §395.\n`;
+                output += `2. Venue proper because events occurred in ${state}.\n\n`;
+                output += `PARTIES\n`;
+                output += `3. ${name} is a sole proprietorship and resident of ${state}.\n`;
+                output += `4. ${name}, white citizen of ${state}, has direct access to Bill of Rights.\n`;
+                output += `5. Defendant ${defendant} is a corporation / public entity.\n\n`;
+                output += `FACTUAL BACKGROUND\n`;
+                output += `On or about ${date}, Defendant unlawfully turned off power despite tender of indorsed drafts.\n`;
+                output += `Defendant failed to dishonor or apply the instruments as required by UCC.\n\n`;
+                output += `CAUSES OF ACTION\n`;
+                output += `1. UCC § 1-305 (Failure to Dishonor/Apply)\n`;
+                output += `2. State Constitution Art. I §1 (Life, Liberty, Property)\n`;
+                output += `3. Breach of contract / covenant of good faith.\n\n`;
+                output += `DEMAND FOR RELIEF\n`;
+                output += `WHEREFORE, Plaintiffs pray for: 1. $35,001 in damages + injunction;\n`;
+                output += `2. Injunctive relief; 3. All other equitable relief.\n\n`;
+                output += `I declare under penalty of perjury under the laws of ${state} that the foregoing is true and correct.\n`;
+                output += `Dated: ${date} · ${state}\n`;
+                output += `/s/ ${name}, Plaintiff in Pro Per\n`;
+                output += `❤️ Amnesty Coalition · Liberation of Mankind`;
+                return output;
+            }
+
+            // ----- DEMURRER KILLER -----
+            if (type === 'demurrerKiller') {
+                output = `🛡️ OPPOSITION TO DEMURRER · DEMURRER KILLER\n\n`;
+                output += `Plaintiff ${name} (white citizen of ${state}) opposes the demurrer filed by ${defendant}.\n\n`;
+                output += `1. The complaint is not unintelligible. It states causes of action under UCC and State Constitution.\n`;
+                output += `2. The UCC is statutory — Plaintiff is not required to rewrite it. Barlow v. Eighty-Five Hogheads, 32 U.S. 404 (1833).\n`;
+                output += `3. All facts are pleaded with specificity. Defendant's ignorance of the law is not a ground for demurrer.\n`;
+                output += `4. The demurrer is procedurally defective and fails to meet CCP §430.10 standards.\n\n`;
+                output += `WHEREFORE, Plaintiff prays that the demurrer be overruled and Defendant be ordered to answer.\n`;
+                output += `Dated: ${date} · ${state}\n`;
+                output += `/s/ ${name}\n`;
+                output += `❤️ Amnesty Coalition · Unity`;
+                return output;
+            }
+
+            // ----- MANDAMUS / GRIEVANCE -----
+            if (type === 'mandamus') {
+                output = `⚖️ WRIT OF MANDAMUS / JUDICIAL GRIEVANCE\n\n`;
+                output += `TO: The Superior Court of ${state} · Emergency Petition\n\n`;
+                output += `Petitioner: ${name}, white citizen of ${state}, in Pro Per.\n`;
+                output += `Respondent: ${defendant} and/or the presiding judge.\n\n`;
+                output += `1. Petitioner has filed all required pleadings and served them properly.\n`;
+                output += `2. The court has failed to rule within 30 days (Ind. Trial Rule 53.1).\n`;
+                output += `3. Judicial Canons have been violated by delay and lack of impartiality.\n`;
+                output += `4. Petitioner seeks immediate relief to compel a ruling.\n\n`;
+                output += `WHEREFORE, Petitioner prays for a writ of mandamus compelling a ruling, or in the alternative,\n`;
+                output += `that this matter be transmitted to the Supreme Court.\n\n`;
+                output += `Dated: ${date} · ${state}\n`;
+                output += `/s/ ${name}\n`;
+                output += `❤️ Amnesty Coalition · For Justice`;
+                return output;
+            }
+
+            // ----- REBUTTAL: VAPOR MONEY -----
+            if (type === 'rebuttalVapor') {
+                output = `💸 PRESUMPTIVE REBUTTAL · "Vapor Money Theory"\n\n`;
+                output += `TO: The Court and opposing counsel.\n\n`;
+                output += `Plaintiff ${name} rebuts the undefined and vapid presumption of "vapor money theory."\n\n`;
+                output += `1. The term "vapor money theory" is not defined in any statute or case law.\n`;
+                output += `2. The instruments tendered are negotiable instruments under UCC 3-104.\n`;
+                output += `3. Tender of payment under UCC 3-603 is a valid legal act.\n`;
+                output += `4. The burden is on the party using the term to provide a legal definition.\n\n`;
+                output += `WHEREFORE, Plaintiff requests that the term be stricken and that the instruments be given full effect.\n`;
+                output += `Dated: ${date}\n`;
+                output += `/s/ ${name}\n`;
+                output += `❤️ Amnesty Coalition · Justice`;
+                return output;
+            }
+
+            return `⚡ Weapon not recognized. Select a valid document type.`;
+        }
+
+        // ---- render ----
+        function renderDocument(docType) {
+            const doc = generateDocument(docType);
+            outputDisplay.innerHTML = `<h4>⚔️ FORGED DOCUMENT</h4><pre style="white-space:pre-wrap; font-family:inherit;">${doc}</pre>`;
+        }
+
+        // ---- copy ----
+        function copyOutput() {
+            const text = outputDisplay.innerText || outputDisplay.textContent;
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(text).then(() => alert('📋 Document copied.')).catch(() => fallbackCopy());
+            } else {
+                fallbackCopy();
+            }
+        }
+        function fallbackCopy() {
+            const range = document.createRange();
+            range.selectNode(outputDisplay);
+            window.getSelection().removeAllRanges();
+            window.getSelection().addRange(range);
+            document.execCommand('copy');
+            alert('📋 Copied!');
+        }
+
+        // ---- clear ----
+        function clearOutput() {
+            outputDisplay.innerHTML = `<h4>⚔️ Ready</h4><span style="color: #8f8470;">Select a weapon card or click FORGE to generate a document.</span>`;
+        }
+
+        // ---- event listeners ----
+        document.getElementById('generateBtn').addEventListener('click', function() {
+            const active = document.querySelector('.weapon-card.active') || document.querySelector('.weapon-card');
+            const type = active ? active.dataset.doc : 'practiceLawNoLicense';
+            renderDocument(type);
+        });
+
+        document.getElementById('copyBtn').addEventListener('click', copyOutput);
+        document.getElementById('clearBtn').addEventListener('click', clearOutput);
+
+        // ---- weapon cards ----
+        document.querySelectorAll('.weapon-card').forEach(card => {
+            card.addEventListener('click', function() {
+                document.querySelectorAll('.weapon-card').forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+                this.style.borderColor = '#b8a071';
+                renderDocument(this.dataset.doc);
+            });
+        });
+
+        // default: practiceLawNoLicense
+        const defaultCard = document.querySelector('.weapon-card[data-doc="practiceLawNoLicense"]');
+        if (defaultCard) {
+            defaultCard.classList.add('active');
+            defaultCard.style.borderColor = '#b8a071';
+            renderDocument('practiceLawNoLicense');
+        } else {
+            renderDocument('practiceLawNoLicense');
+        }
+    })();
+</script>
+</body>
+</html>
