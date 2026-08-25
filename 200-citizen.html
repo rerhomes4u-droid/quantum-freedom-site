@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Legal Guillotine: Global Truth Portal</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Special+Elite&family=Oswald:wght@700&display=swap');
+        
+        body {
+            background-color: #050505;
+            color: #fff;
+            font-family: 'Special Elite', 'Courier New', monospace;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        /* The Panic Pulse Background */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, rgba(128, 0, 0, 0.8), rgba(0,0,0,1));
+            animation: pulse 5s infinite;
+            z-index: -1;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.2; }
+            50% { opacity: 0.5; }
+            100% { opacity: 0.2; }
+        }
+
+        .top-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: #000;
+            padding: 15px;
+            z-index: 1000;
+            border-bottom: 4px solid #800000;
+            text-align: center;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.9);
+            height: 130px;
+            box-sizing: border-box;
+        }
+
+        .timer {
+            font-family: 'Oswald', sans-serif;
+            font-size: 2.5rem;
+            color: #ff0000;
+            text-shadow: 0 0 20px #ff0000;
+            margin-top: 10px;
+        }
+
+        .scroll-container {
+            height: 100vh;
+            overflow-y: scroll;
+            scroll-snap-type: y proximity;
+            perspective: 800px;
+            position: relative;
+            padding-top: 200px;
+            padding-bottom: 150px;
+        }
+
+        .point-item {
+            scroll-snap-align: start;
+            scroll-margin-top: 140px;
+            padding: 50px 10px;
+            margin: 0 auto;
+            max-width: 900px;
+            text-align: center;
+            transition: transform 0.1s linear, opacity 0.1s linear, font-size 0.1s linear;
+            color: #fff;
+            transform: scale(0.7);
+            font-size: 1.2rem;
+            opacity: 0.7;
+            border-bottom: 2px solid #333;
+        }
+
+        .point-item.active {
+            opacity: 1;
+            transform: scale(1.8);
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #ffff00;
+            text-shadow: 0 0 30px #ff0000;
+            border: 4px solid #ff0000;
+            padding: 40px;
+            margin: 30px auto;
+            background-color: #111;
+            z-index: 10;
+            position: relative;
+            box-shadow: 0 0 50px rgba(255,0,0,0.5);
+        }
+
+        /* GLOBAL EDUCATION SECTION - The "Recruitment Tool" */
+        .education-section {
+            background: #0a0a0a;
+            border: 3px solid #ffff00;
+            padding: 30px;
+            margin: 50px auto;
+            max-width: 850px;
+            border-radius: 10px;
+            box-shadow: 0 0 30px rgba(255,255,255,0.2);
+            text-align: left;
+        }
+
+        .education-section h2 { color: #ffff00; font-family: 'Oswald', sans-serif; text-align: center; }
+        .education-section h3 { color: #ff3333; font-family: 'Oswald', sans-serif; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        .education-section p { line-height: 1.8; font-size: 1.1rem; }
+        .education-section ul { line-height: 1.8; font-size: 1.1rem; }
+        .education-section strong { color: #ff3333; }
+
+        .defendant-matrix {
+            margin-top: 50px;
+            background: #000;
+            border: 2px solid #800000;
+            padding: 20px;
+        }
+
+        .defendant { 
+            padding: 15px; 
+            border-bottom: 1px solid #444; 
+            color: #fff; 
+            transition: all 0.5s ease;
+        }
+
+        .defendant.exposed { 
+            color: #ff0000; 
+            font-weight: bold; 
+            background: rgba(128, 0, 0, 0.3);
+            text-shadow: 0 0 10px #ff0000;
+        }
+
+        .bottom-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #111;
+            padding: 15px;
+            z-index: 1000;
+            border-top: 4px solid #800000;
+            text-align: center;
+        }
+
+        button {
+            background: #800000;
+            color: #fff;
+            border: none;
+            padding: 15px 30px;
+            font-family: 'Oswald', sans-serif;
+            font-size: 1.2rem;
+            cursor: pointer;
+            text-transform: uppercase;
+        }
+
+        button:hover { background: #a30000; }
+        .hidden { display: none; }
+        
+        .quote-box {
+            background: #111;
+            border-left: 5px solid #ff0000;
+            padding: 15px;
+            margin: 20px 0;
+            font-style: italic;
+            color: #ddd;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="top-bar">
+        <h1 style="font-family: 'Oswald', sans-serif;">⚠️ THE LEGAL GUILLOTINE ⚠️</h1>
+        <p>Global Truth Portal & 200-Point Interrogatory</p>
+        <div class="timer" id="countdown">14 DAYS : 00 : 00 : 00</div>
+        <p style="color: #ff3333; font-size: 0.8rem;">Failure to respond point-by-point constitutes an admission of guilt in the Court of Equity.</p>
+    </div>
+
+    <div class="scroll-container" id="scrollBox">
+        <div id="points-list"></div>
+
+        <!-- THE GLOBAL EDUCATION & RECRUITMENT SECTION -->
+        <div class="education-section">
+            <h2>🔓 DECLASSIFIED: THE TRUTH ABOUT CITIZENSHIP & THE CORPORATE MACHINE</h2>
+            
+            <p>Every person who feels oppressed by the "justice system" is right. The system is not designed to protect the individual; it is designed to protect the <strong>corporate machine</strong>. Understanding this is the first step to breaking free.</p>
+
+            <h3>The Two Classes of Citizenship (The Legal Loophole)</h3>
+            <p>In <strong>1873</strong>, the Supreme Court of the United States established in <strong>The Slaughter-House Cases (83 U.S. 36)</strong> that there are <strong>TWO DISTINCT CLASSES OF CITIZENSHIP</strong>:</p>
+            <ul>
+                <li><strong>Class 1: The State Citizen</strong> – A sovereign member of the Republic, owing allegiance to God Almighty and bound by the organic Constitution. This is <strong>YOU</strong>.</li>
+                <li><strong>Class 2: The 14th Amendment Citizen</strong> – A corporate, federal subject, bound by the legislative jurisdiction of the United States Corporation. This is the <strong>legal fiction</strong> the courts use to control you.</li>
+            </ul>
+            <p>The courts never tell you this. They treat you as a "person" under the 14th Amendment, which makes you a <strong>subject</strong> rather than a <strong>sovereign</strong>. That is why they can throw you in jail, take your children, and steal your property.</p>
+
+            <h3>The Corporate Trap (Why Judges Hate This)</h3>
+            <p>When you stand up and declare, "I am a State Citizen, not a 14th Amendment person," the Judge becomes visibly angry. Why? Because <strong>he is a corporate agent</strong>. He knows that if he rules on your jurisdiction, he exposes the entire sham of the system. He labels you a "sovereign citizen" to dismiss you.</p>
+            <p><strong>The counter-attack:</strong> Use this exact legal script to force him to expose himself.</p>
+
+            <div class="quote-box">
+                <p><strong>YOUR SCRIPT:</strong> <em>"Your Honor, I appear specially, under protest. I am a sovereign State Citizen of this Republic. Under <strong>The Slaughter-House Cases, 83 U.S. 36 (1873)</strong>, there are two classes of citizenship. I have never consented to the jurisdiction of this corporate tribunal. By proceeding without ruling on my jurisdictional objection, you are forcing a kangaroo court on a sovereign citizen and exposing yourself to liability for interpreting the law incorrectly. I am reserving all rights for my Federal RICO action."</em></p>
+            </div>
+
+            <h3>The "Fraud Upon the Court" Doctrine</h3>
+            <p>Once you have established that you are not a corporate subject, every action taken against you is a <strong>Fraud Upon the Court</strong>. Under <strong>Ex parte Weeks, 82 S.C. 210 (1909)</strong>, <em>"Fraud vitiates all proceedings."</em> If the Judge ignores your sovereignty, he is upholding fraud. He is no longer a judge; he is a co-conspirator.</p>
+            
+            <h3>Your "Legal Weapons" Toolkit</h3>
+            <ul>
+                <li><strong>The Unrebutted Affidavit:</strong> If they don't respond point-by-point, they admit to the truth.</li>
+                <li><strong>The Clean Hands Doctrine:</strong> A party who acts in bad faith cannot seek equitable relief.</li>
+                <li><strong>The UCC-1 Filing:</strong> Use this to secure your fundamental rights against the corporate state.</li>
+                <li><strong>The Body Cam Footage:</strong> Always demand it. Their refusal to provide it is proof of guilt.</li>
+            </ul>
+        </div>
+
+        <!-- THE EXPOSURE MATRIX -->
+        <div class="defendant-matrix">
+            <h2 style="color: #ffff00;">THE EXPOSURE MATRIX</h2>
+            <p>These parties have been served. They are currently in the 14-day window. If they fail to respond, their names will be permanently branded.</p>
+            
+            <div class="defendant">1. Christian Bernal Ortiz</div>
+            <div class="defendant">2. Jessica Hudson</div>
+            <div class="defendant">3. Richard Allen</div>
+            <div class="defendant">4. Destiny Glenn</div>
+            <div class="defendant">5. Suzanne Freed</div>
+            <div class="defendant">6. Chloe Lopez</div>
+            <div class="defendant">7. Officer Erik M. Haines</div>
+            <div class="defendant">8. Officer Cameron S. Woody</div>
+            <div class="defendant">9. Officer Jonathan T. Harrelson</div>
+            <div class="defendant">10. Judge Mark C. Edmonds</div>
+            <div class="defendant">11. Judge Darrell Scott Fisher</div>
+            <div class="defendant">12. Judge Kenneth G. Southerlin Jr.</div>
+            <div class="defendant">13. Nicholas Addison Howe</div>
+            <div class="defendant">14. Michael T. Kellett</div>
+            <div class="defendant">15. Joe L. Alverson</div>
+        </div>
+    </div>
+
+    <div class="bottom-bar">
+        <button onclick="showResponseForm()">⚠️ RESPOND POINT BY POINT ⚠️</button>
+    </div>
+
+    <div id="response-form" class="hidden" style="max-width: 800px; margin: 50px auto; background: #111; padding: 30px; border: 4px solid #800000;">
+        <h2 style="color: #ffff00;">YOUR POINT-BY-POINT REBUTTAL</h2>
+        <p style="color: #fff;">You cannot say "I deny all." You must copy and paste each specific point number and type your admission or denial. This is a private, administrative review.</p>
+        
+        <form action="https://formsubmit.co/qbopuesmijo@proton.me" method="POST" id="responseForm">
+            <input type="hidden" name="_subject" value="CRITICAL: 200-Point Interrogatory Response from Defendant">
+            <input type="hidden" name="_template" value="table">
+            <input type="hidden" name="_captcha" value="false">
+            
+            <label style="color: #fff;">Paste the specific points you are denying (with your evidence):</label>
+            <textarea name="Point_Response" id="pointResponse" rows="12" placeholder="Point 1: I ADMIT/ DENY because...&#10;Point 2: I ADMIT/ DENY because..."></textarea>
+            
+            <button type="submit" style="width: 100%; margin-top: 20px;">SEND PRIVATE SECURE EMAIL</button>
+        </form>
+
+        <div style="text-align: center; margin-top: 20px;">
+            <a href="https://wa.me/573108885154?text=I%20am%20responding%20to%20the%20200%20point%20interrogatory%20affidavit." target="_blank" style="background: #25D366; color: #000; padding: 15px; text-decoration: none; font-weight: bold; display: inline-block;">SEND VIA WHATSAPP</a>
+        </div>
+        
+        <button onclick="location.reload()" style="margin-top: 20px; background: #333;">CLOSE PORTAL</button>
+    </div>
+
+    <script>
+        // THE 200 POINT AFFIDAVIT - REAL QUESTIONS
+        const points = [
+            "1. Did Christian Bernal Ortiz enter the United States illegally?",
+            "2. Did Bernal use Carolina Herrera Gonzalez to obtain immigration status?",
+            "3. Did Bernal intentionally steal Carolina’s vehicle (marital property)?",
+            "4. Did Bernal self-mutilate himself on 10/18/2025 to fabricate evidence of an assault?",
+            "5. Did Carolina initiate the 911 call to report the abuse?",
+            "6. Did Officer Erik M. Haines arrest the 911 caller without probable cause?",
+            "7. Did Officer Cameron S. Woody throw a sleeping woman to the ground and place his knee on her head?",
+            "8. Did Jessica Hudson remove EBH without a court order?",
+            "9. Did Attorney Richard Allen state that breastfeeding was 'not a reason' to return a child?",
+            "10. Did Chloe Lopez lock a mother and child in an unventilated room?",
+            "11. Did Suzanne Freed knowingly cover for DSS's fraudulent conduct?",
+            "12. Did Nicholas Addison Howe read the evidence and do nothing?",
+            "13. Did you violate S.C. Code Ann. § 63-7-720?",
+            "14. Did you violate the Clean Hands Doctrine?",
+            "15. Did you engage in Fraud Upon the Court?",
+            "16. Did Bernal enter the courtroom to request the maximum sentence for Carolina?",
+            "17. Did Bernal enter the courtroom to request no bail for Carolina?",
+            "18. Did you attempt to force a sovereign State Citizen into the jurisdiction of a corporate court?",
+            "19. Did you knowingly ignore The Slaughter-House Cases, 83 U.S. 36 (1873)?",
+            "20. Did you fail to provide a translator to a non-English speaker?",
+            "21. Did you arrest a mother for sending a notice of intent to sue?",
+            "22. Did you break a woman's ribs during an arrest?",
+            "23. Did you fail to provide medical attention after breaking a woman's ribs?",
+            "24. Did you falsify a police report?",
+            "25. Did you commit perjury?",
+            "26. Did you knowingly accept a fabricated GAL report?",
+            "27. Did you lock a mother and child in a hot, unventilated room?",
+            "28. Did you demand a 'document' that does not exist to block visitation?",
+            "29. Did you ignore a 15-minute grace period granted by your own agent?",
+            "30. Did you steal a vehicle by fraudulent transfer?",
+            "31. Did you abuse your power to kidnap a child?",
+            "32. Did you weaponize the court system against a victim of domestic abuse?",
+            "33. Did you violate 42 U.S.C. § 1983?",
+            "34. Did you act with malice and prejudice?",
+            "35. Did you act in bad faith?",
+            "36. Did you conspire to defraud the court?",
+            "37. Did you conspire to destroy an innocent woman's life?",
+            "38. Did you engage in a RICO conspiracy?",
+            "39. Did you engage in a pattern of racketeering?",
+            "40. Did you obstruct justice?",
+            "41. Did you tamper with witnesses?",
+            "42. Did you destroy evidence?",
+            "43. Did you hide the body cam footage?",
+            "44. Did you hide the 911 calls?",
+            "45. Did you hide the dash cam footage?",
+            "46. Did you hide the medical records?",
+            "47. Did you fail to investigate the claims against Carolina?",
+            "48. Did you fail to investigate the claims made by Bernal?",
+            "49. Did you fail to provide equal protection under the law?",
+            "50. Did you fail to provide due process of law?",
+            "51. Did you fail to provide a fair hearing?",
+            "52. Did you fail to provide a fair trial?",
+            "53. Did you fail to provide a fair investigation?",
+            "54. Did you fail to provide a fair outcome?",
+            "55. Did you fail to provide justice?",
+            "56. Did you fail to provide the truth?",
+            "57. Did you fail to provide her son?",
+            "58. Did you fail to provide her freedom?",
+            "59. Did you fail to provide her life?",
+            "60. Did you fail to provide her dignity?",
+            "61. Did you fail to provide her respect?",
+            "62. Did you fail to provide her humanity?",
+            "63. Did you fail to provide her rights?",
+            "64. Did you fail to provide her justice?",
+            "65. Did you fail to provide her son?",
+            "66. Did you fail to provide her freedom?",
+            "67. Did you fail to provide her life?",
+            "68. Did you fail to provide her dignity?",
+            "69. Did you fail to provide her respect?",
+            "70. Did you fail to provide her humanity?",
+            "71. Did you fail to provide her rights?",
+            "72. Did you fail to provide her justice?",
+            "73. Did you fail to provide her son?",
+            "74. Did you fail to provide her freedom?",
+            "75. Did you fail to provide her life?",
+            "76. Did you fail to provide her dignity?",
+            "77. Did you fail to provide her respect?",
+            "78. Did you fail to provide her humanity?",
+            "79. Did you fail to provide her rights?",
+            "80. Did you fail to provide her justice?",
+            "81. Did you fail to provide her son?",
+            "82. Did you fail to provide her freedom?",
+            "83. Did you fail to provide her life?",
+            "84. Did you fail to provide her dignity?",
+            "85. Did you fail to provide her respect?",
+            "86. Did you fail to provide her humanity?",
+            "87. Did you fail to provide her rights?",
+            "88. Did you fail to provide her justice?",
+            "89. Did you fail to provide her son?",
+            "90. Did you fail to provide her freedom?",
+            "91. Did you fail to provide her life?",
+            "92. Did you fail to provide her dignity?",
+            "93. Did you fail to provide her respect?",
+            "94. Did you fail to provide her humanity?",
+            "95. Did you fail to provide her rights?",
+            "96. Did you fail to provide her justice?",
+            "97. Did you fail to provide her son?",
+            "98. Did you fail to provide her freedom?",
+            "99. Did you fail to provide her life?",
+            "100. Did you fail to provide her dignity?",
+            "101. Did you fail to provide her respect?",
+            "102. Did you fail to provide her humanity?",
+            "103. Did you fail to provide her rights?",
+            "104. Did you fail to provide her justice?",
+            "105. Did you fail to provide her son?",
+            "106. Did you fail to provide her freedom?",
+            "107. Did you fail to provide her life?",
+            "108. Did you fail to provide her dignity?",
+            "109. Did you fail to provide her respect?",
+            "110. Did you fail to provide her humanity?",
+            "111. Did you fail to provide her rights?",
+            "112. Did you fail to provide her justice?",
+            "113. Did you fail to provide her son?",
+            "114. Did you fail to provide her freedom?",
+            "115. Did you fail to provide her life?",
+            "116. Did you fail to provide her dignity?",
+            "117. Did you fail to provide her respect?",
+            "118. Did you fail to provide her humanity?",
+            "119. Did you fail to provide her rights?",
+            "120. Did you fail to provide her justice?",
+            "121. Did you fail to provide her son?",
+            "122. Did you fail to provide her freedom?",
+            "123. Did you fail to provide her life?",
+            "124. Did you fail to provide her dignity?",
+            "125. Did you fail to provide her respect?",
+            "126. Did you fail to provide her humanity?",
+            "127. Did you fail to provide her rights?",
+            "128. Did you fail to provide her justice?",
+            "129. Did you fail to provide her son?",
+            "130. Did you fail to provide her freedom?",
+            "131. Did you fail to provide her life?",
+            "132. Did you fail to provide her dignity?",
+            "133. Did you fail to provide her respect?",
+            "134. Did you fail to provide her humanity?",
+            "135. Did you fail to provide her rights?",
+            "136. Did you fail to provide her justice?",
+            "137. Did you fail to provide her son?",
+            "138. Did you fail to provide her freedom?",
+            "139. Did you fail to provide her life?",
+            "140. Did you fail to provide her dignity?",
+            "141. Did you fail to provide her respect?",
+            "142. Did you fail to provide her humanity?",
+            "143. Did you fail to provide her rights?",
+            "144. Did you fail to provide her justice?",
+            "145. Did you fail to provide her son?",
+            "146. Did you fail to provide her freedom?",
+            "147. Did you fail to provide her life?",
+            "148. Did you fail to provide her dignity?",
+            "149. Did you fail to provide her respect?",
+            "150. Did you fail to provide her humanity?",
+            "151. Did you fail to provide her rights?",
+            "152. Did you fail to provide her justice?",
+            "153. Did you fail to provide her son?",
+            "154. Did you fail to provide her freedom?",
+            "155. Did you fail to provide her life?",
+            "156. Did you fail to provide her dignity?",
+            "157. Did you fail to provide her respect?",
+            "158. Did you fail to provide her humanity?",
+            "159. Did you fail to provide her rights?",
+            "160. Did you fail to provide her justice?",
+            "161. Did you fail to provide her son?",
+            "162. Did you fail to provide her freedom?",
+            "163. Did you fail to provide her life?",
+            "164. Did you fail to provide her dignity?",
+            "165. Did you fail to provide her respect?",
+            "166. Did you fail to provide her humanity?",
+            "167. Did you fail to provide her rights?",
+            "168. Did you fail to provide her justice?",
+            "169. Did you fail to provide her son?",
+            "170. Did you fail to provide her freedom?",
+            "171. Did you fail to provide her life?",
+            "172. Did you fail to provide her dignity?",
+            "173. Did you fail to provide her respect?",
+            "174. Did you fail to provide her humanity?",
+            "175. Did you fail to provide her rights?",
+            "176. Did you fail to provide her justice?",
+            "177. Did you fail to provide her son?",
+            "178. Did you fail to provide her freedom?",
+            "179. Did you fail to provide her life?",
+            "180. Did you fail to provide her dignity?",
+            "181. Did you fail to provide her respect?",
+            "182. Did you fail to provide her humanity?",
+            "183. Did you fail to provide her rights?",
+            "184. Did you fail to provide her justice?",
+            "185. Did you fail to provide her son?",
+            "186. Did you fail to provide her freedom?",
+            "187. Did you fail to provide her life?",
+            "188. Did you fail to provide her dignity?",
+            "189. Did you fail to provide her respect?",
+            "190. Did you fail to provide her humanity?",
+            "191. Did you fail to provide her rights?",
+            "192. Did you fail to provide her justice?",
+            "193. Did you fail to provide her son?",
+            "194. Did you fail to provide her freedom?",
+            "195. Did you fail to provide her life?",
+            "196. Did you fail to provide her dignity?",
+            "197. Did you fail to provide her respect?",
+            "198. Did you fail to provide her humanity?",
+            "199. Are you aware that your refusal to respond has sealed your fate?",
+            "200. Are you ready to face the consequences of your actions?"
+        ];
+
+        const listContainer = document.getElementById('points-list');
+        
+        points.forEach(point => {
+            const div = document.createElement('div');
+            div.className = 'point-item';
+            div.innerText = point;
+            listContainer.appendChild(div);
+        });
+
+        // THE PANIC SCROLL ENGINE
+        const scrollBox = document.getElementById('scrollBox');
+        const items = document.querySelectorAll('.point-item');
+
+        function updateScale() {
+            const viewportHeight = window.innerHeight;
+            const viewportCenterY = viewportHeight / 2;
+
+            items.forEach(item => {
+                const rect = item.getBoundingClientRect();
+                const itemCenterY = rect.top + (rect.height / 2);
+                const distance = Math.abs(viewportCenterY - itemCenterY);
+                
+                const scale = Math.max(0.6, 1.8 - (distance / 200));
+                const opacity = Math.max(0.4, 1.2 - (distance / 250));
+                
+                item.style.transform = `scale(${scale})`;
+                item.style.opacity = opacity;
+                
+                if (distance < 100) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+        }
+
+        window.addEventListener('load', () => {
+            scrollBox.scrollTop = 100; 
+            updateScale();
+        });
+        
+        scrollBox.addEventListener('scroll', updateScale);
+
+        // THE EXPOSURE CLOCK
+        const deadline = new Date();
+        deadline.setDate(deadline.getDate() + 14);
+
+        const timer = setInterval(() => {
+            const now = new Date();
+            const diff = deadline - now;
+
+            if (diff < 0) {
+                clearInterval(timer);
+                document.getElementById('countdown').innerHTML = "DEFAULT JUDGMENT ENTERED";
+                document.querySelectorAll('.defendant').forEach(el => {
+                    el.classList.add('exposed');
+                    el.style.background = "#ff0000";
+                    el.style.color = "#fff";
+                });
+            } else {
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+                document.getElementById('countdown').innerHTML = `${days} DAYS : ${hours} HRS : ${minutes} MIN : ${seconds} SEC`;
+            }
+        }, 1000);
+
+        function showResponseForm() {
+            document.getElementById('response-form').classList.remove('hidden');
+            document.getElementById('response-form').scrollIntoView({behavior: 'smooth'});
+        }
+    </script>
+</body>
+</html>
