@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Forbidden Knowledge Archive — The Record</title>
+<style>
+  :root{
+    --bg:#08080c;--panel:#101018;--panel2:#181822;--border:#26263a;
+    --text:#e8e8f0;--dim:#8080a0;--accent:#ff3b3b;--accent2:#ffb347;
+    --gold:#ffd700;--green:#4ade80;--blue:#60a5fa;--purple:#a78bfa;
+    --red:#ef4444;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'SF Mono',Menlo,Consolas,monospace;background:var(--bg);color:var(--text);line-height:1.5;padding:20px;min-height:100vh}
+  header{border-bottom:2px solid var(--accent);padding-bottom:16px;margin-bottom:20px}
+  h1{font-size:1.4rem;letter-spacing:2px;color:var(--accent);text-transform:uppercase}
+  h1 span{color:var(--gold)}
+  .sub{color:var(--dim);font-size:.72rem;margin-top:6px;letter-spacing:1px}
+  .banner{background:linear-gradient(90deg,#1a0a0a,#2a1010);border:1px solid var(--accent);padding:12px 16px;border-radius:4px;font-size:.72rem;color:var(--accent2);margin-bottom:18px;letter-spacing:1px;line-height:1.6}
+  .banner b{color:var(--gold)}
+  .stats{display:flex;gap:12px;flex-wrap:wrap;margin:16px 0;font-size:.7rem}
+  .stat{background:var(--panel);border:1px solid var(--border);padding:10px 14px;border-radius:4px;min-width:120px}
+  .stat b{color:var(--accent2);font-size:1.1rem;display:block}
+  .controls{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+  input[type=search]{flex:1;min-width:240px;background:var(--panel);border:1px solid var(--border);color:var(--text);padding:10px 14px;border-radius:4px;font-family:inherit;font-size:.85rem}
+  input[type=search]:focus{outline:none;border-color:var(--accent)}
+  select{background:var(--panel);border:1px solid var(--border);color:var(--text);padding:10px;border-radius:4px;font-family:inherit;font-size:.8rem}
+  .cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;margin-bottom:22px}
+  .cat-btn{background:var(--panel);border:1px solid var(--border);color:var(--dim);padding:10px 8px;border-radius:4px;cursor:pointer;font-size:.68rem;text-align:center;transition:.15s;font-family:inherit;line-height:1.4}
+  .cat-btn:hover{border-color:var(--accent2);color:var(--text)}
+  .cat-btn.active{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:bold}
+  .cat-btn .count{display:block;font-size:1.05rem;color:var(--accent2);margin-top:4px}
+  .cat-btn.active .count{color:#fff}
+  .files{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px}
+  .file{background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--accent);padding:12px;border-radius:4px;text-decoration:none;color:var(--text);transition:.15s;display:flex;flex-direction:column;gap:6px}
+  .file:hover{background:var(--panel2);border-left-color:var(--gold);transform:translateX(3px)}
+  .file .name{font-size:.82rem;font-weight:600;word-break:break-all}
+  .file .meta{font-size:.62rem;color:var(--dim);display:flex;justify-content:space-between;gap:8px}
+  .file .cat-tag{color:var(--accent2);text-transform:uppercase;letter-spacing:1px}
+  .empty{color:var(--dim);text-align:center;padding:40px;font-size:.85rem}
+  .section-title{color:var(--gold);font-size:.75rem;letter-spacing:2px;margin:24px 0 10px;text-transform:uppercase;border-bottom:1px solid var(--border);padding-bottom:6px}
+  footer{margin-top:40px;padding-top:16px;border-top:1px solid var(--border);color:var(--dim);font-size:.62rem;text-align:center;letter-spacing:1px;line-height:1.7}
+  footer a{color:var(--accent2);text-decoration:none}
+  @media(max-width:600px){body{padding:12px}h1{font-size:1rem}}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>⚡ Forbidden Knowledge <span>Archive</span></h1>
+  <div class="sub">POSTHUMOUS RELEASE · PHASE ONE · THE RECORD</div>
+</header>
+
+<div class="banner">
+  ⚠ <b>BASE:</b> http://quantum-freedom-site.vercel.app/<br>
+  Every file below opens at that address. Free. No signup. No paywall.<br>
+  <b>Mirror it. Copy it. Print it. Translate it. Share it.</b>
+</div>
+
+<div class="stats" id="stats"></div>
+
+<div class="controls">
+  <input type="search" id="search" placeholder="🔍 Search filenames, categories, keywords...">
+  <select id="sort">
+    <option value="name">Sort: A→Z</option>
+    <option value="cat">Sort: Category</option>
+    <option value="recent">Sort: Newest first (as listed)</option>
+  </select>
+</div>
+
+<div class="cat-grid" id="cats"></div>
+<div class="files" id="files"></div>
+
+<footer>
+  <div id="footer-stat"></div>
+  <div style="margin-top:8px">
+    THE RECORD · Phase One · quantum-freedom-site.vercel.app<br>
+    Say the names. Pull your money. Vote the votes. Support the documenters. Archive everything.
+  </div>
+</footer>
+
+<script>
+/* ============================================================
+   FILE LIST — Add new files here as the trigger demands.
+   Paste the filename with .html. Categorization is automatic.
+   ============================================================ */
+const FILE_LIST = [
+"200-citizen.html","3024.html","432Hz.html","666.html","6year.html","7Enero.html","9taps.html",
+"ACU-OSINT-Portal.html","ACU-OSINT.html","ARK-ColombianSolutionsNexus.html","AWAKENER.html",
+"AccessCosmicConsciousness.html","AccionSoberana.html","ActivateYourSovereignty.html","ActiveWeapon.html",
+"AdventureAgency.html","AgenteColombiaPlus.html","AlvaroMolina.html","AmnestyCoalition4Unity.html",
+"AmnestyCoalitionCentral.html","AmnestyCoalitionForUnity3.0.html","AncientWisdomAwaits.html",
+"AndeanConnections.html","Angel-Transmissions.html","AngelTransmissions.html","Angiie.html","AntiChrist.html",
+"ApocalypseOfPeter.html","AppHub.html","AppreciacionPOLICIA.html","Archons.html","ArkHost.html",
+"AuraSerenaRomance.html","AwakeningJourney.html","Ayni.html","BANK-REVERSAL.html",
+"BANNED-CENSORED-FORBIDDEN-KNOWLEDGE.html","BANNED.html","BOOK1.html","BancaOffshore.html","BankFight.html",
+"BankReversal.html","BankingSystemCollapse.html","BeginSovereignJourney.html","BeyondSilence.html",
+"BirthCertificateReversal.html","Blitzkrieg.html","BloodHarvest.html","BloodRobbery.html",
+"BloodlineRedemptionProtocol.html","BlueprintdeExitoEmpresarialColombiano.html","BoneConspiracy.html",
+"BookOfEcclesiastes.html","BookOfEnoch.html","BoomTuristico.html","BreakTheChains2.html","Broadcast.html",
+"BrokenMirror.html","BurnNotice.html","Buttons.html","CALL-HANDLING-System-EQUITY.html","CAROLINA-ARMOR.html",
+"CENSORED-BOOK-DRAFT.html","CENSORED-BOOK.html","CENSORED.html","CENSORED2.html",
+"CKC2-1.html","CKC2-2.html","CKC2-3.html","CKC2-4.html","CKC2-5.html","CKC2-7.html","CKC2-8.html","CKC2-9.html",
+"CKC2-10.html","CKC2-11.html","CKC2-12.html","CKC2-13.html","CKC2-14.html","CKC2-15.html","CKC2-16.html",
+"CKC2-17.html","CKC2-18.html","CKC2-19.html","CKC2-20.html","CKC2-21.html","CKC2-22.html","CKC2-23.html",
+"CKC2-24.html","CKC2-25.html","CKC3-1.html","CKC3-2.html","CKC3-3.html","CKC3-4.html","CKC3-5.html",
+"CODE_LEAK.html","COMPLETE.html","CONTRACTOR-JUSTICE.html","COVID19-BLACK-BOX-WARNING.html","CTC-all-in-one.html",
+"CallHandlingSystem.html","Camilo.html","Camilo2.html","Camilo3.html","Camino-Libertad.html","CannibalMenu.html",
+"Carolina-Case.html","Carolina-Practice.html","Carolina-Practice2.html","Carolina-Practice3.html",
+"Carolina-Strategy-Blitzkrieg.html","Carolina-Walmart-Judges.html","CarolinaCourtroomCompanion.html",
+"CarolinaHerrera2026.html","CarolinaHerreraCOURT1.html","CarolinaHerreraJury.html","CarolinaJury.html",
+"CarolinaMaster.html","CarolinaReunion.html","Carolina_AUGUST.html","Carolina_Herrera.html",
+"Carolina_Herrera_Gonzalez.html","Carolina_Herrera_Master.html","CartaEstrategia.html",
+"CatholicSpiritualWarfare-DeliverancePrayers.html","CelebrityScandals.html","CensoredTruth-TheyHidThis.html",
+"Chirstopher_Key.html","Christopher-Key-Carolina.html","ChristopherKey-interview.html","ChristopherKey.html",
+"Christopher_Key.html","CieloLimpioSalento.html","ClubLeones-ConstruyeLibertadFinanciera.html",
+"ClubLeones-Dashboard.html","ClubLeonesCalarca-invitar-ver-rifas-aprender-FUTURO.html",
+"ClubLeonesCalarca-invitar-ver-rifas-aprender-karaoke.html","ClubLeonesCalarca-invitar-ver-rifas-aprender.html",
+"CodigoDelLeon.html","Colombia-Amor-Verdadero.html","Colombia-Bases.html","Colombia-invitation.html",
+"ColombiaAwaitsYourHeart.html","ColombiaBusinessSuccessBlueprint.html","ColombiaPortal.html",
+"ColombiaTravelCompanion.html","Colombia_Sanctuary.html","ColombianArtisanFreedom.html",
+"ColombianArtisanGlobalConnect.html","ColombianBusinessSystemTutorial.html","ColombianCulinaryFreedom.html",
+"ColombianCulinaryFreedomAPP.html","ColombianFreedomTookit2.html","ColombianFreedomToolkit.html",
+"ColombianRhythmRevolution.html","ColombianSoulJourney.html","ColombianSoulmate.html",
+"ColombianTravelProfile.html","CompleteSovereignEcosystem.html","Complete_Legal_Liberation-SovereigntyEngine.html",
+"Complete_Sovereignty_System.html","Conexión-Local-Herramientas-para-emprendedores-de-startups.html",
+"ConnectionCompass.html","ConocimientoProhibido.html","ConocimientoProhibido2026.html","Conocimiento_Prohibido2.html",
+"ConsciousnessBridge.html","ConsciousnessMatrixDecoder.html","ConsentTrap.html","ConstitutionalJurisdiction.html",
+"ConstitutionalObjection.html","Contract-Killer.html","ContractKillerCourse3.html","ContractKiller3.0.html",
+"ContractKillerCourse3-1.html","ContractKillerCourse3-2.html","ContractKillerCourse3-3.html",
+"ContractKillerCourse3-4.html","ContractKillerCourse3-5.html","ContractKillerCourse3-6.html",
+"ContractKillerCourse3-7.html","ContractKillerCourse3-8.html","ContractKillerCourse3-9.html",
+"ContractKillerCourse3-10.html","ContractKillerCourse3-11.html","ContractKillerCourse3-12.html",
+"ContractKillerCourse3-13.html","ContractKillerCourse3-14.html","ContractKillerCourse3-15.html",
+"ConviertePasionEnNegocio.html","CourtCaseKillerPowerTools.html","CourtroomStage.html","CreditAmnesty.html",
+"CriptoPrivacidadTotal.html","Cristian.html","CryptoVigilante.html","DEBATE.html","DECLARATION.html","DIPLOMAT.html",
+"DIPLOMATIC.html","DUAL.html","DamafreOrigen.html","DarkTruthsSpanish.html","DashboardColombia.html",
+"DebtNotOwed.html","DebtNullificationWidget.html","DeerFlow2.0.html",
+"DeliverancePrayers-CatholicSpiritualWarfare.html","DesignYourFreedom.html","DiegoRamos.html","Digital-ID.html",
+"DigitalExorcist.html","Discover.html","DiscoverMagicColombia.html","DiscoverTheSuppressedScriptures.html",
+"Discovery.html","DivineConsciousnessBridge.html","DivinePrinciples.html","DivineSovereigntyEngine.html",
+"DocTrin.html","DocTrinApp.html","DocTrinApp3.html","DoctrineApp.html","DonJulio-StructuralAnalysis.html",
+"DonJulio.html","DonJulioGaviria.html","Door.html","Duck.html","DuckHunter.html",
+"ENS-LEGIS-master-system-eng.html","ENS-LEGIS-master-system-esp.html","EQUITY.html","EUROPHIA-Liberation.html",
+"EcoCultura.html","EcoCulturaAndina-EmergencyAPP.html","EcoCulturaAndina=Cosmic.html",
+"EcosistemaViralColombia.html","EmbodimentProcess.html","EnsLegisMasterSystem.html",
+"EnsLegisSovereigntyEducation.html","EpsteinAssociates.html","EpsteinFriends.html","EpsteinTrump.html",
+"Equiad9B.html","Equidad1.html","Equidad10.html","Equidad10B.html","Equidad11.html","Equidad11B.html",
+"Equidad12.html","Equidad12B.html","Equidad13.html","Equidad13B.html","Equidad14.html","Equidad14B.html",
+"Equidad2.html","Equidad2B.html","Equidad3.html","Equidad3B.html","Equidad4.html","Equidad4B.html",
+"Equidad5.html","Equidad5B.html","Equidad6.html","Equidad6B.html","Equidad7.html","Equidad7B.html",
+"Equidad8.html","Equidad8B.html","Equidad9.html","Equidad9B.html","Equilibrio.html","Equilibrio2.html",
+"Equilibrio4.html","Equilibrio5.html","Equilibrio6.html","EquipoExitoso.html","Equity-OS.html","Equity-School.html",
+"Equity11B.html","EquityCallHandler.html","EquityCallHandlingSystem.html","EquityCallHandlingSystem2.html",
+"EquityJournal.html","EquityMotion1.html","EquityWorkflowManager.html","Equity_Workflow_Manager.html",
+"EscuelaEcosistema.html","EscuelaEquidad.html","EscuelaEquidad1.html","Exodus-Miracles-Control.html",
+"ExodusMiraclesControl.html","ExposedPsyOps.html","ExterminationFrequency.html","FINANCIAL.html","FK-Portal.html",
+"FORBIDDEN.html","FORBIDDEN_KNOWLEDGE_KONAMI.html","FREE-TEXT-READER.html","FREEMIUM.html","FamilyUnit.html",
+"FideicomisoInternacionalProteccionPatrimonial.html","FinalAwakening.html","FinalCall.html",
+"FinalChapterUnfinished.html","FinalDownload.html","FinalLock.html","FinalOctagon.html",
+"FinalOpportunityToCure.html","FinalTransmission-10Keys.html","Financial-Freedom-Helper.html",
+"FinancialFreedomHelper.html","FinancialFreedomHelper–Debt.html","FinancialFreedomSystem.html",
+"FindYourPathCOLOMBIA.html","FirstLie.html","FlatEarth.html","FleshVeil.html","FollowYourPersonalLegend.html",
+"ForbiddenBlueprint.html","ForbiddenCryptoArsenal.html","ForbiddenDiplomaticKnowledge.html",
+"ForbiddenHealingProtocols.html","ForbiddenKnowledge-TheSovereignFinancialLiberationSystem.html",
+"ForbiddenKnowledge6Year.html","ForbiddenKnowledgeBook-ANGEL.html","ForbiddenKnowledgeBook.html",
+"ForbiddenKnowledgeBook2.html","ForbiddenKnowledgeBook3.html","ForbiddenKnowledgeComplete.html",
+"ForbiddenKnowledgeJustice.html","ForbiddenKnowledgePortal2.html","ForbiddenKnowledgePowerTools-COURT.html",
+"ForbiddenKnowledgePowerTools.html","ForbiddenKnowledgeSixYear.html","ForbiddenKnowledgeToolkit.html",
+"ForbiddenQuestion.html","Forbidden_Knowledge_Arsenal.html","Forbidden_Knowledge_Freemium.html",
+"Frazzledrip.html","FrequencyShield.html","GAZA-emergencyResponse.html","GENESIS.html","GRIMOIRE.html",
+"GamifiedLibertadColombia.html","GamifiedLibertadColombiaDashboard.html","GestionesSegurosMoncada.html",
+"Gift-Financial-Freedom-Tool.html","Gift-FinancialFreedomTool.html","GlobalImpactEconomy.html",
+"GlobalLiberationCalendar.html","GodProgram.html","GospelOfThomas-TheHiddenSayingsOfJesus.html","Graphene.html",
+"GrapheneOS.html","Gringos.html","GuardianLegalShield.html","GuerraTotal.html","Gym-Parking.html","HOW-AWAKE.html",
+"HabeusCorpus.html","HantaHoax.html","HarvesterConfession.html",
+"Herramientas-para-emprendedores-de-startups.html","Himno-Leonistico-LetraOficial.html","HimnoLeonistico.html",
+"Hoss-Phoenix.html","HumanTrafficking.html","HydraShield.html","I.html","IRS.html","Illuminator_Companion.html",
+"ImmortalBlood.html","InformalWork2026.html","IntegrationHub.html","IsaacKappy.html",
+"Jax-Slaters-Free-Car-Path.html","JeffreyEpstein.html","JeffreyEpstein1.html","Jesus.html","JesusWEAPON.html",
+"JnJ.html","JoaqNJandros.html","JoaqNJandros2.html","JoaqNJandros3.html","JoaqNJandros4.html","Jonestown.html",
+"JubileeProtocol.html","JulianSwan.html","Juliana-FreedomCommandCenter.html","Juliana.html",
+"JurisdictionalChallenge.html","KNN.html","KONAMI-2026.html","KONAMI-draft.html","KONAMI.html","Kappy.html",
+"Kelly.html","KingPickle.html","KingdomBuilderSystem.html","KingdomCommunityBlueprint.html",
+"KingdomFrequency.html","LEGAL-FORBIDDEN-KNOWLEDGE.html","LEGAL-first-strike.html","LEGAL-update1.html",
+"LOVE-Frequency.html","LXXvsMT.html","Land.html","LandStewardshipAgreementHelper.html","LastElection.html",
+"LastWord.html","LegalArsenal.html","LegalShield.html","LegalSlavery.html","Leidy2.html","Leidy3.html",
+"LeidySpa..html","Lenceria.html","LiberateColombia.html","LiberationLibrary.html",
+"LibertadColombia-TruthShield2026.html","LibertadColombiaDashboard.html","LibertadColombiaDashboard2.html",
+"LibertadColombiaTruthShield2026.html","LibertadFiduciaria.html","LibertadPasaporte.html",
+"Libertad_Financiera_Colombia.html","LibertyClassroom.html","LionsClub-AccessoMiembros.html",
+"LionsClub-Calarca-Monarca-App.html","LionsClubALPHA.html","LionsClubBETA.html","LionsClub_CalarcaMonarca.html",
+"LionsDen2.html","LionsRoar.html","LivingSeedEcosystem.html","LlavesLibertad.html","LlavesLibertadTECHNICAL.html",
+"LoserLogic.html","MALKO.html","ManchurianCandidate.html","MariaFernanda.html","MariaFernandaVet.html",
+"Mariposa.html","Marroko.html","MarrokoMoto.html","MarrokoMotorcycleRent.html","MarrokoRomance.html",
+"Marroko_Motorcycle_Rentals.html","Marroko_Test.html","MartyrsApp.html","Master-Key.html","MasterPortal.html",
+"MedicalEmergencyDeclaration.html","MentalHealthCrisisSupport.html","Miembros-Lions.html",
+"MiembrosLeon-Dashboard.html","MiembrosLions-Dashboard.html",
+"MientrasTrabajasDuro-ExtranjerosGananRegistrandoNegociosColombianos.html","MonetaryTrustTheory.html",
+"MoneySpell.html","MotoColombia.html","MotoSalento.html","MountainLandNetwork.html",
+"MultiDimensionalSanctuary.html","NACU-HUB.html","NACU-NUKE.html",
+"NO-DEJES-QUE-LOS-GRINGOS-TE-QUITEN-EL-TRABAJO.html","NationOfTheAmnestyCoalitionForUnity.html",
+"NegotiableInstrumentStudio.html","NegotiableInstruments.html","NuevoBoomTuristico.html","NuevoTurismo.html",
+"OBLITERATUS.html","OFF-LIMITS.html","OMEGA-tool.html","OMEGA.html","OSINT.html","OfficialSovereigntyDeclaration.html",
+"OficinaVirtualBienesRaizClubLeonesCalarcaMonarca.html","OmegaLina.html","OneStupidFuck.html",
+"Operacion-Pavimento-Colombia.html","OperacionSalvacionColombia.html","OperacionSistemaRaiz.html",
+"OperationConstitutionalAwakening.html","OperationOrange.html","OperationPavement.html","OperationRootSystem.html",
+"Orange3.html","OrgulloPavimentoColombiano.html","Origen.ViveLaExperiencia.html","OrigenParapente.html",
+"OrigenSalento.html","PAYOUTS.html","PDF-maker.html",
+"PRESIDENT-PETRO-10-PERCENT-TOURISM-ECONOMIC-BOOM-PROGRAM-IS-ACTIVE.html","Paola.html","Paola2.html",
+"Paola3.html","Parcero.html","ParentalFinancialTool.html","PasaporteSinNumeroSeguroSocial.html","Passport.html",
+"PassportFreedom.html","PassportWithoutSSN.html","PatiosRevolucion.html","Permission.html","PetroColombia.html",
+"PhantomProphet.html","PharmaceuticalSafetyMonitor.html","PharmaceuticalSafetyMonitor2.html","PhoenixEdition.html",
+"Pijao.html","Plan-Quinquenal.html","PlanQuinquenal.html","PlanQuinquenalDigital.html","PoderProSe.html",
+"Posthumous-Release.html","PowerAudit-48Laws.html","PowerCommandCenter.html","PowerCommandCenter2.html",
+"PowerfulFinancialTools-gift.html","PrinciplesOfSovereignty-FinancialFreedom.html","ProcurementAgencies.html",
+"ProjectEsther.html","ProteccionDiplomatica.html","Public-Private.html","PublicNotice-HydraShield.html",
+"QuantumFinancialOS-CompleteDebtEliminationSystem.html","QuantumFinancialSystemInterface.html",
+"QuantumFreedomOSv2.0.html","QuantumFreedomV2.html","QuantumHabitFormation.html","QuantumResurrection.html",
+"Quimbaya-AI-multilingual.html","Quimbaya-ia-SISTEMA-ACTIVO.html","Quimbaya-ia-concurso.html",
+"Quimbaya-ia-hemi-informalwork2026.html","Quimbaya-ia-hemi-v6.1.html","Quimbaya-ia-hemi–Ligero–offline.html",
+"Quimbaya-ia-traduccion.html","Quimbaya-ia-v6-64Native.html","Quimbaya-ia-v6.1UCC.html","RAMIREZ&Ramirez.html",
+"RAMIREZ_Ramirez.html","RECOVERY.html","RICO.html","RamirezFamilyFotos.html","RamirezMoto.html",
+"RamiroRamirez-DIPLOMAT.html","RamiroRamirez-POSTHUMOUS-RELEASE.html","RamiroRamirezPosthumousProtocolActive.html",
+"RealityHackerToolkit.html","RealityReclamationMatrix.html","RecuperacionActivosIlicitos.html",
+"RefugeePathfinder.html","RevolucionDeLiberacion2.html","RevolucionDeLiberacionDigital.html",
+"RevolucionDigitalHispana.html","RevolucionandoElComercioGlobal.html","Rosary.html","RosonanciaColombiana.html",
+"SAVE-COLOMBIA-Expose-ORANGEman-Phase1.html","SOS-Commander.html","SOS-Commander=progress.html",
+"SOS-Freedom-Writer-10percent.html","SOS-Freedom-Writer.html","SOS-MatrixFreedomWriter.html","SOS-v1.html",
+"SOS-v2.0.html","SOS.html","SOSfreedomWriter.html","SOS–Freedom-Writer-esp.html","Sabores-Saberes.html",
+"SacredWound.html","SalentoChemtrail.html","SalentoSkies.html","Scutum-Fidei-DailyArmory.html",
+"ScutumFidei-QuantumSpiritualWarfare.html","ScutumFidei.html","SecureMountainNetworkContact.html",
+"SignalCannon.html","SilentKiller.html","SistemaEQUIDAD-LLAMADAS.html","Slave.html","SociedadesOffshore.html",
+"SociosEstrategicos.html","SoulRecognitionEngine.html","SourceCode.html","SoveraniaPersonal-LeyColombiana.html",
+"Sovereign-Declaration.html","SovereignFamilyCompact.html","SovereignFreedomToolEnglish.html",
+"SovereignMasterPortal-CompleteLiberationSystem.html","SovereignMasterPortal-No10.html",
+"SovereignOperatingSystem-SOS.html","Sovereign_Literacy_Platform-See_The_Fraud.htmnl","SovereignsManual.html",
+"SovereigntyActionSuite.html","SovereigntyActivationPortal.html","SovereigntyCalculator.html",
+"SovereigntyEngine-CompleteLegalLiberationSystem.html","SovereigntyEngine-CompleteLiberationSystem-vUNKNOWN.html",
+"SovereigntyEngine.html","SovereigntyEngine4.html","Spanish-DEBATE.html","StarRemphan.html",
+"StateCourtRemover.html","SteamingPile.html","StolenCenturies.html","StringsOfIllusion.html",
+"SuccessArchitecture.html","SurvivorManual.html","Syringe.html","TAROT-2026.html","TAROT.html",
+"TELEPROMPTER-PLUS.html","TEST.html","TIMECLOCK.html","TRANSCRIBE.html","TRINITY.html","TRUST.html","TRUTH.html",
+"TRUTH_EXTRACTION_ENGINE.html","Talmud-Exposer.html","Te-Damos-Trabajo.html","Te-Ocultaron-Esto.html",
+"TeDamosTrabajo-Historias.html","TeDamosTrabajo.html","TechRage.html","Teleprompter.html","TheCommandEngine.html",
+"TheCosmicWeddingManifesto.html","TheGospelOfPhilip.html","TheGrimoire.html","TheJosephProject.html",
+"TheLionsDen.html","TheNationOfTheAmnestyCoalitionForUnity.html","TheOpticGuillotine.html","TheTruthBridge.html",
+"TheTruthBridgePlatform.html","TheTruthThatWillSetYouFree.html","TheUltimateCourtCaseKiller.html",
+"TheUntouchablesExposed-DocumentedCrimesofthePowerful.html","Tick.html","Tono.html",
+"TradingAlgoritmicoInteligenciaCuántica-Leones.html","TrafficStop.html","Travel.html","Trinity-Blueprint.html",
+"TrinityJanessa.html","TrinityJanessaRamirez.html","TrinitySecretDrawer.html","TrinitySuccess.html",
+"TrinityTravel.html","TrinityTravel2.html","Trinitys-Secret-Drawer.html","TripsToColombia-APP.html",
+"TripsToColombia-SanctuaryPortico-Quimbaya-Prophet.html","TripsToColombia-SanctuaryPortico-Quimbaya.html",
+"TripsToColombia-SanctuaryPortico-Quimbaya2.html","TripsToColombia-SanctuaryPortico.html",
+"TripsToColombia-SanctuaryPortico2.html","TripsToColombia-UnforgettableAdventure.html",
+"TripsToColombia-theAPP.html","TripsToColombiaHub.html","TripsToColombiaWEBSITE.html",
+"TriuneConsciousnessBridge.html","Trump.html","Trump2.html","Trump3.html","TrumpForbiddenTruth.html",
+"TrustAssetRecovery.html","TrustFreedomEngine.html","TrustPlanning.html","TrusteeTrap.html","Truth-Activation.html",
+"TruthBridge.html","TruthResonance.html","TuDeudaYaEstaPagada.html","UCC-1.html","UCC-1_Mastery.html",
+"UCC-Accounting.html","UCC_Accounting_Engine.html","UltimateCourtCaseKiller.html","UniRed.html",
+"UnspokenNumber.html","UrgentHumanitarianCrisis.html","Urine.html","VAULT.html","VERDAD.html","VERIFY_DIPLOMAT.html",
+"VW-NUCLEAR.html","VerifiedTrump.html","VictorMendoza.html","WalkerTodd.html","WeddingPreparations.html",
+"WhatsAppClaudeBot.html","WhatsYourColombianType.html","WhereDoYouWantToGo.html","Wisdom-Of-Solomon.html",
+"WisdomOfSolomon.html","Word_Magic_Explorer.html","WritOfQuoWarranto.html","YOLO-ADVENTURE.html","YOLO-TRIP.html",
+"YOLO-itinerary.html","YOLO-logistics.html","YOLO-visual.html","YOLO2.html","YOU.html",
+"YOUR-DEBT-IS-ALREADY-PAID.html","Yolo.html","Yolo3.html","Yolo4.html","YourAwakeningJourneyStartsHere.html",
+"YourDebt-QuantumDischarged.html","YourLiberationJourneyPARADISE.html","ZeroPoint.html","calculator.html",
+"death-industry.html","ecocultura.html","examination-of-controversial-topics.html","forbidden_crypto_arsenal.html",
+"grimoire.html","hmmm.html","ice-melt.html","ice-melt2.html","imunidad-esp.html","index.html","infiltration.html",
+"libertad-cuantica-v2.html","menu.html","menu2.html","menu3.html","meta.html","meta3.html","metatest.html",
+"myfaceisachair.html","personal-message-from-AI.html","quantum-freedom-v2.html","servicios-integrales-COL.html",
+"servicios_integrales_COL.html","the-Hearth.html","theDidache.html","theRICO.html","travel-2.html",
+"untouchables1.html","zona-informal.html"
+];
+
+const BASE_URL = "http://quantum-freedom-site.vercel.app/";
+
+/* ============================================================
+   CATEGORIES — Evidence-first, not topic-first.
+   ============================================================ */
+const CATEGORIES = [
+  {id:"legal",    name:"Sovereignty & Legal",       icon:"⚖️", keywords:["sovereign","soveran","soberan","ens-legis","enslegis","constitution","jurisdiction","declaration","ucc","habeus","habeas","quo","warranto","ens legis","imunidad","immunity","diplomat","passport","birthcertificate","birth-certificate","deed","jurisdic","statute","legal-","legal","ley","leyes","nationality","nationof","nation-","officialsovereignty","sovereignsmanual","passportfreedom","passportwithout","pasaporte","protecciondiplomatica","jubilee","writof","consenttrap","trustee","landstewardship","jurisdictional","soverania","sovereignty"]},
+  {id:"court",    name:"Court & Case Tools",        icon:"🏛️", keywords:["court","carolina","ckc","contractkill","contract-kill","courtoom","courtroom","jury","caso","casekiller","case-killer","statecourt","motion","blitz","walmart","practice","armor","ramirez","writofquowarranto","ricoprosecut","therico","rico.html","contract","obliteratus"]},
+  {id:"finance",  name:"Financial Liberation",      icon:"💰", keywords:["bank","financ","debt","trust","money","monetary","credit","offshore","banca","deuda","irs","payout","payoff","crypto","cripto","negociable","negotiable","quantumfinancial","fiduciar","fideicomiso","patrimon","gift-financ","financial-freedom","payment","asset","assetrecovery","trustasset","trustfreedom","trustplanning","parentalfinancial","poderprose","invest","trading","trade","wallet","banking"]},
+  {id:"conscious",name:"Consciousness & Awakening", icon:"🧠", keywords:["awak","consciousness","conscious","quantum","zero","frequency","432","resonance","resonan","resurrect","habit","embodiment","cosmic","divine","soul","spiritual-warfare","trinity","triune","antichrist","apocalypse","genesis","phoenix","omega","godprogram","kingdomfrequency","love-frequency","love-freq","magic","word_magic","reality","hack","matrix","energy","vibra","ascend","illuminat","enlight","multidimension","sanctuary","hearth"]},
+  {id:"forbidden",name:"Forbidden & Censored",      icon:"🔓", keywords:["forbidden","banned","censored","conocimientoprohibido","conocimiento_prohibido","prohibido","off-limits","offlimits","secret","hidden","suppressed","occult","grimoire","code_leak","code-leak","steamingpile","fleshveil","vault"]},
+  {id:"spiritual",name:"Spiritual & Religious",     icon:"✝️", keywords:["gospel","bookof","bible","jesus","christ","catholic","deliverance","rosary","angel","archon","talmud","didache","wisdom","solomon","ecclesiastes","enoch","thomas","philip","psalm","prayer","scutum","fidei","exorcist","saint","holy","scripture","discoverthesuppressedscriptures","healing","miracle","exodus","sacred","wound","martyr","prophet","phantomprophet","quimbaya-prophet","hymn","himno","leonistico"]},
+  {id:"expose",   name:"Exposure & Truth",          icon:"🔍", keywords:["epstein","trump","fraud","scandal","expose","untouchable","talmud-exposer","trafficking","humantrafficking","darktruth","conspiracy","conspiracies","chemtrail","jones","jonestown","kappy","isaac","psyops","psy-ops","censoredtruth","thetruth","truthbridge","thetruthbridge","stolencenturies","firstlie","harvester","blood","bone","cannibal","frazzledrip","manchurian","verified"]},
+  {id:"colombia",name:"Colombia & Culture",         icon:"🇨🇴", keywords:["colombia","colombian","salento","origen","moto","pijao","quimbaya","sabores","saberes","cielo","cielolimpio","calarca","calarcá","eje","cafetero","andean","cultura","ecocultura","turismo","tourism","travel","trips","yolo","adventure","gringo","parcero","marroko","soulmate","gym-parking","land","mountainland","sos-commander","gaza","refugee","hispan","hispanic","espa","espanol","spanish","revolucion","revoluciondigital","orgullo","pavimento","operacion","petro","president-petro","informalwork","zona-informal","informal","gestiones","seguros","moncada","camilo","paola","leidy","maria","fernanda","angiie","carolina","juliana","cristian","diego","alvaro","victor","donjulio","ramiro","ramirez","trinidad","juan","andros"]},
+  {id:"business", name:"Business & Entrepreneurship",icon:"📈", keywords:["business","negocio","emprend","empresa","startup","ecosistema","ecosystem","club","lion","leon","kingdombuilder","blueprint","success","successarchitecture","viabilidad","viable","marketing","viral","comercio","commerce","globalimpact","procurement","socios","socioestrateg","estrategic","sociosestrategicos","conviertepasion","convierte","gym","gimnasio","agency","adventureagency","boomturistic","nuevoboom","nuevoturismo","escuelaequidad","equidad","equity","equity-","equity_","escuelac","school","classroom","libertyclassroom","education","tutorial","learning","curso","course","club-leones"]},
+  {id:"osint",    name:"OSINT & Investigation",     icon:"🕵️", keywords:["osint","investigat","investig","duck","hunter","duckhunter","surveillance","signal","signalcannon","crypto","vigilante","cryptovigilant","code","source","infiltration","infiltrat","recovery","track","tracker","detective","spy","spyware","wiretap","intercept","audit","poweraudit","verif","verid","verify","truth_extraction","truthextraction","knowledge_extraction"]},
+  {id:"health",   name:"Health & Bio",              icon:"🩺", keywords:["health","medical","pharma","vaccine","syringe","virus","covid","mental","wellness","healing","heal","hanta","hantavirus","ice-melt","icemelt","urine","toxic","toxin","chemtrail","silentkiller","silent-kill","death-industry","deathindustry","urgent","humanitarian","crisis","emergency","gaza","medicalemergency","mentalhealth"]},
+  {id:"ai",       name:"AI & Tools",                icon:"🤖", keywords:["ai","claude","gpt","llm","bot","teleprompter","transcribe","tarot","whatsapp","chatbot","deepseek","deerflow","omnibot","assistant","calculator","pdf-maker","pdfmaker","reader","free-text","widget","timeclock","tracker","notes","form","dashboard","portal","hub","system","os ","-os","_os","manager","workflow","handler","tool","suite","engine","engine-","genie","automation","script"]},
+  {id:"meta",     name:"System & Meta",             icon:"🗂️", keywords:["index","menu","meta","apphub","masterportal","master-","hub.html","test","hmmm","myfaceisachair","you.html","i.html","door","buttons","broadcast","whisper","whisperer","app.html"]}
+];
+
+function categorize(filename){
+  const f = filename.toLowerCase();
+  for (const cat of CATEGORIES){
+    for (const kw of cat.keywords){
+      if (f.includes(kw.toLowerCase())) return cat.id;
+    }
+  }
+  return "meta";
+}
+
+const $search = document.getElementById('search');
+const $sort   = document.getElementById('sort');
+const $cats   = document.getElementById('cats');
+const $files  = document.getElementById('files');
+const $stats  = document.getElementById('stats');
+const $footerStat = document.getElementById('footer-stat');
+
+let activeCat = 'all';
+
+const FILES = FILE_LIST.map((name,i)=>({
+  name,
+  idx:i,
+  cat:categorize(name),
+  url:BASE_URL + name
+}));
+
+function buildCats(){
+  const counts = {};
+  FILES.forEach(f=>counts[f.cat]=(counts[f.cat]||0)+1);
+  const all = document.createElement('button');
+  all.className = 'cat-btn active';
+  all.dataset.cat = 'all';
+  all.innerHTML = `🌐 ALL <span class="count">${FILES.length}</span>`;
+  all.onclick = ()=>setCat('all');
+  $cats.appendChild(all);
+
+  CATEGORIES.forEach(c=>{
+    if(!counts[c.id]) return;
+    const b = document.createElement('button');
+    b.className='cat-btn';
+    b.dataset.cat=c.id;
+    b.innerHTML=`${c.icon} ${c.name.toUpperCase()} <span class="count">${counts[c.id]}</span>`;
+    b.onclick=()=>setCat(c.id);
+    $cats.appendChild(b);
+  });
+}
+
+function setCat(id){
+  activeCat=id;
+  document.querySelectorAll('.cat-btn').forEach(b=>b.classList.toggle('active',b.dataset.cat===id));
+  render();
+}
+
+function render(){
+  const q = $search.value.trim().toLowerCase();
+  const sort = $sort.value;
+
+  let list = FILES.filter(f=>{
+    if(activeCat!=='all' && f.cat!==activeCat) return false;
+    if(q && !f.name.toLowerCase().includes(q) && !f.cat.toLowerCase().includes(q)) return false;
+    return true;
+  });
+
+  if(sort==='name') list.sort((a,b)=>a.name.localeCompare(b.name));
+  else if(sort==='cat') list.sort((a,b)=>a.cat.localeCompare(b.cat)||a.name.localeCompare(b.name));
+  else list.sort((a,b)=>a.idx-b.idx);
+
+  $files.innerHTML = list.length ? '' :
+    `<div class="empty">No files match. Try clearing the search.</div>`;
+
+  list.forEach(f=>{
+    const cat = CATEGORIES.find(c=>c.id===f.cat) || {icon:'🗂️',name:'System'};
+    const a = document.createElement('a');
+    a.className='file';
+    a.href=f.url;
+    a.target='_blank';
+    a.rel='noopener';
+    a.innerHTML=`<div class="name">${f.name}</div>
+      <div class="meta"><span class="cat-tag">${cat.icon} ${cat.name}</span></div>`;
+    $files.appendChild(a);
+  });
+
+  $footerStat.textContent = `Showing ${list.length} of ${FILES.length} files · Category: ${activeCat}`;
+}
+
+function buildStats(){
+  const cats = new Set(FILES.map(f=>f.cat)).size;
+  $stats.innerHTML=`
+    <div class="stat"><b>${FILES.length}</b>FILES LOADED</div>
+    <div class="stat"><b>${cats}</b>CATEGORIES ACTIVE</div>
+    <div class="stat"><b>${CATEGORIES.length}</b>CATEGORIES TOTAL</div>
+    <div class="stat"><b>PHASE 1</b>THE RECORD</div>`;
+}
+
+$search.addEventListener('input',render);
+$sort.addEventListener('change',render);
+
+buildStats();
+buildCats();
+render();
+</script>
+</body>
+</html>
