@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Master Graph - Forbidden Knowledge</title>
+<style>
+:root {
+  --bg-void: #030305;
+  --bg-deep: #07070c;
+  --bg-panel: #0a0a12;
+  --bg-card: #0f0f18;
+  --accent-gold: #d4af37;
+  --accent-fire: #ff4500;
+  --accent-blood: #8b0000;
+  --accent-ice: #00d4ff;
+  --accent-green: #2ecc71;
+  --accent-purple: #9b59b6;
+  --accent-tesla: #00bcd4;
+  --text-primary: #f0f0f5;
+  --text-secondary: #a0a0b0;
+  --text-dim: #505060;
+  --border: #151520;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: var(--bg-void);
+  color: var(--text-primary);
+  line-height: 1.9;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(212, 175, 55, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 0% 50%, rgba(0, 212, 255, 0.04) 0%, transparent 40%),
+    radial-gradient(ellipse at 100% 50%, rgba(139, 0, 0, 0.04) 0%, transparent 40%),
+    radial-gradient(ellipse at 50% 100%, rgba(155, 89, 182, 0.03) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: -2;
+  animation: breathe 15s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+.stars {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: -1;
+  overflow: hidden;
+}
+
+.star {
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+  animation: pulse 6s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.03; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.4); }
+}
+
+.app-header {
+  background: linear-gradient(180deg, rgba(3, 3, 5, 0.99), rgba(3, 3, 5, 0.95));
+  border-bottom: 1px solid var(--accent-gold);
+  padding: 1.25rem 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(30px);
+}
+
+.header-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.logo { display: flex; align-items: center; gap: 0.75rem; }
+
+.logo-icon {
+  width: 50px; height: 50px;
+  background: radial-gradient(circle at 30% 30%, var(--accent-gold), var(--accent-fire), var(--accent-blood));
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.5rem;
+  box-shadow: 0 0 50px rgba(212, 175, 55, 0.5);
+  animation: logo-breathe 4s ease-in-out infinite;
+}
+
+@keyframes logo-breathe {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 30px rgba(212, 175, 55, 0.4); }
+  50% { transform: scale(1.08); box-shadow: 0 0 80px rgba(212, 175, 55, 0.8); }
+}
+
+.logo-text { font-size: 1.1rem; font-weight: 700; letter-spacing: 1px; }
+.logo-text span { color: var(--accent-gold); }
+
+.banner {
+  background: linear-gradient(90deg, rgba(212, 175, 55, 0.8), rgba(139, 0, 0, 0.7), rgba(212, 175, 55, 0.8));
+  border-bottom: 2px solid var(--accent-gold);
+  padding: 1rem 2rem;
+  text-align: center;
+}
+
+.banner p {
+  color: white;
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 1px;
+}
+
+.main-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.hero {
+  text-align: center;
+  padding: 4rem 0 3rem;
+}
+
+.hero h1 {
+  font-size: clamp(2rem, 6vw, 4rem);
+  font-weight: 900;
+  background: linear-gradient(135deg, var(--accent-gold), var(--accent-fire), var(--accent-ice));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 1rem;
+}
+
+.hero .subtitle {
+  font-size: 1.2rem;
+  color: var(--text-secondary);
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+/* Graph Container */
+.graph-container {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  margin: 2rem 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.graph-container h2 {
+  font-size: 1.3rem;
+  color: var(--accent-gold);
+  margin-bottom: 1rem;
+}
+
+#graph-canvas {
+  width: 100%;
+  height: 600px;
+  background: var(--bg-void);
+  border-radius: 12px;
+  display: block;
+}
+
+.graph-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  justify-content: center;
+}
+
+.graph-btn {
+  padding: 0.5rem 1rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.graph-btn:hover, .graph-btn.active {
+  background: var(--accent-gold);
+  color: var(--bg-void);
+  border-color: var(--accent-gold);
+}
+
+/* Stats */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+
+.stat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--accent-gold);
+  border-radius: 0 0 12px 12px;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.stat-card .value {
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: var(--accent-gold);
+  line-height: 1;
+}
+
+.stat-card .label {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+}
+
+/* Data Table */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 2rem 0;
+  font-size: 0.9rem;
+}
+
+.data-table th {
+  background: var(--bg-panel);
+  color: var(--accent-gold);
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 2px solid var(--accent-gold);
+  font-weight: 700;
+}
+
+.data-table td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+
+.data-table tr:hover {
+  background: rgba(212, 175, 55, 0.05);
+}
+
+.data-table .status {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.status.assassinated { background: rgba(231, 76, 60, 0.15); color: #e74c3c; border: 1px solid rgba(231, 76, 60, 0.3); }
+.status.disputed { background: rgba(155, 89, 182, 0.15); color: #9b59b6; border: 1px solid rgba(155, 89, 182, 0.3); }
+.status.military { background: rgba(74, 158, 255, 0.15); color: #4a9eff; border: 1px solid rgba(74, 158, 255, 0.3); }
+.status.suicide { background: rgba(243, 156, 18, 0.15); color: #f39c12; border: 1px solid rgba(243, 156, 18, 0.3); }
+.status.natural { background: rgba(46, 204, 113, 0.15); color: #2ecc71; border: 1px solid rgba(46, 204, 113, 0.3); }
+.status.unknown { background: rgba(100, 116, 139, 0.15); color: #64748b; border: 1px solid rgba(100, 116, 139, 0.3); }
+
+/* Search */
+.search-bar {
+  width: 100%;
+  padding: 1rem 1.5rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 50px;
+  color: var(--text-primary);
+  font-size: 1rem;
+  margin: 1.5rem 0;
+  font-family: inherit;
+}
+
+.search-bar:focus {
+  outline: none;
+  border-color: var(--accent-gold);
+}
+
+.search-bar::placeholder {
+  color: var(--text-dim);
+}
+
+/* Footer */
+.app-footer {
+  text-align: center;
+  padding: 4rem 2rem;
+  border-top: 1px solid var(--border);
+  margin-top: 4rem;
+}
+
+.app-footer .blessing {
+  color: var(--accent-gold);
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.app-footer a { color: var(--accent-gold); text-decoration: none; }
+
+@media (max-width: 768px) {
+  .main-container { padding: 1rem; }
+  .hero h1 { font-size: 2rem; }
+  #graph-canvas { height: 400px; }
+  .data-table { font-size: 0.8rem; }
+  .data-table th, .data-table td { padding: 0.5rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<header class="app-header">
+  <div class="header-content">
+    <div class="logo">
+      <div class="logo-icon">📊</div>
+      <div class="logo-text">THE MASTER <span>GRAPH</span></div>
+    </div>
+  </div>
+</header>
+
+<div class="banner">
+  <p>📊 THE ANALYTICAL LAYER — VISUALIZING THE PATTERN OF SILENCING ACROSS DECADES AND CONTINENTS</p>
+</div>
+
+<main class="main-container">
+
+  <section class="hero">
+    <h1>THE MASTER GRAPH</h1>
+    <p class="subtitle">Every name. Every death. Every connection. The pattern they don't want you to see.</p>
+  </section>
+
+  <!-- Stats -->
+  <section class="stats-grid" id="stats-container">
+    <div class="stat-card">
+      <div class="value" id="total-cases">0</div>
+      <div class="label">Total Cases</div>
+    </div>
+    <div class="stat-card">
+      <div class="value" id="total-assassinated">0</div>
+      <div class="label">Assassinated</div>
+    </div>
+    <div class="stat-card">
+      <div class="value" id="total-disputed">0</div>
+      <div class="label">Disputed</div>
+    </div>
+    <div class="stat-card">
+      <div class="value" id="total-countries">0</div>
+      <div class="label">Countries</div>
+    </div>
+    <div class="stat-card">
+      <div class="value" id="total-decades">0</div>
+      <div class="label">Decades Spanned</div>
+    </div>
+  </section>
+
+  <!-- Search -->
+  <input type="text" class="search-bar" id="search-input" placeholder="Search by name, country, category, or year...">
+
+  <!-- Graph -->
+  <div class="graph-container">
+    <h2>📈 NETWORK VISUALIZATION</h2>
+    <canvas id="graph-canvas"></canvas>
+    <div class="graph-controls">
+      <button class="graph-btn active" data-filter="all">All Cases</button>
+      <button class="graph-btn" data-filter="assassinated">Assassinated</button>
+      <button class="graph-btn" data-filter="disputed">Disputed</button>
+      <button class="graph-btn" data-filter="military">Military Strikes</button>
+      <button class="graph-btn" data-filter="suicide">Suicide Ruled</button>
+      <button class="graph-btn" data-filter="natural">Natural Causes</button>
+    </div>
+  </div>
+
+  <!-- Data Table -->
+  <div class="graph-container">
+    <h2>📋 COMPLETE CASE DATABASE</h2>
+    <table class="data-table" id="case-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Category</th>
+          <th>Country</th>
+          <th>Year</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="table-body">
+        <!-- Filled by JS -->
+      </tbody>
+    </table>
+  </div>
+
+</main>
+
+<footer class="app-footer">
+  <div class="blessing">✝ Soli Deo Gloria ✝</div>
+  <p>The pattern is the proof.</p>
+  <p style="margin-top: 1rem;">Brought to you by <a href="https://ForbiddenKnowledge.substack.com">ForbiddenKnowledge.substack.com</a></p>
+</footer>
+
+<script>
+// ============================================
+// MASTER DATABASE
+// ============================================
+const CASES = [
+  // ISRAEL CRITICS - HISTORICAL
+  { name: "Jacob Israël de Haan", category: "Israel Critic", country: "Netherlands/Israel", year: 1924, status: "assassinated", x: 100, y: 100 },
+  { name: "Aaron Samuel Tamares", category: "Israel Critic", country: "Poland", year: 1961, status: "natural", x: 120, y: 150 },
+  { name: "Edwin Montagu", category: "Israel Critic", country: "UK", year: 1924, status: "natural", x: 90, y: 120 },
+  { name: "Moshe Menuhin", category: "Israel Critic", country: "Germany/US", year: 1983, status: "natural", x: 200, y: 200 },
+  { name: "Lessing Rosenwald", category: "Israel Critic", country: "USA", year: 1979, status: "natural", x: 210, y: 210 },
+  { name: "Felicia Langer", category: "Israel Critic", country: "Israel/Germany", year: 2018, status: "natural", x: 300, y: 250 },
+  { name: "Ghassan Kanafani", category: "Israel Critic", country: "Lebanon", year: 1972, status: "assassinated", x: 250, y: 180 },
+  { name: "Wael Zuaiter", category: "Israel Critic", country: "Italy", year: 1972, status: "assassinated", x: 260, y: 190 },
+  { name: "Mahmoud Hamshari", category: "Israel Critic", country: "France", year: 1972, status: "assassinated", x: 270, y: 200 },
+  { name: "Hussein Bashir Abu Khair", category: "Israel Critic", country: "Cyprus", year: 1973, status: "assassinated", x: 280, y: 210 },
+  { name: "Basil al-Kubaisi", category: "Israel Critic", country: "France", year: 1973, status: "assassinated", x: 290, y: 220 },
+  { name: "Kamal Nasser", category: "Israel Critic", country: "Lebanon", year: 1973, status: "assassinated", x: 300, y: 230 },
+  { name: "Kamal Adwan", category: "Israel Critic", country: "Lebanon", year: 1973, status: "assassinated", x: 310, y: 240 },
+  { name: "Abu Yusuf al-Najjar", category: "Israel Critic", country: "Lebanon", year: 1973, status: "assassinated", x: 320, y: 250 },
+  { name: "Zaid al-Muqsi", category: "Israel Critic", country: "Greece", year: 1973, status: "assassinated", x: 330, y: 260 },
+  { name: "Abdul Hamid Shibli", category: "Israel Critic", country: "Italy", year: 1973, status: "assassinated", x: 340, y: 270 },
+  { name: "Abdul Hadi al-Naqqa", category: "Israel Critic", country: "Italy", year: 1973, status: "assassinated", x: 350, y: 280 },
+  { name: "Mohammed Boudia", category: "Israel Critic", country: "France", year: 1973, status: "assassinated", x: 360, y: 290 },
+  { name: "Ahmed Bouchiki", category: "Israel Critic", country: "Norway", year: 1973, status: "military", x: 370, y: 300 },
+  { name: "Ali Hassan Salameh", category: "Israel Critic", country: "Lebanon", year: 1979, status: "assassinated", x: 380, y: 310 },
+  { name: "Majed Abu Sharar", category: "Israel Critic", country: "Italy", year: 1981, status: "assassinated", x: 390, y: 320 },
+  { name: "Khalil al-Wazir (Abu Jihad)", category: "Israel Critic", country: "Tunisia", year: 1988, status: "assassinated", x: 400, y: 330 },
+  { name: "Abu Ali Mustafa", category: "Israel Critic", country: "Palestine", year: 2001, status: "assassinated", x: 410, y: 340 },
+  { name: "Ahmed Yassin", category: "Israel Critic", country: "Palestine", year: 2004, status: "assassinated", x: 420, y: 350 },
+  { name: "Abdel Aziz al-Rantisi", category: "Israel Critic", country: "Palestine", year: 2004, status: "assassinated", x: 430, y: 360 },
+  { name: "Salah Shehadeh", category: "Israel Critic", country: "Palestine", year: 2002, status: "assassinated", x: 440, y: 370 },
+  { name: "Jamal Abu Samhadana", category: "Israel Critic", country: "Palestine", year: 2006, status: "assassinated", x: 450, y: 380 },
+  { name: "Imad Mughniyeh", category: "Israel Critic", country: "Syria", year: 2008, status: "assassinated", x: 460, y: 390 },
+  { name: "Mahmoud al-Mabhouh", category: "Israel Critic", country: "UAE", year: 2010, status: "assassinated", x: 470, y: 400 },
+  { name: "Ahmad Jabari", category: "Israel Critic", country: "Palestine", year: 2012, status: "assassinated", x: 480, y: 410 },
+  { name: "Bahaa Abu al-Ata", category: "Israel Critic", country: "Palestine", year: 2019, status: "assassinated", x: 490, y: 420 },
+  { name: "Fadi al-Batsh", category: "Israel Critic", country: "Malaysia", year: 2018, status: "assassinated", x: 500, y: 430 },
+  { name: "Saleh al-Arouri", category: "Israel Critic", country: "Lebanon", year: 2024, status: "assassinated", x: 510, y: 440 },
+  { name: "Ismail Haniyeh", category: "Israel Critic", country: "Iran", year: 2024, status: "assassinated", x: 520, y: 450 },
+  { name: "Yahya Sinwar", category: "Israel Critic", country: "Palestine", year: 2024, status: "military", x: 530, y: 460 },
+  { name: "Mohammed Deif", category: "Israel Critic", country: "Palestine", year: 2024, status: "assassinated", x: 540, y: 470 },
+  { name: "Hassan Nasrallah", category: "Israel Critic", country: "Lebanon", year: 2024, status: "assassinated", x: 550, y: 480 },
+  { name: "Fouad Shukur", category: "Israel Critic", country: "Lebanon", year: 2024, status: "assassinated", x: 560, y: 490 },
+  { name: "Seyed Razi Mousavi", category: "Israel Critic", country: "Syria", year: 2023, status: "assassinated", x: 570, y: 500 },
+  { name: "Elias Khoury", category: "Israel Critic", country: "Lebanon", year: 2024, status: "natural", x: 580, y: 510 },
+  { name: "Leïla Shahid", category: "Israel Critic", country: "Palestine", year: 2026, status: "natural", x: 590, y: 520 },
+  { name: "Edgar Morin", category: "Israel Critic", country: "France", year: 2026, status: "natural", x: 600, y: 530 },
+  { name: "Sion Assidon", category: "Israel Critic", country: "Morocco", year: 2025, status: "natural", x: 610, y: 540 },
+  { name: "Chaim Tzvi Freiman", category: "Israel Critic", country: "Israel", year: 2026, status: "natural", x: 620, y: 550 },
+  { name: "Khatoon Salma Kershet", category: "Israel Critic", country: "Lebanon", year: 2026, status: "military", x: 630, y: 560 },
+  { name: "Hind Rajab", category: "Israel Critic", country: "Palestine", year: 2024, status: "military", x: 640, y: 570 },
+  { name: "Khaled Nabhan", category: "Israel Critic", country: "Palestine", year: 2024, status: "military", x: 650, y: 580 },
+  { name: "Reem", category: "Israel Critic", country: "Palestine", year: 2023, status: "military", x: 660, y: 590 },
+  { name: "Tareq", category: "Israel Critic", country: "Palestine", year: 2023, status: "military", x: 670, y: 600 },
+  { name: "Nadim Shamseddine", category: "Israel Critic", country: "Lebanon", year: 2026, status: "military", x: 680, y: 610 },
+  { name: "Ola Attar", category: "Israel Critic", country: "Lebanon", year: 2026, status: "military", x: 690, y: 620 },
+  { name: "Talin Ahmed Hamzi", category: "Israel Critic", country: "Lebanon", year: 2026, status: "military", x: 700, y: 630 },
+  { name: "Yasmin Hussein Allam", category: "Israel Critic", country: "Lebanon", year: 2026, status: "military", x: 710, y: 640 },
+  { name: "Maya Muhammad Balaghi", category: "Israel Critic", country: "Lebanon", year: 2026, status: "military", x: 720, y: 650 },
+  { name: "Lina Hassan Afif Issa", category: "Israel Critic", country: "Lebanon", year: 2026, status: "military", x: 730, y: 660 },
+  { name: "Rayan Haidar Shuaib", category: "Israel Critic", country: "Lebanon", year: 2026, status: "military", x: 740, y: 670 },
+  { name: "Rahma Haidar Shuaib", category: "Israel Critic", country: "Lebanon", year: 2026, status: "military", x: 750, y: 680 },
+  { name: "Jad Ghandour", category: "Israel Critic", country: "Lebanon", year: 2026, status: "military", x: 760, y: 690 },
+  { name: "Wadie Haddad", category: "Israel Critic", country: "Germany", year: 1978, status: "unknown", x: 770, y: 700 },
+  { name: "Anis Sayegh", category: "Israel Critic", country: "Palestine", year: 0, status: "unknown", x: 780, y: 710 },
+  { name: "Bassam Abu Sharif", category: "Israel Critic", country: "Palestine", year: 0, status: "unknown", x: 790, y: 720 },
+
+  // DOCTORS
+  { name: "Dr. Herbert Needleman", category: "Doctor", country: "USA", year: 2017, status: "natural", x: 100, y: 400 },
+  { name: "Dr. Claus Knapp", category: "Doctor", country: "Spain/Germany", year: 2026, status: "natural", x: 150, y: 420 },
+  { name: "Dr. Rashid Buttar", category: "Doctor", country: "USA", year: 2023, status: "disputed", x: 200, y: 440 },
+  { name: "Dr. Jeff Bradstreet", category: "Doctor", country: "USA", year: 2015, status: "suicide", x: 250, y: 460 },
+  { name: "Dr. Bruce Hedendal", category: "Doctor", country: "USA", year: 2015, status: "natural", x: 300, y: 480 },
+  { name: "Dr. Theresa Ann Sievers", category: "Doctor", country: "USA", year: 2015, status: "military", x: 350, y: 500 },
+  { name: "Dr. Jeffrey Whiteside", category: "Doctor", country: "USA", year: 2016, status: "suicide", x: 400, y: 520 },
+  { name: "Dr. Patrick Fitzpatrick", category: "Doctor", country: "USA", year: 2016, status: "unknown", x: 450, y: 540 },
+  { name: "Dr. Alaa al-Najjar", category: "Doctor", country: "Palestine", year: 2026, status: "military", x: 500, y: 560 },
+  { name: "Frank Suárez", category: "Doctor", country: "Puerto Rico", year: 2021, status: "disputed", x: 550, y: 580 },
+
+  // ACTORS
+  { name: "Isaac Kappy", category: "Actor", country: "USA", year: 2019, status: "disputed", x: 100, y: 700 },
+  { name: "Matthew Perry", category: "Actor", country: "USA", year: 2023, status: "natural", x: 150, y: 720 },
+  { name: "Hayden Panettiere", category: "Actor", country: "USA", year: 2026, status: "disputed", x: 200, y: 740 },
+  { name: "Mohammad Bakri", category: "Actor", country: "Palestine", year: 2025, status: "natural", x: 250, y: 760 },
+  { name: "Awni Eldous", category: "Actor", country: "Palestine", year: 2023, status: "military", x: 300, y: 780 },
+
+  // SINGERS
+  { name: "Chris Cornell", category: "Singer", country: "USA", year: 2017, status: "disputed", x: 100, y: 850 },
+  { name: "Chester Bennington", category: "Singer", country: "USA", year: 2017, status: "disputed", x: 150, y: 870 },
+  { name: "Bob Marley", category: "Singer", country: "Jamaica", year: 1981, status: "disputed", x: 200, y: 890 },
+  { name: "Fatima Amhaz", category: "Singer", country: "Lebanon", year: 2026, status: "military", x: 250, y: 910 },
+  { name: "Suzanne Khalil", category: "Singer", country: "Lebanon", year: 2026, status: "military", x: 300, y: 930 },
+
+  // OFFICIALS
+  { name: "Jorge Enrique Pizano", category: "Official", country: "Colombia", year: 2018, status: "disputed", x: 600, y: 100 },
+  { name: "Pedro Jorge de Melo e Silva", category: "Official", country: "Brazil", year: 1982, status: "assassinated", x: 650, y: 120 },
+  { name: "Hasan Bitmez", category: "Official", country: "Turkey", year: 2023, status: "disputed", x: 700, y: 140 },
+  { name: "Mahmoud Ahmadinejad", category: "Official", country: "Iran", year: 2026, status: "military", x: 750, y: 160 },
+  { name: "Charlie Kirk", category: "Official", country: "USA", year: 2025, status: "unknown", x: 800, y: 180 },
+
+  // JOURNALISTS
+  { name: "Liz MacKean", category: "Journalist", country: "UK", year: 2017, status: "disputed", x: 100, y: 1000 },
+  { name: "Jill Dando", category: "Journalist", country: "UK", year: 1999, status: "military", x: 150, y: 1020 },
+  { name: "Liz Crokin", category: "Journalist", country: "USA", year: 0, status: "unknown", x: 200, y: 1040 },
+  { name: "Ayman al-Rafati", category: "Journalist", country: "Palestine", year: 2024, status: "military", x: 250, y: 1060 },
+  { name: "Ismail Al Ghoul", category: "Journalist", country: "Palestine", year: 2024, status: "military", x: 300, y: 1080 },
+  { name: "Ahmed Washah", category: "Journalist", country: "Palestine", year: 2024, status: "military", x: 350, y: 1100 },
+  { name: "Islam Hisham Quneita", category: "Journalist", country: "Palestine", year: 2024, status: "military", x: 400, y: 1120 },
+  { name: "Mohammed Washah", category: "Journalist", country: "Palestine", year: 2024, status: "military", x: 450, y: 1140 },
+  { name: "Amal Shamali", category: "Journalist", country: "Palestine", year: 2024, status: "military", x: 500, y: 1160 },
+  { name: "Anas Ghoneim", category: "Journalist", country: "Palestine", year: 2024, status: "military", x: 550, y: 1180 },
+  { name: "Abdul Raouf Shaath", category: "Journalist", country: "Palestine", year: 2024, status: "military", x: 600, y: 1200 },
+  { name: "Salah Qashta", category: "Journalist", country: "Palestine", year: 2024, status: "military", x: 650, y: 1220 },
+  { name: "Mahmoud Wadi", category: "Journalist", country: "Palestine", year: 2024, status: "military", x: 700, y: 1240 },
+  { name: "Mohammed Al-Munirawi", category: "Journalist", country: "Palestine", year: 2024, status: "military", x: 750, y: 1260 },
+  { name: "Ahmed Abu Mutair", category: "Journalist", country: "Palestine", year: 2024, status: "military", x: 800, y: 1280 },
+  { name: "Fatma Hassouna", category: "Journalist", country: "Palestine", year: 2026, status: "military", x: 850, y: 1300 },
+  { name: "Ghada Dayekh", category: "Journalist", country: "Lebanon", year: 2026, status: "military", x: 900, y: 1320 },
+
+  // SYNAGOGUE OF SATAN
+  { name: "David Wilcock", category: "SOS", country: "USA", year: 2026, status: "disputed", x: 100, y: 1400 },
+  { name: "Jeffrey Epstein", category: "SOS", country: "USA", year: 2019, status: "disputed", x: 150, y: 1420 },
+  { name: "Ghislaine Maxwell", category: "SOS", country: "USA", year: 0, status: "unknown", x: 200, y: 1440 },
+  { name: "Simon Andriesz", category: "SOS", country: "UK/Thailand", year: 2026, status: "disputed", x: 250, y: 1460 },
+  { name: "Virginia Giuffre", category: "SOS", country: "USA/Australia", year: 2025, status: "disputed", x: 300, y: 1480 },
+  { name: "Joseph Recarey", category: "SOS", country: "USA", year: 2018, status: "unknown", x: 350, y: 1500 },
+  { name: "Alfredo Rodriguez", category: "SOS", country: "USA", year: 2014, status: "natural", x: 400, y: 1520 },
+  { name: "Shoshana Strook", category: "SOS", country: "Israel", year: 2026, status: "disputed", x: 450, y: 1540 },
+  { name: "Joe Felz", category: "SOS", country: "USA", year: 2026, status: "disputed", x: 500, y: 1560 },
+  { name: "Randy Mills", category: "SOS", country: "USA", year: 2026, status: "unknown", x: 550, y: 1580 },
+
+  // COLOMBIA 112
+  { name: "Arnobio Pérez", category: "Colombia 112", country: "Colombia", year: 2026, status: "assassinated", x: 100, y: 1700 },
+  { name: "Héctor Bastidas Ibarra", category: "Colombia 112", country: "Colombia", year: 2026, status: "assassinated", x: 150, y: 1720 },
+  { name: "Mateo Pérez Rueda", category: "Colombia 112", country: "Colombia", year: 2026, status: "assassinated", x: 200, y: 1740 },
+  { name: "Cristian Herrera", category: "Colombia 112", country: "Colombia", year: 2026, status: "assassinated", x: 250, y: 1760 },
+  { name: "Julián Andrés Hincapié", category: "Colombia 112", country: "Colombia", year: 2026, status: "assassinated", x: 300, y: 1780 },
+  { name: "Freiman David Velásquez", category: "Colombia 112", country: "Colombia", year: 2026, status: "assassinated", x: 350, y: 1800 },
+  { name: "José Deifer Giraldo", category: "Colombia 112", country: "Colombia", year: 2026, status: "assassinated", x: 400, y: 1820 },
+  { name: "Yerlín Andrey Giraldo", category: "Colombia 112", country: "Colombia", year: 2026, status: "assassinated", x: 450, y: 1840 },
+  { name: "Pedro Luis González", category: "Colombia 112", country: "Colombia", year: 2026, status: "assassinated", x: 500, y: 1860 },
+  { name: "Luis Enrique Rojas", category: "Colombia 112", country: "Colombia", year: 0, status: "disputed", x: 550, y: 1880 },
+  { name: "Laura Camila Peña Beltrán", category: "Colombia 112", country: "Colombia", year: 0, status: "disputed", x: 600, y: 1900 },
+  { name: "Gustavo Petro", category: "Colombia 112", country: "Colombia", year: 0, status: "disputed", x: 650, y: 1920 }
+];
+
+// ============================================
+// STATS
+// ============================================
+function updateStats() {
+  document.getElementById('total-cases').textContent = CASES.length;
+  document.getElementById('total-assassinated').textContent = CASES.filter(c => c.status === 'assassinated').length;
+  document.getElementById('total-disputed').textContent = CASES.filter(c => c.status === 'disputed').length;
+  
+  const countries = [...new Set(CASES.map(c => c.country.split('/')[0]))];
+  document.getElementById('total-countries').textContent = countries.length;
+  
+  const years = CASES.map(c => c.year).filter(y => y > 0);
+  const decades = [...new Set(years.map(y => Math.floor(y / 10) * 10))];
+  document.getElementById('total-decades').textContent = decades.length;
+}
+
+// ============================================
+// TABLE
+// ============================================
+function renderTable(filter = 'all', search = '') {
+  const tbody = document.getElementById('table-body');
+  let filtered = CASES;
+  
+  if (filter !== 'all') {
+    filtered = filtered.filter(c => c.status === filter);
+  }
+  
+  if (search) {
+    const s = search.toLowerCase();
+    filtered = filtered.filter(c => 
+      c.name.toLowerCase().includes(s) ||
+      c.category.toLowerCase().includes(s) ||
+      c.country.toLowerCase().includes(s) ||
+      (c.year > 0 && c.year.toString().includes(s))
+    );
+  }
+  
+  tbody.innerHTML = filtered.map(c => `
+    <tr>
+      <td>${c.name}</td>
+      <td>${c.category}</td>
+      <td>${c.country}</td>
+      <td>${c.year > 0 ? c.year : '—'}</td>
+      <td><span class="status ${c.status}">${c.status}</span></td>
+    </tr>
+  `).join('');
+}
+
+// ============================================
+// GRAPH
+// ============================================
+const canvas = document.getElementById('graph-canvas');
+const ctx = canvas.getContext('2d');
+
+function resizeCanvas() {
+  canvas.width = canvas.offsetWidth;
+  canvas.height = canvas.offsetHeight;
+  drawGraph();
+}
+
+function drawGraph(filter = 'all') {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  
+  // Background
+  ctx.fillStyle = '#030305';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  
+  let filtered = CASES;
+  if (filter !== 'all') {
+    filtered = filtered.filter(c => c.status === filter);
+  }
+  
+  // Scale positions to canvas
+  const maxX = Math.max(...CASES.map(c => c.x)) + 100;
+  const maxY = Math.max(...CASES.map(c => c.y)) + 100;
+  const scaleX = canvas.width / maxX;
+  const scaleY = canvas.height / maxY;
+  const scale = Math.min(scaleX, scaleY);
+  
+  // Draw connections (lines between cases from same category)
+  const categories = {};
+  filtered.forEach(c => {
+    if (!categories[c.category]) categories[c.category] = [];
+    categories[c.category].push(c);
+  });
+  
+  Object.values(categories).forEach(group => {
+    ctx.strokeStyle = 'rgba(212, 175, 55, 0.1)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i < group.length - 1; i++) {
+      ctx.beginPath();
+      ctx.moveTo(group[i].x * scale, group[i].y * scale);
+      ctx.lineTo(group[i+1].x * scale, group[i+1].y * scale);
+      ctx.stroke();
+    }
+  });
+  
+  // Draw nodes
+  const colors = {
+    assassinated: '#e74c3c',
+    disputed: '#9b59b6',
+    military: '#4a9eff',
+    suicide: '#f39c12',
+    natural: '#2ecc71',
+    unknown: '#64748b'
+  };
+  
+  filtered.forEach(c => {
+    const x = c.x * scale;
+    const y = c.y * scale;
+    const color = colors[c.status] || '#64748b';
+    
+    // Glow
+    ctx.beginPath();
+    ctx.arc(x, y, 8, 0, Math.PI * 2);
+    ctx.fillStyle = color + '40';
+    ctx.fill();
+    
+    // Node
+    ctx.beginPath();
+    ctx.arc(x, y, 4, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.fill();
+    
+    // Label
+    ctx.fillStyle = 'rgba(240, 240, 245, 0.6)';
+    ctx.font = '10px Segoe UI';
+    ctx.textAlign = 'left';
+    ctx.fillText(c.name, x + 8, y + 4);
+  });
+}
+
+// ============================================
+// EVENTS
+// ============================================
+document.querySelectorAll('.graph-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.graph-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const filter = btn.getAttribute('data-filter');
+    drawGraph(filter);
+    renderTable(filter, document.getElementById('search-input').value);
+  });
+});
+
+document.getElementById('search-input').addEventListener('input', (e) => {
+  const activeFilter = document.querySelector('.graph-btn.active')?.getAttribute('data-filter') || 'all';
+  renderTable(activeFilter, e.target.value);
+});
+
+window.addEventListener('resize', resizeCanvas);
+
+// ============================================
+// INIT
+// ============================================
+updateStats();
+renderTable();
+resizeCanvas();
+</script>
+
+</body>
+</html>
