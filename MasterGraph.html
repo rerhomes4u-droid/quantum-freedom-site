@@ -1,0 +1,1798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+<title>The Master Graph v2.0 - Forbidden Knowledge</title>
+<style>
+:root {
+  --bg-void: #030305;
+  --bg-deep: #07070c;
+  --bg-panel: #0a0a12;
+  --bg-card: #0f0f18;
+  --accent-gold: #d4af37;
+  --accent-fire: #ff4500;
+  --accent-blood: #8b0000;
+  --accent-ice: #00d4ff;
+  --accent-green: #2ecc71;
+  --accent-purple: #9b59b6;
+  --accent-tesla: #00bcd4;
+  --accent-orange: #f39c12;
+  --accent-slate: #64748b;
+  --text-primary: #f0f0f5;
+  --text-secondary: #a0a0b0;
+  --text-dim: #505060;
+  --border: #151520;
+  --node-assassinated: #e74c3c;
+  --node-disputed: #9b59b6;
+  --node-military: #4a9eff;
+  --node-suicide: #f39c12;
+  --node-natural: #2ecc71;
+  --node-unknown: #64748b;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: var(--bg-void);
+  color: var(--text-primary);
+  line-height: 1.7;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(212, 175, 55, 0.06) 0%, transparent 50%),
+    radial-gradient(ellipse at 0% 50%, rgba(0, 212, 255, 0.04) 0%, transparent 40%),
+    radial-gradient(ellipse at 100% 50%, rgba(139, 0, 0, 0.04) 0%, transparent 40%);
+  pointer-events: none;
+  z-index: -2;
+}
+
+.stars {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: -1;
+  overflow: hidden;
+}
+
+.star {
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+  animation: pulse 6s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.03; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.4); }
+}
+
+.app-header {
+  background: linear-gradient(180deg, rgba(3, 3, 5, 0.99), rgba(3, 3, 5, 0.95));
+  border-bottom: 1px solid var(--accent-gold);
+  padding: 1rem 1.5rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(30px);
+}
+
+.header-content {
+  max-width: 1600px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.logo { display: flex; align-items: center; gap: 0.75rem; }
+
+.logo-icon {
+  width: 44px; height: 44px;
+  background: radial-gradient(circle at 30% 30%, var(--accent-gold), var(--accent-fire), var(--accent-blood));
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.3rem;
+  box-shadow: 0 0 40px rgba(212, 175, 55, 0.5);
+  animation: logo-breathe 4s ease-in-out infinite;
+}
+
+@keyframes logo-breathe {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 25px rgba(212, 175, 55, 0.4); }
+  50% { transform: scale(1.05); box-shadow: 0 0 60px rgba(212, 175, 55, 0.8); }
+}
+
+.logo-text { font-size: 1rem; font-weight: 700; letter-spacing: 1px; }
+.logo-text span { color: var(--accent-gold); }
+
+.banner {
+  background: linear-gradient(90deg, rgba(212, 175, 55, 0.8), rgba(139, 0, 0, 0.7), rgba(212, 175, 55, 0.8));
+  border-bottom: 2px solid var(--accent-gold);
+  padding: 0.75rem 1.5rem;
+  text-align: center;
+}
+
+.banner p {
+  color: white;
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+}
+
+.main-container {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+/* Stats */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.stat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-top: 3px solid var(--accent-gold);
+  border-radius: 0 0 10px 10px;
+  padding: 1rem;
+  text-align: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.stat-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(212, 175, 55, 0.15);
+}
+
+.stat-card .value {
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: var(--accent-gold);
+  line-height: 1;
+}
+
+.stat-card .label {
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Graph Container */
+.graph-container {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+  position: relative;
+}
+
+.graph-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg-card);
+}
+
+.graph-header h2 {
+  font-size: 1.1rem;
+  color: var(--accent-gold);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.graph-stats {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.graph-stats span {
+  padding: 0.25rem 0.75rem;
+  background: var(--bg-panel);
+  border-radius: 50px;
+  border: 1px solid var(--border);
+}
+
+.graph-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 1rem 1.5rem;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  align-items: center;
+}
+
+.toolbar-group {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding-right: 0.75rem;
+  border-right: 1px solid var(--border);
+}
+
+.toolbar-group:last-child { border-right: none; }
+
+.toolbar-label {
+  font-size: 0.7rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-right: 0.25rem;
+}
+
+.toolbar-btn {
+  padding: 0.4rem 0.75rem;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 0.75rem;
+  font-family: inherit;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.toolbar-btn:hover, .toolbar-btn.active {
+  background: var(--accent-gold);
+  color: var(--bg-void);
+  border-color: var(--accent-gold);
+}
+
+/* Graph Canvas */
+.graph-viewport {
+  position: relative;
+  width: 100%;
+  height: 600px;
+  background: var(--bg-void);
+  cursor: grab;
+  overflow: hidden;
+  touch-action: none;
+}
+
+.graph-viewport:active { cursor: grabbing; }
+
+#graph-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Tooltip */
+.tooltip {
+  position: absolute;
+  background: rgba(0, 0, 0, 0.95);
+  border: 1px solid var(--accent-gold);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-size: 0.8rem;
+  color: var(--text-primary);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  max-width: 280px;
+  z-index: 10;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8);
+}
+
+.tooltip.visible { opacity: 1; }
+
+.tooltip .tt-name {
+  font-weight: 700;
+  color: var(--accent-gold);
+  margin-bottom: 0.25rem;
+}
+
+.tooltip .tt-meta {
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+.tooltip .tt-status {
+  display: inline-block;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-top: 0.25rem;
+}
+
+/* Legend */
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 0.75rem 1.5rem;
+  background: var(--bg-card);
+  border-top: 1px solid var(--border);
+  font-size: 0.75rem;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+.legend-item:hover { background: var(--bg-panel); }
+
+.legend-item.inactive { opacity: 0.3; }
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  box-shadow: 0 0 8px currentColor;
+}
+
+/* Detail Panel */
+.detail-panel {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 320px;
+  max-height: calc(100% - 2rem);
+  background: rgba(10, 10, 18, 0.98);
+  border: 1px solid var(--accent-gold);
+  border-radius: 12px;
+  padding: 1.25rem;
+  overflow-y: auto;
+  display: none;
+  z-index: 20;
+  backdrop-filter: blur(20px);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.9);
+}
+
+.detail-panel.visible { display: block; }
+
+.detail-panel .close-btn {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.detail-panel h3 {
+  color: var(--accent-gold);
+  font-size: 1rem;
+  margin-bottom: 0.75rem;
+  padding-right: 2rem;
+}
+
+.detail-panel .detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.85rem;
+}
+
+.detail-panel .detail-row .key {
+  color: var(--text-dim);
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  letter-spacing: 0.5px;
+}
+
+.detail-panel .detail-row .val {
+  color: var(--text-primary);
+  text-align: right;
+}
+
+/* Search */
+.search-container {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.search-bar {
+  width: 100%;
+  padding: 0.9rem 1.25rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 50px;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-family: inherit;
+  transition: border-color 0.2s ease;
+}
+
+.search-bar:focus {
+  outline: none;
+  border-color: var(--accent-gold);
+}
+
+.search-bar::placeholder { color: var(--text-dim); }
+
+.search-results {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: var(--bg-card);
+  border: 1px solid var(--accent-gold);
+  border-radius: 12px;
+  margin-top: 0.5rem;
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 50;
+  display: none;
+}
+
+.search-results.visible { display: block; }
+
+.search-result-item {
+  padding: 0.75rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  font-size: 0.85rem;
+  transition: background 0.15s ease;
+}
+
+.search-result-item:hover {
+  background: rgba(212, 175, 55, 0.1);
+}
+
+.search-result-item:last-child { border-bottom: none; }
+
+.search-result-item .sr-name {
+  color: var(--accent-gold);
+  font-weight: 600;
+}
+
+.search-result-item .sr-meta {
+  color: var(--text-dim);
+  font-size: 0.75rem;
+}
+
+/* Timeline */
+.timeline-container {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  margin-bottom: 1.5rem;
+  padding: 1.5rem;
+  display: none;
+}
+
+.timeline-container.visible { display: block; }
+
+.timeline-container h2 {
+  font-size: 1.1rem;
+  color: var(--accent-gold);
+  margin-bottom: 1rem;
+}
+
+#timeline-canvas {
+  width: 100%;
+  height: 200px;
+  display: block;
+  background: var(--bg-void);
+  border-radius: 8px;
+}
+
+/* Table */
+.table-container {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+}
+
+.table-header {
+  padding: 1rem 1.5rem;
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.table-header h2 {
+  font-size: 1.1rem;
+  color: var(--accent-gold);
+}
+
+.table-count {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.data-table thead th {
+  background: var(--bg-card);
+  color: var(--accent-gold);
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 2px solid var(--accent-gold);
+  font-weight: 700;
+  position: sticky;
+  top: 0;
+  cursor: pointer;
+  user-select: none;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.data-table thead th:hover {
+  background: rgba(212, 175, 55, 0.1);
+}
+
+.data-table thead th .sort-arrow {
+  margin-left: 0.4rem;
+  opacity: 0.4;
+  font-size: 0.7rem;
+}
+
+.data-table thead th.sorted .sort-arrow { opacity: 1; color: var(--accent-gold); }
+
+.data-table td {
+  padding: 0.6rem 1rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+
+.data-table tr {
+  transition: background 0.15s ease;
+  cursor: pointer;
+}
+
+.data-table tr:hover { background: rgba(212, 175, 55, 0.06); }
+
+.data-table .name-cell { color: var(--text-primary); font-weight: 500; }
+
+.status-badge {
+  display: inline-block;
+  padding: 0.2rem 0.55rem;
+  border-radius: 4px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-badge.assassinated { background: rgba(231, 76, 60, 0.15); color: var(--node-assassinated); border: 1px solid rgba(231, 76, 60, 0.3); }
+.status-badge.disputed { background: rgba(155, 89, 182, 0.15); color: var(--node-disputed); border: 1px solid rgba(155, 89, 182, 0.3); }
+.status-badge.military { background: rgba(74, 158, 255, 0.15); color: var(--node-military); border: 1px solid rgba(74, 158, 255, 0.3); }
+.status-badge.suicide { background: rgba(243, 156, 18, 0.15); color: var(--node-suicide); border: 1px solid rgba(243, 156, 18, 0.3); }
+.status-badge.natural { background: rgba(46, 204, 113, 0.15); color: var(--node-natural); border: 1px solid rgba(46, 204, 113, 0.3); }
+.status-badge.unknown { background: rgba(100, 116, 139, 0.15); color: var(--node-unknown); border: 1px solid rgba(100, 116, 139, 0.3); }
+
+/* Footer */
+.app-footer {
+  text-align: center;
+  padding: 2.5rem 1.5rem;
+  border-top: 1px solid var(--border);
+  margin-top: 2rem;
+}
+
+.app-footer .blessing {
+  color: var(--accent-gold);
+  font-size: 1rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.app-footer p {
+  color: var(--text-dim);
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+}
+
+.app-footer a { color: var(--accent-gold); text-decoration: none; }
+
+@media (max-width: 768px) {
+  .main-container { padding: 0.75rem; }
+  .graph-viewport { height: 400px; }
+  .graph-toolbar { padding: 0.75rem; }
+  .toolbar-group { border-right: none; padding-right: 0; }
+  .detail-panel {
+    position: fixed;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-height: 60vh;
+    border-radius: 16px 16px 0 0;
+  }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .stat-card .value { font-size: 1.4rem; }
+  .search-bar { font-size: 0.85rem; padding: 0.75rem 1rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<header class="app-header">
+  <div class="header-content">
+    <div class="logo">
+      <div class="logo-icon">📊</div>
+      <div class="logo-text">THE MASTER <span>GRAPH</span> v2.0</div>
+    </div>
+  </div>
+</header>
+
+<div class="banner">
+  <p>📊 INTERACTIVE VISUALIZATION — ZOOM, PAN, CLICK, EXPLORE. THE PATTERN IS THE PROOF.</p>
+</div>
+
+<main class="main-container">
+
+  <!-- Stats -->
+  <section class="stats-grid">
+    <div class="stat-card" data-filter="all">
+      <div class="value" id="stat-total">0</div>
+      <div class="label">Total Cases</div>
+    </div>
+    <div class="stat-card" data-filter="assassinated">
+      <div class="value" id="stat-assassinated">0</div>
+      <div class="label">Assassinated</div>
+    </div>
+    <div class="stat-card" data-filter="military">
+      <div class="value" id="stat-military">0</div>
+      <div class="label">Military Strikes</div>
+    </div>
+    <div class="stat-card" data-filter="disputed">
+      <div class="value" id="stat-disputed">0</div>
+      <div class="label">Disputed</div>
+    </div>
+    <div class="stat-card" data-filter="suicide">
+      <div class="value" id="stat-suicide">0</div>
+      <div class="label">Suicide Ruled</div>
+    </div>
+    <div class="stat-card" data-filter="countries">
+      <div class="value" id="stat-countries">0</div>
+      <div class="label">Countries</div>
+    </div>
+  </section>
+
+  <!-- Search -->
+  <div class="search-container">
+    <input type="text" class="search-bar" id="search-input" placeholder="🔍 Search by name, country, category, or year...">
+    <div class="search-results" id="search-results"></div>
+  </div>
+
+  <!-- Graph -->
+  <div class="graph-container">
+    <div class="graph-header">
+      <h2>📈 NETWORK VISUALIZATION</h2>
+      <div class="graph-stats">
+        <span id="graph-visible-count">Showing: 0</span>
+        <span id="graph-zoom-level">Zoom: 100%</span>
+      </div>
+    </div>
+    
+    <div class="graph-toolbar">
+      <div class="toolbar-group">
+        <span class="toolbar-label">Layout</span>
+        <button class="toolbar-btn active" data-layout="cluster">Cluster</button>
+        <button class="toolbar-btn" data-layout="timeline">Timeline</button>
+        <button class="toolbar-btn" data-layout="radial">Radial</button>
+        <button class="toolbar-btn" data-layout="grid">Grid</button>
+      </div>
+      
+      <div class="toolbar-group">
+        <span class="toolbar-label">Group</span>
+        <button class="toolbar-btn active" data-group="category">Category</button>
+        <button class="toolbar-btn" data-group="country">Country</button>
+        <button class="toolbar-btn" data-group="decade">Decade</button>
+      </div>
+      
+      <div class="toolbar-group">
+        <span class="toolbar-label">Filter</span>
+        <button class="toolbar-btn active" data-filter="all">All</button>
+        <button class="toolbar-btn" data-filter="assassinated">Assassinated</button>
+        <button class="toolbar-btn" data-filter="disputed">Disputed</button>
+        <button class="toolbar-btn" data-filter="military">Military</button>
+      </div>
+      
+      <div class="toolbar-group">
+        <button class="toolbar-btn" id="btn-reset">🔄 Reset View</button>
+        <button class="toolbar-btn" id="btn-export">💾 Export PNG</button>
+        <button class="toolbar-btn" id="btn-timeline-toggle">📅 Timeline</button>
+      </div>
+    </div>
+    
+    <div class="graph-viewport" id="graph-viewport">
+      <canvas id="graph-canvas"></canvas>
+      <div class="tooltip" id="tooltip">
+        <div class="tt-name"></div>
+        <div class="tt-meta"></div>
+      </div>
+      
+      <div class="detail-panel" id="detail-panel">
+        <button class="close-btn" id="detail-close">✕</button>
+        <h3 id="detail-name">Name</h3>
+        <div id="detail-body"></div>
+      </div>
+    </div>
+    
+    <div class="legend" id="legend">
+      <div class="legend-item" data-legend="assassinated">
+        <span class="legend-dot" style="background: var(--node-assassinated); color: var(--node-assassinated);"></span>
+        Assassinated
+      </div>
+      <div class="legend-item" data-legend="military">
+        <span class="legend-dot" style="background: var(--node-military); color: var(--node-military);"></span>
+        Military Strike
+      </div>
+      <div class="legend-item" data-legend="disputed">
+        <span class="legend-dot" style="background: var(--node-disputed); color: var(--node-disputed);"></span>
+        Disputed
+      </div>
+      <div class="legend-item" data-legend="suicide">
+        <span class="legend-dot" style="background: var(--node-suicide); color: var(--node-suicide);"></span>
+        Suicide Ruled
+      </div>
+      <div class="legend-item" data-legend="natural">
+        <span class="legend-dot" style="background: var(--node-natural); color: var(--node-natural);"></span>
+        Natural Causes
+      </div>
+      <div class="legend-item" data-legend="unknown">
+        <span class="legend-dot" style="background: var(--node-unknown); color: var(--node-unknown);"></span>
+        Unknown
+      </div>
+    </div>
+  </div>
+
+  <!-- Timeline -->
+  <div class="timeline-container" id="timeline-container">
+    <h2>📅 TIMELINE VIEW</h2>
+    <canvas id="timeline-canvas"></canvas>
+  </div>
+
+  <!-- Table -->
+  <div class="table-container">
+    <div class="table-header">
+      <h2>📋 COMPLETE CASE DATABASE</h2>
+      <span class="table-count" id="table-count">0 cases</span>
+    </div>
+    <div class="table-wrapper">
+      <table class="data-table" id="case-table">
+        <thead>
+          <tr>
+            <th data-sort="name">Name <span class="sort-arrow">↕</span></th>
+            <th data-sort="category">Category <span class="sort-arrow">↕</span></th>
+            <th data-sort="country">Country <span class="sort-arrow">↕</span></th>
+            <th data-sort="year">Year <span class="sort-arrow">↕</span></th>
+            <th data-sort="status">Status <span class="sort-arrow">↕</span></th>
+          </tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+</main>
+
+<footer class="app-footer">
+  <div class="blessing">✝ Soli Deo Gloria ✝</div>
+  <p>The pattern is the proof.</p>
+  <p style="margin-top: 0.5rem;">Brought to you by ForbiddenKnowledge.substack.com</p>
+</footer>
+
+<script>
+// ============================================
+// CASE DATA
+// ============================================
+const CASES = [
+  { name: "Jacob Israël de Haan", category: "Israel Critic", country: "Netherlands", year: 1924, status: "assassinated" },
+  { name: "Aaron Samuel Tamares", category: "Israel Critic", country: "Poland", year: 1961, status: "natural" },
+  { name: "Edwin Montagu", category: "Israel Critic", country: "UK", year: 1924, status: "natural" },
+  { name: "Moshe Menuhin", category: "Israel Critic", country: "Germany", year: 1983, status: "natural" },
+  { name: "Lessing Rosenwald", category: "Israel Critic", country: "USA", year: 1979, status: "natural" },
+  { name: "Felicia Langer", category: "Israel Critic", country: "Israel", year: 2018, status: "natural" },
+  { name: "Ghassan Kanafani", category: "Israel Critic", country: "Lebanon", year: 1972, status: "assassinated" },
+  { name: "Wael Zuaiter", category: "Israel Critic", country: "Italy", year: 1972, status: "assassinated" },
+  { name: "Mahmoud Hamshari", category: "Israel Critic", country: "France", year: 1972, status: "assassinated" },
+  { name: "Hussein Bashir Abu Khair", category: "Israel Critic", country: "Cyprus", year: 1973, status: "assassinated" },
+  { name: "Basil al-Kubaisi", category: "Israel Critic", country: "France", year: 1973, status: "assassinated" },
+  { name: "Kamal Nasser", category: "Israel Critic", country: "Lebanon", year: 1973, status: "assassinated" },
+  { name: "Kamal Adwan", category: "Israel Critic", country: "Lebanon", year: 1973, status: "assassinated" },
+  { name: "Abu Yusuf al-Najjar", category: "Israel Critic", country: "Lebanon", year: 1973, status: "assassinated" },
+  { name: "Zaid al-Muqsi", category: "Israel Critic", country: "Greece", year: 1973, status: "assassinated" },
+  { name: "Abdul Hamid Shibli", category: "Israel Critic", country: "Italy", year: 1973, status: "assassinated" },
+  { name: "Abdul Hadi al-Naqqa", category: "Israel Critic", country: "Italy", year: 1973, status: "assassinated" },
+  { name: "Mohammed Boudia", category: "Israel Critic", country: "France", year: 1973, status: "assassinated" },
+  { name: "Ahmed Bouchiki", category: "Israel Critic", country: "Norway", year: 1973, status: "military" },
+  { name: "Ali Hassan Salameh", category: "Israel Critic", country: "Lebanon", year: 1979, status: "assassinated" },
+  { name: "Majed Abu Sharar", category: "Israel Critic", country: "Italy", year: 1981, status: "assassinated" },
+  { name: "Khalil al-Wazir", category: "Israel Critic", country: "Tunisia", year: 1988, status: "assassinated" },
+  { name: "Abu Ali Mustafa", category: "Israel Critic", country: "Palestine", year: 2001, status: "assassinated" },
+  { name: "Ahmed Yassin", category: "Israel Critic", country: "Palestine", year: 2004, status: "assassinated" },
+  { name: "Abdel Aziz al-Rantisi", category: "Israel Critic", country: "Palestine", year: 2004, status: "assassinated" },
+  { name: "Salah Shehadeh", category: "Israel Critic", country: "Palestine", year: 2002, status: "assassinated" },
+  { name: "Jamal Abu Samhadana", category: "Israel Critic", country: "Palestine", year: 2006, status: "assassinated" },
+  { name: "Imad Mughniyeh", category: "Israel Critic", country: "Syria", year: 2008, status: "assassinated" },
+  { name: "Mahmoud al-Mabhouh", category: "Israel Critic", country: "UAE", year: 2010, status: "assassinated" },
+  { name: "Ahmad Jabari", category: "Israel Critic", country: "Palestine", year: 2012, status: "assassinated" },
+  { name: "Bahaa Abu al-Ata", category: "Israel Critic", country: "Palestine", year: 2019, status: "assassinated" },
+  { name: "Fadi al-Batsh", category: "Israel Critic", country: "Malaysia", year: 2018, status: "assassinated" },
+  { name: "Saleh al-Arouri", category: "Israel Critic", country: "Lebanon", year: 2024, status: "assassinated" },
+  { name: "Ismail Haniyeh", category: "Israel Critic", country: "Iran", year: 2024, status: "assassinated" },
+  { name: "Yahya Sinwar", category: "Israel Critic", country: "Palestine", year: 2024, status: "military" },
+  { name: "Mohammed Deif", category: "Israel Critic", country: "Palestine", year: 2024, status: "assassinated" },
+  { name: "Hassan Nasrallah", category: "Israel Critic", country: "Lebanon", year: 2024, status: "assassinated" },
+  { name: "Fouad Shukur", category: "Israel Critic", country: "Lebanon", year: 2024, status: "assassinated" },
+  { name: "Seyed Razi Mousavi", category: "Israel Critic", country: "Syria", year: 2023, status: "assassinated" },
+  { name: "Elias Khoury", category: "Israel Critic", country: "Lebanon", year: 2024, status: "natural" },
+  { name: "Leïla Shahid", category: "Israel Critic", country: "Palestine", year: 2026, status: "natural" },
+  { name: "Edgar Morin", category: "Israel Critic", country: "France", year: 2026, status: "natural" },
+  { name: "Sion Assidon", category: "Israel Critic", country: "Morocco", year: 2025, status: "natural" },
+  { name: "Chaim Tzvi Freiman", category: "Israel Critic", country: "Israel", year: 2026, status: "natural" },
+  { name: "Khatoon Salma Kershet", category: "Israel Critic", country: "Lebanon", year: 2026, status: "military" },
+  { name: "Hind Rajab", category: "Israel Critic", country: "Palestine", year: 2024, status: "military" },
+  { name: "Khaled Nabhan", category: "Israel Critic", country: "Palestine", year: 2024, status: "military" },
+  { name: "Nadim Shamseddine", category: "Israel Critic", country: "Lebanon", year: 2026, status: "military" },
+  { name: "Ola Attar", category: "Israel Critic", country: "Lebanon", year: 2026, status: "military" },
+  { name: "Talin Ahmed Hamzi", category: "Israel Critic", country: "Lebanon", year: 2026, status: "military" },
+  { name: "Yasmin Hussein Allam", category: "Israel Critic", country: "Lebanon", year: 2026, status: "military" },
+  { name: "Maya Muhammad Balaghi", category: "Israel Critic", country: "Lebanon", year: 2026, status: "military" },
+  { name: "Lina Hassan Afif Issa", category: "Israel Critic", country: "Lebanon", year: 2026, status: "military" },
+  { name: "Rayan Haidar Shuaib", category: "Israel Critic", country: "Lebanon", year: 2026, status: "military" },
+  { name: "Rahma Haidar Shuaib", category: "Israel Critic", country: "Lebanon", year: 2026, status: "military" },
+  { name: "Jad Ghandour", category: "Israel Critic", country: "Lebanon", year: 2026, status: "military" },
+  { name: "Wadie Haddad", category: "Israel Critic", country: "Germany", year: 1978, status: "unknown" },
+  
+  { name: "Dr. Herbert Needleman", category: "Doctor", country: "USA", year: 2017, status: "natural" },
+  { name: "Dr. Claus Knapp", category: "Doctor", country: "Spain", year: 2026, status: "natural" },
+  { name: "Dr. Rashid Buttar", category: "Doctor", country: "USA", year: 2023, status: "disputed" },
+  { name: "Dr. Jeff Bradstreet", category: "Doctor", country: "USA", year: 2015, status: "suicide" },
+  { name: "Dr. Bruce Hedendal", category: "Doctor", country: "USA", year: 2015, status: "natural" },
+  { name: "Dr. Theresa Ann Sievers", category: "Doctor", country: "USA", year: 2015, status: "military" },
+  { name: "Dr. Jeffrey Whiteside", category: "Doctor", country: "USA", year: 2016, status: "suicide" },
+  { name: "Dr. Patrick Fitzpatrick", category: "Doctor", country: "USA", year: 2016, status: "unknown" },
+  { name: "Dr. Alaa al-Najjar", category: "Doctor", country: "Palestine", year: 2026, status: "military" },
+  { name: "Frank Suárez", category: "Doctor", country: "Puerto Rico", year: 2021, status: "disputed" },
+  
+  { name: "Isaac Kappy", category: "Actor", country: "USA", year: 2019, status: "disputed" },
+  { name: "Matthew Perry", category: "Actor", country: "USA", year: 2023, status: "natural" },
+  { name: "Hayden Panettiere", category: "Actor", country: "USA", year: 2026, status: "disputed" },
+  { name: "Mohammad Bakri", category: "Actor", country: "Palestine", year: 2025, status: "natural" },
+  { name: "Awni Eldous", category: "Actor", country: "Palestine", year: 2023, status: "military" },
+  
+  { name: "Chris Cornell", category: "Singer", country: "USA", year: 2017, status: "disputed" },
+  { name: "Chester Bennington", category: "Singer", country: "USA", year: 2017, status: "disputed" },
+  { name: "Bob Marley", category: "Singer", country: "Jamaica", year: 1981, status: "disputed" },
+  { name: "Fatima Amhaz", category: "Singer", country: "Lebanon", year: 2026, status: "military" },
+  { name: "Suzanne Khalil", category: "Singer", country: "Lebanon", year: 2026, status: "military" },
+  
+  { name: "Jorge Enrique Pizano", category: "Official", country: "Colombia", year: 2018, status: "disputed" },
+  { name: "Pedro Jorge de Melo", category: "Official", country: "Brazil", year: 1982, status: "assassinated" },
+  { name: "Hasan Bitmez", category: "Official", country: "Turkey", year: 2023, status: "disputed" },
+  { name: "Mahmoud Ahmadinejad", category: "Official", country: "Iran", year: 2026, status: "military" },
+  
+  { name: "Liz MacKean", category: "Journalist", country: "UK", year: 2017, status: "disputed" },
+  { name: "Jill Dando", category: "Journalist", country: "UK", year: 1999, status: "military" },
+  { name: "Ayman al-Rafati", category: "Journalist", country: "Palestine", year: 2024, status: "military" },
+  { name: "Ismail Al Ghoul", category: "Journalist", country: "Palestine", year: 2024, status: "military" },
+  { name: "Ahmed Washah", category: "Journalist", country: "Palestine", year: 2024, status: "military" },
+  { name: "Islam Hisham Quneita", category: "Journalist", country: "Palestine", year: 2024, status: "military" },
+  { name: "Mohammed Washah", category: "Journalist", country: "Palestine", year: 2024, status: "military" },
+  { name: "Amal Shamali", category: "Journalist", country: "Palestine", year: 2024, status: "military" },
+  { name: "Fatma Hassouna", category: "Journalist", country: "Palestine", year: 2026, status: "military" },
+  { name: "Ghada Dayekh", category: "Journalist", country: "Lebanon", year: 2026, status: "military" },
+  
+  { name: "David Wilcock", category: "SOS", country: "USA", year: 2026, status: "disputed" },
+  { name: "Jeffrey Epstein", category: "SOS", country: "USA", year: 2019, status: "disputed" },
+  { name: "Simon Andriesz", category: "SOS", country: "UK", year: 2026, status: "disputed" },
+  { name: "Virginia Giuffre", category: "SOS", country: "USA", year: 2025, status: "disputed" },
+  { name: "Joseph Recarey", category: "SOS", country: "USA", year: 2018, status: "unknown" },
+  { name: "Alfredo Rodriguez", category: "SOS", country: "USA", year: 2014, status: "natural" },
+  { name: "Shoshana Strook", category: "SOS", country: "Israel", year: 2026, status: "disputed" },
+  { name: "Joe Felz", category: "SOS", country: "USA", year: 2026, status: "disputed" },
+  { name: "Randy Mills", category: "SOS", country: "USA", year: 2026, status: "unknown" },
+  
+  { name: "Arnobio Pérez", category: "Colombia 112", country: "Colombia", year: 2026, status: "assassinated" },
+  { name: "Héctor Bastidas Ibarra", category: "Colombia 112", country: "Colombia", year: 2026, status: "assassinated" },
+  { name: "Mateo Pérez Rueda", category: "Colombia 112", country: "Colombia", year: 2026, status: "assassinated" },
+  { name: "Cristian Herrera", category: "Colombia 112", country: "Colombia", year: 2026, status: "assassinated" },
+  { name: "Julián Andrés Hincapié", category: "Colombia 112", country: "Colombia", year: 2026, status: "assassinated" },
+  { name: "Freiman David Velásquez", category: "Colombia 112", country: "Colombia", year: 2026, status: "assassinated" },
+  { name: "José Deifer Giraldo", category: "Colombia 112", country: "Colombia", year: 2026, status: "assassinated" },
+  { name: "Yerlín Andrey Giraldo", category: "Colombia 112", country: "Colombia", year: 2026, status: "assassinated" },
+  { name: "Pedro Luis González", category: "Colombia 112", country: "Colombia", year: 2026, status: "assassinated" },
+  { name: "Luis Enrique Rojas", category: "Colombia 112", country: "Colombia", year: 0, status: "disputed" },
+  { name: "Laura Camila Peña", category: "Colombia 112", country: "Colombia", year: 0, status: "disputed" },
+  { name: "Gustavo Petro", category: "Colombia 112", country: "Colombia", year: 0, status: "disputed" }
+];
+
+// ============================================
+// STATE
+// ============================================
+const state = {
+  layout: 'cluster',
+  groupBy: 'category',
+  filter: 'all',
+  selectedStatuses: new Set(['assassinated', 'disputed', 'military', 'suicide', 'natural', 'unknown']),
+  search: '',
+  zoom: 1,
+  panX: 0,
+  panY: 0,
+  selectedNode: null,
+  hoveredNode: null,
+  tableSort: { key: 'name', dir: 1 },
+  showTimeline: false
+};
+
+// ============================================
+// UTILS
+// ============================================
+const statusColors = {
+  assassinated: '#e74c3c',
+  disputed: '#9b59b6',
+  military: '#4a9eff',
+  suicide: '#f39c12',
+  natural: '#2ecc71',
+  unknown: '#64748b'
+};
+
+const statusLabels = {
+  assassinated: 'Assassinated',
+  disputed: 'Disputed',
+  military: 'Military Strike',
+  suicide: 'Suicide Ruled',
+  natural: 'Natural Causes',
+  unknown: 'Unknown'
+};
+
+function getFilteredCases() {
+  let filtered = CASES;
+  if (state.filter !== 'all') {
+    filtered = filtered.filter(c => c.status === state.filter);
+  }
+  filtered = filtered.filter(c => state.selectedStatuses.has(c.status));
+  if (state.search) {
+    const s = state.search.toLowerCase();
+    filtered = filtered.filter(c => 
+      c.name.toLowerCase().includes(s) ||
+      c.category.toLowerCase().includes(s) ||
+      c.country.toLowerCase().includes(s) ||
+      (c.year > 0 && c.year.toString().includes(s))
+    );
+  }
+  return filtered;
+}
+
+// ============================================
+// LAYOUTS
+// ============================================
+function computeLayout(cases, width, height) {
+  const layout = {};
+  const padding = 60;
+  const usableW = width - padding * 2;
+  const usableH = height - padding * 2;
+
+  if (state.layout === 'cluster') {
+    // Group by state.groupBy
+    const groups = {};
+    cases.forEach(c => {
+      const key = state.groupBy === 'decade' ? Math.floor(c.year / 10) * 10 : c[state.groupBy];
+      if (!groups[key]) groups[key] = [];
+      groups[key].push(c);
+    });
+    
+    const groupKeys = Object.keys(groups);
+    const cols = Math.ceil(Math.sqrt(groupKeys.length));
+    const rows = Math.ceil(groupKeys.length / cols);
+    const cellW = usableW / cols;
+    const cellH = usableH / rows;
+    
+    groupKeys.forEach((key, i) => {
+      const col = i % cols;
+      const row = Math.floor(i / cols);
+      const cx = padding + col * cellW + cellW / 2;
+      const cy = padding + row * cellH + cellH / 2;
+      
+      const group = groups[key];
+      const radius = Math.min(cellW, cellH) * 0.35;
+      
+      group.forEach((c, j) => {
+        if (group.length === 1) {
+          layout[c.name] = { x: cx, y: cy };
+        } else {
+          const angle = (j / group.length) * Math.PI * 2;
+          layout[c.name] = {
+            x: cx + Math.cos(angle) * radius,
+            y: cy + Math.sin(angle) * radius
+          };
+        }
+      });
+    });
+  } else if (state.layout === 'timeline') {
+    // X = year, Y = jittered by category
+    const years = cases.map(c => c.year).filter(y => y > 0);
+    const minYear = Math.min(...years) || 1900;
+    const maxYear = Math.max(...years) || 2030;
+    const yearRange = maxYear - minYear || 1;
+    
+    const categories = [...new Set(cases.map(c => c.category))];
+    const catIndex = {};
+    categories.forEach((cat, i) => catIndex[cat] = i);
+    
+    cases.forEach(c => {
+      const year = c.year > 0 ? c.year : minYear + yearRange / 2;
+      const x = padding + ((year - minYear) / yearRange) * usableW;
+      const cat = catIndex[c.category] || 0;
+      const y = padding + (cat / Math.max(categories.length - 1, 1)) * usableH;
+      layout[c.name] = { x, y };
+    });
+  } else if (state.layout === 'radial') {
+    // Categories arranged in circle, cases around each category
+    const categories = [...new Set(cases.map(c => c.category))];
+    const cx = width / 2;
+    const cy = height / 2;
+    const outerRadius = Math.min(usableW, usableH) * 0.4;
+    
+    categories.forEach((cat, i) => {
+      const angle = (i / categories.length) * Math.PI * 2 - Math.PI / 2;
+      const catX = cx + Math.cos(angle) * outerRadius;
+      const catY = cy + Math.sin(angle) * outerRadius;
+      
+      const group = cases.filter(c => c.category === cat);
+      const innerRadius = Math.min(60, outerRadius * 0.2);
+      
+      group.forEach((c, j) => {
+        if (group.length === 1) {
+          layout[c.name] = { x: catX, y: catY };
+        } else {
+          const innerAngle = (j / group.length) * Math.PI * 2;
+          layout[c.name] = {
+            x: catX + Math.cos(innerAngle) * innerRadius,
+            y: catY + Math.sin(innerAngle) * innerRadius
+          };
+        }
+      });
+    });
+  } else { // grid
+    const cols = Math.ceil(Math.sqrt(cases.length));
+    const rows = Math.ceil(cases.length / cols);
+    const cellW = usableW / cols;
+    const cellH = usableH / rows;
+    
+    cases.forEach((c, i) => {
+      const col = i % cols;
+      const row = Math.floor(i / cols);
+      layout[c.name] = {
+        x: padding + col * cellW + cellW / 2,
+        y: padding + row * cellH + cellH / 2
+      };
+    });
+  }
+  
+  return layout;
+}
+
+// ============================================
+// CANVAS
+// ============================================
+const canvas = document.getElementById('graph-canvas');
+const ctx = canvas.getContext('2d');
+const viewport = document.getElementById('graph-viewport');
+const tooltip = document.getElementById('tooltip');
+
+let canvasWidth = 0;
+let canvasHeight = 0;
+let nodePositions = {};
+let currentCases = [];
+let dpr = window.devicePixelRatio || 1;
+
+function resizeCanvas() {
+  const rect = viewport.getBoundingClientRect();
+  canvasWidth = rect.width;
+  canvasHeight = rect.height;
+  
+  canvas.width = canvasWidth * dpr;
+  canvas.height = canvasHeight * dpr;
+  canvas.style.width = canvasWidth + 'px';
+  canvas.style.height = canvasHeight + 'px';
+  
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  
+  drawGraph();
+  drawTimeline();
+}
+
+function drawGraph() {
+  ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+  
+  // Background grid
+  drawGrid();
+  
+  currentCases = getFilteredCases();
+  
+  if (currentCases.length === 0) {
+    ctx.fillStyle = '#505060';
+    ctx.font = '16px Segoe UI';
+    ctx.textAlign = 'center';
+    ctx.fillText('No cases match the current filters', canvasWidth / 2, canvasHeight / 2);
+    return;
+  }
+  
+  // Compute layout without zoom/pan
+  nodePositions = computeLayout(currentCases, canvasWidth, canvasHeight);
+  
+  // Apply zoom/pan transform
+  ctx.save();
+  ctx.translate(state.panX, state.panY);
+  ctx.scale(state.zoom, state.zoom);
+  
+  // Draw connections between cases in same category
+  drawConnections();
+  
+  // Draw nodes
+  currentCases.forEach(c => {
+    drawNode(c);
+  });
+  
+  ctx.restore();
+  
+  // Update stats
+  document.getElementById('graph-visible-count').textContent = `Showing: ${currentCases.length}`;
+  document.getElementById('graph-zoom-level').textContent = `Zoom: ${Math.round(state.zoom * 100)}%`;
+}
+
+function drawGrid() {
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.02)';
+  ctx.lineWidth = 1;
+  const gridSize = 40;
+  const offsetX = (state.panX % gridSize);
+  const offsetY = (state.panY % gridSize);
+  
+  for (let x = offsetX; x < canvasWidth; x += gridSize) {
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, canvasHeight);
+    ctx.stroke();
+  }
+  for (let y = offsetY; y < canvasHeight; y += gridSize) {
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(canvasWidth, y);
+    ctx.stroke();
+  }
+}
+
+function drawConnections() {
+  const groups = {};
+  currentCases.forEach(c => {
+    const key = state.groupBy === 'decade' ? Math.floor(c.year / 10) * 10 : c[state.groupBy];
+    if (!groups[key]) groups[key] = [];
+    groups[key].push(c);
+  });
+  
+  ctx.strokeStyle = 'rgba(212, 175, 55, 0.08)';
+  ctx.lineWidth = 1;
+  
+  Object.values(groups).forEach(group => {
+    if (group.length < 2) return;
+    for (let i = 0; i < group.length - 1; i++) {
+      const a = nodePositions[group[i].name];
+      const b = nodePositions[group[i + 1].name];
+      if (!a || !b) continue;
+      ctx.beginPath();
+      ctx.moveTo(a.x, a.y);
+      ctx.lineTo(b.x, b.y);
+      ctx.stroke();
+    }
+  });
+}
+
+function drawNode(c) {
+  const pos = nodePositions[c.name];
+  if (!pos) return;
+  
+  const isHovered = state.hoveredNode && state.hoveredNode.name === c.name;
+  const isSelected = state.selectedNode && state.selectedNode.name === c.name;
+  const isSearched = state.search && c.name.toLowerCase().includes(state.search.toLowerCase());
+  
+  const baseRadius = 4;
+  const radius = isHovered || isSelected ? baseRadius * 1.8 : isSearched ? baseRadius * 1.4 : baseRadius;
+  const color = statusColors[c.status];
+  
+  // Outer glow
+  if (isHovered || isSelected || isSearched) {
+    ctx.beginPath();
+    ctx.arc(pos.x, pos.y, radius * 3, 0, Math.PI * 2);
+    ctx.fillStyle = color + '20';
+    ctx.fill();
+  }
+  
+  // Middle glow
+  ctx.beginPath();
+  ctx.arc(pos.x, pos.y, radius * 2, 0, Math.PI * 2);
+  ctx.fillStyle = color + '40';
+  ctx.fill();
+  
+  // Core node
+  ctx.beginPath();
+  ctx.arc(pos.x, pos.y, radius, 0, Math.PI * 2);
+  ctx.fillStyle = color;
+  ctx.fill();
+  
+  // Selection ring
+  if (isSelected) {
+    ctx.beginPath();
+    ctx.arc(pos.x, pos.y, radius + 4, 0, Math.PI * 2);
+    ctx.strokeStyle = '#d4af37';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  }
+  
+  // Label (only show when zoomed in enough or hovered/selected/searched)
+  const showLabel = state.zoom > 0.8 || isHovered || isSelected || isSearched;
+  if (showLabel) {
+    const fontSize = Math.max(9, Math.min(12, 10 / state.zoom));
+    ctx.font = `${fontSize}px Segoe UI`;
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    
+    // Text shadow for readability
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+    ctx.fillText(c.name, pos.x + radius + 5, pos.y + 1);
+    
+    ctx.fillStyle = isSearched ? '#d4af37' : 'rgba(240, 240, 245, 0.85)';
+    ctx.fillText(c.name, pos.x + radius + 4, pos.y);
+  }
+}
+
+// ============================================
+// TIMELINE
+// ============================================
+const timelineCanvas = document.getElementById('timeline-canvas');
+const timelineCtx = timelineCanvas.getContext('2d');
+
+function drawTimeline() {
+  if (!state.showTimeline) return;
+  
+  const rect = timelineCanvas.getBoundingClientRect();
+  timelineCanvas.width = rect.width * dpr;
+  timelineCanvas.height = rect.height * dpr;
+  timelineCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  
+  const w = rect.width;
+  const h = rect.height;
+  
+  timelineCtx.clearRect(0, 0, w, h);
+  timelineCtx.fillStyle = '#030305';
+  timelineCtx.fillRect(0, 0, w, h);
+  
+  const cases = getFilteredCases().filter(c => c.year > 0);
+  if (cases.length === 0) return;
+  
+  const padding = 40;
+  const minYear = 1920;
+  const maxYear = 2030;
+  const range = maxYear - minYear;
+  
+  // Draw year ticks
+  timelineCtx.strokeStyle = 'rgba(212, 175, 55, 0.2)';
+  timelineCtx.fillStyle = '#505060';
+  timelineCtx.font = '10px Segoe UI';
+  timelineCtx.textAlign = 'center';
+  
+  for (let year = 1920; year <= 2030; year += 10) {
+    const x = padding + ((year - minYear) / range) * (w - padding * 2);
+    timelineCtx.beginPath();
+    timelineCtx.moveTo(x, 20);
+    timelineCtx.lineTo(x, h - 20);
+    timelineCtx.stroke();
+    timelineCtx.fillText(year.toString(), x, h - 5);
+  }
+  
+  // Plot cases
+  cases.forEach(c => {
+    const x = padding + ((c.year - minYear) / range) * (w - padding * 2);
+    const y = 30 + Math.random() * (h - 60);
+    const color = statusColors[c.status];
+    
+    timelineCtx.beginPath();
+    timelineCtx.arc(x, y, 3, 0, Math.PI * 2);
+    timelineCtx.fillStyle = color;
+    timelineCtx.fill();
+  });
+}
+
+// ============================================
+// TOOLTIP & INTERACTION
+// ============================================
+function findNodeAt(mouseX, mouseY) {
+  const canvasRect = canvas.getBoundingClientRect();
+  const x = (mouseX - canvasRect.left - state.panX) / state.zoom;
+  const y = (mouseY - canvasRect.top - state.panY) / state.zoom;
+  
+  for (const c of currentCases) {
+    const pos = nodePositions[c.name];
+    if (!pos) continue;
+    const dist = Math.sqrt((x - pos.x) ** 2 + (y - pos.y) ** 2);
+    if (dist < 10) return c;
+  }
+  return null;
+}
+
+viewport.addEventListener('mousemove', (e) => {
+  const node = findNodeAt(e.clientX, e.clientY);
+  
+  if (node !== state.hoveredNode) {
+    state.hoveredNode = node;
+    drawGraph();
+  }
+  
+  if (node) {
+    tooltip.classList.add('visible');
+    tooltip.style.left = (e.clientX - viewport.getBoundingClientRect().left + 15) + 'px';
+    tooltip.style.top = (e.clientY - viewport.getBoundingClientRect().top + 15) + 'px';
+    tooltip.querySelector('.tt-name').textContent = node.name;
+    tooltip.querySelector('.tt-meta').innerHTML = `
+      ${node.category} · ${node.country} · ${node.year > 0 ? node.year : '—'}<br>
+      <span class="status-badge ${node.status}">${statusLabels[node.status]}</span>
+    `;
+  } else {
+    tooltip.classList.remove('visible');
+  }
+});
+
+viewport.addEventListener('mouseleave', () => {
+  tooltip.classList.remove('visible');
+  state.hoveredNode = null;
+  drawGraph();
+});
+
+// ============================================
+// ZOOM & PAN
+// ============================================
+let isDragging = false;
+let dragStart = { x: 0, y: 0 };
+let panStart = { x: 0, y: 0 };
+
+viewport.addEventListener('mousedown', (e) => {
+  if (e.target === canvas) {
+    isDragging = true;
+    dragStart = { x: e.clientX, y: e.clientY };
+    panStart = { x: state.panX, y: state.panY };
+  }
+});
+
+window.addEventListener('mousemove', (e) => {
+  if (isDragging) {
+    state.panX = panStart.x + (e.clientX - dragStart.x);
+    state.panY = panStart.y + (e.clientY - dragStart.y);
+    drawGraph();
+  }
+});
+
+window.addEventListener('mouseup', () => {
+  isDragging = false;
+});
+
+// Wheel zoom
+viewport.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  const delta = e.deltaY > 0 ? 0.9 : 1.1;
+  const newZoom = Math.max(0.3, Math.min(5, state.zoom * delta));
+  
+  // Zoom toward cursor
+  const rect = viewport.getBoundingClientRect();
+  const mx = e.clientX - rect.left;
+  const my = e.clientY - rect.top;
+  
+  state.panX = mx - (mx - state.panX) * (newZoom / state.zoom);
+  state.panY = my - (my - state.panY) * (newZoom / state.zoom);
+  state.zoom = newZoom;
+  
+  drawGraph();
+}, { passive: false });
+
+// Touch support
+let touchStartDist = 0;
+let touchStartZoom = 1;
+
+viewport.addEventListener('touchstart', (e) => {
+  if (e.touches.length === 2) {
+    const dx = e.touches[0].clientX - e.touches[1].clientX;
+    const dy = e.touches[0].clientY - e.touches[1].clientY;
+    touchStartDist = Math.sqrt(dx * dx + dy * dy);
+    touchStartZoom = state.zoom;
+  } else if (e.touches.length === 1) {
+    isDragging = true;
+    dragStart = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    panStart = { x: state.panX, y: state.panY };
+  }
+}, { passive: true });
+
+viewport.addEventListener('touchmove', (e) => {
+  if (e.touches.length === 2) {
+    e.preventDefault();
+    const dx = e.touches[0].clientX - e.touches[1].clientX;
+    const dy = e.touches[0].clientY - e.touches[1].clientY;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    state.zoom = Math.max(0.3, Math.min(5, touchStartZoom * (dist / touchStartDist)));
+    drawGraph();
+  } else if (e.touches.length === 1 && isDragging) {
+    state.panX = panStart.x + (e.touches[0].clientX - dragStart.x);
+    state.panY = panStart.y + (e.touches[0].clientY - dragStart.y);
+    drawGraph();
+  }
+}, { passive: false });
+
+viewport.addEventListener('touchend', () => {
+  isDragging = false;
+});
+
+// ============================================
+// CLICK TO SELECT
+// ============================================
+viewport.addEventListener('click', (e) => {
+  if (isDragging) return;
+  const node = findNodeAt(e.clientX, e.clientY);
+  
+  if (node) {
+    state.selectedNode = node;
+    showDetailPanel(node);
+    drawGraph();
+  } else {
+    state.selectedNode = null;
+    hideDetailPanel();
+    drawGraph();
+  }
+});
+
+function showDetailPanel(node) {
+  const panel = document.getElementById('detail-panel');
+  panel.classList.add('visible');
+  document.getElementById('detail-name').textContent = node.name;
+  
+  const related = CASES.filter(c => 
+    c.name !== node.name && 
+    (c.category === node.category || c.country === node.country)
+  ).slice(0, 5);
+  
+  document.getElementById('detail-body').innerHTML = `
+    <div class="detail-row"><span class="key">Category</span><span class="val">${node.category}</span></div>
+    <div class="detail-row"><span class="key">Country</span><span class="val">${node.country}</span></div>
+    <div class="detail-row"><span class="key">Year</span><span class="val">${node.year > 0 ? node.year : '—'}</span></div>
+    <div class="detail-row"><span class="key">Status</span><span class="val"><span class="status-badge ${node.status}">${statusLabels[node.status]}</span></span></div>
+    ${related.length > 0 ? `
+      <div style="margin-top: 1rem;">
+        <div style="font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.5rem;">Related Cases</div>
+        ${related.map(r => `
+          <div style="padding: 0.4rem 0; border-bottom: 1px solid var(--border); font-size: 0.8rem; cursor: pointer;" onclick="focusNode('${r.name.replace(/'/g, "\\'")}')">
+            <span style="color: var(--text-primary);">${r.name}</span>
+            <span style="color: var(--text-dim); font-size: 0.7rem;"> · ${r.year > 0 ? r.year : '—'}</span>
+          </div>
+        `).join('')}
+      </div>
+    ` : ''}
+  `;
+}
+
+function hideDetailPanel() {
+  document.getElementById('detail-panel').classList.remove('visible');
+}
+
+document.getElementById('detail-close').addEventListener('click', () => {
+  state.selectedNode = null;
+  hideDetailPanel();
+  drawGraph();
+});
+
+window.focusNode = function(name) {
+  const node = CASES.find(c => c.name === name);
+  if (node) {
+    state.selectedNode = node;
+    showDetailPanel(node);
+    // Center on node
+    const pos = nodePositions[name];
+    if (pos) {
+      state.panX = canvasWidth / 2 - pos.x * state.zoom;
+      state.panY = canvasHeight / 2 - pos.y * state.zoom;
+    }
+    drawGraph();
+  }
+};
+
+// ============================================
+// TOOLBAR ACTIONS
+// ============================================
+document.querySelectorAll('[data-layout]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('[data-layout]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    state.layout = btn.getAttribute('data-layout');
+    state.panX = 0; state.panY = 0; state.zoom = 1;
+    drawGraph();
+  });
+});
+
+document.querySelectorAll('[data-group]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('[data-group]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    state.groupBy = btn.getAttribute('data-group');
+    drawGraph();
+  });
+});
+
+document.querySelectorAll('.toolbar-btn[data-filter]').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.toolbar-btn[data-filter]').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    state.filter = btn.getAttribute('data-filter');
+    drawGraph();
+    renderTable();
+  });
+});
+
+document.getElementById('btn-reset').addEventListener('click', () => {
+  state.zoom = 1;
+  state.panX = 0;
+  state.panY = 0;
+  state.selectedNode = null;
+  state.hoveredNode = null;
+  state.search = '';
+  document.getElementById('search-input').value = '';
+  hideDetailPanel();
+  drawGraph();
+});
+
+document.getElementById('btn-export').addEventListener('click', () => {
+  const link = document.createElement('a');
+  link.download = 'master-graph.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+});
+
+document.getElementById('btn-timeline-toggle').addEventListener('click', () => {
+  state.showTimeline = !state.showTimeline;
+  document.getElementById('timeline-container').classList.toggle('visible', state.showTimeline);
+  if (state.showTimeline) {
+    setTimeout(drawTimeline, 50);
+  }
+});
+
+// ============================================
+// STAT CARDS
+// ============================================
+document.querySelectorAll('.stat-card').forEach(card => {
+  card.addEventListener('click', () => {
+    const filter = card.getAttribute('data-filter');
+    if (filter === 'countries') return;
+    if (filter === 'all') {
+      state.filter = 'all';
+      document.querySelectorAll('.toolbar-btn[data-filter]').forEach(b => b.classList.remove('active'));
+      document.querySelector('.toolbar-btn[data-filter="all"]').classList.add('active');
+    } else {
+      state.filter = filter;
+      document.querySelectorAll('.toolbar-btn[data-filter]').forEach(b => b.classList.remove('active'));
+      const btn = document.querySelector(`.toolbar-btn[data-filter="${filter}"]`);
+      if (btn) btn.classList.add('active');
+    }
+    drawGraph();
+    renderTable();
+    viewport.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+});
+
+// ============================================
+// LEGEND
+// ============================================
+document.querySelectorAll('.legend-item').forEach(item => {
+  item.addEventListener('click', () => {
+    const status = item.getAttribute('data-legend');
+    if (state.selectedStatuses.has(status)) {
+      state.selectedStatuses.delete(status);
+      item.classList.add('inactive');
+    } else {
+      state.selectedStatuses.add(status);
+      item.classList.remove('inactive');
+    }
+    drawGraph();
+    renderTable();
+  });
+});
+
+// ============================================
+// SEARCH
+// ============================================
+const searchInput = document.getElementById('search-input');
+const searchResults = document.getElementById('search-results');
+
+searchInput.addEventListener('input', (e) => {
+  const q = e.target.value.toLowerCase().trim();
+  state.search = q;
+  
+  if (q.length < 2) {
+    searchResults.classList.remove('visible');
+    drawGraph();
+    return;
+  }
+  
+  const matches = CASES.filter(c => 
+    c.name.toLowerCase().includes(q) ||
+    c.category.toLowerCase().includes(q) ||
+    c.country.toLowerCase().includes(q) ||
+    (c.year > 0 && c.year.toString().includes(q))
+  ).slice(0, 10);
+  
+  if (matches.length > 0) {
+    searchResults.classList.add('visible');
+    searchResults.innerHTML = matches.map(c => `
+      <div class="search-result-item" onclick="focusNode('${c.name.replace(/'/g, "\\'")}'); document.getElementById('search-results').classList.remove('visible');">
+        <div class="sr-name">${c.name}</div>
+        <div class="sr-meta">${c.category} · ${c.country} · ${c.year > 0 ? c.year : '—'}</div>
+      </div>
+    `).join('');
+  } else {
+    searchResults.classList.remove('visible');
+  }
+  
+  drawGraph();
+  renderTable();
+});
+
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.search-container')) {
+    searchResults.classList.remove('visible');
+  }
+});
+
+// ============================================
+// TABLE
+// ============================================
+function renderTable() {
+  const tbody = document.getElementById('table-body');
+  let cases = getFilteredCases();
+  
+  // Sort
+  const { key, dir } = state.tableSort;
+  cases = [...cases].sort((a, b) => {
+    let av = a[key], bv = b[key];
+    if (key === 'year') { av = av || 0; bv = bv || 0; }
+    if (typeof av === 'string') av = av.toLowerCase();
+    if (typeof bv === 'string') bv = bv.toLowerCase();
+    if (av < bv) return -1 * dir;
+    if (av > bv) return 1 * dir;
+    return 0;
+  });
+  
+  document.getElementById('table-count').textContent = `${cases.length} cases`;
+  
+  tbody.innerHTML = cases.map(c => `
+    <tr onclick="focusNode('${c.name.replace(/'/g, "\\'")}'); document.querySelector('.graph-container').scrollIntoView({behavior: 'smooth'});">
+      <td class="name-cell">${c.name}</td>
+      <td>${c.category}</td>
+      <td>${c.country}</td>
+      <td>${c.year > 0 ? c.year : '—'}</td>
+      <td><span class="status-badge ${c.status}">${statusLabels[c.status]}</span></td>
+    </tr>
+  `).join('');
+}
+
+document.querySelectorAll('.data-table th[data-sort]').forEach(th => {
+  th.addEventListener('click', () => {
+    const key = th.getAttribute('data-sort');
+    if (state.tableSort.key === key) {
+      state.tableSort.dir *= -1;
+    } else {
+      state.tableSort.key = key;
+      state.tableSort.dir = 1;
+    }
+    document.querySelectorAll('.data-table th').forEach(t => t.classList.remove('sorted'));
+    th.classList.add('sorted');
+    renderTable();
+  });
+});
+
+// ============================================
+// STATS
+// ============================================
+function updateStats() {
+  document.getElementById('stat-total').textContent = CASES.length;
+  document.getElementById('stat-assassinated').textContent = CASES.filter(c => c.status === 'assassinated').length;
+  document.getElementById('stat-military').textContent = CASES.filter(c => c.status === 'military').length;
+  document.getElementById('stat-disputed').textContent = CASES.filter(c => c.status === 'disputed').length;
+  document.getElementById('stat-suicide').textContent = CASES.filter(c => c.status === 'suicide').length;
+  document.getElementById('stat-countries').textContent = [...new Set(CASES.map(c => c.country))].length;
+}
+
+// ============================================
+// STARS
+// ============================================
+function createStars() {
+  const starsContainer = document.getElementById('stars');
+  if (!starsContainer) return;
+  for (let i = 0; i < 120; i++) {
+    const star = document.createElement('div');
+    star.className = 'star';
+    star.style.left = Math.random() * 100 + '%';
+    star.style.top = Math.random() * 100 + '%';
+    star.style.animationDelay = Math.random() * 6 + 's';
+    star.style.width = Math.random() * 2 + 1 + 'px';
+    star.style.height = star.style.width;
+    starsContainer.appendChild(star);
+  }
+}
+
+// ============================================
+// INIT
+// ============================================
+window.addEventListener('resize', () => {
+  resizeCanvas();
+});
+
+createStars();
+updateStats();
+renderTable();
+
+// Wait for layout then draw
+setTimeout(() => {
+  resizeCanvas();
+}, 100);
+</script>
+
+</body>
+</html>
