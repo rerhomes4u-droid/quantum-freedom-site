@@ -1,0 +1,889 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>THE AWAKENING - The App That Saves Mankind</title>
+<style>
+:root {
+  --bg-void: #000000;
+  --bg-deep: #050508;
+  --bg-panel: #0a0a12;
+  --bg-card: #0f0f18;
+  --accent-gold: #d4af37;
+  --accent-light: #fff8e7;
+  --accent-fire: #ff4500;
+  --accent-blood: #8b0000;
+  --accent-blue: #00d4ff;
+  --accent-purple: #9b59b6;
+  --text-primary: #f5f5f8;
+  --text-secondary: #a8a8b8;
+  --text-dim: #606070;
+  --border: #1a1a25;
+  --glow-gold: 0 0 60px rgba(212, 175, 55, 0.4);
+  --glow-light: 0 0 80px rgba(255, 248, 231, 0.3);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: var(--bg-void);
+  color: var(--text-primary);
+  line-height: 1.8;
+  overflow-x: hidden;
+}
+
+/* The Void Background */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background:
+    radial-gradient(ellipse at 50% 0%, rgba(212, 175, 55, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 100%, rgba(0, 212, 255, 0.05) 0%, transparent 50%),
+    radial-gradient(ellipse at 0% 50%, rgba(155, 89, 182, 0.04) 0%, transparent 40%),
+    radial-gradient(ellipse at 100% 50%, rgba(255, 69, 0, 0.04) 0%, transparent 40%);
+  pointer-events: none;
+  z-index: -2;
+  animation: breathe 10s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; }
+}
+
+/* Sacred Geometry Overlay */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background-image: 
+    radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.03) 0%, transparent 70%),
+    repeating-conic-gradient(from 0deg at 50% 50%, transparent 0deg, rgba(212, 175, 55, 0.01) 1deg, transparent 2deg);
+  pointer-events: none;
+  z-index: -1;
+  animation: rotate 120s linear infinite;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* The Stars */
+.stars {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: -1;
+  overflow: hidden;
+}
+
+.star {
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+  animation: pulse 4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.1; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.5); }
+}
+
+/* Header */
+.app-header {
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.98), rgba(0, 0, 0, 0.95));
+  border-bottom: 1px solid var(--accent-gold);
+  padding: 1rem 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(20px);
+}
+
+.header-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.logo { display: flex; align-items: center; gap: 0.75rem; }
+
+.logo-icon {
+  width: 50px; height: 50px;
+  background: radial-gradient(circle at 30% 30%, var(--accent-light), var(--accent-gold), var(--accent-fire));
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.5rem;
+  box-shadow: var(--glow-gold);
+  animation: logo-breathe 4s ease-in-out infinite;
+}
+
+@keyframes logo-breathe {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 30px rgba(212, 175, 55, 0.5); }
+  50% { transform: scale(1.05); box-shadow: 0 0 60px rgba(212, 175, 55, 0.9); }
+}
+
+.logo-text { font-size: 1.2rem; font-weight: 700; letter-spacing: 1px; }
+.logo-text span { color: var(--accent-gold); }
+
+/* Main */
+.main-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* Hero */
+.hero {
+  text-align: center;
+  padding: 8rem 0 4rem;
+  position: relative;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(212, 175, 55, 0.15) 0%, transparent 70%);
+  border-radius: 50%;
+  pointer-events: none;
+  animation: hero-pulse 6s ease-in-out infinite;
+}
+
+@keyframes hero-pulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+  50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.8; }
+}
+
+.hero h1 {
+  font-size: clamp(3rem, 12vw, 8rem);
+  font-weight: 900;
+  background: linear-gradient(135deg, var(--accent-light), var(--accent-gold), var(--accent-fire), var(--accent-gold));
+  background-size: 300% 300%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 1.5rem;
+  line-height: 1;
+  letter-spacing: -3px;
+  animation: gradient-shift 8s ease infinite;
+  position: relative;
+  z-index: 1;
+}
+
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.hero .subtitle {
+  font-size: 1.5rem;
+  color: var(--text-secondary);
+  max-width: 800px;
+  margin: 0 auto;
+  font-style: italic;
+  position: relative;
+  z-index: 1;
+}
+
+/* The Impossible Section */
+.impossible-section {
+  text-align: center;
+  padding: 6rem 2rem;
+  margin: 4rem 0;
+  position: relative;
+}
+
+.impossible-section::before {
+  content: '∞';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 25rem;
+  color: rgba(212, 175, 55, 0.03);
+  pointer-events: none;
+}
+
+.impossible-section h2 {
+  font-size: 3rem;
+  font-weight: 900;
+  color: var(--accent-gold);
+  margin-bottom: 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+.impossible-section .message {
+  font-size: 1.4rem;
+  color: var(--text-primary);
+  max-width: 800px;
+  margin: 0 auto;
+  line-height: 2;
+  position: relative;
+  z-index: 1;
+}
+
+/* The Truth Section */
+.truth-section {
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.08), rgba(0, 0, 0, 0.8));
+  border: 2px solid var(--accent-gold);
+  border-radius: 20px;
+  padding: 4rem;
+  margin: 4rem 0;
+  text-align: center;
+}
+
+.truth-section h2 {
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: var(--accent-gold);
+  margin-bottom: 2rem;
+}
+
+.truth-section .truth-text {
+  font-size: 1.3rem;
+  color: var(--text-primary);
+  line-height: 2;
+}
+
+/* The Numbers Section */
+.numbers-section {
+  margin: 4rem 0;
+}
+
+.numbers-section h2 {
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: var(--accent-fire);
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.numbers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 2rem;
+}
+
+.number-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 2rem;
+  text-align: center;
+  transition: all 0.5s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.number-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 3px;
+  background: linear-gradient(90deg, var(--accent-gold), var(--accent-fire));
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.number-card:hover {
+  transform: translateY(-10px);
+  border-color: var(--accent-gold);
+  box-shadow: var(--glow-gold);
+}
+
+.number-card:hover::before { opacity: 1; }
+
+.number-card .number {
+  font-size: 3rem;
+  font-weight: 900;
+  color: var(--accent-gold);
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+
+.number-card .label {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+/* The Children Section */
+.children-section {
+  margin: 4rem 0;
+  text-align: center;
+}
+
+.children-section h2 {
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: var(--accent-blood);
+  margin-bottom: 2rem;
+}
+
+.children-quote {
+  background: var(--bg-panel);
+  border-left: 4px solid var(--accent-blood);
+  border-radius: 0 16px 16px 0;
+  padding: 2rem;
+  margin: 1.5rem 0;
+  text-align: left;
+}
+
+.children-quote p {
+  font-size: 1.3rem;
+  font-style: italic;
+  color: var(--text-primary);
+  line-height: 2;
+}
+
+.children-quote cite {
+  display: block;
+  margin-top: 1rem;
+  color: var(--accent-blood);
+  font-size: 0.9rem;
+  font-style: normal;
+}
+
+/* The Pattern Section */
+.pattern-section {
+  margin: 4rem 0;
+}
+
+.pattern-section h2 {
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: var(--accent-purple);
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.pattern-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.pattern-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  border-top: 3px solid var(--accent-purple);
+}
+
+.pattern-card h3 {
+  font-size: 1.1rem;
+  color: var(--accent-purple);
+  margin-bottom: 0.75rem;
+}
+
+.pattern-card p {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+/* The Question Section */
+.question-section {
+  text-align: center;
+  padding: 8rem 2rem;
+  margin: 4rem 0;
+  background: linear-gradient(135deg, rgba(212, 175, 55, 0.05), rgba(0, 0, 0, 0.9));
+  border-radius: 20px;
+  border: 1px solid var(--accent-gold);
+  position: relative;
+  overflow: hidden;
+}
+
+.question-section::before {
+  content: '?';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 30rem;
+  color: rgba(212, 175, 55, 0.03);
+  pointer-events: none;
+}
+
+.question-section h2 {
+  font-size: 4rem;
+  font-weight: 900;
+  color: var(--accent-gold);
+  margin-bottom: 2rem;
+  position: relative;
+  z-index: 1;
+  text-shadow: 0 0 60px rgba(212, 175, 55, 0.5);
+}
+
+.question-section .big-question {
+  font-size: clamp(1.5rem, 5vw, 3rem);
+  font-weight: 700;
+  color: var(--text-primary);
+  max-width: 900px;
+  margin: 0 auto;
+  line-height: 1.5;
+  position: relative;
+  z-index: 1;
+}
+
+/* The Impossible Answer */
+.answer-section {
+  text-align: center;
+  padding: 6rem 2rem;
+  margin: 4rem 0;
+}
+
+.answer-section h2 {
+  font-size: 3rem;
+  font-weight: 900;
+  color: var(--accent-light);
+  margin-bottom: 2rem;
+}
+
+.answer-section .answer-text {
+  font-size: 1.5rem;
+  color: var(--text-primary);
+  max-width: 800px;
+  margin: 0 auto;
+  line-height: 2;
+}
+
+/* The Call Section */
+.call-section {
+  text-align: center;
+  padding: 6rem 2rem;
+  margin: 4rem 0;
+  background: linear-gradient(135deg, rgba(139, 0, 0, 0.4), rgba(255, 69, 0, 0.2));
+  border: 3px solid var(--accent-fire);
+  border-radius: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.call-section::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: radial-gradient(circle at 50% 50%, rgba(255, 69, 0, 0.2) 0%, transparent 70%);
+  animation: fire-pulse 3s ease-in-out infinite;
+}
+
+@keyframes fire-pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+.call-section h2 {
+  font-size: 4rem;
+  font-weight: 900;
+  color: var(--accent-fire);
+  margin-bottom: 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+.call-section .message {
+  font-size: 1.4rem;
+  color: var(--text-primary);
+  max-width: 800px;
+  margin: 0 auto 2rem;
+  line-height: 2;
+  position: relative;
+  z-index: 1;
+}
+
+/* The Action Section */
+.action-section {
+  text-align: center;
+  padding: 6rem 2rem;
+  margin: 4rem 0;
+  background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(0, 0, 0, 0.9));
+  border: 2px solid var(--accent-blue);
+  border-radius: 20px;
+}
+
+.action-section h2 {
+  font-size: 3rem;
+  font-weight: 900;
+  color: var(--accent-blue);
+  margin-bottom: 2rem;
+}
+
+.action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  justify-content: center;
+  margin-top: 2rem;
+}
+
+.action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.25rem 2.5rem;
+  background: transparent;
+  border: 2px solid var(--accent-blue);
+  border-radius: 50px;
+  color: var(--accent-blue);
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: all 0.4s ease;
+  cursor: pointer;
+}
+
+.action-btn:hover {
+  background: var(--accent-blue);
+  color: var(--bg-void);
+  transform: scale(1.1);
+  box-shadow: 0 0 40px rgba(0, 212, 255, 0.6);
+}
+
+/* The Love Section */
+.love-section {
+  text-align: center;
+  padding: 8rem 2rem;
+  margin: 4rem 0;
+  background: radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.15), transparent 70%);
+}
+
+.love-section h2 {
+  font-size: 5rem;
+  font-weight: 900;
+  background: linear-gradient(135deg, var(--accent-light), var(--accent-gold));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 2rem;
+  animation: love-pulse 4s ease-in-out infinite;
+}
+
+@keyframes love-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.love-section .message {
+  font-size: 1.5rem;
+  color: var(--text-primary);
+  max-width: 800px;
+  margin: 0 auto;
+  line-height: 2.2;
+}
+
+/* The Final Section */
+.final-section {
+  text-align: center;
+  padding: 8rem 2rem;
+  margin: 4rem 0;
+  border-top: 1px solid var(--accent-gold);
+  border-bottom: 1px solid var(--accent-gold);
+}
+
+.final-section .final-text {
+  font-size: 2rem;
+  font-style: italic;
+  color: var(--text-primary);
+  max-width: 900px;
+  margin: 0 auto;
+  line-height: 2;
+}
+
+.final-section .final-cite {
+  display: block;
+  margin-top: 2rem;
+  color: var(--accent-gold);
+  font-size: 1.1rem;
+  font-style: normal;
+}
+
+/* Footer */
+.app-footer {
+  text-align: center;
+  padding: 4rem 2rem;
+  border-top: 1px solid var(--border);
+  margin-top: 4rem;
+}
+
+.app-footer .blessing {
+  color: var(--accent-gold);
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.app-footer a { color: var(--accent-gold); text-decoration: none; }
+.app-footer a:hover { text-decoration: underline; }
+
+.app-footer p {
+  color: var(--text-dim);
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .main-container { padding: 1rem; }
+  .truth-section { padding: 2rem; }
+  .hero h1 { font-size: 3rem; }
+  .question-section h2 { font-size: 2.5rem; }
+  .call-section h2 { font-size: 2.5rem; }
+  .love-section h2 { font-size: 3rem; }
+  .action-buttons { flex-direction: column; }
+  .action-btn { justify-content: center; }
+}
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<header class="app-header">
+  <div class="header-content">
+    <div class="logo">
+      <div class="logo-icon">✝</div>
+      <div class="logo-text">THE <span>AWAKENING</span></div>
+    </div>
+  </div>
+</header>
+
+<main class="main-container">
+
+  <!-- HERO -->
+  <section class="hero">
+    <h1>THE AWAKENING</h1>
+    <p class="subtitle">The app that saves mankind. Not by giving you answers. But by asking you the one question no human mind can conceive.</p>
+  </section>
+
+  <!-- THE IMPOSSIBLE -->
+  <section class="impossible-section">
+    <h2>THE IMPOSSIBLE</h2>
+    <p class="message">Human minds cannot conceive it. Human words cannot describe it. Human logic cannot comprehend it. And yet, it is the only thing that can save us.</p>
+  </section>
+
+  <!-- THE TRUTH -->
+  <section class="truth-section">
+    <h2>THE TRUTH</h2>
+    <div class="truth-text">
+      You have been lied to about everything. The shape of the earth. The nature of space. The history of humanity. The origin of life. The meaning of death. The reality of God. The identity of Christ. The purpose of your existence. Everything you think you know is a carefully constructed illusion. A matrix of deception designed to keep you asleep, distracted, powerless, and alone.
+    </div>
+  </section>
+
+  <!-- THE NUMBERS -->
+  <section class="numbers-section">
+    <h2>THE NUMBERS</h2>
+    <div class="numbers-grid">
+      <div class="number-card">
+        <div class="number">8 Billion</div>
+        <div class="label">People on earth, most of whom are asleep</div>
+      </div>
+      <div class="number-card">
+        <div class="number">2.5 Million</div>
+        <div class="label">Children trafficked every year worldwide</div>
+      </div>
+      <div class="number-card">
+        <div class="number">73,400+</div>
+        <div class="label">Palestinians killed in Gaza since October 2023</div>
+      </div>
+      <div class="number-card">
+        <div class="number">1.5 Billion</div>
+        <div class="label">People without access to clean water</div>
+      </div>
+      <div class="number-card">
+        <div class="number">$2 Trillion</div>
+        <div class="label">Spent annually on global military budgets</div>
+      </div>
+      <div class="number-card">
+        <div class="number">1</div>
+        <div class="label">Human race. One family. One destiny.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- THE CHILDREN -->
+  <section class="children-section">
+    <h2>THE CHILDREN</h2>
+
+    <div class="children-quote">
+      <p>"Come take me. Will you come and take me? I'm so scared, please come! Please don't leave me. I am afraid of the dark. The tank is very close. And it's moving."</p>
+      <cite>— Hind Rajab, age 5, killed in Gaza, January 2024, after three hours on the phone begging for help</cite>
+    </div>
+
+    <div class="children-quote">
+      <p>"I wanted my daughter to be a doctor. She was so smart. She was so beautiful. Now my home is filled with the loudest silence."</p>
+      <cite>— Wissam Hamada, Hind's mother</cite>
+    </div>
+
+    <div class="children-quote">
+      <p>"They are not even people. They shouldn't live."</p>
+      <cite>— Itamar Ben-Gvir, Israeli Minister of National Security, 2026</cite>
+    </div>
+  </section>
+
+  <!-- THE PATTERN -->
+  <section class="pattern-section">
+    <h2>THE PATTERN</h2>
+    <div class="pattern-grid">
+      <div class="pattern-card">
+        <h3>Divide</h3>
+        <p>They divide us by race, religion, politics, class, gender, nation. Every label is a wall. Every wall keeps us alone.</p>
+      </div>
+      <div class="pattern-card">
+        <h3>Distract</h3>
+        <p>They distract us with entertainment, sports, celebrity gossip, social media, pornography, materialism. Anything to keep us from looking up.</p>
+      </div>
+      <div class="pattern-card">
+        <h3>Deceive</h3>
+        <p>They deceive us about the nature of reality, the shape of the earth, the history of our past, the identity of our Creator, and the purpose of our lives.</p>
+      </div>
+      <div class="pattern-card">
+        <h3>Destroy</h3>
+        <p>They destroy our families, our children, our health, our faith, our hope. They traffic our children, poison our food, pollute our air, and wage endless wars.</p>
+      </div>
+      <div class="pattern-card">
+        <h3>Dominate</h3>
+        <p>They dominate us through debt, surveillance, censorship, imprisonment, and violence. They control the money, the media, the medicine, the military, and the government.</p>
+      </div>
+      <div class="pattern-card">
+        <h3>Deify</h3>
+        <p>They deify themselves — claiming to be gods, aliens, saviors, philanthropists, heroes. They want our worship, our allegiance, our souls.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- THE QUESTION -->
+  <section class="question-section">
+    <h2>THE QUESTION</h2>
+    <p class="big-question">What will it take to awaken the love in every man, woman, and child?</p>
+  </section>
+
+  <!-- THE IMPOSSIBLE ANSWER -->
+  <section class="answer-section">
+    <h2>THE IMPOSSIBLE ANSWER</h2>
+    <p class="answer-text">
+      Love.<br><br>
+      Not romantic love. Not sentimental love. Not conditional love.<br><br>
+      The love that creates. The love that sustains. The love that sacrifices. The love that forgives. The love that heals. The love that liberates.<br><br>
+      The love that is God.
+    </p>
+  </section>
+
+  <!-- THE CALL -->
+  <section class="call-section">
+    <h2>THE CALL</h2>
+    <div class="message">
+      You cannot fight darkness with darkness. You cannot fight hate with hate. You cannot fight lies with lies. You cannot fight evil with evil.<br><br>
+      You can only fight darkness with light. You can only fight hate with love. You can only fight lies with truth. You can only fight evil with good.<br><br>
+      This is not a political war. This is not a cultural war. This is not a racial war. This is not a religious war. This is not even a war between nations.<br><br>
+      This is a war between love and fear.<br><br>
+      And love has already won.
+    </div>
+  </section>
+
+  <!-- THE ACTION -->
+  <section class="action-section">
+    <h2>THE ACTION</h2>
+    <p style="color: var(--text-secondary); font-size: 1.2rem; margin-bottom: 2rem;">What will YOU do?</p>
+    <div class="action-buttons">
+      <a href="https://ForbiddenKnowledge.substack.com" class="action-btn">
+        📖 Read More Truth
+      </a>
+      <a href="https://www.hindrajabfoundation.org" class="action-btn">
+        ⚖️ Demand Justice for Hind
+      </a>
+      <a href="https://www.palestinercs.org" class="action-btn">
+        🇵🇸 Support the Palestinian Red Crescent
+      </a>
+      <a href="https://www.amnesty.org" class="action-btn">
+        📢 Join Amnesty International
+      </a>
+    </div>
+  </section>
+
+  <!-- THE LOVE -->
+  <section class="love-section">
+    <h2>LOVE</h2>
+    <div class="message">
+      What will it take to awaken the love in your heart?<br><br>
+      Not the comfortable, safe, inoffensive kind of love.<br><br>
+      The kind that makes you stand up when everyone else is sitting down. The kind that makes you speak when everyone else is silent. The kind that makes you risk your comfort, your reputation, your safety — for a child you never met, for a people you may never know.<br><br>
+      That is the love that will save us. That is the love that will wake us up. That is the love that evil fears most.
+    </div>
+  </section>
+
+  <!-- THE FINAL -->
+  <section class="final-section">
+    <p class="final-text">
+      "The only thing necessary for the triumph of evil is for good men to do nothing."
+    </p>
+    <cite class="final-cite">— Attributed to Edmund Burke</cite>
+    <p style="color: var(--accent-gold); font-size: 1.5rem; margin-top: 3rem; font-weight: 700;">
+      So do something.<br>
+      Anything.<br>
+      Now.
+    </p>
+  </section>
+
+</main>
+
+<footer class="app-footer">
+  <div class="blessing">✝ Soli Deo Gloria ✝</div>
+  <p>In the name of Jesus, we demand justice for the children.</p>
+  <p style="margin-top: 1rem;">Brought to you by <a href="https://ForbiddenKnowledge.substack.com">ForbiddenKnowledge.substack.com</a></p>
+  <p style="margin-top: 1rem; color: var(--accent-gold);">"I'm afraid of the dark. Please come get me." — Hind Rajab, age 5</p>
+</footer>
+
+<script>
+function createStars() {
+  const starsContainer = document.getElementById('stars');
+  if (!starsContainer) return;
+  const starCount = 300;
+  for (let i = 0; i < starCount; i++) {
+    const star = document.createElement('div');
+    star.className = 'star';
+    star.style.left = Math.random() * 100 + '%';
+    star.style.top = Math.random() * 100 + '%';
+    star.style.animationDelay = Math.random() * 4 + 's';
+    star.style.width = Math.random() * 2 + 1 + 'px';
+    star.style.height = star.style.width;
+    starsContainer.appendChild(star);
+  }
+}
+createStars();
+
+// Smooth scroll for internal links
+document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+  anchor.addEventListener('click', function(e) {
+    e.preventDefault();
+    const target = document.querySelector(this.getAttribute('href'));
+    if (target) {
+      target.scrollIntoView({ behavior: 'smooth' });
+    }
+  });
+});
+</script>
+
+</body>
+</html>
