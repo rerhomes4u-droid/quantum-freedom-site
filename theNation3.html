@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOVEREIGN OS // SECURE TERMINAL</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #030303;
+            --panel: #0a0a0a;
+            --border: #1f1f1f;
+            --accent: #00ff41; /* Matrix Green */
+            --gold: #d4af37;
+            --danger: #ff003c;
+            --text: #d1d1d1;
+            --muted: #666;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            background-image: 
+                linear-gradient(rgba(0, 255, 65, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 255, 65, 0.03) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .terminal-header {
+            background: #000;
+            border-bottom: 1px solid var(--accent);
+            padding: 10px 20px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            color: var(--accent);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .blink { animation: blink 1s step-end infinite; }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        .container {
+            max-width: 900px;
+            margin: 4rem auto;
+            padding: 0 20px;
+        }
+
+        .panel {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            padding: 2.5rem;
+            position: relative;
+            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+        }
+
+        .panel::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 3px;
+            background: linear-gradient(90deg, var(--accent), var(--gold), var(--danger));
+        }
+
+        h1 {
+            font-family: 'Fira Code', monospace;
+            font-size: 2rem;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            font-family: 'Fira Code', monospace;
+            color: var(--muted);
+            font-size: 0.9rem;
+            margin-bottom: 3rem;
+            border-bottom: 1px dashed var(--border);
+            padding-bottom: 1rem;
+        }
+
+        .step { display: none; animation: fadeIn 0.5s ease; }
+        .step.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+        label {
+            display: block;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.85rem;
+            color: var(--gold);
+            margin-bottom: 0.5rem;
+            margin-top: 1.5rem;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            background: #000;
+            border: 1px solid var(--border);
+            color: var(--accent);
+            font-family: 'Fira Code', monospace;
+            font-size: 1rem;
+            transition: border 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 10px rgba(0, 255, 65, 0.2);
+        }
+
+        .btn {
+            display: inline-block;
+            width: 100%;
+            padding: 15px;
+            margin-top: 2rem;
+            background: transparent;
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            font-family: 'Fira Code', monospace;
+            font-size: 1rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background: var(--accent);
+            color: #000;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.4);
+        }
+
+        .btn-gold { border-color: var(--gold); color: var(--gold); }
+        .btn-gold:hover { background: var(--gold); color: #000; box-shadow: 0 0 20px rgba(212, 175, 55, 0.4); }
+        
+        .btn-danger { border-color: var(--danger); color: var(--danger); }
+        .btn-danger:hover { background: var(--danger); color: #fff; box-shadow: 0 0 20px rgba(255, 0, 60, 0.4); }
+
+        .output {
+            background: #000;
+            border: 1px solid var(--border);
+            padding: 1.5rem;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.9rem;
+            color: var(--accent);
+            margin-top: 2rem;
+            white-space: pre-wrap;
+            display: none;
+            border-left: 3px solid var(--accent);
+        }
+
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        @media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } }
+
+        .contact-box {
+            margin-top: 3rem;
+            padding: 2rem;
+            border: 1px solid var(--danger);
+            background: rgba(255, 0, 60, 0.05);
+            text-align: center;
+        }
+
+        .contact-box h3 { color: var(--danger); font-family: 'Fira Code', monospace; margin-bottom: 1rem; }
+        
+        .action-buttons { display: flex; gap: 1rem; justify-content: center; margin-top: 1.5rem; flex-wrap: wrap; }
+        .action-buttons a { width: auto; padding: 12px 24px; margin: 0; font-size: 0.9rem; }
+
+        .progress-bar {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 2rem;
+        }
+        .progress-dot {
+            flex: 1;
+            height: 3px;
+            background: var(--border);
+            transition: background 0.3s;
+        }
+        .progress-dot.active { background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+    </style>
+</head>
+<body>
+
+    <div class="terminal-header">
+        <span>SOVEREIGN_OS v3.2 // ENCRYPTED SESSION</span>
+        <span>STATUS: <span class="blink">AWAITING_INPUT</span></span>
+    </div>
+
+    <div class="container">
+        <div class="panel">
+            <h1>INITIALIZE ASCENT</h1>
+            <p class="subtitle">Complete the diagnostic to generate your Sovereign Profile and unlock the Forbidden Knowledge.</p>
+            
+            <div class="progress-bar">
+                <div class="progress-dot active" id="dot-1"></div>
+                <div class="progress-dot" id="dot-2"></div>
+                <div class="progress-dot" id="dot-3"></div>
+            </div>
+
+            <!-- STEP 1: Threat Assessment -->
+            <div class="step active" id="step-1">
+                <label>01. PRIMARY THREAT VECTOR</label>
+                <select id="threatInput">
+                    <option value="medical">Medical Tyranny / Vaccine Mandates</option>
+                    <option value="legal">Predatory Lawsuits / Asset Seizure</option>
+                    <option value="financial">Inflation / Bank Freezes</option>
+                    <option value="all">All of the Above (The Great Reset)</option>
+                </select>
+
+                <label>02. ESTIMATED NET WORTH EXPOSED TO SEIZURE ($)</label>
+                <input type="number" id="wealthInput" placeholder="e.g. 250000" value="250000">
+
+                <button class="btn" onclick="nextStep(2)">RUN DIAGNOSTIC &gt;&gt;</button>
+            </div>
+
+            <!-- STEP 2: The AI Strategy -->
+            <div class="step" id="step-2">
+                <div id="diagnosticOutput" class="output"></div>
+                <button class="btn btn-gold" onclick="nextStep(3)">GENERATE AI WEALTH ENGINE &gt;&gt;</button>
+            </div>
+
+            <!-- STEP 3: The Execution -->
+            <div class="step" id="step-3">
+                <div id="aiOutput" class="output" style="display:block;"></div>
+                
+                <div class="contact-box">
+                    <h3>⚠️ EXECUTION REQUIRED</h3>
+                    <p>Your Sovereign Profile is complete. The system has calculated what you stand to lose. To access the complete Trust & Equity path, the Hugo Protocol, and your EIN setup, you must contact the Sovereign directly.</p>
+                    
+                    <div class="action-buttons">
+                        <a href="#" id="waLink" target="_blank" class="btn" style="border-color:#25D366; color:#25D366;">WhatsApp Ramiro</a>
+                        <a href="#" id="emailLink" class="btn" style="border-color:var(--gold); color:var(--gold);">Email Secure Line</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        let profile = {
+            threat: '',
+            wealth: 0,
+            taxLost: 0
+        };
+
+        function nextStep(step) {
+            // Update UI
+            document.querySelectorAll('.step').forEach(el => el.classList.remove('active'));
+            document.getElementById(`step-${step}`).classList.add('active');
+            
+            document.querySelectorAll('.progress-dot').forEach((el, i) => {
+                if(i < step) el.classList.add('active');
+            });
+
+            if (step === 2) runDiagnostic();
+            if (step === 3) runAIEngine();
+        }
+
+        function runDiagnostic() {
+            profile.threat = document.getElementById('threatInput').value;
+            profile.wealth = parseFloat(document.getElementById('wealthInput').value) || 0;
+            profile.taxLost = profile.wealth * 0.40;
+
+            const out = document.getElementById('diagnosticOutput');
+            out.style.display = 'block';
+            out.innerHTML = "> ANALYZING THREAT VECTORS...\n> ACCESSING FORBIDDEN KNOWLEDGE...\n> CALCULATING EXPOSURE...\n\n";
+
+            setTimeout(() => {
+                out.innerHTML += `[ THREAT DETECTED ]: ${profile.threat.toUpperCase()}\n`;
+                out.innerHTML += `[ ASSET EXPOSURE ]: $${profile.wealth.toLocaleString()}\n`;
+                out.innerHTML += `[ ESTIMATED ESTATE TAX LOSS ]: -$${profile.taxLost.toLocaleString()}\n\n`;
+                
+                out.innerHTML += `[ SYSTEM ANALYSIS ]:\n`;
+                out.innerHTML += `You are currently a target. If a creditor, the IRS, or a hostile litigant sues you, they can seize 100% of your exposed wealth. The state will take 40% upon your death.\n\n`;
+                
+                out.innerHTML += `[ SOLUTION ]:\n`;
+                out.innerHTML += `The Wyoming LLC and South Dakota Dynasty Trust do not just hide your wealth; they remove it from the jurisdiction of the corporate state entirely. The charging order makes you bulletproof.\n\n`;
+                out.innerHTML += `> DIAGNOSTIC COMPLETE. PROCEED TO AI WEALTH ENGINE.`;
+            }, 1000);
+        }
+
+        function runAIEngine() {
+            const out = document.getElementById('aiOutput');
+            out.innerHTML = "> INITIALIZING AI AVATAR FACTORY...\n> GENERATING CONTENT STRATEGY...\n\n";
+
+            let niche = "";
+            let hook = "";
+            let strategy = "";
+
+            if (profile.threat === 'medical' || profile.threat === 'all') {
+                niche = "Health Freedom / Medical Truth-Teller";
+                hook = "They silenced the FDA's own scientists. Here is the leaked document that proves they knew.";
+                strategy = "Deploy a faceless AI avatar. Post the BMJ study and the 99-million-person safety data. Funnel traffic to the Hugo Protocol.";
+            } else if (profile.threat === 'legal') {
+                niche = "Legal Shield / Sovereign Defender";
+                hook = "Why the Rockefellers never get sued (and how you can become bulletproof today).";
+                strategy = "Deploy a legal expert avatar. Explain the 'Charging Order' and the South Dakota Trust. Funnel to the Affidavit of Truth templates.";
+            } else if (profile.threat === 'financial') {
+                niche = "Financial Sovereignty / Crypto Ghost";
+                hook = "The banks are freezing accounts. Here is how to move your wealth to a Dynasty Trust in 24 hours.";
+                strategy = "Use Midjourney to create images of collapsing banks. Post videos on decentralized finance. Funnel to the $10k Trust Course.";
+            }
+
+            setTimeout(() => {
+                out.innerHTML += `[ AI AVATAR PERSONA ]: ${niche}\n`;
+                out.innerHTML += `[ TARGET DEMOGRAPHIC ]: High-net-worth individuals terrified of systemic collapse.\n`;
+                out.innerHTML += `[ VIRAL HOOK ]: "${hook}"\n`;
+                out.innerHTML += `[ DEPLOYMENT STRATEGY ]: ${strategy}\n\n`;
+                
+                out.innerHTML += `> PROFILE COMPLETE. AWAITING EXECUTION.`;
+
+                // Setup the contact links
+                const waMsg = encodeURIComponent(`Hello Ramiro. I just ran the Sovereign OS Diagnostic. My primary threat vector is ${profile.threat.toUpperCase()}, and I have $${profile.wealth.toLocaleString()} exposed. I am ready to execute the Trust & Equity path. Please send the details.`);
+                document.getElementById('waLink').href = `https://wa.me/573108885154?text=${waMsg}`;
+
+                const emailSubject = encodeURIComponent(`Sovereign Operator Application - Threat: ${profile.threat}`);
+                const emailBody = encodeURIComponent(`Ramiro,\n\nI have completed the diagnostic. \n\nThreat Level: ${profile.threat.toUpperCase()}\nExposed Wealth: $${profile.wealth.toLocaleString()}\nEstimated Tax Loss: -$${profile.taxLost.toLocaleString()}\n\nI understand the risks. I am ready to join the Amnesty Coalition and execute the $10,000 path.\n\nLet's build the fortress.`);
+                document.getElementById('emailLink').href = `mailto:qbopuesmijo@proton.me?subject=${emailSubject}&body=${emailBody}`;
+
+            }, 1500);
+        }
+    </script>
+</body>
+</html>
