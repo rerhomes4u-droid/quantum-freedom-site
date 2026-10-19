@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sovereign Operator | Command Center</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #05080f;
+            --panel: #0a1220;
+            --panel-light: #111c30;
+            --border: #1f3454;
+            --gold: #c9a050;
+            --gold-hover: #e5c07b;
+            --text: #e2e8f0;
+            --muted: #8892b0;
+            --danger: #ef4444;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            background-image: radial-gradient(circle at 50% 0%, #0d1b33 0%, var(--bg) 70%);
+            min-height: 100vh;
+        }
+
+        /* Top Navigation */
+        .nav {
+            border-bottom: 1px solid var(--border);
+            padding: 1.5rem 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(5, 8, 15, 0.8);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-family: 'Cinzel', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--gold);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .nav-status {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #10b981;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 6rem 5% 4rem;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-family: 'Cinzel', serif;
+            font-size: 3rem;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(to right, #fff, var(--gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            color: var(--muted);
+            margin-bottom: 2rem;
+            font-weight: 300;
+        }
+
+        /* Main Layout */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 5% 5rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 900px) {
+            .container { grid-template-columns: 1fr; }
+            .hero h1 { font-size: 2.2rem; }
+        }
+
+        /* Panels */
+        .panel {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 2.5rem;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .panel:hover {
+            border-color: var(--gold);
+            box-shadow: 0 10px 30px rgba(201, 160, 80, 0.05);
+        }
+
+        .panel-header {
+            font-family: 'Cinzel', serif;
+            font-size: 1.4rem;
+            color: var(--gold);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 1rem;
+        }
+
+        .panel-header span {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            color: var(--muted);
+            background: var(--panel-light);
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        /* Form Elements */
+        label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+            margin-top: 1.5rem;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 14px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            border-radius: 4px;
+            transition: border 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--gold);
+        }
+
+        /* Buttons */
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            margin-top: 2rem;
+            background: var(--gold);
+            color: #000;
+            border: none;
+            border-radius: 4px;
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background: var(--gold-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(201, 160, 80, 0.2);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--gold);
+            color: var(--gold);
+        }
+
+        .btn-outline:hover {
+            background: rgba(201, 160, 80, 0.1);
+            color: var(--gold-hover);
+        }
+
+        /* Output Terminal */
+        .terminal {
+            background: #000;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 1.5rem;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: #10b981;
+            margin-top: 2rem;
+            display: none;
+            white-space: pre-wrap;
+            min-height: 200px;
+        }
+
+        .terminal.error { color: var(--danger); }
+        .terminal .highlight { color: var(--gold); font-weight: bold; }
+
+        /* Course Integration Section */
+        .courses-section {
+            background: var(--panel-light);
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            padding: 6rem 5%;
+            text-align: center;
+        }
+
+        .courses-section h2 {
+            font-family: 'Cinzel', serif;
+            font-size: 2rem;
+            color: var(--gold);
+            margin-bottom: 1rem;
+        }
+
+        .courses-section p {
+            color: var(--muted);
+            max-width: 700px;
+            margin: 0 auto 3rem;
+        }
+
+        .course-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 768px) {
+            .course-grid { grid-template-columns: 1fr; }
+        }
+
+        .course-card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            padding: 2.5rem;
+            border-radius: 4px;
+            text-align: left;
+            position: relative;
+        }
+
+        .course-card.premium {
+            border-color: var(--gold);
+            box-shadow: 0 0 30px rgba(201, 160, 80, 0.1);
+        }
+
+        .course-tag {
+            position: absolute;
+            top: -12px;
+            right: 20px;
+            background: var(--gold);
+            color: #000;
+            font-size: 0.7rem;
+            font-weight: 800;
+            padding: 4px 12px;
+            border-radius: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .course-card h3 {
+            font-family: 'Cinzel', serif;
+            font-size: 1.5rem;
+            color: #fff;
+            margin-bottom: 0.5rem;
+        }
+
+        .course-card .price {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--gold);
+            margin: 1rem 0;
+        }
+
+        .course-card ul {
+            list-style: none;
+            margin: 1.5rem 0;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        .course-card ul li {
+            margin-bottom: 0.8rem;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+
+        .course-card ul li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--gold);
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 4rem 5%;
+            color: var(--muted);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .footer a { color: var(--gold); text-decoration: none; }
+    </style>
+</head>
+<body>
+
+    <nav class="nav">
+        <div class="logo">Sovereign Operator</div>
+        <div class="nav-status">
+            <div class="status-dot"></div>
+            SECURE CONNECTION ESTABLISHED
+        </div>
+    </nav>
+
+    <section class="hero">
+        <h1>THE ARCHITECTURE OF ABSOLUTE SOVEREIGNTY</h1>
+        <p>You have accessed the terminal. The system wants you dependent, sick, and broke. We are going to make you a Sovereign Operator. Calculate your exposure, generate your AI wealth strategy, and execute the Trust & Equity path.</p>
+    </section>
+
+    <div class="container">
+        
+        <!-- Left Panel: The Diagnostic -->
+        <div class="panel">
+            <div class="panel-header">
+                <span>01</span> Threat Assessment
+            </div>
+            
+            <label>Primary Threat Vector</label>
+            <select id="threatInput">
+                <option value="medical">Medical Tyranny / Vaccine Mandates</option>
+                <option value="legal">Predatory Lawsuits / Asset Seizure</option>
+                <option value="financial">Inflation / Bank Freezes</option>
+                <option value="all">All of the Above (The Great Reset)</option>
+            </select>
+
+            <label>Estimated Net Worth Exposed to Seizure ($)</label>
+            <input type="number" id="wealthInput" placeholder="e.g. 250000" value="250000">
+
+            <button class="btn" onclick="runDiagnostic()">Run Diagnostic</button>
+        </div>
+
+        <!-- Right Panel: The Engine -->
+        <div class="panel">
+            <div class="panel-header">
+                <span>02</span> The Sovereign Engine
+            </div>
+            
+            <div class="terminal" id="terminalOutput">
+> INITIALIZING SECURE KERNEL...
+> AWAITING DIAGNOSTIC DATA...
+            </div>
+
+            <button class="btn btn-outline" onclick="generateAIStrategy()" id="aiBtn" style="display:none;">Generate AI Wealth Strategy</button>
+        </div>
+
+    </div>
+
+    <!-- Course Integration Section -->
+    <section class="courses-section">
+        <h2>The Execution Phase</h2>
+        <p>Your diagnostic is complete. To protect your assets and discharge fraudulent debts, you must learn the true application of Equity Jurisprudence. Select your path below.</p>
+
+        <div class="course-grid">
+            <!-- Course 1 -->
+            <div class="course-card">
+                <h3>The Equity Trust System</h3>
+                <p style="color: var(--muted); font-size: 0.9rem;">Live Series starting December 1, 2026. Learn how to remove your assets from the corporate jurisdiction using true Equity.</p>
+                <div class="price">$4,500</div>
+                <ul>
+                    <li>Wyoming LLC & South Dakota Trust setup</li>
+                    <li>The Charging Order Shield</li>
+                    <li>AI Trust Administration prompts</li>
+                    <li>Direct access to the PMA</li>
+                </ul>
+                <a href="https://standingontherock.com/?ref=qbopuesmijo" target="_blank" class="btn btn-outline">Enroll via Standing on the Rock</a>
+            </div>
+
+            <!-- Course 2 -->
+            <div class="course-card premium">
+                <div class="course-tag">Most Powerful</div>
+                <h3>Honor with Equity</h3>
+                <p style="color: var(--muted); font-size: 0.9rem;">Live Series starting November 4, 2026. The complete path to discharging IRS notices, wage garnishments, and state tax agencies.</p>
+                <div class="price">$10,000</div>
+                <ul>
+                    <li>Everything in The Equity Trust System</li>
+                    <li>The 96C Letter Protocol</li>
+                    <li>The Hugo Protocol (Medical Defense)</li>
+                    <li>Full Amnesty Coalition Integration</li>
+                </ul>
+                <a href="https://standingontherock.com/?ref=qbopuesmijo" target="_blank" class="btn">Enroll via Standing on the Rock</a>
+            </div>
+        </div>
+
+        <div style="margin-top: 3rem; text-align: center;">
+            <p style="color: var(--muted); margin-bottom: 1rem;">Have specific questions before enrolling?</p>
+            <a href="https://wa.me/573108885154?text=Hello%20Ramiro,%20I%20completed%20the%20Sovereign%20Diagnostic.%20I%20am%20ready%20to%20discuss%20the%20Trust%20and%20Equity%20courses." target="_blank" class="btn" style="display:inline-block; width: auto; padding: 14px 40px; background: #25D366; color: #fff;">WhatsApp Ramiro Directly</a>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <p>&copy; 2026 Amnesty Coalition for Unity. All rights reserved.</p>
+        <p style="margin-top: 10px;">Secure communications via <a href="mailto:qbopuesmijo@proton.me">qbopuesmijo@proton.me</a></p>
+    </footer>
+
+    <script>
+        let profile = {
+            threat: '',
+            wealth: 0,
+            taxLost: 0
+        };
+
+        function runDiagnostic() {
+            profile.threat = document.getElementById('threatInput').value;
+            profile.wealth = parseFloat(document.getElementById('wealthInput').value) || 0;
+            profile.taxLost = profile.wealth * 0.40; // Estimated 40% estate/asset tax loss
+
+            const term = document.getElementById('terminalOutput');
+            term.style.display = 'block';
+            term.innerHTML = "> ANALYZING THREAT VECTORS...\n> ACCESSING FORBIDDEN KNOWLEDGE...\n> CALCULATING EXPOSURE...\n\n";
+
+            setTimeout(() => {
+                term.innerHTML += `<span class="highlight">[ THREAT DETECTED ]</span>: ${profile.threat.toUpperCase()}\n`;
+                term.innerHTML += `<span class="highlight">[ ASSET EXPOSURE ]</span>: $${profile.wealth.toLocaleString()}\n`;
+                term.innerHTML += `<span class="highlight">[ ESTIMATED TAX LOSS ]</span>: -$${profile.taxLost.toLocaleString()}\n\n`;
+                
+                term.innerHTML += `[ SYSTEM ANALYSIS ]:\n`;
+                term.innerHTML += `You are currently a target. If a creditor, the IRS, or a hostile litigant sues you, they can seize 100% of your exposed wealth. The state will take 40% upon your death.\n\n`;
+                
+                term.innerHTML += `[ SOLUTION ]:\n`;
+                term.innerHTML += `The Wyoming LLC and South Dakota Dynasty Trust do not just hide your wealth; they remove it from the jurisdiction of the corporate state entirely. The charging order makes you bulletproof.\n\n`;
+                term.innerHTML += `> DIAGNOSTIC COMPLETE. SCROLL DOWN TO GENERATE AI STRATEGY AND ENROLL.`;
+
+                document.getElementById('aiBtn').style.display = 'block';
+            }, 1000);
+        }
+
+        function generateAIStrategy() {
+            const term = document.getElementById('terminalOutput');
+            term.innerHTML = "> INITIALIZING AI AVATAR FACTORY...\n> GENERATING CONTENT STRATEGY...\n\n";
+
+            let niche = "";
+            let hook = "";
+            let strategy = "";
+
+            if (profile.threat === 'medical' || profile.threat === 'all') {
+                niche = "Health Freedom / Medical Truth-Teller";
+                hook = "They silenced the FDA's own scientists. Here is the leaked document that proves they knew.";
+                strategy = "Deploy a faceless AI avatar. Post the BMJ study and the 99-million-person safety data. Funnel traffic to the Hugo Protocol.";
+            } else if (profile.threat === 'legal') {
+                niche = "Legal Shield / Sovereign Defender";
+                hook = "Why the Rockefellers never get sued (and how you can become bulletproof today).";
+                strategy = "Deploy a legal expert avatar. Explain the 'Charging Order' and the South Dakota Trust. Funnel to the Affidavit of Truth templates.";
+            } else if (profile.threat === 'financial') {
+                niche = "Financial Sovereignty / Crypto Ghost";
+                hook = "The banks are freezing accounts. Here is how to move your wealth to a Dynasty Trust in 24 hours.";
+                strategy = "Use Midjourney to create images of collapsing banks. Post videos on decentralized finance. Funnel to the $10k Trust Course.";
+            }
+
+            setTimeout(() => {
+                term.innerHTML += `<span class="highlight">[ AI AVATAR PERSONA ]</span>: ${niche}\n`;
+                term.innerHTML += `<span class="highlight">[ TARGET DEMOGRAPHIC ]</span>: High-net-worth individuals terrified of systemic collapse.\n`;
+                term.innerHTML += `<span class="highlight">[ VIRAL HOOK ]</span>: "${hook}"\n`;
+                term.innerHTML += `<span class="highlight">[ DEPLOYMENT STRATEGY ]</span>: ${strategy}\n\n`;
+                
+                term.innerHTML += `> PROFILE COMPLETE. PROCEED TO THE EXECUTION PHASE BELOW.`;
+
+                // Scroll to courses smoothly
+                document.querySelector('.courses-section').scrollIntoView({ behavior: 'smooth' });
+            }, 1500);
+        }
+    </script>
+</body>
+</html>
