@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE PCR DECEPTION // EXPOSÉ TERMINAL</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #050505;
+            --panel: #111;
+            --border: #333;
+            --text: #e0e0e0;
+            --danger: #ff003c;
+            --safe: #00ff41;
+            --gold: #d4af37;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 30px 30px;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .terminal {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            max-width: 800px;
+            width: 100%;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            overflow: hidden;
+        }
+
+        .terminal-header {
+            background: #000;
+            padding: 15px 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            color: var(--muted);
+        }
+
+        .terminal-header span { color: var(--danger); font-weight: bold; }
+
+        .terminal-body {
+            padding: 40px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        h1 {
+            font-family: 'Inter', sans-serif;
+            font-size: 2rem;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            color: var(--muted);
+            font-size: 0.9rem;
+            margin-bottom: 40px;
+            border-bottom: 1px dashed var(--border);
+            padding-bottom: 20px;
+        }
+
+        .control-panel {
+            background: #000;
+            border: 1px solid var(--border);
+            padding: 20px;
+            border-radius: 4px;
+            margin-bottom: 30px;
+        }
+
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 15px;
+        }
+
+        input[type=range] {
+            flex-grow: 1;
+            -webkit-appearance: none;
+            background: transparent;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 24px;
+            width: 24px;
+            border-radius: 50%;
+            background: var(--danger);
+            cursor: pointer;
+            margin-top: -10px;
+            box-shadow: 0 0 15px var(--danger);
+        }
+
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: var(--border);
+            border-radius: 2px;
+        }
+
+        .ct-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--danger);
+            min-width: 60px;
+            text-align: right;
+        }
+
+        .ct-label {
+            font-size: 0.8rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .result-box {
+            background: #000;
+            border: 2px solid var(--border);
+            padding: 40px;
+            text-align: center;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .result-box.positive {
+            border-color: var(--danger);
+            box-shadow: 0 0 30px rgba(255, 0, 60, 0.2);
+        }
+
+        .result-box.negative {
+            border-color: var(--safe);
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.2);
+        }
+
+        .result-status {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .result-box.positive .result-status { color: var(--danger); }
+        .result-box.negative .result-status { color: var(--safe); }
+
+        .result-explanation {
+            color: var(--muted);
+            font-size: 0.95rem;
+            max-width: 500px;
+            margin: 0 auto;
+            display: none;
+        }
+
+        .result-box.positive .result-explanation { display: block; }
+
+        .actions {
+            margin-top: 40px;
+            text-align: center;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 15px 30px;
+            background: var(--gold);
+            color: #000;
+            text-decoration: none;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border-radius: 4px;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background: #fff;
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+        }
+
+        .warning {
+            margin-top: 20px;
+            font-size: 0.8rem;
+            color: var(--danger);
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="terminal">
+        <div class="terminal-header">
+            <span>SOVEREIGN_TERMINAL // PCR_MODULE</span>
+            <span>STATUS: <span style="color: var(--danger); animation: pulse 1s infinite;">EXPOSING FRAUD</span></span>
+        </div>
+
+        <div class="terminal-body">
+            <h1>THE PCR DECEPTION</h1>
+            <div class="subtitle">Interactive Simulation: How to Manufacture a Pandemic</div>
+
+            <p style="margin-bottom: 30px; color: #aaa;">
+                In the book, we explained how the PCR test was used to create false positives. Now, see it for yourself. 
+                Slide the <strong>Cycle Threshold (Ct)</strong> below. 
+                <br><br>
+                Any result above <strong>35 cycles</strong> is clinically meaningless. Watch what happens to a perfectly healthy person when the lab runs the test at 40 cycles.
+            </p>
+
+            <div class="control-panel">
+                <div class="slider-container">
+                    <input type="range" id="ctSlider" min="20" max="45" value="20" oninput="updateTest()">
+                    <div class="ct-value" id="ctDisplay">20</div>
+                </div>
+                <div class="ct-label">CYCLE THRESHOLD (Ct) - Adjust to see the fraud</div>
+            </div>
+
+            <div class="result-box negative" id="resultBox">
+                <div class="result-status" id="resultStatus">NEGATIVE</div>
+                <div style="color: var(--muted); font-size: 0.9rem;" id="resultText">Healthy Patient. No viral load detected.</div>
+                
+                <div class="result-explanation" id="resultExplanation">
+                    <strong style="color: #fff; display: block; margin-bottom: 10px;">FALSE POSITIVE GENERATED</strong>
+                    At this cycle threshold, the PCR machine is amplifying dead genetic fragments and harmless debris. The patient is completely healthy and non-infectious. But the system will label them as a "COVID-19 Case." This is the lie that locked down the world.
+                </div>
+            </div>
+
+            <div class="actions">
+                <button class="btn" onclick="window.location.href='https://quantum-freedom-site.vercel.app/CENSORED-BOOK-DRAFT.html'">Read The Original Censored Book</button>
+            </div>
+            
+            <div class="warning">
+                "The PCR, if you do it well, you can find almost anything in anybody." - Kary Mullis, Inventor of PCR
+            </div>
+        </div>
+    </div>
+
+    <style>
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+    </style>
+
+    <script>
+        function updateTest() {
+            const slider = document.getElementById('ctSlider');
+            const display = document.getElementById('ctDisplay');
+            const box = document.getElementById('resultBox');
+            const status = document.getElementById('resultStatus');
+            const text = document.getElementById('resultText');
+
+            const val = parseInt(slider.value);
+            display.innerText = val;
+
+            if (val >= 35) {
+                // Danger Zone
+                box.className = 'result-box positive';
+                status.innerText = 'POSITIVE';
+                text.innerText = 'The patient is flagged as infected and a danger to society.';
+                display.style.color = 'var(--danger)';
+            } else if (val >= 30) {
+                // Gray Zone
+                box.className = 'result-box'; // neutral
+                status.innerText = 'INCONCLUSIVE';
+                text.innerText = 'Testing at this level is borderline. The system may still count this as a case.';
+                display.style.color = 'var(--gold)';
+            } else {
+                // Safe Zone
+                box.className = 'result-box negative';
+                status.innerText = 'NEGATIVE';
+                text.innerText = 'Healthy Patient. No viral load detected.';
+                display.style.color = 'var(--safe)';
+            }
+        }
+    </script>
+</body>
+</html>
