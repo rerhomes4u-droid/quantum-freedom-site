@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Word "Person" — Sovereign Operator Companion</title>
+<style>
+  :root{
+    --bg:#0a0a0c; --panel:#121216; --panel2:#18181d; --line:#2a2a33;
+    --ink:#e8e6e0; --dim:#9a978f; --gold:#c9a24b; --gold-dim:#8a7136;
+    --red:#b3453c; --green:#4e8a5c; --blue:#4a6f8a;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:Georgia,'Times New Roman',serif; line-height:1.65;
+  }
+  header{
+    padding:2rem 1.25rem 1.5rem; border-bottom:1px solid var(--line);
+    background:linear-gradient(180deg,#0d0d10,#0a0a0c);
+  }
+  .kicker{font-family:ui-monospace,Menlo,monospace;font-size:.7rem;letter-spacing:.22em;
+    text-transform:uppercase;color:var(--gold-dim);margin:0 0 .5rem}
+  h1{font-size:1.6rem;margin:0 0 .4rem;font-weight:600;letter-spacing:.01em}
+  .sub{color:var(--dim);font-size:.92rem;margin:0;max-width:60ch}
+  main{max-width:880px;margin:0 auto;padding:1.5rem 1.25rem 6rem}
+  .tabs{display:flex;flex-wrap:wrap;gap:.4rem;margin:1.5rem 0 1.25rem;
+    border-bottom:1px solid var(--line);padding-bottom:.75rem}
+  .tab{
+    font-family:ui-monospace,Menlo,monospace;font-size:.72rem;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--dim);background:transparent;border:1px solid var(--line);
+    padding:.5rem .8rem;border-radius:3px;cursor:pointer;transition:.15s;
+  }
+  .tab:hover{color:var(--ink);border-color:var(--gold-dim)}
+  .tab.active{color:#0a0a0c;background:var(--gold);border-color:var(--gold);font-weight:600}
+  section{display:none;animation:fade .25s ease}
+  section.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  h2{font-size:1.15rem;margin:1.75rem 0 .6rem;color:var(--gold);font-weight:600}
+  h3{font-size:.95rem;margin:1.25rem 0 .4rem;color:var(--ink);font-weight:600}
+  p{margin:.6rem 0}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:5px;padding:1.1rem 1.25rem;margin:1rem 0}
+  .panel2{background:var(--panel2)}
+  .step{display:flex;gap:.9rem;margin:1rem 0;align-items:flex-start}
+  .num{flex:0 0 1.9rem;height:1.9rem;border-radius:50%;border:1px solid var(--gold-dim);
+    color:var(--gold);display:flex;align-items:center;justify-content:center;
+    font-family:ui-monospace,monospace;font-size:.8rem;font-weight:600}
+  .step-body{flex:1}
+  .step-body strong{display:block;margin-bottom:.2rem}
+  .step-body span{color:var(--dim);font-size:.9rem}
+  label{display:block;font-family:ui-monospace,Menlo,monospace;font-size:.72rem;
+    letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin:.9rem 0 .35rem}
+  input[type=text],textarea,select{
+    width:100%;background:#0e0e12;border:1px solid var(--line);border-radius:3px;
+    color:var(--ink);padding:.65rem .75rem;font-family:inherit;font-size:.92rem;
+  }
+  textarea{min-height:5.5rem;resize:vertical;line-height:1.5}
+  input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold-dim)}
+  button.act{
+    font-family:ui-monospace,Menlo,monospace;font-size:.75rem;letter-spacing:.1em;
+    text-transform:uppercase;background:var(--gold);color:#0a0a0c;border:none;
+    padding:.65rem 1.1rem;border-radius:3px;cursor:pointer;font-weight:600;margin-top:.9rem;
+  }
+  button.act:hover{background:#d9b25a}
+  button.ghost{background:transparent;color:var(--gold);border:1px solid var(--gold-dim)}
+  button.ghost:hover{background:#1a1710}
+  .verdict{display:flex;flex-wrap:wrap;gap:.4rem;margin:.9rem 0 .4rem}
+  .vbtn{
+    font-family:ui-monospace,monospace;font-size:.7rem;letter-spacing:.06em;text-transform:uppercase;
+    background:transparent;border:1px solid var(--line);color:var(--dim);
+    padding:.45rem .7rem;border-radius:3px;cursor:pointer;
+  }
+  .vbtn.on{border-color:var(--gold);color:var(--gold);background:#171410}
+  .card{
+    background:var(--panel2);border-left:3px solid var(--gold-dim);
+    padding:.9rem 1.1rem;margin:.8rem 0;border-radius:0 4px 4px 0;
+  }
+  .card .tag{font-family:ui-monospace,monospace;font-size:.65rem;letter-spacing:.15em;
+    text-transform:uppercase;color:var(--gold-dim);display:block;margin-bottom:.3rem}
+  .card p{margin:.3rem 0;font-size:.92rem}
+  .quote{font-style:italic;color:#cfc9bd;border-left:2px solid var(--gold-dim);
+    padding-left:.9rem;margin:.8rem 0}
+  .cite{font-family:ui-monospace,monospace;font-size:.72rem;color:var(--blue);letter-spacing:.03em}
+  .gap{border-left-color:var(--red)}
+  .gap .tag{color:var(--red)}
+  .ok{border-left-color:var(--green)}
+  .ok .tag{color:var(--green)}
+  .warn{border-left-color:var(--blue)}
+  .warn .tag{color:var(--blue)}
+  .out{white-space:pre-wrap;font-family:ui-monospace,Menlo,monospace;font-size:.78rem;
+    line-height:1.55;background:#08080a;border:1px solid var(--line);border-radius:4px;
+    padding:1rem;margin-top:1rem;color:#c7c3b8;overflow-x:auto}
+  .hint{font-size:.82rem;color:var(--dim);font-style:italic}
+  .checklist{list-style:none;padding:0;margin:.6rem 0}
+  .checklist li{display:flex;gap:.6rem;align-items:flex-start;padding:.45rem 0;
+    border-bottom:1px dashed #22222a;font-size:.9rem}
+  .checklist li:last-child{border-bottom:none}
+  .checklist input[type=checkbox]{margin-top:.25rem;accent-color:var(--gold)}
+  footer{border-top:1px solid var(--line);padding:1.25rem;text-align:center;
+    font-family:ui-monospace,monospace;font-size:.68rem;letter-spacing:.12em;
+    text-transform:uppercase;color:#4a4840}
+  .badge{display:inline-block;font-family:ui-monospace,monospace;font-size:.62rem;
+    letter-spacing:.14em;text-transform:uppercase;border:1px solid var(--gold-dim);
+    color:var(--gold-dim);padding:.2rem .5rem;border-radius:2px;margin-bottom:.7rem}
+  a{color:var(--gold);text-decoration:none;border-bottom:1px solid var(--gold-dim)}
+  a:hover{color:#e0bf6c}
+</style>
+</head>
+<body>
+
+<header>
+  <span class="badge">Sovereign Operator Companion</span>
+  <p class="kicker">Chapter Tool · The Method Applied</p>
+  <h1>The Word “Person”</h1>
+  <p class="sub">A field tool for the reader who wants to check the record — not to be told what to believe. Name the specific. Find the corroboration. Mark the gap. Refuse to overclaim.</p>
+</header>
+
+<main>
+
+  <div class="tabs" role="tablist">
+    <button class="tab active" data-tab="method">The Method</button>
+    <button class="tab" data-tab="claims">Claim Checker</button>
+    <button class="tab" data-tab="sources">The Record</button>
+    <button class="tab" data-tab="gaps">The Gaps</button>
+    <button class="tab" data-tab="kit">Question Kit</button>
+  </div>
+
+  <!-- METHOD -->
+  <section id="method" class="active">
+    <h2>Four steps. Non-negotiable.</h2>
+    <p class="hint">This is the same method the book uses in every chapter. The app does not do the thinking for you. It holds the structure so you can do it yourself.</p>
+
+    <div class="panel">
+      <div class="step">
+        <div class="num">1</div>
+        <div class="step-body"><strong>Name the specific.</strong>
+        <span>Not “the law hides things.” The statute, the case, the date, the exact sentence. Vague claims cannot be checked. Specific ones can.</span></div>
+      </div>
+      <div class="step">
+        <div class="num">2</div>
+        <div class="step-body"><strong>Find the corroboration.</strong>
+        <span>What does the primary record actually say? Not the article about the record. Not the video about the record. The record.</span></div>
+      </div>
+      <div class="step">
+        <div class="num">3</div>
+        <div class="step-body"><strong>Mark the gap.</strong>
+        <span>What is unknown? What has not been tested in court? What has not been independently verified? Say it plainly.</span></div>
+      </div>
+      <div class="step">
+        <div class="num">4</div>
+        <div class="step-body"><strong>Refuse to overclaim.</strong>
+        <span>If the record does not support the claim, say so. Do not soften it. Do not hedge it into meaninglessness. State what the record supports — and stop there.</span></div>
+      </div>
+    </div>
+
+    <div class="panel panel2">
+      <h3>What this chapter is actually about</h3>
+      <p>The word “person” in American law has a history. It is not a synonym for “human being.” Federal law defines it to include corporations. The 14th Amendment created a category of United States citizenship distinct from state citizenship, and the Supreme Court said so in <em>The Slaughter-House Cases</em> (1873). Those are documented facts.</p>
+      <p>What follows from those facts is where people disagree — often violently. This app does not resolve the disagreement. It shows you where the record ends and interpretation begins.</p>
+    </div>
+  </section>
+
+  <!-- CLAIM CHECKER -->
+  <section id="claims">
+    <h2>Claim Checker</h2>
+    <p class="hint">Enter one claim. Take it through the four steps. The app writes the finding in the book's voice. Nothing is saved or sent anywhere — this runs only in your browser.</p>
+
+    <label for="c-specific">Step 1 — The specific claim (exactly as stated)</label>
+    <textarea id="c-specific" placeholder="Example: '1 U.S.C. § 1 defines person to include corporations.'"></textarea>
+
+    <label for="c-source">Step 2 — Where is this in the record? (citation, URL, case name)</label>
+    <textarea id="c-source" placeholder="Example: 1 U.S.C. § 1 (Dictionary Act); Cornell LII. Read the statute itself."></textarea>
+
+    <label for="c-gap">Step 3 — What is still unknown or contested?</label>
+    <textarea id="c-gap" placeholder="Example: The statute's scope in any particular federal act. How courts have applied it varies by context."></textarea>
+
+    <label>Step 4 — Verdict</label>
+    <div class="verdict" id="verdicts">
+      <button class="vbtn" data-v="SUPPORTED BY THE RECORD">Supported by the record</button>
+      <button class="vbtn" data-v="PARTIALLY SUPPORTED — GAP MARKED">Partially supported</button>
+      <button class="vbtn" data-v="NOT SUPPORTED BY THE RECORD">Not supported</button>
+      <button class="vbtn" data-v="CONTESTED — RECORD DOES NOT RESOLVE">Contested</button>
+    </div>
+
+    <button class="act" id="gen">Generate finding</button>
+    <button class="act ghost" id="copy">Copy</button>
+
+    <div class="out" id="out">Your finding will appear here.</div>
+  </section>
+
+  <!-- SOURCES -->
+  <section id="sources">
+    <h2>The Record — primary sources</h2>
+    <p class="hint">These are the documents the chapter stands on. Read them yourself. Do not take this app's word for it.</p>
+
+    <div class="card ok">
+      <span class="tag">The statute · primary</span>
+      <p><strong>1 U.S.C. § 1 — The Dictionary Act.</strong> The federal definition of “person.”</p>
+      <p class="cite">The words “person” and “whoever” include corporations, companies, associations, firms, partnerships, societies, and joint stock companies, as well as individuals.</p>
+      <p><a href="https://www.law.cornell.edu/uscode/text/1/1" target="_blank" rel="noopener">Read the statute — Cornell LII</a></p>
+    </div>
+
+    <div class="card ok">
+      <span class="tag">The case · primary</span>
+      <p><strong>Dred Scott v. Sandford, 60 U.S. 393 (1857).</strong> Taney's distinction between “the people of the United States” and “persons.” The case's racism is repudiated; its structural distinction was not erased by the 14th Amendment — it was worked around. Read the language yourself and note what it does and does not say.</p>
+      <p><a href="https://supreme.justia.com/cases/federal/us/60/393/" target="_blank" rel="noopener">Read the opinion — Justia</a></p>
+    </div>
+
+    <div class="card ok">
+      <span class="tag">The case · primary</span>
+      <p><strong>The Slaughter-House Cases, 83 U.S. 36 (1873).</strong> The Court's holding that United States citizenship and state citizenship are distinct, and that the Privileges or Immunities Clause of the 14th Amendment protects only the former. This is the hinge on which much of the “person vs. people” argument turns. Read what the Court actually wrote.</p>
+      <p><a href="https://supreme.justia.com/cases/federal/us/83/36/" target="_blank" rel="noopener">Read the opinion — Justia</a></p>
+    </div>
+
+    <div class="card warn">
+      <span class="tag">The amendment · primary</span>
+      <p><strong>U.S. Const. amend. XIV, § 1.</strong> “All persons born or naturalized in the United States... are citizens of the United States and of the State wherein they reside.” Note the word: <em>persons</em>. Read it against the two cases above.</p>
+      <p><a href="https://www.archives.gov/founding-docs/amendments-11-27" target="_blank" rel="noopener">Read the amendment — National Archives</a></p>
+    </div>
+
+    <div class="card">
+      <span class="tag">The secondary source · contested</span>
+      <p><strong>“A Treatise on the Word ‘Person’”</strong> — Williams and Williams Law Firm. The long argument the chapter engages. It has a point of view. It cites real cases. It also interprets them through a specific lens. Read it as an argument, not as the record.</p>
+      <p><a href="https://www.williamsandwilliamslawfirm.com/a-treatise-on-the-word-person" target="_blank" rel="noopener">Read the Treatise</a></p>
+    </div>
+
+    <div class="panel panel2">
+      <h3>How to read a case for yourself</h3>
+      <ul class="checklist">
+        <li><input type="checkbox"> Find the holding — the sentence that begins “We hold that...”</li>
+        <li><input type="checkbox"> Separate holding from dicta — what the court decided vs. what it mused about</li>
+        <li><input type="checkbox"> Note what the court did <em>not</em> decide</li>
+        <li><input type="checkbox"> Check whether a later case overruled or narrowed it</li>
+        <li><input type="checkbox"> Ask: does the Treatise's quote match the sentence in context?</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- GAPS -->
+  <section id="gaps">
+    <h2>The Gaps — stated plainly</h2>
+    <p class="hint">The chapter's honesty lives here. These are the places where the record ends and interpretation begins. Mark them. Do not paper over them.</p>
+
+    <div class="card gap">
+      <span class="tag">Gap · scope</span>
+      <p><strong>“Person” means different things in different statutes.</strong> The Dictionary Act sets a default for Acts of Congress, but courts construe “person” contextually. A claim that “person always means X” is not supported. A claim that “person can include corporations in federal law” is supported.</p>
+    </div>
+
+    <div class="card gap">
+      <span class="tag">Gap · consequences</span>
+      <p><strong>The record does not support the leap from “person includes corporations” to “you are a corporation.”</strong> The Treatise sometimes moves from the first to the second. The first is documented. The second is an interpretation, and it is contested. Mark it.</p>
+    </div>
+
+    <div class="card gap">
+      <span class="tag">Gap · remedy</span>
+      <p><strong>The record does not support “VOID — NO CONTRACT” filings as a legal remedy.</strong> Courts have consistently rejected sovereign-citizen theories. This is not a guardrail — it is what the case law shows. Telling a reader otherwise can get them jailed. The chapter must not do that, and this app will not either.</p>
+    </div>
+
+    <div class="card gap">
+      <span class="tag">Gap · the 14th Amendment</span>
+      <p><strong>“Circumvented, not overturned” is a contested reading.</strong> It is an argument some scholars and practitioners make. It is not the settled holding of any court. The chapter can present it as an argument and mark it as such. It cannot present it as established fact.</p>
+    </div>
+
+    <div class="card gap">
+      <span class="tag">Gap · what is unknown</span>
+      <p><strong>No court has ever held that the word “person” in ordinary legal usage strips a human being of constitutional rights.</strong> If a reader encounters that claim, the burden is on the claim to produce the case. The app has not found one. Mark the gap.</p>
+    </div>
+  </section>
+
+  <!-- KIT -->
+  <section id="kit">
+    <h2>The Question Kit</h2>
+    <p class="hint">Carry these. They work on any claim — from any side. The point is not to win. The point is to find the step where the claim stops being evidence and starts being belief.</p>
+
+    <div class="panel">
+      <h3>Five questions</h3>
+      <div class="step"><div class="num">1</div><div class="step-body"><strong>What is the specific?</strong><span>Which statute, case, date, sentence? If the claim cannot be made specific, it cannot be checked.</span></div></div>
+      <div class="step"><div class="num">2</div><div class="step-body"><strong>What is the primary source?</strong><span>The record itself — not the article about it. Read the case. Read the statute. Read the amendment.</span></div></div>
+      <div class="step"><div class="num">3</div><div class="step-body"><strong>Where is the step?</strong><span>Find the sentence where the claim moves from “this is documented” to “therefore this follows.” That is the place to stop.</span></div></div>
+      <div class="step"><div class="num">4</div><div class="step-body"><strong>What would prove this wrong?</strong><span>If nothing would, it is not a claim about the record. It is a belief. Both can matter. They are not the same thing.</span></div></div>
+      <div class="step"><div class="num">5</div><div class="step-body"><strong>Who benefits from me believing this without checking?</strong><span>Ask it of every claim — including the ones you like. Especially the ones you like.</span></div></div>
+    </div>
+
+    <div class="panel panel2">
+      <h3>The oath of the reader</h3>
+      <p class="quote">“I will not believe a thing because it makes me feel like I am part of a brave minority. I will not reject a thing because it makes me uncomfortable. I will check. I will mark the gap. I will refuse to overclaim. And when the record does not support what I want it to support, I will say so — plainly.”</p>
+    </div>
+
+    <div class="panel">
+      <h3>What the chapter asks of you</h3>
+      <ul class="checklist">
+        <li><input type="checkbox"> Read 1 U.S.C. § 1 yourself.</li>
+        <li><input type="checkbox"> Read the Dred Scott language Taney actually wrote.</li>
+        <li><input type="checkbox"> Read The Slaughter-House Cases holding.</li>
+        <li><input type="checkbox"> Read the 14th Amendment, § 1.</li>
+        <li><input type="checkbox"> Write down where the record ends and your interpretation begins.</li>
+        <li><input type="checkbox"> Share the finding — not the feeling.</li>
+      </ul>
+    </div>
+  </section>
+
+</main>
+
+<footer>Soli Deo Gloria · The record is the record · Check it yourself</footer>
+
+<script>
+(function(){
+  // Tabs
+  const tabs = document.querySelectorAll('.tab');
+  const sections = document.querySelectorAll('section');
+  tabs.forEach(t => t.addEventListener('click', () => {
+    tabs.forEach(x => x.classList.remove('active'));
+    sections.forEach(s => s.classList.remove('active'));
+    t.classList.add('active');
+    const target = document.getElementById(t.dataset.tab);
+    if(target) target.classList.add('active');
+    window.scrollTo({top:0, behavior:'smooth'});
+  }));
+
+  // Verdict buttons
+  let verdict = '';
+  const vbtns = document.querySelectorAll('.vbtn');
+  vbtns.forEach(b => b.addEventListener('click', () => {
+    vbtns.forEach(x => x.classList.remove('on'));
+    b.classList.add('on');
+    verdict = b.dataset.v;
+  }));
+
+  // Generate finding
+  const out = document.getElementById('out');
+  document.getElementById('gen').addEventListener('click', () => {
+    const specific = (document.getElementById('c-specific').value || '').trim();
+    const source   = (document.getElementById('c-source').value || '').trim();
+    const gap      = (document.getElementById('c-gap').value || '').trim();
+
+    if(!specific || !source){
+      out.textContent = 'Name the specific and cite the source first. The method does not skip steps.';
+      return;
+    }
+    if(!verdict){
+      out.textContent = 'Choose a verdict. Refusing to overclaim requires deciding what the record actually supports.';
+      return;
+    }
+
+    const lines = [
+      'FINDING — ' + new Date().toISOString().slice(0,10),
+      '',
+      'THE SPECIFIC',
+      specific,
+      '',
+      'THE CORROBORATION',
+      source,
+      '',
+      'THE GAP',
+      gap || 'Not marked. If the gap is not stated, the finding is incomplete.',
+      '',
+      'VERDICT',
+      verdict,
+      '',
+      '— Generated with the Sovereign Operator method. Check the primary sources before you share this. —'
+    ];
+    out.textContent = lines.join('\n');
+  });
+
+  // Copy
+  document.getElementById('copy').addEventListener('click', async () => {
+    try{
+      await navigator.clipboard.writeText(out.textContent);
+      const btn = document.getElementById('copy');
+      const old = btn.textContent;
+      btn.textContent = 'Copied';
+      setTimeout(()=>{ btn.textContent = old; }, 1200);
+    }catch(e){
+      out.textContent += '\n\n[Copy failed — select the text manually.]';
+    }
+  });
+})();
+</script>
+</body>
+</html>
