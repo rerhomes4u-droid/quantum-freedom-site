@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Question That Gets You Banned · A Manifesto Engine</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --negro:#0a0a0a;--gris:#141414;--gris2:#1c1c1c;--borde:#2a2a2a;
+    --texto:#d8d8d8;--dim:#7a7a7a;--rojo:#c1121f;--rojo2:#780000;
+    --amber:#e8a33d;--verde:#4ade80;--azul:#48cae4;--plata:#c0c0c0;
+  }
+  body{font-family:'Courier New',monospace;background:var(--negro);color:var(--texto);line-height:1.8;overflow-x:hidden}
+
+  .header{background:var(--gris);border-bottom:2px solid var(--rojo);padding:15px 20px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:50}
+  .header-titulo{font-size:0.95rem;color:var(--rojo);letter-spacing:2px;font-weight:bold}
+  .header-status{font-size:0.7rem;color:var(--dim);letter-spacing:1px}
+  .header-status .dot{display:inline-block;width:8px;height:8px;background:var(--rojo);border-radius:50%;margin-right:5px;animation:pulse 2s infinite}
+  @keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(193,18,31,0.6)}50%{opacity:0.6;box-shadow:0 0 0 8px rgba(193,18,31,0)}}
+
+  .container{max-width:820px;margin:0 auto;padding:30px 20px}
+
+  /* OPENING */
+  .apertura{min-height:80vh;display:flex;flex-direction:column;justify-content:center;padding:40px 0;border-bottom:1px solid var(--borde);margin-bottom:40px}
+  .apertura .etiqueta{font-size:0.7rem;color:var(--rojo);letter-spacing:3px;margin-bottom:20px;text-transform:uppercase}
+  .apertura h1{font-size:clamp(1.6rem,5vw,2.6rem);color:var(--texto);font-weight:bold;line-height:1.3;margin-bottom:30px;letter-spacing:0.5px}
+  .apertura h1 .rojo{color:var(--rojo)}
+  .apertura .sub{font-size:1rem;color:var(--dim);font-style:italic;margin-bottom:20px;max-width:600px}
+  .apertura .advertencia{background:rgba(193,18,31,0.08);border-left:3px solid var(--rojo);padding:18px 22px;margin:30px 0;font-size:0.85rem;color:#e0a0a8;max-width:650px}
+  .btn-principal{display:inline-block;background:var(--rojo);color:var(--negro);padding:16px 42px;text-decoration:none;font-weight:bold;letter-spacing:2px;font-size:0.85rem;border:none;cursor:pointer;font-family:inherit;transition:all 0.3s;align-self:flex-start;margin-top:20px}
+  .btn-principal:hover{background:var(--rojo2);color:var(--texto)}
+
+  /* MANIFESTO SCROLL */
+  .manifiesto{background:var(--gris2);border-left:4px solid var(--amber);padding:35px 30px;margin:40px 0;border-radius:0 6px 6px 0;font-size:0.92rem;color:#c8c8c8;line-height:1.9}
+  .manifiesto p{margin-bottom:18px}
+  .manifiesto p:last-child{margin-bottom:0}
+  .manifiesto .firma{color:var(--amber);font-style:italic;margin-top:25px;padding-top:20px;border-top:1px solid var(--borde);font-size:0.85rem}
+  .manifiesto .destacado{color:var(--texto);font-weight:bold}
+
+  /* PREGUNTA CENTRAL */
+  .pregunta-central{text-align:center;padding:60px 20px;margin:40px 0;background:linear-gradient(180deg,var(--gris2) 0%,var(--negro) 100%);border-top:2px solid var(--rojo);border-bottom:2px solid var(--rojo)}
+  .pregunta-central .etiqueta{font-size:0.7rem;color:var(--rojo);letter-spacing:3px;margin-bottom:25px;text-transform:uppercase}
+  .pregunta-central h2{font-size:clamp(1.4rem,4.5vw,2.2rem);color:var(--rojo);font-weight:bold;line-height:1.4;margin-bottom:15px;font-style:italic}
+  .pregunta-central p{font-size:0.9rem;color:var(--dim);max-width:500px;margin:0 auto}
+
+  /* PATTERN */
+  .patron{margin:50px 0}
+  .patron h3{font-size:1.1rem;color:var(--azul);letter-spacing:1px;margin-bottom:25px;text-transform:uppercase}
+  .paso-patron{display:flex;gap:18px;padding:18px 0;border-bottom:1px solid var(--borde);align-items:flex-start}
+  .paso-patron:last-child{border-bottom:none}
+  .paso-patron .num{background:var(--gris);border:1px solid var(--borde);color:var(--amber);width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;flex-shrink:0;font-size:0.9rem}
+  .paso-patron .texto{font-size:0.9rem;color:#c8c8c8;padding-top:6px}
+
+  /* INTERACTIVE: THE ANSWER */
+  .interactivo{background:var(--gris2);border:1px solid var(--borde);border-radius:8px;padding:35px 30px;margin:50px 0}
+  .interactivo h3{font-size:1.2rem;color:var(--texto);margin-bottom:10px;letter-spacing:1px}
+  .interactivo .desc{font-size:0.85rem;color:var(--dim);margin-bottom:25px;font-style:italic}
+  .interactivo label{display:block;font-size:0.75rem;color:var(--azul);letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;margin-top:20px}
+  .interactivo label:first-of-type{margin-top:0}
+  .interactivo textarea,.interactivo input{width:100%;background:var(--negro);border:1px solid var(--borde);color:var(--texto);padding:14px;font-family:'Courier New',monospace;font-size:0.9rem;line-height:1.6;border-radius:4px;resize:vertical}
+  .interactivo textarea:focus,.interactivo input:focus{outline:none;border-color:var(--amber)}
+  .interactivo textarea{min-height:100px}
+  .contador{font-size:0.7rem;color:var(--dim);text-align:right;margin-top:5px}
+  .btn-generar{display:block;width:100%;background:var(--amber);color:var(--negro);padding:16px;text-decoration:none;font-weight:bold;letter-spacing:2px;font-size:0.85rem;border:none;cursor:pointer;font-family:inherit;margin-top:25px;transition:all 0.3s;border-radius:4px}
+  .btn-generar:hover{background:var(--texto)}
+
+  /* GENERATED CARD */
+  .tarjeta-output{display:none;margin:50px 0}
+  .tarjeta-output.mostrar{display:block;animation:fadeIn 0.6s ease}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+  .tarjeta{background:linear-gradient(135deg,var(--gris2) 0%,var(--gris) 100%);border:2px solid var(--amber);border-radius:12px;padding:40px 30px;position:relative;overflow:hidden}
+  .tarjeta::before{content:'"';position:absolute;top:-30px;left:20px;font-size:12rem;color:rgba(232,163,61,0.08);font-family:Georgia,serif;line-height:1}
+  .tarjeta-header{font-size:0.65rem;color:var(--amber);letter-spacing:3px;margin-bottom:20px;text-transform:uppercase}
+  .tarjeta-question{font-size:clamp(1.1rem,3vw,1.4rem);color:var(--rojo);font-weight:bold;font-style:italic;margin-bottom:25px;line-height:1.5}
+  .tarjeta-answer{font-size:0.95rem;color:var(--texto);line-height:1.8;margin-bottom:25px;padding:20px;background:rgba(0,0,0,0.3);border-radius:6px;border-left:3px solid var(--amber);white-space:pre-wrap}
+  .tarjeta-answer:empty{display:none}
+  .tarjeta-signature{font-size:0.8rem;color:var(--dim);text-align:right;font-style:italic;margin-bottom:15px}
+  .tarjeta-footer{font-size:0.65rem;color:var(--dim);letter-spacing:2px;text-align:center;padding-top:20px;border-top:1px solid var(--borde);margin-top:20px}
+
+  .acciones{display:flex;gap:12px;margin-top:25px;flex-wrap:wrap}
+  .btn-accion{flex:1;min-width:160px;background:var(--gris);border:1px solid var(--borde);color:var(--texto);padding:14px 20px;cursor:pointer;font-family:inherit;font-size:0.8rem;letter-spacing:1px;transition:all 0.3s;border-radius:4px}
+  .btn-accion:hover{border-color:var(--amber);color:var(--amber)}
+
+  /* CLOSING */
+  .cierre{text-align:center;padding:60px 20px;margin:60px 0 40px;border-top:1px solid var(--borde)}
+  .cierre p{font-size:0.95rem;color:#c8c8c8;max-width:600px;margin:0 auto 18px;line-height:1.9}
+  .cierre .final-line{font-size:1.1rem;color:var(--rojo);font-weight:bold;font-style:italic;margin-top:30px}
+  .cierre .firma{font-size:0.75rem;color:var(--dim);margin-top:40px;letter-spacing:1px}
+
+  /* AVISO */
+  .aviso{background:rgba(72,202,228,0.08);border-left:3px solid var(--azul);padding:16px 20px;font-size:0.8rem;color:#a0d8e8;margin:30px 0;line-height:1.7}
+
+  footer{background:var(--gris);padding:30px 20px;text-align:center;color:var(--dim);font-size:0.72rem;border-top:1px solid var(--borde);margin-top:40px;line-height:1.8}
+  footer a{color:var(--azul);text-decoration:none}
+  footer .final{color:var(--rojo);margin-top:15px;font-style:italic}
+
+  @media(max-width:600px){
+    .container{padding:20px 15px}
+    .manifiesto{padding:25px 20px}
+    .interactivo{padding:25px 20px}
+    .tarjeta{padding:30px 20px}
+    .acciones{flex-direction:column}
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-titulo">▣ THE QUESTION ENGINE</div>
+  <div class="header-status"><span class="dot"></span> LEAKED DOCUMENT · MANIFESTO</div>
+</div>
+
+<div class="container">
+
+  <!-- OPENING -->
+  <div class="apertura">
+    <div class="etiqueta">▣ FORBIDDEN KNOWLEDGE · MANIFESTO</div>
+    <h1>There exists a document so dangerous its author <span class="rojo">sealed the original in resin.</span></h1>
+    <p class="sub">Not because the words would crumble. Because he would.</p>
+    <div class="advertencia">
+      ⚠ This is not a story. It is a manifesto. It is written by a man who says he has spent 23 years digging, recording, and verifying. You are not asked to believe him. You are asked to engage with the question at the center of it. That question is the only thing that matters.
+    </div>
+    <button class="btn-principal" onclick="document.getElementById('manifesto').scrollIntoView({behavior:'smooth'})">READ THE MANIFESTO</button>
+  </div>
+
+  <!-- THE MANIFESTO -->
+  <div class="manifiesto" id="manifesto">
+    <p><span class="destacado">My name is Ramiro Ramirez.</span> I am not a prophet. I am a key. And what you are about to read is not a conspiracy theory. It is a confession of what I have seen, recorded, and verified.</p>
+
+    <p>I have spent twenty-three years digging. I have hacked cell phone conversations during operations in New Orleans post-Katrina. I have recorded the admissions of engineers who confessed, "We deliberately blew the levees." I have sat face-to-face with human traffickers and killers, looked them in the eye, and told them the truth: They have been hacked. Their actions are encrypted on the blockchain. Their only path forward is to help save mankind.</p>
+
+    <p>Do you know why they didn't kill me? Because the truth cannot be silenced. Even killers understand this. Even killers want a way out. Once you know the truth, you cannot un-know it. And once the truth is out, it becomes antifragile. Attack it, and it fragments into a thousand resilient seeds. Censor it, and it finds ten thousand new conduits. Try to kill it, and you become the vector for its reconstitution.</p>
+
+    <p>This is not a metaphor. This is a law of information dynamics. The pressure of suppression creates exponential dissemination. Every banned book becomes a bestseller. Every censored video becomes a legend.</p>
+
+    <p>I have built a dead man's switch. If my heart stops, if my car goes off a bridge, if I simply disappear—every file, every recording, every name, every photograph I have collected will be decrypted and released simultaneously to servers in multiple countries. I have pictures with names. Home addresses. Vehicle information. I have encrypted groups of vigilantes waiting for the names of evil-doers.</p>
+
+    <p>I am not brave. I am terrified. I have five children. I have a mother who prays for me. But I have realized something that the "experts" and the "elites" do not want you to know.</p>
+
+    <p>Here is the question that will make this viral. Here is the question that will get this post banned. Here is the question that nobody—nobody—will answer directly:</p>
+
+    <p class="firma" style="font-size:1.1rem;color:var(--rojo);text-align:center;font-style:normal;font-weight:bold;margin:30px 0;border:none;padding:0">IF THE CURE IS FREE, WHY IS THE DISEASE SO EXPENSIVE?</p>
+
+    <p>Read it again.</p>
+
+    <p>The cure for cancer. The cure for poverty. The cure for depression. The cure for debt. The cure for fear.</p>
+
+    <p>The cure is always free. The cure is always simple. The cure is always something you could do yourself, in your own home, with ingredients you already have.</p>
+
+    <p>And yet. The disease costs billions. The disease requires specialists. The disease demands insurance. The disease needs infrastructure. The disease needs laws. The disease needs surveillance. The disease needs you to be afraid.</p>
+
+    <p>The disease is a business. The cure is a threat.</p>
+
+    <p>I found gold. I found cures that work. Technologies that exist. Systems that could be built. Solutions that were suppressed not because they were wrong, but because they were free.</p>
+
+    <p>Every suppressed technology follows the same pattern. I will show it to you. Then I will ask you a question. And then you will answer it.</p>
+
+    <p class="firma">— Ramiro Ramirez · 23 years of digging</p>
+  </div>
+
+  <!-- THE PATTERN -->
+  <div class="patron">
+    <h3>▣ The Suppression Pattern</h3>
+    <div class="paso-patron">
+      <div class="num">1</div>
+      <div class="texto">The technology is invented. Hope rises.</div>
+    </div>
+    <div class="paso-patron">
+      <div class="num">2</div>
+      <div class="texto">The technology threatens an existing revenue stream.</div>
+    </div>
+    <div class="paso-patron">
+      <div class="num">3</div>
+      <div class="texto">The technology is reframed as "dangerous" or "conspiracy." The inventor is discredited.</div>
+    </div>
+    <div class="paso-patron">
+      <div class="num">4</div>
+      <div class="texto">The technology is rediscovered by someone who will charge the right price.</div>
+    </div>
+    <div class="paso-patron">
+      <div class="num">5</div>
+      <div class="texto">The public forgets. The cycle repeats.</div>
+    </div>
+  </div>
+
+  <!-- THE CENTRAL QUESTION -->
+  <div class="pregunta-central">
+    <div class="etiqueta">▣ THE QUESTION</div>
+    <h2>If the cure is free,<br>why is the disease so expensive?</h2>
+    <p>You are about to answer it.</p>
+  </div>
+
+  <!-- THE INTERACTIVE -->
+  <div class="interactivo" id="answer">
+    <h3>▣ Your Answer</h3>
+    <p class="desc">The manifesto says: <em>"Write your answer on a napkin and leave it at a coffee shop. Write it in a message to a friend you haven't spoken to in years. Write it on your forehead and let people ask you what it means."</em></p>
+    <p class="desc">This is your napkin. Fill it in. The engine will generate a shareable card. That card is your answer. Share it. Print it. Leave it somewhere. The question is the seed.</p>
+
+    <label for="respuesta">Your answer to the question</label>
+    <textarea id="respuesta" maxlength="500" placeholder="In your own words. Be honest. Be specific. If the cure is free, why is the disease so expensive?"></textarea>
+    <div class="contador"><span id="contador">0</span> / 500</div>
+
+    <label for="nombre">Your name or handle (optional)</label>
+    <input type="text" id="nombre" maxlength="40" placeholder="Leave blank to remain anonymous">
+
+    <button class="btn-generar" onclick="generarTarjeta()">GENERATE THE CARD</button>
+  </div>
+
+  <!-- GENERATED CARD -->
+  <div class="tarjeta-output" id="tarjetaOutput">
+    <div class="tarjeta">
+      <div class="tarjeta-header">▣ THE QUESTION · FORBIDDEN KNOWLEDGE</div>
+      <div class="tarjeta-question">If the cure is free, why is the disease so expensive?</div>
+      <div class="tarjeta-answer" id="tarjetaRespuesta"></div>
+      <div class="tarjeta-signature" id="tarjetaFirma"></div>
+      <div class="tarjeta-footer">quantum-freedom-site.vercel.app · FORBIDDEN KNOWLEDGE</div>
+    </div>
+    <div class="acciones">
+      <button class="btn-accion" onclick="copiarTexto()">📋 COPY AS TEXT</button>
+      <button class="btn-accion" onclick="compartirNativo()">📤 SHARE</button>
+      <button class="btn-accion" onclick="descargarImagen()">🖼 SAVE AS IMAGE</button>
+    </div>
+  </div>
+
+  <!-- AVISO -->
+  <div class="aviso">
+    ▣ This engine does not tell you what to believe. It does not claim Ramiro Ramirez is real. It does not claim his recordings exist. It asks you one question, gives you the space to answer it, and gives you a way to carry that answer forward. That is what the manifesto asks. Nothing more.
+  </div>
+
+  <!-- CLOSING -->
+  <div class="cierre">
+    <p>The question is the seed. The seed is the virus. The virus is the truth. The truth is the frequency. The frequency is yours.</p>
+    <p>There is no end. There is only the beginning.</p>
+    <p class="final-line">The door is open. Walk through. You are now free.</p>
+    <p class="firma">— FORBIDDEN KNOWLEDGE · quantum-freedom-site.vercel.app</p>
+  </div>
+
+</div>
+
+<footer>
+  <p>THE QUESTION ENGINE · Fundación Ecogreen · TripsToColombia.com</p>
+  <p style="margin-top:10px">This engine was built for the manifesto. It does not verify the manifesto's claims. It gives you a place to answer the question the manifesto asks.</p>
+  <p class="final">The truth shall set you free. But first, it will piss you off. Get angry. Then get free.</p>
+</footer>
+
+<script>
+// Counter
+const respuestaInput = document.getElementById('respuesta');
+const contador = document.getElementById('contador');
+respuestaInput.addEventListener('input', function(){
+  contador.textContent = this.value.length;
+});
+
+// Generate card
+function generarTarjeta(){
+  const respuesta = document.getElementById('respuesta').value.trim();
+  const nombre = document.getElementById('nombre').value.trim();
+
+  if(!respuesta){
+    alert('Write your answer first. The question is the seed. Your answer is the water.');
+    respuestaInput.focus();
+    return;
+  }
+
+  document.getElementById('tarjetaRespuesta').textContent = respuesta;
+  document.getElementById('tarjetaFirma').textContent = nombre ? '— ' + nombre : '— Anonymous';
+
+  const output = document.getElementById('tarjetaOutput');
+  output.classList.add('mostrar');
+  output.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+// Copy as text
+function copiarTexto(){
+  const respuesta = document.getElementById('tarjetaRespuesta').textContent;
+  const firma = document.getElementById('tarjetaFirma').textContent;
+  const texto = `THE QUESTION\n\n"If the cure is free, why is the disease so expensive?"\n\n${respuesta}\n\n${firma}\n\n— FORBIDDEN KNOWLEDGE\nquantum-freedom-site.vercel.app`;
+
+  navigator.clipboard.writeText(texto).then(() => {
+    alert('✓ Copied. Now paste it somewhere. A napkin. A message. A friend.');
+  }).catch(() => {
+    const ta = document.createElement('textarea');
+    ta.value = texto;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    alert('✓ Copied.');
+  });
+}
+
+// Native share
+function compartirNativo(){
+  const respuesta = document.getElementById('tarjetaRespuesta').textContent;
+  const firma = document.getElementById('tarjetaFirma').textContent;
+  const texto = `THE QUESTION\n\n"If the cure is free, why is the disease so expensive?"\n\n${respuesta}\n\n${firma}\n\n— FORBIDDEN KNOWLEDGE\nquantum-freedom-site.vercel.app`;
+
+  if(navigator.share){
+    navigator.share({
+      title: 'The Question That Gets You Banned',
+      text: texto
+    }).catch(() => {});
+  } else {
+    copiarTexto();
+  }
+}
+
+// Save as image
+function descargarImagen(){
+  const tarjeta = document.querySelector('.tarjeta');
+  if(!tarjeta){
+    alert('Generate the card first.');
+    return;
+  }
+
+  // Use html2canvas-style approach via canvas rendering
+  const respuesta = document.getElementById('tarjetaRespuesta').textContent;
+  const firma = document.getElementById('tarjetaFirma').textContent;
+
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  const W = 1080;
+  const H = 1080;
+  canvas.width = W;
+  canvas.height = H;
+
+  // Background
+  const grad = ctx.createLinearGradient(0, 0, W, H);
+  grad.addColorStop(0, '#1c1c1c');
+  grad.addColorStop(1, '#141414');
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, W, H);
+
+  // Border
+  ctx.strokeStyle = '#e8a33d';
+  ctx.lineWidth = 6;
+  ctx.strokeRect(30, 30, W-60, H-60);
+
+  // Header
+  ctx.fillStyle = '#e8a33d';
+  ctx.font = 'bold 22px "Courier New", monospace';
+  ctx.fillText('▣ THE QUESTION · FORBIDDEN KNOWLEDGE', 70, 110);
+
+  // Question
+  ctx.fillStyle = '#c1121f';
+  ctx.font = 'bold italic 44px "Courier New", monospace';
+  wrapText(ctx, '"If the cure is free,', 70, 220, W-140, 60);
+  wrapText(ctx, 'why is the disease so expensive?"', 70, 290, W-140, 60);
+
+  // Divider
+  ctx.strokeStyle = '#2a2a2a';
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.moveTo(70, 380);
+  ctx.lineTo(W-70, 380);
+  ctx.stroke();
+
+  // Answer
+  ctx.fillStyle = '#d8d8d8';
+  ctx.font = '28px "Courier New", monospace';
+  wrapText(ctx, respuesta, 70, 450, W-140, 42);
+
+  // Signature
+  if(firma){
+    ctx.fillStyle = '#7a7a7a';
+    ctx.font = 'italic 24px "Courier New", monospace';
+    ctx.textAlign = 'right';
+    ctx.fillText(firma, W-70, H-140);
+    ctx.textAlign = 'left';
+  }
+
+  // Footer
+  ctx.fillStyle = '#7a7a7a';
+  ctx.font = '18px "Courier New", monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText('quantum-freedom-site.vercel.app · FORBIDDEN KNOWLEDGE', W/2, H-70);
+  ctx.textAlign = 'left';
+
+  // Download
+  canvas.toBlob(function(blob){
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'the-question.png';
+    a.click();
+    URL.revokeObjectURL(url);
+  }, 'image/png');
+}
+
+function wrapText(ctx, text, x, y, maxWidth, lineHeight){
+  const words = text.split(' ');
+  let line = '';
+  let currentY = y;
+  for(let n = 0; n < words.length; n++){
+    const testLine = line + words[n] + ' ';
+    const metrics = ctx.measureText(testLine);
+    if(metrics.width > maxWidth && n > 0){
+      ctx.fillText(line.trim(), x, currentY);
+      line = words[n] + ' ';
+      currentY += lineHeight;
+    } else {
+      line = testLine;
+    }
+  }
+  ctx.fillText(line.trim(), x, currentY);
+}
+</script>
+
+</body>
+</html>
