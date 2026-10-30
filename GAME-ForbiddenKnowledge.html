@@ -1,113 +1,276 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Forbidden Knowledge</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-        body {
-            background: #1a0e0b;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            font-family: 'Georgia', 'Times New Roman', serif;
-            overflow: hidden;
-            touch-action: pan-x pan-y;
-        }
-        .app {
-            width: 100%;
-            max-width: 400px;
-            height: 80vh;
-            max-height: 700px;
-            position: relative;
-            border-radius: 12px;
-            overflow: hidden;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.8), 0 0 0 1px #5a3e2b;
-        }
-        /* ----- BOOK VIEW ----- */
-        .book-view {
-            position: absolute;
-            inset: 0;
-            background: #f7f0e0;
-            background-image:
-                linear-gradient(90deg, #e8dcc8 0%, #f7f0e0 8%, #f7f0e0 92%, #e8dcc8 100%),
-                repeating-linear-gradient(0deg, rgba(180, 140, 100, 0.05) 0px, rgba(180, 140, 100, 0.05) 1px, transparent 1px, transparent 24px);
-            padding: 24px 20px 20px;
-            display: flex;
-            flex-direction: column;
-            transition: opacity 0.25s ease, transform 0.25s ease;
-            border: 2px solid #b59a7a;
-            border-radius: 8px;
-            box-shadow: inset 0 0 40px rgba(120, 80, 50, 0.15);
-            z-index: 2;
-        }
-        .book-view.hidden {
-            opacity: 0;
-            transform: scale(0.96);
-            pointer-events: none;
-        }
-        .book-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 12px;
-            letter-spacing: 2px;
-            color: #8b6b4a;
-            text-transform: uppercase;
-            border-bottom: 1px solid #d4c0a8;
-            padding-bottom: 8px;
-            margin-bottom: 12px;
-            font-weight: 600;
-            flex-shrink: 0;
-        }
-        .book-header span:last-child {
-            font-style: italic;
-            letter-spacing: 0.5px;
-            font-weight: 400;
-            color: #a88b68;
-        }
-        .text-container {
-            flex: 1;
-            overflow-y: auto;
-            padding: 6px 8px 6px 4px;
-            scrollbar-width: thin;
-            scrollbar-color: #c9b294 #f7f0e0;
-            font-size: 16px;
-            line-height: 1.65;
-            color: #2e1e12;
-            white-space: pre-wrap;
-            word-break: break-word;
-            text-align: justify;
-            text-justify: inter-word;
-            cursor: text;
-            user-select: text;
-            outline: none;
-            background: transparent;
-            border: none;
-            resize: none;
-            font-family: inherit;
-            width: 100%;
-        }
-        .text-container::-webkit-scrollbar {
-            width: 6px;
-        }
-        .text-container::-webkit-scrollbar-track {
-            background: #f7f0e0;
-        }
-        .text-container::-webkit-scrollbar-thumb {
-            background: #c9b294;
-            border-radius: 6px;
-        }
-        .text-container:empty:before {
-            content: "FORBIDDEN KNOWLEDGE: THE SOVEREIGN OPERATOR
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Forbidden Knowledge</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html, body { height:100%; }
+  body {
+    background:#1a0e0b;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Georgia','Times New Roman',serif;
+    overflow:hidden;
+    touch-action:manipulation;
+  }
+  .app {
+    width:100%; max-width:420px; height:92vh; max-height:820px;
+    position:relative; border-radius:12px; overflow:hidden;
+    box-shadow:0 20px 40px rgba(0,0,0,.8), 0 0 0 1px #5a3e2b;
+  }
+
+  /* ================= BOOK VIEW ================= */
+  .book-view {
+    position:absolute; inset:0;
+    background:#f7f0e0;
+    background-image:
+      linear-gradient(90deg,#e8dcc8 0%,#f7f0e0 8%,#f7f0e0 92%,#e8dcc8 100%),
+      repeating-linear-gradient(0deg,rgba(180,140,100,.05) 0px,rgba(180,140,100,.05) 1px,transparent 1px,transparent 24px);
+    padding:20px 18px 16px;
+    display:flex; flex-direction:column;
+    border:2px solid #b59a7a; border-radius:8px;
+    box-shadow:inset 0 0 40px rgba(120,80,50,.15);
+    z-index:2;
+    transition:opacity .25s ease, transform .25s ease;
+  }
+  .book-view.hidden { opacity:0; transform:scale(.96); pointer-events:none; }
+
+  .book-header {
+    display:flex; justify-content:space-between; align-items:center;
+    font-size:11px; letter-spacing:2px; color:#8b6b4a;
+    text-transform:uppercase; border-bottom:1px solid #d4c0a8;
+    padding-bottom:8px; margin-bottom:10px; font-weight:600;
+    flex-shrink:0;
+  }
+  .book-header .vol { font-style:italic; font-weight:400; color:#a88b68; letter-spacing:.5px; }
+
+  /* Reading toolbar */
+  .reading-toolbar {
+    display:flex; gap:6px; margin-bottom:10px; flex-shrink:0;
+    flex-wrap:wrap;
+  }
+  .tool-btn {
+    flex:1 1 auto;
+    background:rgba(181,154,122,.15);
+    border:1px solid #c9b294;
+    color:#6b4f34;
+    font-family:'Courier New',monospace;
+    font-size:10px; letter-spacing:1px;
+    padding:6px 8px; border-radius:6px;
+    cursor:pointer; font-weight:700;
+    transition:all .15s;
+    white-space:nowrap;
+  }
+  .tool-btn:active { background:rgba(181,154,122,.35); transform:scale(.97); }
+  .tool-btn.active { background:#8b6b4a; color:#f7f0e0; border-color:#6b4f34; }
+
+  /* Scrollable reading area */
+  .text-scroll {
+    flex:1; overflow-y:auto; overflow-x:hidden;
+    padding:4px 10px 4px 4px;
+    scrollbar-width:thin; scrollbar-color:#c9b294 #f7f0e0;
+    font-size:16px; line-height:1.7; color:#2e1e12;
+    word-break:break-word; text-align:justify;
+    -webkit-overflow-scrolling:touch;
+    position:relative;
+  }
+  .text-scroll::-webkit-scrollbar { width:6px; }
+  .text-scroll::-webkit-scrollbar-track { background:#f7f0e0; }
+  .text-scroll::-webkit-scrollbar-thumb { background:#c9b294; border-radius:6px; }
+
+  /* The actual text content */
+  #bookText {
+    white-space:pre-wrap;
+    cursor:pointer;
+    user-select:text;
+    -webkit-user-select:text;
+  }
+  #bookText a {
+    color:#8b3a1a;
+    text-decoration:underline;
+    text-decoration-color:rgba(139,58,26,.4);
+    word-break:break-all;
+  }
+  #bookText a:hover { color:#b04a2a; }
+  #bookText h1, #bookText h2, #bookText h3 {
+    color:#5a3e2b; margin:1em 0 .4em; line-height:1.3;
+  }
+  #bookText p { margin:0 0 .8em; }
+  #bookText blockquote {
+    border-left:3px solid #c9b294; padding-left:12px;
+    margin:.8em 0; color:#6b4f34; font-style:italic;
+  }
+  #bookText code, #bookText pre {
+    background:rgba(181,154,122,.15);
+    padding:2px 5px; border-radius:3px;
+    font-family:'Courier New',monospace; font-size:.9em;
+    white-space:pre-wrap; word-break:break-all;
+  }
+  #bookText pre { padding:10px; display:block; margin:.8em 0; }
+  #bookText ul, #bookText ol { margin:.6em 0 .8em 1.4em; }
+  #bookText img { max-width:100%; height:auto; border-radius:4px; margin:.6em 0; }
+  #bookText hr { border:0; border-top:1px solid #d4c0a8; margin:1em 0; }
+
+  /* Reading-point marker */
+  .reading-marker {
+    display:block;
+    height:0; position:relative;
+    border-top:2px dashed #b04a2a;
+    margin:6px 0 10px;
+    opacity:.7;
+    animation:markerFade 2s ease;
+  }
+  .reading-marker::before {
+    content:"📍 start";
+    position:absolute; top:-16px; left:0;
+    font-size:9px; color:#b04a2a;
+    font-family:'Courier New',monospace;
+    letter-spacing:1px; font-weight:700;
+  }
+  @keyframes markerFade { from { opacity:1; } to { opacity:.7; } }
+
+  /* Mode indicator */
+  .mode-indicator {
+    font-size:10px; color:#8b6b4a; letter-spacing:1px;
+    font-family:'Courier New',monospace;
+    padding:4px 0 0; text-align:center;
+    flex-shrink:0; min-height:16px;
+  }
+  .mode-indicator.focused { color:#b04a2a; font-weight:700; }
+
+  .book-footer {
+    margin-top:8px; padding-top:8px;
+    border-top:1px solid #d4c0a8;
+    display:flex; justify-content:space-between; align-items:center;
+    font-size:10px; color:#a88b68; font-style:italic;
+    letter-spacing:1px; flex-shrink:0;
+    font-family:'Courier New',monospace;
+  }
+  .tap-hint { display:flex; gap:4px; align-items:center; }
+  .tap-hint .dot {
+    width:5px; height:5px; border-radius:50%;
+    background:#b59a7a; animation:pulse 1.8s infinite;
+  }
+  .tap-hint .dot:nth-child(2) { animation-delay:.3s; }
+  .tap-hint .dot:nth-child(3) { animation-delay:.6s; }
+  @keyframes pulse {
+    0%,100% { opacity:.3; transform:scale(.9); }
+    50%     { opacity:1;  transform:scale(1.2); background:#8b5e3c; }
+  }
+
+  /* ================= GAME VIEW ================= */
+  .game-view {
+    position:absolute; inset:0;
+    background:#0b1a1f;
+    background-image:
+      radial-gradient(circle at 20% 30%,#1e3a44 0%,transparent 40%),
+      radial-gradient(circle at 80% 70%,#2a4a3a 0%,transparent 40%),
+      repeating-linear-gradient(45deg,rgba(100,200,150,.03) 0px,rgba(100,200,150,.03) 2px,transparent 2px,transparent 8px);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:20px; z-index:1; opacity:0; pointer-events:none;
+    transition:opacity .3s ease;
+  }
+  .game-view.active { opacity:1; pointer-events:auto; }
+
+  .game-header {
+    position:absolute; top:14px; left:0; right:0;
+    display:flex; justify-content:space-between; padding:0 20px;
+    color:#8fc9a8; font-family:'Courier New',monospace;
+    font-size:13px; letter-spacing:2px; text-shadow:0 0 10px #2a7a5a;
+  }
+  .game-title {
+    font-size:22px; font-weight:700; color:#b8e6d0;
+    text-shadow:0 0 15px #3a9a6a,0 0 30px #1a5a3a;
+    margin-bottom:4px; letter-spacing:4px;
+    font-family:'Courier New',monospace; text-transform:uppercase;
+  }
+  .game-sub {
+    color:#6a9a7a; font-size:11px; letter-spacing:2px;
+    margin-bottom:18px; font-family:'Courier New',monospace;
+  }
+  .timer-bar-wrap {
+    width:100%; max-width:280px; height:6px;
+    background:#0e2a22; border-radius:6px; overflow:hidden;
+    margin-bottom:12px; border:1px solid #2a6a4a;
+  }
+  .timer-bar {
+    height:100%; width:100%;
+    background:linear-gradient(90deg,#3a9a6a,#8affb0);
+    transition:width .1s linear; border-radius:6px;
+  }
+  .grid-container {
+    display:grid; grid-template-columns:repeat(3,1fr);
+    gap:10px; width:100%; max-width:280px;
+    margin:4px 0 14px;
+  }
+  .cell {
+    aspect-ratio:1/1; background:#0e2a22;
+    border:2px solid #2a6a4a; border-radius:12px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:30px; font-weight:700; color:#b8e6d0;
+    text-shadow:0 0 10px #3a9a6a; cursor:pointer;
+    transition:all .12s ease; font-family:'Courier New',monospace;
+    box-shadow:0 0 15px rgba(40,120,80,.3),inset 0 0 15px rgba(0,0,0,.5);
+    user-select:none; position:relative;
+  }
+  .cell:active { transform:scale(.94); }
+  .cell.sigil {
+    background:#1e5a3a; border-color:#8affb0;
+    box-shadow:0 0 30px #3aff8a,inset 0 0 25px #2a8a5a;
+    color:#fff; text-shadow:0 0 20px #8affb0;
+    animation:sigilPulse .6s infinite alternate;
+  }
+  @keyframes sigilPulse {
+    from { box-shadow:0 0 20px #3aff8a,inset 0 0 15px #2a8a5a; }
+    to   { box-shadow:0 0 40px #8affb0,inset 0 0 30px #3a9a6a; }
+  }
+  .cell.hit {
+    background:#5a8a3a; border-color:#ffffa0;
+    box-shadow:0 0 35px #ffff80; animation:none;
+  }
+  .status-area {
+    color:#a8d8c0; font-family:'Courier New',monospace;
+    font-size:14px; letter-spacing:1.5px; margin:6px 0 12px;
+    min-height:24px; text-align:center;
+    text-shadow:0 0 10px #2a8a5a; font-weight:600;
+  }
+  .btn-reset {
+    background:transparent; border:2px solid #3a8a6a;
+    color:#a8d8c0; padding:10px 30px; border-radius:40px;
+    font-family:'Courier New',monospace; font-size:13px;
+    letter-spacing:3px; font-weight:700; cursor:pointer;
+    text-shadow:0 0 8px #2a8a5a; box-shadow:0 0 20px rgba(40,160,100,.2);
+    margin-top:4px; transition:all .15s;
+  }
+  .btn-reset:active {
+    background:#1a4a3a; border-color:#7ac9a8;
+    transform:scale(.96); box-shadow:0 0 30px rgba(80,220,140,.4);
+  }
+  .back-hint {
+    margin-top:16px; color:#4a7a6a; font-size:10px;
+    letter-spacing:2px; font-family:'Courier New',monospace;
+    opacity:.6;
+  }
+</style>
+</head>
+<body>
+<div class="app" id="app">
+
+  <!-- ============ BOOK VIEW ============ -->
+  <div class="book-view" id="bookView">
+    <div class="book-header">
+      <span>📖 FORBIDDEN KNOWLEDGE</span>
+      <span class="vol">vol. I</span>
+    </div>
+
+    <div class="reading-toolbar">
+      <button class="tool-btn" id="btnSetStart" title="Tap in the text to set your reading point">📍 SET READING POINT</button>
+      <button class="tool-btn" id="btnClearStart" title="Clear reading point">✕ CLEAR</button>
+    </div>
+
+    <div class="text-scroll" id="textScroll">
+      <div id="bookText"><FORBIDDEN KNOWLEDGE: THE SOVEREIGN OPERATOR
 The Complete Unabridged Edition
 
 **PROLOGUE: The Murder of Hugo**
@@ -3686,515 +3849,397 @@ The door is open. Walk through. You are now free.
 https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-Manifesto.html
 ￼
 
-";
-            color: #b59a7a;
-            font-style: italic;
-        }
-        .book-footer {
-            margin-top: 10px;
-            padding-top: 10px;
-            border-top: 1px solid #d4c0a8;
-            display: flex;
-            justify-content: space-between;
-            font-size: 11px;
-            color: #a88b68;
-            font-style: italic;
-            letter-spacing: 1px;
-            flex-shrink: 0;
-        }
-        .tap-hint {
-            display: flex;
-            gap: 4px;
-            align-items: center;
-        }
-        .tap-hint .dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: #b59a7a;
-            animation: pulse 1.8s infinite;
-        }
-        .tap-hint .dot:nth-child(2) { animation-delay: 0.3s; }
-        .tap-hint .dot:nth-child(3) { animation-delay: 0.6s; }
-        @keyframes pulse {
-            0%, 100% { opacity: 0.3; transform: scale(0.9); }
-            50% { opacity: 1; transform: scale(1.2); background: #8b5e3c; }
-        }
-        .book-footer .hide-hint {
-            cursor: pointer;
-            padding: 2px 8px;
-            border-radius: 20px;
-            transition: background 0.2s;
-        }
-        .book-footer .hide-hint:hover {
-            background: rgba(181, 154, 122, 0.2);
-        }
-        /* ----- GAME VIEW ----- */
-        .game-view {
-            position: absolute;
-            inset: 0;
-            background: #0b1a1f;
-            background-image:
-                radial-gradient(circle at 20% 30%, #1e3a44 0%, transparent 40%),
-                radial-gradient(circle at 80% 70%, #2a4a3a 0%, transparent 40%),
-                repeating-linear-gradient(45deg, rgba(100, 200, 150, 0.03) 0px, rgba(100, 200, 150, 0.03) 2px, transparent 2px, transparent 8px);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            z-index: 1;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s ease;
-        }
-        .game-view.active {
-            opacity: 1;
-            pointer-events: auto;
-        }
-        .game-header {
-            position: absolute;
-            top: 16px;
-            left: 0;
-            right: 0;
-            display: flex;
-            justify-content: space-between;
-            padding: 0 20px;
-            color: #8fc9a8;
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
-            letter-spacing: 2px;
-            text-shadow: 0 0 10px #2a7a5a;
-            z-index: 5;
-        }
-        .game-title {
-            font-size: 22px;
-            font-weight: 700;
-            color: #b8e6d0;
-            text-shadow: 0 0 15px #3a9a6a, 0 0 30px #1a5a3a;
-            margin-bottom: 6px;
-            letter-spacing: 4px;
-            font-family: 'Courier New', monospace;
-            text-transform: uppercase;
-        }
-        .game-sub {
-            color: #6a9a7a;
-            font-size: 12px;
-            letter-spacing: 2px;
-            margin-bottom: 20px;
-            font-family: 'Courier New', monospace;
-        }
-        .timer-bar-wrap {
-            width: 100%;
-            max-width: 280px;
-            height: 6px;
-            background: #0e2a22;
-            border-radius: 6px;
-            overflow: hidden;
-            margin-bottom: 14px;
-            border: 1px solid #2a6a4a;
-        }
-        .timer-bar {
-            height: 100%;
-            width: 100%;
-            background: linear-gradient(90deg, #3a9a6a, #8affb0);
-            transition: width 0.1s linear;
-            border-radius: 6px;
-        }
-        .grid-container {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            width: 100%;
-            max-width: 280px;
-            margin: 6px 0 16px;
-        }
-        .cell {
-            aspect-ratio: 1 / 1;
-            background: #0e2a22;
-            border: 2px solid #2a6a4a;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 30px;
-            font-weight: 700;
-            color: #b8e6d0;
-            text-shadow: 0 0 10px #3a9a6a;
-            cursor: pointer;
-            transition: all 0.12s ease;
-            font-family: 'Courier New', monospace;
-            box-shadow: 0 0 15px rgba(40, 120, 80, 0.3), inset 0 0 15px rgba(0,0,0,0.5);
-            user-select: none;
-            position: relative;
-        }
-        .cell:active {
-            transform: scale(0.94);
-        }
-        .cell.sigil {
-            background: #1e5a3a;
-            border-color: #8affb0;
-            box-shadow: 0 0 30px #3aff8a, inset 0 0 25px #2a8a5a;
-            color: #ffffff;
-            text-shadow: 0 0 20px #8affb0;
-            animation: sigilPulse 0.6s infinite alternate;
-        }
-        @keyframes sigilPulse {
-            from { box-shadow: 0 0 20px #3aff8a, inset 0 0 15px #2a8a5a; }
-            to   { box-shadow: 0 0 40px #8affb0, inset 0 0 30px #3a9a6a; }
-        }
-        .cell.hit {
-            background: #5a8a3a;
-            border-color: #ffffa0;
-            box-shadow: 0 0 35px #ffff80;
-            animation: none;
-        }
-        .status-area {
-            color: #a8d8c0;
-            font-family: 'Courier New', monospace;
-            font-size: 15px;
-            letter-spacing: 1.5px;
-            margin: 6px 0 12px;
-            min-height: 26px;
-            text-align: center;
-            text-shadow: 0 0 10px #2a8a5a;
-            font-weight: 600;
-        }
-        .btn-reset {
-            background: transparent;
-            border: 2px solid #3a8a6a;
-            color: #a8d8c0;
-            padding: 10px 30px;
-            border-radius: 40px;
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
-            letter-spacing: 3px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.15s;
-            text-shadow: 0 0 8px #2a8a5a;
-            box-shadow: 0 0 20px rgba(40, 160, 100, 0.2);
-            margin-top: 4px;
-        }
-        .btn-reset:active {
-            background: #1a4a3a;
-            border-color: #7ac9a8;
-            transform: scale(0.96);
-            box-shadow: 0 0 30px rgba(80, 220, 140, 0.4);
-        }
-        .back-hint {
-            margin-top: 18px;
-            color: #4a7a6a;
-            font-size: 11px;
-            letter-spacing: 2px;
-            font-family: 'Courier New', monospace;
-            opacity: 0.6;
-        }
-    </style>
-</head>
-<body>
-    <div class="app" id="app">
-        <!-- BOOK VIEW -->
-        <div class="book-view" id="bookView">
-            <div class="book-header">
-                <span>📖 FORBIDDEN KNOWLEDGE</span>
-                <span>vol. I</span>
-            </div>
-            <div class="text-container" id="textContainer" contenteditable="true" spellcheck="false"></div>
-            <div class="book-footer">
-                <span class="tap-hint">
-                    <span class="dot"></span>
-                    <span class="dot"></span>
-                    <span class="dot"></span>
-                    <span style="margin-left: 4px;">tap 3× to hide</span>
-                </span>
-                <span class="hide-hint" id="hideHint">✦</span>
-            </div>
-        </div>
-
-        <!-- GAME VIEW -->
-        <div class="game-view" id="gameView">
-            <div class="game-header">
-                <span>◆ SIGIL HUNT</span>
-                <span id="scoreDisplay">0</span>
-            </div>
-            <div class="game-title">VOID SIGIL</div>
-            <div class="game-sub">— catch the glow —</div>
-            <div class="timer-bar-wrap">
-                <div class="timer-bar" id="timerBar"></div>
-            </div>
-            <div class="grid-container" id="gridContainer"></div>
-            <div class="status-area" id="statusArea">Tap the glowing sigil</div>
-            <button class="btn-reset" id="resetBtn">↺ RESTART</button>
-            <div class="back-hint">tap 3× to return to book</div>
-        </div>
+></div>
     </div>
 
-    <script>
-        (function() {
-            const bookView = document.getElementById('bookView');
-            const gameView = document.getElementById('gameView');
-            const textContainer = document.getElementById('textContainer');
-            const gridContainer = document.getElementById('gridContainer');
-            const statusArea = document.getElementById('statusArea');
-            const resetBtn = document.getElementById('resetBtn');
-            const scoreDisplay = document.getElementById('scoreDisplay');
-            const timerBar = document.getElementById('timerBar');
+    <div class="mode-indicator" id="modeIndicator"></div>
 
-            const STORAGE_KEY = 'forbiddenKnowledgeText';
+    <div class="book-footer">
+      <span class="tap-hint">
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        <span style="margin-left:4px;">tap 3× to hide</span>
+      </span>
+      <span>✦</span>
+    </div>
+  </div>
 
-            // ---------- Load / save book text ----------
-            const saved = localStorage.getItem(STORAGE_KEY);
-            if (saved && saved.trim()) {
-                textContainer.innerText = saved;
-            } else {
-                // Default content on first run
-                textContainer.innerHTML =
-                    "The whispers are true.<br><br>" +
-                    "In the shadowed corners of old libraries, between the lines of banned books, and in the silence after midnight, there are things that should not be known.<br><br>" +
-                    "This is a space for forbidden texts. Drop your own secrets, your hidden truths, your unspoken words. They will rest here, safe, until you need to hide them from prying eyes.<br><br>" +
-                    "Tap the screen three times to conceal this knowledge and enter the game.<br><br>" +
-                    "But be careful — the game is simple, but the knowledge remains. What you write here stays here, in the dark.<br><br>" +
-                    "<span style='color: #8b6b4a; font-style: italic;'>— The Archivist</span>";
-            }
+  <!-- ============ GAME VIEW ============ -->
+  <div class="game-view" id="gameView">
+    <div class="game-header">
+      <span>◆ SIGIL HUNT</span>
+      <span id="scoreDisplay">0</span>
+    </div>
+    <div class="game-title">VOID SIGIL</div>
+    <div class="game-sub">— catch the glow —</div>
+    <div class="timer-bar-wrap"><div class="timer-bar" id="timerBar"></div></div>
+    <div class="grid-container" id="gridContainer"></div>
+    <div class="status-area" id="statusArea">Tap the glowing sigil</div>
+    <button class="btn-reset" id="resetBtn">↺ RESTART</button>
+    <div class="back-hint">tap 3× to return to book</div>
+  </div>
 
-            // Persist text as user edits
-            let saveTimer = null;
-            textContainer.addEventListener('input', () => {
-                if (saveTimer) clearTimeout(saveTimer);
-                saveTimer = setTimeout(() => {
-                    localStorage.setItem(STORAGE_KEY, textContainer.innerText);
-                }, 400);
-            });
+</div>
 
-            // Save immediately on blur too
-            textContainer.addEventListener('blur', () => {
-                localStorage.setItem(STORAGE_KEY, textContainer.innerText);
-            });
+<script>
+(function(){
+  'use strict';
 
-            // Prevent drag-and-drop and paste defaults from duplicating content
-            textContainer.addEventListener('drop', (e) => {
-                e.preventDefault();
-                const droppedText = e.dataTransfer.getData('text/plain');
-                if (droppedText) document.execCommand('insertText', false, droppedText);
-            });
-            textContainer.addEventListener('paste', (e) => {
-                // Let native paste happen, then save
-                setTimeout(() => {
-                    localStorage.setItem(STORAGE_KEY, textContainer.innerText);
-                }, 0);
-            });
+  var bookView     = document.getElementById('bookView');
+  var gameView     = document.getElementById('gameView');
+  var bookText     = document.getElementById('bookText');
+  var textScroll   = document.getElementById('textScroll');
+  var modeInd      = document.getElementById('modeIndicator');
+  var btnSetStart  = document.getElementById('btnSetStart');
+  var btnClearStart= document.getElementById('btnClearStart');
+  var gridContainer= document.getElementById('gridContainer');
+  var statusArea   = document.getElementById('statusArea');
+  var resetBtn     = document.getElementById('resetBtn');
+  var scoreDisplay = document.getElementById('scoreDisplay');
+  var timerBar     = document.getElementById('timerBar');
 
-            // ---------- TAP DETECTION (3 taps) ----------
-            const TAP_TIMEOUT = 800;
-            let tapCountBook = 0, tapTimerBook = null;
-            let tapCountGame = 0, tapTimerGame = null;
+  /* ============ READING POINT STATE ============ */
+  // We store the reading point as a marker element inserted into bookText.
+  // When set, the reader shows only from that marker onward.
+  var readingMarker = null;
 
-            function resetBookTaps() {
-                tapCountBook = 0;
-                if (tapTimerBook) { clearTimeout(tapTimerBook); tapTimerBook = null; }
-            }
-            function resetGameTaps() {
-                tapCountGame = 0;
-                if (tapTimerGame) { clearTimeout(tapTimerGame); tapTimerGame = null; }
-            }
+  function clearMarker(){
+    if (readingMarker && readingMarker.parentNode){
+      readingMarker.parentNode.removeChild(readingMarker);
+    }
+    readingMarker = null;
+    updateModeIndicator();
+  }
 
-            bookView.addEventListener('click', (e) => {
-                if (bookView.classList.contains('hidden')) return;
-                // Don't count taps on the editable text field or hide hint as taps
-                if (e.target.closest('#textContainer') || e.target.closest('#hideHint')) return;
-                tapCountBook++;
-                if (tapCountBook === 3) {
-                    switchToGame();
-                    resetBookTaps();
-                } else {
-                    if (tapTimerBook) clearTimeout(tapTimerBook);
-                    tapTimerBook = setTimeout(resetBookTaps, TAP_TIMEOUT);
-                }
-            });
+  function setMarkerAtRange(range){
+    // Remove existing marker
+    clearMarker();
+    // Create marker element
+    var marker = document.createElement('span');
+    marker.className = 'reading-marker';
+    // Insert at range
+    try {
+      range.collapse(true);
+      range.insertNode(marker);
+    } catch(e){
+      return false;
+    }
+    readingMarker = marker;
+    updateModeIndicator();
+    // Scroll marker into view
+    setTimeout(function(){
+      if (marker && marker.scrollIntoView){
+        marker.scrollIntoView({behavior:'smooth', block:'center'});
+      }
+    }, 60);
+    return true;
+  }
 
-            // Hide hint does the same as 3 taps
-            document.getElementById('hideHint').addEventListener('click', (e) => {
-                e.stopPropagation();
-                switchToGame();
-            });
+  // Set reading point by click position (caret range from point)
+  function setReadingPointFromEvent(e){
+    var range = null;
+    if (document.caretRangeFromPoint){
+      range = document.caretRangeFromPoint(e.clientX, e.clientY);
+    } else if (document.caretPositionFromPoint){
+      var pos = document.caretPositionFromPoint(e.clientX, e.clientY);
+      if (pos){
+        range = document.createRange();
+        range.setStart(pos.offsetNode, pos.offset);
+        range.collapse(true);
+      }
+    }
+    if (range && bookText.contains(range.startContainer)){
+      // Only allow if the point is inside bookText (not the marker itself)
+      if (readingMarker && readingMarker.contains(range.startContainer)) return false;
+      return setMarkerAtRange(range);
+    }
+    return false;
+  }
 
-            gameView.addEventListener('click', (e) => {
-                if (!gameView.classList.contains('active')) return;
-                if (e.target.closest('.cell') || e.target.closest('.btn-reset')) return;
-                tapCountGame++;
-                if (tapCountGame === 3) {
-                    switchToBook();
-                    resetGameTaps();
-                } else {
-                    if (tapTimerGame) clearTimeout(tapTimerGame);
-                    tapTimerGame = setTimeout(resetGameTaps, TAP_TIMEOUT);
-                }
-            });
+  // Button: set reading point at top of visible scroll area
+  btnSetStart.addEventListener('click', function(){
+    // Compute the point in the text that is at the top of the scroll viewport
+    var rect = textScroll.getBoundingClientRect();
+    var x = rect.left + rect.width / 2;
+    var y = rect.top + 8; // just below the top edge
+    var range = null;
+    if (document.caretRangeFromPoint){
+      range = document.caretRangeFromPoint(x, y);
+    } else if (document.caretPositionFromPoint){
+      var pos = document.caretPositionFromPoint(x, y);
+      if (pos){
+        range = document.createRange();
+        range.setStart(pos.offsetNode, pos.offset);
+        range.collapse(true);
+      }
+    }
+    if (range && bookText.contains(range.startContainer)){
+      setMarkerAtRange(range);
+    } else {
+      // Fallback: set at very top of bookText
+      range = document.createRange();
+      range.setStart(bookText, 0);
+      range.collapse(true);
+      setMarkerAtRange(range);
+    }
+  });
 
-            // ---------- VIEW SWITCHING ----------
-            function switchToGame() {
-                bookView.classList.add('hidden');
-                gameView.classList.add('active');
-                resetBookTaps();
-                resetGameTaps();
-                startGame();
-            }
-            function switchToBook() {
-                gameView.classList.remove('active');
-                bookView.classList.remove('hidden');
-                resetBookTaps();
-                resetGameTaps();
-                stopGame();
-            }
+  btnClearStart.addEventListener('click', function(){
+    clearMarker();
+  });
 
-            // ---------- SOLO SIGIL GAME ----------
-            // A glowing cell appears; tap it before the timer runs out.
-            // Each successful hit adds points and speeds things up.
-            // Miss (tap wrong cell or timer expires) = game over.
+  function updateModeIndicator(){
+    if (readingMarker){
+      modeInd.textContent = '📍 reading from marker — tap a new spot to move it';
+      modeInd.classList.add('focused');
+      btnSetStart.classList.add('active');
+    } else {
+      modeInd.textContent = 'tap anywhere in the text to set your reading point';
+      modeInd.classList.remove('focused');
+      btnSetStart.classList.remove('active');
+    }
+  }
+  updateModeIndicator();
 
-            const gridCells = [];
-            for (let i = 0; i < 9; i++) {
-                const cell = document.createElement('div');
-                cell.classList.add('cell');
-                cell.dataset.index = i;
-                cell.addEventListener('click', () => onCellTap(i));
-                gridContainer.appendChild(cell);
-                gridCells.push(cell);
-            }
+  /* ============ TAP DETECTION: 3-tap hide ============ */
+  var TAP_TIMEOUT = 750;
+  var tapCountBook = 0, tapTimerBook = null;
+  var tapCountGame = 0, tapTimerGame = null;
 
-            let gameRunning = false;
-            let score = 0;
-            let activeSigil = -1;
-            let sigilTimer = null;
-            let tickInterval = null;
-            let timeLeft = 0;
-            let roundDuration = 1800; // ms
-            const MIN_DURATION = 600;
+  function resetBookTaps(){ tapCountBook = 0; if (tapTimerBook){ clearTimeout(tapTimerBook); tapTimerBook = null; } }
+  function resetGameTaps(){ tapCountGame = 0; if (tapTimerGame){ clearTimeout(tapTimerGame); tapTimerGame = null; } }
 
-            function clearTimers() {
-                if (sigilTimer) { clearTimeout(sigilTimer); sigilTimer = null; }
-                if (tickInterval) { clearInterval(tickInterval); tickInterval = null; }
-            }
+  // Track a "tap" only if it isn't a scroll, text selection, or link click.
+  // We listen for pointerup with a small movement threshold.
+  var pointerDownPos = null;
+  var pointerDownTime = 0;
 
-            function resetBoardVisuals() {
-                gridCells.forEach(c => {
-                    c.classList.remove('sigil', 'hit');
-                    c.textContent = '';
-                });
-            }
+  bookView.addEventListener('pointerdown', function(e){
+    pointerDownPos = { x: e.clientX, y: e.clientY };
+    pointerDownTime = Date.now();
+  });
 
-            function startGame() {
-                stopGame();
-                resetBoardVisuals();
-                score = 0;
-                updateScore();
-                gameRunning = true;
-                roundDuration = 1800;
-                statusArea.textContent = 'Tap the glowing sigil';
-                nextRound();
-            }
+  bookView.addEventListener('pointerup', function(e){
+    if (!pointerDownPos) return;
+    var dx = Math.abs(e.clientX - pointerDownPos.x);
+    var dy = Math.abs(e.clientY - pointerDownPos.y);
+    var dt = Date.now() - pointerDownTime;
+    pointerDownPos = null;
+    // Ignore long-press, drags, scrolls
+    if (dx > 12 || dy > 12 || dt > 500) return;
 
-            function stopGame() {
-                gameRunning = false;
-                clearTimers();
-                activeSigil = -1;
-                timerBar.style.width = '100%';
-            }
+    // Ignore taps on interactive elements that should NOT count as hide-taps
+    var t = e.target;
+    if (t.closest && (t.closest('a') || t.closest('button') || t.closest('.reading-toolbar'))) return;
 
-            function updateScore() {
-                scoreDisplay.textContent = score;
-            }
+    // If tapping inside the scrollable text area:
+    if (t.closest && t.closest('#textScroll')){
+      // If a selection was just made (text selected), don't count as tap
+      var sel = window.getSelection();
+      if (sel && sel.toString && sel.toString().length > 0) return;
 
-            function nextRound() {
-                if (!gameRunning) return;
-                resetBoardVisuals();
-                // Pick a random cell that is not the previous one
-                let idx;
-                do {
-                    idx = Math.floor(Math.random() * 9);
-                } while (idx === activeSigil && 9 > 1);
-                activeSigil = idx;
-                gridCells[idx].classList.add('sigil');
-                gridCells[idx].textContent = '✦';
+      // If user tapped inside text but NOT on a link, treat as "set reading point" attempt
+      // But only do it when user has clicked the SET button? No — spec says: tap where you want to start reading.
+      // So: single tap inside text sets the reading point. This also means a single tap in text
+      // shouldn't count toward the 3-tap hide. That's the intended UX: tap text = set reading point.
+      setReadingPointFromEvent(e);
+      return; // do not count toward hide
+    }
 
-                // Timer
-                const startTime = performance.now();
-                timeLeft = roundDuration;
-                timerBar.style.width = '100%';
+    // Anywhere else on the book → count toward 3-tap hide
+    tapCountBook++;
+    if (tapCountBook === 3){
+      switchToGame();
+      resetBookTaps();
+    } else {
+      if (tapTimerBook) clearTimeout(tapTimerBook);
+      tapTimerBook = setTimeout(resetBookTaps, TAP_TIMEOUT);
+    }
+  });
 
-                clearTimers();
+  // Game view: 3 taps (outside cells/buttons) returns to book
+  gameView.addEventListener('pointerdown', function(e){
+    if (!gameView.classList.contains('active')) return;
+    var t = e.target;
+    if (t.closest && (t.closest('.cell') || t.closest('.btn-reset'))) return;
+    tapCountGame++;
+    if (tapCountGame === 3){
+      switchToBook();
+      resetGameTaps();
+    } else {
+      if (tapTimerGame) clearTimeout(tapTimerGame);
+      tapTimerGame = setTimeout(resetGameTaps, TAP_TIMEOUT);
+    }
+  });
 
-                tickInterval = setInterval(() => {
-                    const elapsed = performance.now() - startTime;
-                    const remaining = Math.max(0, roundDuration - elapsed);
-                    timeLeft = remaining;
-                    timerBar.style.width = (remaining / roundDuration * 100) + '%';
-                    if (remaining <= 0) {
-                        // Time's up = miss
-                        handleMiss();
-                    }
-                }, 30);
+  /* ============ VIEW SWITCHING ============ */
+  function switchToGame(){
+    bookView.classList.add('hidden');
+    gameView.classList.add('active');
+    resetBookTaps(); resetGameTaps();
+    startGame();
+  }
+  function switchToBook(){
+    gameView.classList.remove('active');
+    bookView.classList.remove('hidden');
+    resetBookTaps(); resetGameTaps();
+    stopGame();
+    // Per spec: on return, user must re-tap to resume reading.
+    // We clear the marker so the reader is not auto-focused anywhere.
+    clearMarker();
+    // Scroll to top so user can pick a new spot
+    textScroll.scrollTop = 0;
+  }
 
-                sigilTimer = setTimeout(() => {
-                    handleMiss();
-                }, roundDuration + 50);
-            }
+  /* ============ READING MODE FOCUS ============ */
+  // When a marker exists, we dim everything above it.
+  // Implemented via CSS on a wrapper — but simplest: when marker is set,
+  // we add a class to bookText that visually distinguishes the "focused" portion.
+  // Because we can't easily split DOM nodes, we instead use a CSS trick:
+  // add class "has-marker" and use a ::before overlay on the marker's parent?
+  // Simpler approach: when marker is set, we insert a spacer div above it
+  // to push content below, and we scroll so the marker is at the top.
+  // The spec says: "reader where the user can select the text where the reader should start reading"
+  // So: after setting the marker, we scroll the marker to the top of the scroll container.
+  // That effectively "starts reading from there".
+  // No need to dim anything — the user just sees their chosen start at the top.
 
-            function handleMiss() {
-                if (!gameRunning) return;
-                gameRunning = false;
-                clearTimers();
-                if (activeSigil !== -1) {
-                    gridCells[activeSigil].classList.remove('sigil');
-                    gridCells[activeSigil].textContent = '';
-                }
-                activeSigil = -1;
-                timerBar.style.width = '0%';
-                statusArea.textContent = '— sigil escaped —  score: ' + score;
-            }
+  // Override setMarkerAtRange to also scroll marker to top after insertion
+  var _origSetMarker = setMarkerAtRange;
+  setMarkerAtRange = function(range){
+    var ok = _origSetMarker.call(this, range);
+    if (ok){
+      setTimeout(function(){
+        if (readingMarker){
+          // Scroll so marker is near the top of the scroll container
+          var top = readingMarker.offsetTop - textScroll.offsetTop - 20;
+          if (top < 0) top = 0;
+          textScroll.scrollTo({ top: top, behavior: 'smooth' });
+        }
+      }, 80);
+    }
+    return ok;
+  };
 
-            function onCellTap(index) {
-                if (!gameRunning) return;
-                if (index !== activeSigil) {
-                    // Tapped wrong cell = miss
-                    handleMiss();
-                    return;
-                }
-                // Hit!
-                gridCells[index].classList.remove('sigil');
-                gridCells[index].classList.add('hit');
-                gridCells[index].textContent = '✓';
-                score++;
-                updateScore();
-                clearTimers();
-                // Speed up
-                roundDuration = Math.max(MIN_DURATION, roundDuration - 100);
-                statusArea.textContent = 'Sigil caught!';
-                // Small pause before next round
-                setTimeout(() => {
-                    if (gameRunning) nextRound();
-                }, 350);
-            }
+  /* ============ SOLO SIGIL GAME ============ */
+  var gridCells = [];
+  for (var i = 0; i < 9; i++){
+    (function(idx){
+      var cell = document.createElement('div');
+      cell.className = 'cell';
+      cell.dataset.index = idx;
+      cell.addEventListener('click', function(){ onCellTap(idx); });
+      gridContainer.appendChild(cell);
+      gridCells.push(cell);
+    })(i);
+  }
 
-            resetBtn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                if (gameRunning) {
-                    startGame();
-                } else {
-                    startGame();
-                }
-            });
+  var gameRunning = false;
+  var score = 0;
+  var activeSigil = -1;
+  var sigilTimer = null;
+  var tickInterval = null;
+  var roundDuration = 1800;
+  var MIN_DURATION = 600;
 
-            // ---------- INIT ----------
-            window.addEventListener('load', () => {
-                gameView.classList.remove('active');
-                bookView.classList.remove('hidden');
-                resetBookTaps();
-                resetGameTaps();
-            });
+  function clearGameTimers(){
+    if (sigilTimer){ clearTimeout(sigilTimer); sigilTimer = null; }
+    if (tickInterval){ clearInterval(tickInterval); tickInterval = null; }
+  }
+  function resetBoardVisuals(){
+    gridCells.forEach(function(c){
+      c.classList.remove('sigil','hit');
+      c.textContent = '';
+    });
+  }
+  function startGame(){
+    stopGame();
+    resetBoardVisuals();
+    score = 0;
+    scoreDisplay.textContent = '0';
+    gameRunning = true;
+    roundDuration = 1800;
+    statusArea.textContent = 'Tap the glowing sigil';
+    nextRound();
+  }
+  function stopGame(){
+    gameRunning = false;
+    clearGameTimers();
+    activeSigil = -1;
+    timerBar.style.width = '100%';
+  }
+  function nextRound(){
+    if (!gameRunning) return;
+    resetBoardVisuals();
+    var idx;
+    do { idx = Math.floor(Math.random()*9); } while (idx === activeSigil && 9 > 1);
+    activeSigil = idx;
+    gridCells[idx].classList.add('sigil');
+    gridCells[idx].textContent = '✦';
 
-        })();
-    </script>
+    var startTime = performance.now();
+    timerBar.style.width = '100%';
+    clearGameTimers();
+
+    tickInterval = setInterval(function(){
+      var elapsed = performance.now() - startTime;
+      var remaining = Math.max(0, roundDuration - elapsed);
+      timerBar.style.width = (remaining / roundDuration * 100) + '%';
+      if (remaining <= 0) handleMiss();
+    }, 30);
+
+    sigilTimer = setTimeout(function(){ handleMiss(); }, roundDuration + 50);
+  }
+  function handleMiss(){
+    if (!gameRunning) return;
+    gameRunning = false;
+    clearGameTimers();
+    if (activeSigil !== -1){
+      gridCells[activeSigil].classList.remove('sigil');
+      gridCells[activeSigil].textContent = '';
+    }
+    activeSigil = -1;
+    timerBar.style.width = '0%';
+    statusArea.textContent = '— sigil escaped —  score: ' + score;
+  }
+  function onCellTap(index){
+    if (!gameRunning) return;
+    if (index !== activeSigil){ handleMiss(); return; }
+    gridCells[index].classList.remove('sigil');
+    gridCells[index].classList.add('hit');
+    gridCells[index].textContent = '✓';
+    score++;
+    scoreDisplay.textContent = score;
+    clearGameTimers();
+    roundDuration = Math.max(MIN_DURATION, roundDuration - 100);
+    statusArea.textContent = 'Sigil caught!';
+    setTimeout(function(){ if (gameRunning) nextRound(); }, 350);
+  }
+  resetBtn.addEventListener('click', function(e){
+    e.stopPropagation();
+    startGame();
+  });
+
+  /* ============ INIT ============ */
+  // On load: clear any reading marker, show book
+  clearMarker();
+  gameView.classList.remove('active');
+  bookView.classList.remove('hidden');
+  textScroll.scrollTop = 0;
+
+  // Also: tapping a link inside the book should open it, not set reading point.
+  // We already skip counting taps on <a>, but pointerup inside text will still try to set marker.
+  // Fix: skip setReadingPointFromEvent if target is a link.
+  var _origSetFromEvent = setReadingPointFromEvent;
+  setReadingPointFromEvent = function(e){
+    var t = e.target;
+    if (t.closest && t.closest('a')) return false;
+    // Also skip if text is selected
+    var sel = window.getSelection();
+    if (sel && sel.toString && sel.toString().length > 0) return false;
+    return _origSetFromEvent.call(this, e);
+  };
+
+})();
+</script>
 </body>
 </html>
