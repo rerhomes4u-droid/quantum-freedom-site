@@ -42,9 +42,11 @@
   .text-scroll::-webkit-scrollbar { width:6px; }
   .text-scroll::-webkit-scrollbar-track { background:#f7f0e0; }
   .text-scroll::-webkit-scrollbar-thumb { background:#c9b294; border-radius:6px; }
-  #bookText { white-space:pre-wrap; cursor:pointer; user-select:text; -webkit-user-select:text; }
+  #bookText { white-space:pre-wrap; cursor:pointer; user-select:text; -webkit-user-select:text;
+    overflow-wrap:anywhere; }
   #bookText a { color:#8b3a1a; text-decoration:underline;
-    text-decoration-color:rgba(139,58,26,.4); word-break:break-all; }
+    text-decoration-color:rgba(139,58,26,.4);
+    overflow-wrap:anywhere; word-break:break-word; }
   #bookText a:hover { color:#b04a2a; }
   #bookText h1,#bookText h2,#bookText h3 { color:#5a3e2b; margin:1em 0 .4em; line-height:1.3; }
   #bookText p { margin:0 0 .8em; }
@@ -52,7 +54,7 @@
     margin:.8em 0; color:#6b4f34; font-style:italic; }
   #bookText code,#bookText pre { background:rgba(181,154,122,.15); padding:2px 5px;
     border-radius:3px; font-family:'Courier New',monospace; font-size:.9em;
-    white-space:pre-wrap; word-break:break-all; }
+    white-space:pre-wrap; overflow-wrap:anywhere; }
   #bookText pre { padding:10px; display:block; margin:.8em 0; }
   #bookText ul,#bookText ol { margin:.6em 0 .8em 1.4em; }
   #bookText img { max-width:100%; height:auto; border-radius:4px; margin:.6em 0; }
@@ -3722,7 +3724,6 @@ The door is open. Walk through. You are now free.
 https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-Manifesto.html
 ￼
 
-
       </div>
     </div>
 
@@ -3756,6 +3757,90 @@ https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-Manifesto.html
 <script>
 (function(){
   'use strict';
+
+  /* =====================================================================
+     STEP 1 — Auto-linkify bare URLs in the book text.
+     Runs once at load. Works on text nodes only, so it won't break
+     any HTML tags you've put in manually.
+     Supports http://, https://, and www.  (adds https:// when missing)
+     All generated links get target="_blank" rel="noopener noreferrer".
+     Existing <a> tags are left alone but forced to open in a new tab.
+     ===================================================================== */
+  function linkifyBookText(root){
+    var URL_RE = /\b(https?:\/\/[^\s<>"']+|www\.[^\s<>"']+)/gi;
+
+    function walk(node){
+      if(node.nodeType === 1){ // element
+        var tag = node.tagName.toLowerCase();
+        if(tag === 'a' || tag === 'script' || tag === 'style') return;
+        // iterate over a static copy of childNodes since we may replace text nodes
+        var kids = Array.prototype.slice.call(node.childNodes);
+        for(var i = 0; i < kids.length; i++) walk(kids[i]);
+        return;
+      }
+      if(node.nodeType !== 3) return; // text node only
+      var text = node.nodeValue;
+      if(!text || !URL_RE.test(text)) { URL_RE.lastIndex = 0; return; }
+      URL_RE.lastIndex = 0;
+
+      var frag = document.createDocumentFragment();
+      var lastIndex = 0, m;
+      while((m = URL_RE.exec(text)) !== null){
+        if(m.index > lastIndex){
+          frag.appendChild(document.createTextNode(text.slice(lastIndex, m.index)));
+        }
+        var url = m[1];
+        var href = url;
+        // Strip trailing punctuation that shouldn't be part of the URL
+        var trailing = '';
+        while(/[.,;:!?)\]]$/.test(url)){
+          trailing = url.slice(-1) + trailing;
+          url = url.slice(0, -1);
+        }
+        href = url;
+        if(!/^https?:\/\//i.test(href)) href = 'https://' + href;
+        var a = document.createElement('a');
+        a.href = href;
+        a.textContent = url;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        frag.appendChild(a);
+        if(trailing) frag.appendChild(document.createTextNode(trailing));
+        lastIndex = m.index + m[0].length;
+      }
+      if(lastIndex < text.length){
+        frag.appendChild(document.createTextNode(text.slice(lastIndex)));
+      }
+      node.parentNode.replaceChild(frag, node);
+    }
+
+    walk(root);
+
+    // Force any pre-existing <a> to open in a new tab
+    var anchors = root.querySelectorAll('a');
+    for(var i = 0; i < anchors.length; i++){
+      anchors[i].target = '_blank';
+      anchors[i].rel = 'noopener noreferrer';
+    }
+  }
+
+  /* =====================================================================
+     STEP 2 — Prevent link taps from bubbling up and triggering the
+     reading-point / 3-tap-hide logic. Links must be free to work.
+     We attach this at document level, in capture phase, so it runs
+     before anything else.
+     ===================================================================== */
+  document.addEventListener('click', function(e){
+    var a = e.target.closest && e.target.closest('a');
+    if(a && a.href){
+      e.stopPropagation();
+      // Let the default navigation happen.
+    }
+  }, true);
+
+  /* =====================================================================
+     STEP 3 — Main app
+     ===================================================================== */
   var bookView=document.getElementById('bookView');
   var gameView=document.getElementById('gameView');
   var bookText=document.getElementById('bookText');
@@ -3769,7 +3854,11 @@ https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-Manifesto.html
   var scoreDisplay=document.getElementById('scoreDisplay');
   var timerBar=document.getElementById('timerBar');
 
+  // Linkify NOW, before we start tracking reading points.
+  linkifyBookText(bookText);
+
   var readingMarker=null;
+
   function clearMarker(){
     if(readingMarker&&readingMarker.parentNode) readingMarker.parentNode.removeChild(readingMarker);
     readingMarker=null; updateModeIndicator();
@@ -3781,7 +3870,7 @@ https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-Manifesto.html
     try{ range.collapse(true); range.insertNode(marker); }catch(e){ return false; }
     readingMarker=marker; updateModeIndicator();
     setTimeout(function(){
-      if(marker&&marker.scrollIntoView) marker.scrollIntoView({behavior:'smooth',block:'center'});
+      if(marker&&marker.scrollIntoView) marker.scrollIntoView({behavior:'smooth',block:'start'});
     },60);
     return true;
   }
@@ -3832,14 +3921,19 @@ https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-Manifesto.html
     var dx=Math.abs(e.clientX-pointerDownPos.x), dy=Math.abs(e.clientY-pointerDownPos.y), dt=Date.now()-pointerDownTime;
     pointerDownPos=null;
     if(dx>12||dy>12||dt>500) return;
+
+    // Ignore taps on interactive elements
     var t=e.target;
-    if(t.closest&&(t.closest('a')||t.closest('button')||t.closest('.reading-toolbar'))) return;
+    if(t.closest&&(t.closest('a')||t.closest('button')||t.closest('.reading-toolbar')||t.closest('.reading-marker'))) return;
+
     if(t.closest&&t.closest('#textScroll')){
+      // Don't set reading point if a selection exists (user was selecting text)
       var sel=window.getSelection();
       if(sel&&sel.toString&&sel.toString().length>0) return;
       setReadingPointFromEvent(e);
       return;
     }
+
     tapCountBook++;
     if(tapCountBook===3){ switchToGame(); resetBookTaps(); }
     else { if(tapTimerBook) clearTimeout(tapTimerBook); tapTimerBook=setTimeout(resetBookTaps,TAP_TIMEOUT); }
@@ -3863,6 +3957,7 @@ https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-Manifesto.html
     return ok;
   };
 
+  // ---------- Sigil game ----------
   var gridCells=[];
   for(var i=0;i<9;i++){
     (function(idx){
@@ -3892,14 +3987,6 @@ https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-Manifesto.html
 
   clearMarker(); gameView.classList.remove('active'); bookView.classList.remove('hidden'); textScroll.scrollTop=0;
 
-  var _origSetFromEvent=setReadingPointFromEvent;
-  setReadingPointFromEvent=function(e){
-    var t=e.target;
-    if(t.closest&&t.closest('a')) return false;
-    var sel=window.getSelection();
-    if(sel&&sel.toString&&sel.toString().length>0) return false;
-    return _origSetFromEvent.call(this,e);
-  };
 })();
 </script>
 </body>
