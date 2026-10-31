@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Forbidden Knowledge · Sovereign Operator</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html, body { height:100%; }
+  body {
+    background:#1a0e0b; display:flex; align-items:center; justify-content:center;
+    font-family:'Georgia','Times New Roman',serif; overflow:hidden;
+    touch-action:manipulation;
+  }
+  .app { width:100%; max-width:420px; height:92vh; max-height:820px;
+    position:relative; border-radius:12px; overflow:hidden;
+    box-shadow:0 20px 40px rgba(0,0,0,.8),0 0 0 1px #5a3e2b; }
+
+  /* ===== BOOK VIEW ===== */
+  .book-view { position:absolute; inset:0; background:#f7f0e0;
+    background-image:linear-gradient(90deg,#e8dcc8 0%,#f7f0e0 8%,#f7f0e0 92%,#e8dcc8 100%),
+      repeating-linear-gradient(0deg,rgba(180,140,100,.05) 0px,rgba(180,140,100,.05) 1px,transparent 1px,transparent 24px);
+    padding:20px 18px 16px; display:flex; flex-direction:column;
+    border:2px solid #b59a7a; border-radius:8px;
+    box-shadow:inset 0 0 40px rgba(120,80,50,.15); z-index:2;
+    transition:opacity .25s ease,transform .25s ease; }
+    .book-view.hidden { opacity:0; transform:scale(.96); pointer-events:none; visibility:hidden; }
+  .book-header { display:flex; justify-content:space-between; align-items:center;
+    font-size:11px; letter-spacing:2px; color:#8b6b4a; text-transform:uppercase;
+    border-bottom:1px solid #d4c0a8; padding-bottom:8px; margin-bottom:10px;
+    font-weight:600; flex-shrink:0; }
+  .book-header .vol { font-style:italic; font-weight:400; color:#a88b68; letter-spacing:.5px; }
+
+  .book-header .chapter-label {
+    font-family:'Courier New',monospace; font-size:9px;
+    letter-spacing:1px; color:#8b3a1a; text-transform:none;
+    font-weight:700; max-width:60%; overflow:hidden;
+    text-overflow:ellipsis; white-space:nowrap;
+  }
+
+  .text-scroll { flex:1; overflow-y:auto; overflow-x:hidden;
+    padding:4px 10px 4px 4px; scrollbar-width:thin; scrollbar-color:#c9b294 #f7f0e0;
+    font-size:16px; line-height:1.7; color:#2e1e12; word-break:break-word;
+    text-align:justify; -webkit-overflow-scrolling:touch; position:relative;
+    scroll-behavior:smooth; }
+  .text-scroll::-webkit-scrollbar { width:6px; }
+  .text-scroll::-webkit-scrollbar-track { background:#f7f0e0; }
+  .text-scroll::-webkit-scrollbar-thumb { background:#c9b294; border-radius:6px; }
+  #bookText { white-space:pre-wrap; cursor:default; user-select:text; -webkit-user-select:text;
+    overflow-wrap:anywhere; }
+  #bookText a { color:#8b3a1a; text-decoration:underline;
+    text-decoration-color:rgba(139,58,26,.4);
+    overflow-wrap:anywhere; word-break:break-word; -webkit-user-select:text; }
+  #bookText a:hover { color:#b04a2a; }
+  #bookText h1,#bookText h2,#bookText h3 { color:#5a3e2b; margin:1em 0 .4em; line-height:1.3; }
+  #bookText p { margin:0 0 .8em; }
+  #bookText blockquote { border-left:3px solid #c9b294; padding-left:12px;
+    margin:.8em 0; color:#6b4f34; font-style:italic; }
+  #bookText code,#bookText pre { background:rgba(181,154,122,.15); padding:2px 5px;
+    border-radius:3px; font-family:'Courier New',monospace; font-size:.9em;
+    white-space:pre-wrap; overflow-wrap:anywhere; }
+  #bookText pre { padding:10px; display:block; margin:.8em 0; }
+  #bookText ul,#bookText ol { margin:.6em 0 .8em 1.4em; }
+  #bookText img { max-width:100%; height:auto; border-radius:4px; margin:.6em 0; }
+  #bookText hr { border:0; border-top:1px solid #d4c0a8; margin:1em 0; }
+
+  /* chapter headings */
+  .chapter-heading {
+    display:block; margin:2em 0 1em; padding-top:1.4em;
+    border-top:1px solid #d4c0a8; position:relative;
+    scroll-margin-top:20px;
+  }
+  .chapter-heading:first-child { margin-top:0; padding-top:0; border-top:none; }
+  .chapter-heading .chapter-num {
+    display:block; font-family:'Courier New',monospace;
+    font-size:10px; letter-spacing:3px; color:#a88b68;
+    text-transform:uppercase; font-weight:700; margin-bottom:4px;
+  }
+  .chapter-heading .chapter-title {
+    display:block; font-family:'Georgia',serif;
+    font-size:22px; font-weight:700; color:#5a3e2b;
+    letter-spacing:.5px; line-height:1.2;
+  }
+  .chapter-heading .chapter-title::first-letter {
+    font-size:2.4em; float:left; line-height:.9;
+    padding:2px 8px 0 0; color:#8b3a1a;
+    font-family:'Georgia',serif; font-weight:700;
+  }
+
+  .mode-indicator { font-size:10px; color:#8b6b4a; letter-spacing:1px;
+    font-family:'Courier New',monospace; padding:4px 0 0; text-align:center;
+    flex-shrink:0; min-height:16px; }
+  .book-footer { margin-top:8px; padding-top:8px; border-top:1px solid #d4c0a8;
+    display:flex; justify-content:space-between; align-items:center;
+    font-size:10px; color:#a88b68; font-style:italic; letter-spacing:1px;
+    flex-shrink:0; font-family:'Courier New',monospace; }
+  .tap-hint { display:flex; gap:4px; align-items:center; }
+  .tap-hint .dot { width:5px; height:5px; border-radius:50%;
+    background:#b59a7a; animation:pulse 1.8s infinite; }
+  .tap-hint .dot:nth-child(2){ animation-delay:.3s; }
+  .tap-hint .dot:nth-child(3){ animation-delay:.6s; }
+  @keyframes pulse { 0%,100%{opacity:.3;transform:scale(.9);} 50%{opacity:1;transform:scale(1.2);background:#8b5e3c;} }
+
+  /* chapter drawer edge tab */
+  .chapter-tab {
+    position:absolute; left:0; top:50%; transform:translateY(-50%);
+    background:linear-gradient(90deg,#8b6b4a,#a88b68);
+    color:#f7f0e0; font-family:'Courier New',monospace;
+    font-size:9px; font-weight:700; letter-spacing:2px;
+    writing-mode:vertical-rl; text-orientation:mixed;
+    padding:14px 5px; border-radius:0 6px 6px 0;
+    box-shadow:2px 0 10px rgba(0,0,0,.25);
+    cursor:pointer; z-index:5; border:1px solid #6b4f34;
+    border-left:none; transition:all .15s;
+    user-select:none;
+  }
+  .chapter-tab:active { background:#6b4f34; padding-right:9px; }
+  .chapter-tab .tab-icon { font-size:12px; display:block; margin-bottom:6px;
+    writing-mode:horizontal-tb; }
+
+  /* chapter drawer */
+  .chapter-drawer {
+    position:absolute; inset:0; z-index:20;
+    background:rgba(20,10,6,.55);
+    opacity:0; pointer-events:none; transition:opacity .25s ease;
+  }
+  .chapter-drawer.open { opacity:1; pointer-events:auto; }
+  .chapter-panel {
+    position:absolute; top:0; bottom:0; left:0;
+    width:82%; max-width:330px; background:#f7f0e0;
+    background-image:linear-gradient(90deg,#f7f0e0 0%,#f2e8d5 100%);
+    border-right:2px solid #8b6b4a;
+    box-shadow:8px 0 30px rgba(0,0,0,.4);
+    transform:translateX(-100%); transition:transform .3s cubic-bezier(.22,1,.36,1);
+    display:flex; flex-direction:column;
+  }
+  .chapter-drawer.open .chapter-panel { transform:translateX(0); }
+  .chapter-panel-header {
+    padding:16px 16px 12px; border-bottom:1px solid #d4c0a8;
+    display:flex; justify-content:space-between; align-items:baseline;
+  }
+  .chapter-panel-header h2 {
+    font-family:'Georgia',serif; font-size:16px; color:#5a3e2b;
+    letter-spacing:1px; font-weight:700;
+  }
+  .chapter-panel-header .count {
+    font-family:'Courier New',monospace; font-size:9px;
+    color:#a88b68; letter-spacing:1px;
+  }
+  .chapter-list {
+    flex:1; overflow-y:auto; padding:8px 0;
+    scrollbar-width:thin; scrollbar-color:#c9b294 #f2e8d5;
+  }
+  .chapter-list::-webkit-scrollbar { width:5px; }
+  .chapter-list::-webkit-scrollbar-thumb { background:#c9b294; border-radius:6px; }
+  .chapter-item {
+    display:flex; align-items:baseline; gap:10px;
+    padding:9px 16px; cursor:pointer; transition:background .12s;
+    border-left:3px solid transparent;
+  }
+  .chapter-item:active { background:rgba(181,154,122,.25); }
+  .chapter-item.current {
+    background:rgba(181,154,122,.18);
+    border-left-color:#8b3a1a;
+  }
+  .chapter-item .num {
+    font-family:'Courier New',monospace; font-size:10px;
+    color:#a88b68; letter-spacing:1px; font-weight:700;
+    min-width:22px; flex-shrink:0;
+  }
+  .chapter-item.current .num { color:#8b3a1a; }
+  .chapter-item .name {
+    font-family:'Georgia',serif; font-size:13px;
+    color:#2e1e12; line-height:1.3; flex:1;
+  }
+  .chapter-item.current .name { color:#5a3e2b; font-weight:700; }
+  .chapter-panel-footer {
+    padding:10px 16px; border-top:1px solid #d4c0a8;
+    font-family:'Courier New',monospace; font-size:9px;
+    color:#a88b68; letter-spacing:1px; text-align:center;
+  }
+
+  /* prev / next floating buttons */
+  .chapter-nav {
+    position:absolute; right:10px; bottom:52px;
+    display:flex; flex-direction:column; gap:6px; z-index:4;
+  }
+  .chapter-nav button {
+    width:34px; height:34px; border-radius:50%;
+    background:rgba(139,107,74,.85); color:#f7f0e0;
+    border:1px solid #6b4f34; cursor:pointer;
+    font-size:14px; line-height:1;
+    box-shadow:0 3px 10px rgba(0,0,0,.3);
+    transition:all .15s; font-family:'Courier New',monospace;
+    padding:0;
+  }
+  .chapter-nav button:active { transform:scale(.9); background:#6b4f34; }
+  .chapter-nav button:disabled { opacity:.3; cursor:default; }
+
+  /* ===== GAME VIEW ===== */
+  .game-view { position:fixed; top:0; left:0; right:0; bottom:0;
+    width:100vw; height:100vh; max-width:100vw;
+    margin:0; padding:0;
+    background:#0b1a1f;
+    background-image:radial-gradient(circle at 20% 30%,#1e3a44 0%,transparent 40%),
+      radial-gradient(circle at 80% 70%,#2a4a3a 0%,transparent 40%),
+      repeating-linear-gradient(45deg,rgba(100,200,150,.03) 0px,rgba(100,200,150,.03) 2px,transparent 2px,transparent 8px);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    z-index:9999; opacity:0; pointer-events:none;
+    transition:opacity .3s ease; overflow:hidden; box-sizing:border-box; }
+  .game-view.active {
+    opacity:1;
+    pointer-events:auto;
+  }
+  .game-selector { position:absolute; top:10px; left:10px; right:10px;
+    display:flex; gap:4px; z-index:6; }
+  .game-selector button { flex:1; background:rgba(14,42,34,.8);
+    border:1px solid #2a6a4a; color:#8fc9a8;
+    font-family:'Courier New',monospace; font-size:9px;
+    letter-spacing:1px; padding:6px 3px; border-radius:6px;
+    cursor:pointer; font-weight:700; transition:all .15s;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .game-selector button:active { transform:scale(.96); }
+  .game-selector button.active { background:#2a7a5a; color:#e0fff0;
+    border-color:#8affb0; box-shadow:0 0 12px #3aff8a; }
+  .game-header { position:absolute; top:48px; left:0; right:0;
+    display:flex; justify-content:space-between; padding:0 20px;
+    color:#8fc9a8; font-family:'Courier New',monospace;
+    font-size:12px; letter-spacing:2px; text-shadow:0 0 10px #2a7a5a; }
+  .game-title { font-size:20px; font-weight:700; color:#b8e6d0;
+    text-shadow:0 0 15px #3a9a6a,0 0 30px #1a5a3a;
+    margin:28px 0 2px; letter-spacing:3px;
+    font-family:'Courier New',monospace; text-transform:uppercase; }
+  .game-sub { color:#6a9a7a; font-size:10px; letter-spacing:2px;
+    margin-bottom:12px; font-family:'Courier New',monospace; }
+  .timer-bar-wrap { width:100%; max-width:280px; height:5px; background:#0e2a22;
+    border-radius:6px; overflow:hidden; margin-bottom:10px; border:1px solid #2a6a4a; }
+  .timer-bar { height:100%; width:100%;
+    background:linear-gradient(90deg,#3a9a6a,#8affb0);
+    transition:width .1s linear; border-radius:6px; }
+  .grid-container { display:grid; grid-template-columns:repeat(3,1fr);
+    gap:8px; width:100%; max-width:280px; margin:4px 0 12px; }
+  .cell { aspect-ratio:1/1; background:#0e2a22; border:2px solid #2a6a4a;
+    border-radius:10px; display:flex; align-items:center; justify-content:center;
+    font-size:22px; font-weight:700; color:#b8e6d0; text-shadow:0 0 10px #3a9a6a;
+    cursor:pointer; transition:all .1s ease; font-family:'Courier New',monospace;
+    box-shadow:0 0 15px rgba(40,120,80,.3),inset 0 0 15px rgba(0,0,0,.5);
+    user-select:none; position:relative; }
+  .cell:active { transform:scale(.94); }
+  .cell.lit { background:#1e5a3a; border-color:#8affb0;
+    box-shadow:0 0 30px #3aff8a,inset 0 0 25px #2a8a5a; color:#fff;
+    text-shadow:0 0 20px #8affb0; }
+  .cell.hit { background:#5a8a3a; border-color:#ffffa0;
+    box-shadow:0 0 35px #ffff80; }
+  .cell.wrong { background:#5a2a2a; border-color:#ff8080;
+    box-shadow:0 0 25px #ff6060; }
+  .cell.pick { background:#2a5a4a; border-color:#a0ffd0;
+    box-shadow:0 0 20px #6affa0; }
+  .status-area { color:#a8d8c0; font-family:'Courier New',monospace;
+    font-size:13px; letter-spacing:1.5px; margin:6px 0 10px;
+    min-height:22px; text-align:center;
+    text-shadow:0 0 10px #2a8a5a; font-weight:600; }
+  .btn-reset { background:transparent; border:2px solid #3a8a6a; color:#a8d8c0;
+    padding:8px 26px; border-radius:40px; font-family:'Courier New',monospace;
+    font-size:12px; letter-spacing:3px; font-weight:700; cursor:pointer;
+    text-shadow:0 0 8px #2a8a5a; box-shadow:0 0 20px rgba(40,160,100,.2);
+    margin-top:2px; transition:all .15s; }
+  .btn-reset:active { background:#1a4a3a; border-color:#7ac9a8;
+    transform:scale(.96); box-shadow:0 0 30px rgba(80,220,140,.4); }
+  .back-hint { margin-top:12px; color:#4a7a6a; font-size:9px;
+    letter-spacing:2px; font-family:'Courier New',monospace; opacity:.6; }
+  .cipher-target { font-family:'Courier New',monospace; font-size:34px;
+    color:#8affb0; text-shadow:0 0 20px #3aff8a;
+    letter-spacing:2px; margin:4px 0 6px; font-weight:700; }
+  .cipher-sum { font-family:'Courier New',monospace; font-size:11px;
+    color:#6a9a7a; letter-spacing:2px; }
+  .best-score { font-family:'Courier New',monospace; font-size:9px;
+    color:#4a7a6a; letter-spacing:2px; margin-top:2px; }
+  .app { overflow:hidden !important; }
+  #app { position:relative; }
+</style>
+</head>
+<body>
+<div class="app" id="app">
+
+  <!-- ================= BOOK VIEW ================= -->
+  <div class="book-view" id="bookView">
+    <div class="book-header">
+      <span>📖 FORBIDDEN KNOWLEDGE</span>
+      <span class="chapter-label" id="chapterLabel">— prologue —</span>
+    </div>
+
+    <div class="text-scroll" id="textScroll">
+      <div id="bookText">
+## FORBIDDEN KNOWLEDGE: THE SOVEREIGN OPERATOR
+The Complete Unabridged Edition
+
+Chapter 1: The Awakening
+The rain fell in sheets over the city of Veridian, washing the grime from the cobblestones and the secrets from the alleyways. In a small, dimly lit room above a forgotten tavern, a young woman named Elara stared at the ancient tome before her. The book was bound in leather that seemed to drink the light, and its pages whispered of things long buried.
+
+She had found it in the ruins of the old library, untouched by the fires that had consumed everything else. The symbol on its cover—a circle bisected by a triangle and a line—matched the birthmark on her left shoulder. It was a sign, the old woman had said. A sign that she was meant for something more.
+
+Elara traced the symbol with her finger. The ink seemed to shift beneath her touch, rearranging itself into words she could almost understand. She leaned closer, her breath catching in her throat.
+
+Chapter 2: The First Lesson
+The book taught her to see. Not with her eyes, but with something deeper—a sense that hummed just beneath her skin. She learned to read the currents of power that flowed through the city, invisible threads connecting every living thing.
+
+Her first lesson was simple: *“The sovereign operator does not command the world; they listen to it.”*
+
+She practiced in the quiet hours before dawn, when the city slept and the veil between worlds was thin. She felt the pulse of the earth beneath her feet, the slow breath of the old trees in the courtyard, the electric hum of the streetlamps.
+
+And she began to notice things. Patterns in the chaos. Signals in the noise.
+
+Chapter 3: The Hunt
+The first game appeared to her as a test. A grid of nine squares, each one a door to a different possibility. She had to find the glowing sigils—the points where the world’s fabric was thinnest—before the time ran out.
+
+She failed the first few times. The sigils slipped through her fingers like water, and the void consumed her attempts with a cold, indifferent hunger. But she learned. She adapted. She began to feel the sigils before she saw them, a faint warmth that guided her hand.
+
+*“The sovereign operator is not faster than the void,”* the book whispered. *“They are simply more present.”*
+
+Chapter 4: The Echo
+The second trial was memory. A sequence of lights, each one a note in a song only she could hear. She had to repeat the pattern, match the echo, prove that she could hold the melody in her mind.
+
+At first, she could only manage three or four steps. The echoes blurred together, and she lost the thread. But she kept practicing, and the sequences grew longer. Soon she could hold seven, then nine, then twelve.
+
+*“Memory is the bridge between what was and what will be,”* the book said. *“The sovereign operator remembers the path, even when the path is dark.”*
+
+Chapter 5: The Cipher
+The final test was logic. Numbers that twisted and turned, equations that seemed to have no answer. She had to find the sum, the key, the hidden truth that would unlock the next door.
+
+She had always been good with numbers—her father had taught her arithmetic before he disappeared—but this was different. The cipher didn’t just require calculation; it required intuition. She had to feel the answer before she could prove it.
+
+*“The sovereign operator does not solve the puzzle,”* the book whispered. *“They become the solution.”*
+
+Chapter 6: The Sovereign
+When Elara finally closed the book, she was no longer the same person who had opened it. She had passed the trials. She had earned the knowledge.
+
+The symbol on her shoulder glowed faintly in the dark, a constant reminder of what she had become. She was a sovereign operator now—one who could see the hidden patterns, hear the silent echoes, and solve the impossible ciphers.
+
+The world was still full of chaos, but she could navigate it. She could find the sigils in the noise, repeat the echoes in the silence, and crack the ciphers in the dark.
+
+*“The sovereign operator does not escape the void,”* the book said, its final words fading into the shadows. *“They dance with it.”*
+
+And Elara danced.
+      </div>
+    </div>
+
+    <div class="mode-indicator" id="modeIndicator"></div>
+
+    <div class="book-footer">
+      <span class="tap-hint">
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        <span style="margin-left:4px;">tap 3× to hide</span>
+      </span>
+      <span id="progressLabel">0%</span>
+    </div>
+
+    <!-- floating prev/next -->
+    <div class="chapter-nav" id="chapterNav">
+      <button id="prevChapter" title="Previous chapter">▲</button>
+      <button id="nextChapter" title="Next chapter">▼</button>
+    </div>
+  </div>
+
+  <!-- chapter edge tab -->
+  <div class="chapter-tab" id="chapterTab" role="button" tabindex="0">
+    <span class="tab-icon">📑</span>CHAPTERS
+  </div>
+
+  <!-- chapter drawer -->
+  <div class="chapter-drawer" id="chapterDrawer">
+    <div class="chapter-panel">
+      <div class="chapter-panel-header">
+        <h2>Chapters</h2>
+        <span class="count" id="chapterCount">0 of 0</span>
+      </div>
+      <div class="chapter-list" id="chapterList"></div>
+      <div class="chapter-panel-footer">tap outside to close</div>
+    </div>
+  </div>
+
+  <!-- ================= GAME VIEW ================= -->
+  <div class="game-view" id="gameView">
+    <div class="game-selector" id="gameSelector">
+      <button data-game="sigil" class="active">VOID SIGIL</button>
+      <button data-game="echo">ECHO SEQ</button>
+      <button data-game="cipher">CIPHER</button>
+    </div>
+    <div class="game-header">
+      <span id="gameTag">◆ SIGIL HUNT</span>
+      <span id="scoreDisplay">0</span>
+    </div>
+    <div class="game-title" id="gameTitle">VOID SIGIL</div>
+    <div class="game-sub" id="gameSub">— catch the glow —</div>
+    <div class="timer-bar-wrap" id="timerWrap"><div class="timer-bar" id="timerBar"></div></div>
+    <div class="cipher-target" id="cipherTarget" style="display:none;">0</div>
+    <div class="cipher-sum" id="cipherSum" style="display:none;">sum: 0</div>
+    <div class="grid-container" id="gridContainer"></div>
+    <div class="status-area" id="statusArea">Tap the glowing sigil</div>
+    <div class="best-score" id="bestScore"></div>
+    <button class="btn-reset" id="resetBtn">↺ RESTART</button>
+    <div class="back-hint">tap 3× to return to book</div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ============================================================
+  // 1.  BOOK ENGINE — parse, render, chapters, drawer, progress
+  // ============================================================
+  const bookTextEl   = document.getElementById('bookText');
+  const textScroll   = document.getElementById('textScroll');
+  const bookView     = document.getElementById('bookView');
+  const gameView     = document.getElementById('gameView');
+  const chapterLabel = document.getElementById('chapterLabel');
+  const chapterTab   = document.getElementById('chapterTab');
+  const chapterDrawer= document.getElementById('chapterDrawer');
+  const chapterList  = document.getElementById('chapterList');
+  const chapterCount = document.getElementById('chapterCount');
+  const prevBtn      = document.getElementById('prevChapter');
+  const nextBtn      = document.getElementById('nextChapter');
+  const progressLabel= document.getElementById('progressLabel');
+  const modeIndicator= document.getElementById('modeIndicator');
+
+  // Raw content exactly as pasted (innerHTML)
+  let rawHTML = bookTextEl.innerHTML;
+
+  // -------- Build chapter model from lines starting with "## " --------
+  function buildChapters(html){
+    const lines = html.split('\n');
+    const chapters = [];
+    let current = { title: null, body: [] };
+
+    for (let i = 0; i < lines.length; i++){
+      const line = lines[i];
+      const m = line.match(/^\s*##\s+(.*)$/);
+      if (m){
+        if (current.body.length || current.title !== null){
+          chapters.push(current);
+        }
+        current = { title: m[1].trim(), body: [] };
+      } else {
+        current.body.push(line);
+      }
+    }
+    if (current.body.length || current.title !== null){
+      chapters.push(current);
+    }
+    if (chapters.length === 0 || (chapters.length === 1 && chapters[0].title === null)){
+      return [{ title: 'FORBIDDEN KNOWLEDGE', body: lines }];
+    }
+    if (chapters[0].title === null && chapters[0].body.join('').trim() === ''){
+      chapters.shift();
+    }
+    return chapters.length ? chapters : [{ title: 'FORBIDDEN KNOWLEDGE', body: lines }];
+  }
+
+  // Auto-linkify URLs in text (but not inside HTML tags)
+  function linkifyText(text){
+    const urlRegex = /\b(https?:\/\/[^\s<]+)/g;
+    return text.replace(urlRegex, function(url){
+      return '<a href="' + url + '" target="_blank" rel="noopener">' + url + '</a>';
+    });
+  }
+
+  // Render chapters into the book text element
+  function renderBook(chapters){
+    let out = '';
+    chapters.forEach((ch, idx) => {
+      if (ch.title !== null){
+        out += '<span class="chapter-heading" data-chapter="' + idx + '">';
+        out += '<span class="chapter-num">Chapter ' + (idx + 1) + '</span>';
+        out += '<span class="chapter-title">' + escapeHTML(ch.title) + '</span>';
+        out += '</span>';
+      }
+      let bodyText = ch.body.join('\n');
+      if (/<[a-z][\s\S]*>/i.test(bodyText)){
+        out += bodyText;
+      } else {
+        out += linkifyText(escapeHTML(bodyText));
+      }
+    });
+    bookTextEl.innerHTML = out;
+  }
+
+  function escapeHTML(s){
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  // -------- State --------
+  let chapters = [];
+  let currentChapter = 0;
+  let scrollObserver = null;
+
+  // -------- Initialize book --------
+  function initBook(){
+    chapters = buildChapters(rawHTML);
+    renderBook(chapters);
+    buildChapterList();
+    updateChapterLabel(0);
+    updateProgress();
+    setupScrollSpy();
+    setupChapterNavigation();
+    setupDrawer();
+    setupTapToHide();
+    setupTap3xToGame();
+  }
+
+  // -------- Chapter list in drawer --------
+  function buildChapterList(){
+    chapterList.innerHTML = '';
+    chapters.forEach((ch, idx) => {
+      const div = document.createElement('div');
+      div.className = 'chapter-item' + (idx === 0 ? ' current' : '');
+      div.dataset.chapter = idx;
+      div.innerHTML = '<span class="num">' + String(idx+1).padStart(2,'0') + '</span>' +
+                      '<span class="name">' + escapeHTML(ch.title || 'Untitled') + '</span>';
+      div.addEventListener('click', () => {
+        goToChapter(idx);
+        closeDrawer();
+      });
+      chapterList.appendChild(div);
+    });
+    chapterCount.textContent = '0 of ' + chapters.length;
+  }
+
+  // -------- Navigate to chapter --------
+  function goToChapter(idx){
+    if (idx < 0 || idx >= chapters.length) return;
+    const heading = bookTextEl.querySelector('.chapter-heading[data-chapter="' + idx + '"]');
+    if (heading){
+      heading.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      textScroll.scrollTop = 0;
+    }
+    currentChapter = idx;
+    updateChapterLabel(idx);
+    updateChapterListCurrent();
+    updateNavButtons();
+  }
+
+  function updateChapterLabel(idx){
+    const ch = chapters[idx];
+    if (ch && ch.title){
+      chapterLabel.textContent = '— ' + ch.title + ' —';
+    } else {
+      chapterLabel.textContent = '— prologue —';
+    }
+  }
+
+  function updateChapterListCurrent(){
+    const items = chapterList.querySelectorAll('.chapter-item');
+    items.forEach((el, i) => {
+      el.classList.toggle('current', i === currentChapter);
+    });
+    chapterCount.textContent = (currentChapter+1) + ' of ' + chapters.length;
+  }
+
+  function updateNavButtons(){
+    prevBtn.disabled = currentChapter <= 0;
+    nextBtn.disabled = currentChapter >= chapters.length - 1;
+  }
+
+  // -------- Scroll spy: update current chapter based on scroll position --------
+  function setupScrollSpy(){
+    if (scrollObserver) scrollObserver.disconnect();
+    const headings = bookTextEl.querySelectorAll('.chapter-heading');
+    if (!headings.length) return;
+
+    const options = {
+      root: textScroll,
+      rootMargin: '0px 0px -60% 0px',
+      threshold: 0
+    };
+
+    scrollObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting){
+          const idx = parseInt(entry.target.dataset.chapter, 10);
+          if (!isNaN(idx) && idx !== currentChapter){
+            currentChapter = idx;
+            updateChapterLabel(idx);
+            updateChapterListCurrent();
+            updateNavButtons();
+          }
+        }
+      });
+    }, options);
+
+    headings.forEach(h => scrollObserver.observe(h));
+
+    textScroll.addEventListener('scroll', updateProgress);
+  }
+
+  function updateProgress(){
+    const scrollTop = textScroll.scrollTop;
+    const scrollHeight =
+          const scrollHeight = textScroll.scrollHeight - textScroll.clientHeight;
+    const pct = scrollHeight > 0 ? Math.round((scrollTop / scrollHeight) * 100) : 0;
+    progressLabel.textContent = pct + '%';
+  }
+
+  function setupChapterNavigation(){
+    prevBtn.addEventListener('click', () => {
+      if (currentChapter > 0) goToChapter(currentChapter - 1);
+    });
+    nextBtn.addEventListener('click', () => {
+      if (currentChapter < chapters.length - 1) goToChapter(currentChapter + 1);
+    });
+  }
+
+  // -------- Chapter drawer open/close --------
+  function openDrawer(){
+    chapterDrawer.classList.add('open');
+  }
+  function closeDrawer(){
+    chapterDrawer.classList.remove('open');
+  }
+  function setupDrawer(){
+    chapterTab.addEventListener('click', openDrawer);
+    chapterTab.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openDrawer(); }
+    });
+    chapterDrawer.addEventListener('click', (e) => {
+      if (e.target === chapterDrawer) closeDrawer();
+    });
+  }
+
+  // -------- Tap 3x on book area to hide the book (reveal game hint) --------
+  function setupTapToHide(){
+    let tapCount = 0;
+    let tapTimer = null;
+    textScroll.addEventListener('click', () => {
+      tapCount++;
+      clearTimeout(tapTimer);
+      tapTimer = setTimeout(() => { tapCount = 0; }, 600);
+      if (tapCount >= 3){
+        tapCount = 0;
+        modeIndicator.textContent = '◈ the void stirs… tap the grid below ◈';
+        // Fade book out a little as feedback
+        bookView.style.opacity = '0.55';
+        setTimeout(() => { bookView.style.opacity = '1'; }, 500);
+      }
+    });
+  }
+
+  // -------- Tap 3x on game view to return to book --------
+  function setupTap3xToGame(){
+    // (Game is entered via a hidden trigger — tapping the footer dots 3x)
+    const footer = document.querySelector('.book-footer');
+    let taps = 0, timer = null;
+    footer.addEventListener('click', () => {
+      taps++;
+      clearTimeout(timer);
+      timer = setTimeout(() => { taps = 0; }, 700);
+      if (taps >= 3){
+        taps = 0;
+        enterGame();
+      }
+    });
+  }
+
+  // ============================================================
+  // 2.  GAME ENGINE — Sigil Hunt, Echo Sequence, Cipher
+  // ============================================================
+  const gameSelector = document.getElementById('gameSelector');
+  const gameTitle    = document.getElementById('gameTitle');
+  const gameSub      = document.getElementById('gameSub');
+  const gameTag      = document.getElementById('gameTag');
+  const scoreDisplay = document.getElementById('scoreDisplay');
+  const timerWrap    = document.getElementById('timerWrap');
+  const timerBar     = document.getElementById('timerBar');
+  const gridContainer= document.getElementById('gridContainer');
+  const statusArea   = document.getElementById('statusArea');
+  const bestScoreEl  = document.getElementById('bestScore');
+  const resetBtn     = document.getElementById('resetBtn');
+  const cipherTarget = document.getElementById('cipherTarget');
+  const cipherSum    = document.getElementById('cipherSum');
+
+  let activeGame = 'sigil';
+  let score = 0;
+  let best = { sigil: 0, echo: 0, cipher: 0 };
+  let gameTimers = [];
+  let isPlaying = false;
+
+  function clearGameTimers(){
+    gameTimers.forEach(t => clearTimeout(t));
+    gameTimers = [];
+  }
+
+  function setScore(n){
+    score = n;
+    scoreDisplay.textContent = n;
+  }
+
+  function updateBestLabel(){
+    const b = best[activeGame] || 0;
+    bestScoreEl.textContent = b > 0 ? '★ best: ' + b : '';
+  }
+
+  function loadBest(){
+    try {
+      const raw = localStorage.getItem('forbidden_best');
+      if (raw){
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === 'object'){
+          best = Object.assign(best, parsed);
+        }
+      }
+    } catch(e){ /* ignore */ }
+    updateBestLabel();
+  }
+
+  function saveBest(){
+    try {
+      localStorage.setItem('forbidden_best', JSON.stringify(best));
+    } catch(e){ /* ignore */ }
+  }
+
+  function recordScore(){
+    if (score > (best[activeGame] || 0)){
+      best[activeGame] = score;
+      saveBest();
+      updateBestLabel();
+    }
+  }
+
+  // -------- Enter game --------
+  function enterGame(){
+    gameView.classList.add('active');
+    bookView.classList.add('hidden');
+    startGame(activeGame);
+  }
+
+  function exitGame(){
+    gameView.classList.remove('active');
+    bookView.classList.remove('hidden');
+    clearGameTimers();
+    isPlaying = false;
+  }
+
+  // -------- Game selector --------
+  gameSelector.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      gameSelector.querySelectorAll('button').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeGame = btn.dataset.game;
+      startGame(activeGame);
+    });
+  });
+
+  // -------- Master start --------
+  function startGame(type){
+    clearGameTimers();
+    isPlaying = true;
+    setScore(0);
+    updateBestLabel();
+    gridContainer.innerHTML = '';
+    timerWrap.style.display = 'block';
+    timerBar.style.width = '100%';
+    cipherTarget.style.display = 'none';
+    cipherSum.style.display = 'none';
+
+    if (type === 'sigil') startSigil();
+    else if (type === 'echo') startEcho();
+    else if (type === 'cipher') startCipher();
+  }
+
+  // ============================================================
+  // GAME 1 — VOID SIGIL (find the glowing cell among 9)
+  // ============================================================
+  let sigilTimer = null;
+  let sigilInterval = null;
+  let sigilTarget = -1;
+  let sigilTimeLeft = 0;
+  let sigilRound = 0;
+  let sigilSpeed = 2200;
+
+  function startSigil(){
+    gameTitle.textContent = 'VOID SIGIL';
+    gameSub.textContent = '— catch the glow —';
+    gameTag.textContent = '◆ SIGIL HUNT';
+    sigilRound = 0;
+    sigilSpeed = 2200;
+    statusArea.textContent = 'Tap the glowing sigil';
+    nextSigilRound();
+  }
+
+  function nextSigilRound(){
+    if (!isPlaying) return;
+    clearGameTimers();
+    gridContainer.innerHTML = '';
+    sigilTarget = Math.floor(Math.random() * 9);
+    sigilRound++;
+
+    for (let i = 0; i < 9; i++){
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      cell.dataset.index = i;
+      cell.addEventListener('click', () => onSigilTap(i, cell));
+      gridContainer.appendChild(cell);
+    }
+
+    // light the target
+    const targetCell = gridContainer.children[sigilTarget];
+    targetCell.classList.add('lit');
+
+    // countdown bar
+    sigilTimeLeft = sigilSpeed;
+    const startTime = performance.now();
+    const tick = () => {
+      if (!isPlaying) return;
+      const elapsed = performance.now() - startTime;
+      const remaining = Math.max(0, 1 - elapsed / sigilSpeed);
+      timerBar.style.width = (remaining * 100) + '%';
+      if (remaining > 0){
+        requestAnimationFrame(tick);
+      } else {
+        // missed
+        targetCell.classList.remove('lit');
+        targetCell.classList.add('wrong');
+        statusArea.textContent = '✗ too slow — the void claims it';
+        recordScore();
+        sigilSpeed = Math.max(700, sigilSpeed - 100);
+        sigilTimer = setTimeout(nextSigilRound, 650);
+      }
+    };
+    requestAnimationFrame(tick);
+  }
+
+  function onSigilTap(index, cell){
+    if (!isPlaying || !cell.classList.contains('lit')) {
+      if (cell.classList.contains('lit') === false && cell.classList.contains('wrong') === false){
+        cell.classList.add('wrong');
+        statusArea.textContent = '✗ wrong sigil';
+      }
+      return;
+    }
+    cell.classList.remove('lit');
+    cell.classList.add('hit');
+    setScore(score + 1);
+    statusArea.textContent = '✓ sigil caught';
+    clearGameTimers();
+    sigilSpeed = Math.max(700, sigilSpeed - 120);
+    sigilTimer = setTimeout(nextSigilRound, 350);
+  }
+
+  // ============================================================
+  // GAME 2 — ECHO SEQ (Simon-says memory)
+  // ============================================================
+  let echoSeq = [];
+  let echoInputIdx = 0;
+  let echoStep = 0;
+  let echoPlayingBack = false;
+
+  function startEcho(){
+    gameTitle.textContent = 'ECHO SEQ';
+    gameSub.textContent = '— repeat the echo —';
+    gameTag.textContent = '◆ ECHO MEMORY';
+    echoSeq = [];
+    echoStep = 0;
+    statusArea.textContent = 'Watch the sequence…';
+    timerWrap.style.display = 'none';
+    setTimeout(() => {
+      if (isPlaying) nextEchoRound();
+    }, 400);
+  }
+
+  function buildEchoGrid(){
+    gridContainer.innerHTML = '';
+    for (let i = 0; i < 9; i++){
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      cell.dataset.index = i;
+      cell.addEventListener('click', () => onEchoTap(i, cell));
+      gridContainer.appendChild(cell);
+    }
+  }
+
+  function nextEchoRound(){
+    if (!isPlaying) return;
+    echoStep++;
+    echoInputIdx = 0;
+    echoPlayingBack = true;
+    statusArea.textContent = 'Round ' + echoStep + ' — watch';
+    buildEchoGrid();
+    // add one new step
+    echoSeq.push(Math.floor(Math.random() * 9));
+    playEchoSequence();
+  }
+
+  function playEchoSequence(){
+    let i = 0;
+    const show = () => {
+      if (!isPlaying) return;
+      if (i >= echoSeq.length){
+        echoPlayingBack = false;
+        statusArea.textContent = 'Your turn — repeat';
+        return;
+      }
+      const idx = echoSeq[i];
+      const cell = gridContainer.children[idx];
+      if (cell){
+        cell.classList.add('lit');
+        setTimeout(() => cell.classList.remove('lit'), 320);
+      }
+      i++;
+      gameTimers.push(setTimeout(show, 520));
+    };
+    gameTimers.push(setTimeout(show, 350));
+  }
+
+  function onEchoTap(index, cell){
+    if (!isPlaying || echoPlayingBack) return;
+    cell.classList.add('pick');
+    setTimeout(() => cell.classList.remove('pick'), 180);
+
+    if (index === echoSeq[echoInputIdx]){
+      echoInputIdx++;
+      if (echoInputIdx >= echoSeq.length){
+        setScore(echoStep);
+        statusArea.textContent = '✓ echo matched';
+        echoPlayingBack = true;
+        gameTimers.push(setTimeout(nextEchoRound, 700));
+      }
+    } else {
+      statusArea.textContent = '✗ echo broken';
+      recordScore();
+      echoPlayingBack = true;
+      gameTimers.push(setTimeout(() => {
+        echoSeq = [];
+        echoStep = 0;
+        if (isPlaying) nextEchoRound();
+      }, 900));
+    }
+  }
+
+  // ============================================================
+  // GAME 3 — CIPHER (solve the arithmetic cipher)
+  // ============================================================
+  let cipherAnswer = 0;
+  let cipherRoundNum = 0;
+
+  function startCipher(){
+    gameTitle.textContent = 'CIPHER';
+    gameSub.textContent = '— become the solution —';
+    gameTag.textContent = '◆ CIPHER LOCK';
+    cipherRoundNum = 0;
+    cipherTarget.style.display = 'block';
+    cipherSum.style.display = 'block';
+    timerWrap.style.display = 'block';
+    nextCipherRound();
+  }
+
+  function nextCipherRound(){
+    if (!isPlaying) return;
+    clearGameTimers();
+    cipherRoundNum++;
+    gridContainer.innerHTML = '';
+
+    // generate an arithmetic puzzle
+    const ops = ['+', '−', '×'];
+    const op = ops[Math.floor(Math.random() * ops.length)];
+    let a, b;
+    if (op === '×') {
+      a = 2 + Math.floor(Math.random() * 9);
+      b = 2 + Math.floor(Math.random() * 9);
+      cipherAnswer = a * b;
+    } else if (op === '−') {
+      a = 5 + Math.floor(Math.random() * 20);
+      b = 1 + Math.floor(Math.random() * (a - 1));
+      cipherAnswer = a - b;
+    } else {
+      a = 1 + Math.floor(Math.random() * 30);
+      b = 1 + Math.floor(Math.random() * 30);
+      cipherAnswer = a + b;
+    }
+
+    cipherTarget.textContent = a + ' ' + op + ' ' + b;
+    cipherSum.textContent = 'sum: ' + cipherAnswer;
+
+    // Build 3x3 grid with the answer + decoys
+    const choices = [cipherAnswer];
+    while (choices.length < 9){
+      let decoy = cipherAnswer + (Math.floor(Math.random() * 21) - 10);
+      if (decoy === cipherAnswer) decoy += 1;
+      if (decoy > 0 && !choices.includes(decoy)) choices.push(decoy);
+    }
+    // shuffle
+    for (let i = choices.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      [choices[i], choices[j]] = [choices[j], choices[i]];
+    }
+
+    for (let i = 0; i < 9; i++){
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      cell.textContent = choices[i];
+      cell.dataset.value = choices[i];
+      cell.addEventListener('click', () => onCipherTap(cell, choices[i]));
+      gridContainer.appendChild(cell);
+    }
+
+    statusArea.textContent = 'Solve the cipher';
+
+    // 10-second timer
+    const total = 10000 - Math.min(5000, cipherRoundNum * 400);
+    const startTime = performance.now();
+    const tick = () => {
+      if (!isPlaying) return;
+      const elapsed = performance.now() - startTime;
+      const remaining = Math.max(0, 1 - elapsed / total);
+      timerBar.style.width = (remaining * 100) + '%';
+      if (remaining > 0){
+        requestAnimationFrame(tick);
+      } else {
+        statusArea.textContent = '✗ cipher locked';
+        recordScore();
+        gameTimers.push(setTimeout(nextCipherRound, 900));
+      }
+    };
+    requestAnimationFrame(tick);
+  }
+
+  function onCipherTap(cell, value){
+    if (!isPlaying) return;
+    if (value === cipherAnswer){
+      cell.classList.add('hit');
+      setScore(score + 1);
+      statusArea.textContent = '✓ cipher cracked';
+      clearGameTimers();
+      gameTimers.push(setTimeout(nextCipherRound, 500));
+    } else {
+      cell.classList.add('wrong');
+      statusArea.textContent = '✗ wrong key';
+      recordScore();
+      clearGameTimers();
+      gameTimers.push(setTimeout(nextCipherRound, 900));
+    }
+  }
+
+  // -------- Reset button --------
+  resetBtn.addEventListener('click', () => {
+    startGame(activeGame);
+  });
+
+  // -------- Tap 3x on game to return to book --------
+  let gameTapCount = 0, gameTapTimer = null;
+  gameView.addEventListener('click', (e) => {
+    // ignore clicks on interactive elements
+    if (e.target.closest('button') || e.target.closest('.cell')) return;
+    gameTapCount++;
+    clearTimeout(gameTapTimer);
+    gameTapTimer = setTimeout(() => { gameTapCount = 0; }, 600);
+    if (gameTapCount >= 3){
+      gameTapCount = 0;
+      exitGame();
+    }
+  });
+
+  // ============================================================
+  // 3.  BOOTSTRAP
+  // ============================================================
+  loadBest();
+  initBook();
+
+})();
