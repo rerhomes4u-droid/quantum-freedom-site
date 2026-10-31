@@ -1,0 +1,1862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Forbidden Knowledge · Sovereign Operator</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html, body { height:100%; width:100%; overflow:hidden; }
+  body {
+    background:#1a0e0b; display:flex; align-items:center; justify-content:center;
+    font-family:'Georgia','Times New Roman',serif;
+    touch-action:manipulation;
+  }
+
+  /* ============ APP SHELL ============ */
+  .app {
+    width:100%; max-width:440px; height:100vh; height:100dvh; max-height:900px;
+    position:relative; overflow:hidden;
+    border-radius:12px;
+    box-shadow:0 20px 40px rgba(0,0,0,.8),0 0 0 1px #5a3e2b;
+    background:#f7f0e0;
+  }
+
+  /* ============ BOOK VIEW ============ */
+  .book-view {
+    position:absolute; top:0; left:0; width:100%; height:100%;
+    background:#f7f0e0;
+    background-image:
+      linear-gradient(90deg,#e8dcc8 0%,#f7f0e0 8%,#f7f0e0 92%,#e8dcc8 100%),
+      repeating-linear-gradient(0deg,rgba(180,140,100,.05) 0px,rgba(180,140,100,.05) 1px,transparent 1px,transparent 24px);
+    padding:18px 16px 14px;
+    display:flex; flex-direction:column;
+    border:2px solid #b59a7a; border-radius:8px;
+    box-shadow:inset 0 0 40px rgba(120,80,50,.15);
+    z-index:2;
+    transition:opacity .25s ease, transform .25s ease;
+    overflow:hidden;
+  }
+  .book-view.hidden { opacity:0; transform:scale(.96); pointer-events:none; visibility:hidden; }
+
+  .book-header {
+    display:flex; justify-content:space-between; align-items:center;
+    font-size:11px; letter-spacing:2px; color:#8b6b4a; text-transform:uppercase;
+    border-bottom:1px solid #d4c0a8; padding-bottom:8px; margin-bottom:10px;
+    font-weight:600; flex-shrink:0; gap:8px;
+  }
+  .book-header .chapter-label {
+    font-family:'Courier New',monospace; font-size:9px;
+    letter-spacing:1px; color:#8b3a1a; text-transform:none;
+    font-weight:700; max-width:60%; overflow:hidden;
+    text-overflow:ellipsis; white-space:nowrap;
+  }
+
+  .text-scroll {
+    flex:1; overflow-y:auto; overflow-x:hidden;
+    padding:4px 10px 4px 4px;
+    scrollbar-width:thin; scrollbar-color:#c9b294 #f7f0e0;
+    font-size:16px; line-height:1.7; color:#2e1e12;
+    word-break:break-word; text-align:justify;
+    -webkit-overflow-scrolling:touch; position:relative;
+    scroll-behavior:smooth;
+  }
+  .text-scroll::-webkit-scrollbar { width:6px; }
+  .text-scroll::-webkit-scrollbar-track { background:#f7f0e0; }
+  .text-scroll::-webkit-scrollbar-thumb { background:#c9b294; border-radius:6px; }
+
+  #bookText {
+    white-space:pre-wrap; cursor:default;
+    user-select:text; -webkit-user-select:text;
+    overflow-wrap:anywhere;
+  }
+  #bookText a {
+    color:#8b3a1a; text-decoration:underline;
+    text-decoration-color:rgba(139,58,26,.4);
+    overflow-wrap:anywhere; word-break:break-word;
+  }
+  #bookText a:hover { color:#b04a2a; }
+  #bookText h1,#bookText h2,#bookText h3 { color:#5a3e2b; margin:1em 0 .4em; line-height:1.3; }
+  #bookText p { margin:0 0 .8em; }
+  #bookText blockquote {
+    border-left:3px solid #c9b294; padding-left:12px;
+    margin:.8em 0; color:#6b4f34; font-style:italic;
+  }
+  #bookText code,#bookText pre {
+    background:rgba(181,154,122,.15); padding:2px 5px;
+    border-radius:3px; font-family:'Courier New',monospace;
+    font-size:.9em; white-space:pre-wrap; overflow-wrap:anywhere;
+  }
+  #bookText pre { padding:10px; display:block; margin:.8em 0; }
+  #bookText ul,#bookText ol { margin:.6em 0 .8em 1.4em; }
+  #bookText img { max-width:100%; height:auto; border-radius:4px; margin:.6em 0; }
+  #bookText hr { border:0; border-top:1px solid #d4c0a8; margin:1em 0; }
+
+  .chapter-heading {
+    display:block; margin:2em 0 1em; padding-top:1.4em;
+    border-top:1px solid #d4c0a8; position:relative;
+    scroll-margin-top:20px;
+  }
+  .chapter-heading:first-child { margin-top:0; padding-top:0; border-top:none; }
+  .chapter-heading .chapter-num {
+    display:block; font-family:'Courier New',monospace;
+    font-size:10px; letter-spacing:3px; color:#a88b68;
+    text-transform:uppercase; font-weight:700; margin-bottom:4px;
+  }
+  .chapter-heading .chapter-title {
+    display:block; font-family:'Georgia',serif;
+    font-size:22px; font-weight:700; color:#5a3e2b;
+    letter-spacing:.5px; line-height:1.2;
+  }
+  .chapter-heading .chapter-title::first-letter {
+    font-size:2.4em; float:left; line-height:.9;
+    padding:2px 8px 0 0; color:#8b3a1a;
+  }
+
+  .mode-indicator {
+    font-size:10px; color:#8b6b4a; letter-spacing:1px;
+    font-family:'Courier New',monospace; padding:4px 0 0;
+    text-align:center; flex-shrink:0; min-height:16px;
+  }
+  .book-footer {
+    margin-top:8px; padding-top:8px; border-top:1px solid #d4c0a8;
+    display:flex; justify-content:space-between; align-items:center;
+    font-size:10px; color:#a88b68; font-style:italic; letter-spacing:1px;
+    flex-shrink:0; font-family:'Courier New',monospace;
+  }
+  .tap-hint { display:flex; gap:4px; align-items:center; }
+  .tap-hint .dot {
+    width:5px; height:5px; border-radius:50%; background:#b59a7a;
+    animation:pulse 1.8s infinite;
+  }
+  .tap-hint .dot:nth-child(2){ animation-delay:.3s; }
+  .tap-hint .dot:nth-child(3){ animation-delay:.6s; }
+  @keyframes pulse {
+    0%,100%{opacity:.3;transform:scale(.9);}
+    50%{opacity:1;transform:scale(1.2);background:#8b5e3c;}
+  }
+
+  /* ============ CHAPTER TAB & DRAWER ============ */
+  .chapter-tab {
+    position:absolute; left:0; top:50%; transform:translateY(-50%);
+    background:linear-gradient(90deg,#8b6b4a,#a88b68);
+    color:#f7f0e0; font-family:'Courier New',monospace;
+    font-size:9px; font-weight:700; letter-spacing:2px;
+    writing-mode:vertical-rl; text-orientation:mixed;
+    padding:14px 5px; border-radius:0 6px 6px 0;
+    box-shadow:2px 0 10px rgba(0,0,0,.25);
+    cursor:pointer; z-index:5;
+    border:1px solid #6b4f34; border-left:none;
+    transition:all .15s; user-select:none;
+  }
+  .chapter-tab:active { background:#6b4f34; padding-right:9px; }
+  .chapter-tab .tab-icon {
+    font-size:12px; display:block; margin-bottom:6px;
+    writing-mode:horizontal-tb;
+  }
+
+  .chapter-drawer {
+    position:absolute; top:0; left:0; width:100%; height:100%;
+    z-index:20; background:rgba(20,10,6,.55);
+    opacity:0; pointer-events:none;
+    transition:opacity .25s ease;
+  }
+  .chapter-drawer.open { opacity:1; pointer-events:auto; }
+  .chapter-panel {
+    position:absolute; top:0; bottom:0; left:0;
+    width:82%; max-width:330px; background:#f7f0e0;
+    background-image:linear-gradient(90deg,#f7f0e0 0%,#f2e8d5 100%);
+    border-right:2px solid #8b6b4a;
+    box-shadow:8px 0 30px rgba(0,0,0,.4);
+    transform:translateX(-100%);
+    transition:transform .3s cubic-bezier(.22,1,.36,1);
+    display:flex; flex-direction:column;
+  }
+  .chapter-drawer.open .chapter-panel { transform:translateX(0); }
+  .chapter-panel-header {
+    padding:16px 16px 12px; border-bottom:1px solid #d4c0a8;
+    display:flex; justify-content:space-between; align-items:baseline;
+  }
+  .chapter-panel-header h2 {
+    font-family:'Georgia',serif; font-size:16px; color:#5a3e2b;
+    letter-spacing:1px; font-weight:700;
+  }
+  .chapter-panel-header .count {
+    font-family:'Courier New',monospace; font-size:9px;
+    color:#a88b68; letter-spacing:1px;
+  }
+  .chapter-list {
+    flex:1; overflow-y:auto; padding:8px 0;
+    scrollbar-width:thin; scrollbar-color:#c9b294 #f2e8d5;
+  }
+  .chapter-list::-webkit-scrollbar { width:5px; }
+  .chapter-list::-webkit-scrollbar-thumb { background:#c9b294; border-radius:6px; }
+  .chapter-item {
+    display:flex; align-items:baseline; gap:10px;
+    padding:9px 16px; cursor:pointer;
+    transition:background .12s;
+    border-left:3px solid transparent;
+  }
+  .chapter-item:active { background:rgba(181,154,122,.25); }
+  .chapter-item.current {
+    background:rgba(181,154,122,.18);
+    border-left-color:#8b3a1a;
+  }
+  .chapter-item .num {
+    font-family:'Courier New',monospace; font-size:10px;
+    color:#a88b68; letter-spacing:1px; font-weight:700;
+    min-width:22px; flex-shrink:0;
+  }
+  .chapter-item.current .num { color:#8b3a1a; }
+  .chapter-item .name {
+    font-family:'Georgia',serif; font-size:13px;
+    color:#2e1e12; line-height:1.3; flex:1;
+  }
+  .chapter-item.current .name { color:#5a3e2b; font-weight:700; }
+  .chapter-panel-footer {
+    padding:10px 16px; border-top:1px solid #d4c0a8;
+    font-family:'Courier New',monospace; font-size:9px;
+    color:#a88b68; letter-spacing:1px; text-align:center;
+  }
+
+  .chapter-nav {
+    position:absolute; right:10px; bottom:52px;
+    display:flex; flex-direction:column; gap:6px; z-index:4;
+  }
+  .chapter-nav button {
+    width:34px; height:34px; border-radius:50%;
+    background:rgba(139,107,74,.85); color:#f7f0e0;
+    border:1px solid #6b4f34; cursor:pointer;
+    font-size:14px; line-height:1;
+    box-shadow:0 3px 10px rgba(0,0,0,.3);
+    transition:all .15s; font-family:'Courier New',monospace;
+    padding:0;
+  }
+  .chapter-nav button:active { transform:scale(.9); background:#6b4f34; }
+  .chapter-nav button:disabled { opacity:.3; cursor:default; }
+
+  /* ============ GAME VIEW ============ */
+  .game-view {
+    position:absolute; top:0; left:0; width:100%; height:100%;
+    background:#0b1a1f;
+    background-image:
+      radial-gradient(circle at 20% 30%,#1e3a44 0%,transparent 40%),
+      radial-gradient(circle at 80% 70%,#2a4a3a 0%,transparent 40%),
+      repeating-linear-gradient(45deg,rgba(100,200,150,.03) 0px,rgba(100,200,150,.03) 2px,transparent 2px,transparent 8px);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:60px 16px 16px;
+    z-index:30;
+    opacity:0; pointer-events:none; visibility:hidden;
+    transition:opacity .3s ease;
+    overflow:hidden;
+  }
+  .game-view.active {
+    opacity:1; pointer-events:auto; visibility:visible;
+  }
+
+  .game-selector {
+    position:absolute; top:10px; left:10px; right:10px;
+    display:flex; gap:4px; z-index:6;
+  }
+  .game-selector button {
+    flex:1; background:rgba(14,42,34,.8);
+    border:1px solid #2a6a4a; color:#8fc9a8;
+    font-family:'Courier New',monospace; font-size:9px;
+    letter-spacing:1px; padding:6px 3px; border-radius:6px;
+    cursor:pointer; font-weight:700;
+    transition:all .15s;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .game-selector button:active { transform:scale(.96); }
+  .game-selector button.active {
+    background:#2a7a5a; color:#e0fff0;
+    border-color:#8affb0; box-shadow:0 0 12px #3aff8a;
+  }
+
+  .game-header {
+    position:absolute; top:48px; left:0; right:0;
+    display:flex; justify-content:space-between; padding:0 20px;
+    color:#8fc9a8; font-family:'Courier New',monospace;
+    font-size:12px; letter-spacing:2px;
+    text-shadow:0 0 10px #2a7a5a;
+  }
+
+  .game-title {
+    font-size:20px; font-weight:700; color:#b8e6d0;
+    text-shadow:0 0 15px #3a9a6a,0 0 30px #1a5a3a;
+    margin:8px 0 2px; letter-spacing:3px;
+    font-family:'Courier New',monospace; text-transform:uppercase;
+    text-align:center;
+  }
+  .game-sub {
+    color:#6a9a7a; font-size:10px; letter-spacing:2px;
+    margin-bottom:12px; font-family:'Courier New',monospace;
+    text-align:center;
+  }
+  .timer-bar-wrap {
+    width:100%; max-width:280px; height:5px; background:#0e2a22;
+    border-radius:6px; overflow:hidden; margin-bottom:10px;
+    border:1px solid #2a6a4a;
+  }
+  .timer-bar {
+    height:100%; width:100%;
+    background:linear-gradient(90deg,#3a9a6a,#8affb0);
+    transition:width .1s linear; border-radius:6px;
+  }
+
+  .grid-container {
+    display:grid; grid-template-columns:repeat(3,1fr);
+    gap:8px; width:100%; max-width:280px; margin:4px 0 12px;
+  }
+  .cell {
+    aspect-ratio:1/1; background:#0e2a22;
+    border:2px solid #2a6a4a; border-radius:10px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:22px; font-weight:700; color:#b8e6d0;
+    text-shadow:0 0 10px #3a9a6a; cursor:pointer;
+    transition:all .1s ease; font-family:'Courier New',monospace;
+    box-shadow:0 0 15px rgba(40,120,80,.3),inset 0 0 15px rgba(0,0,0,.5);
+    user-select:none; position:relative;
+  }
+  .cell:active { transform:scale(.94); }
+  .cell.lit {
+    background:#1e5a3a; border-color:#8affb0;
+    box-shadow:0 0 30px #3aff8a,inset 0 0 25px #2a8a5a;
+    color:#fff; text-shadow:0 0 20px #8affb0;
+  }
+  .cell.hit {
+    background:#5a8a3a; border-color:#ffffa0;
+    box-shadow:0 0 35px #ffff80;
+  }
+  .cell.wrong {
+    background:#5a2a2a; border-color:#ff8080;
+    box-shadow:0 0 25px #ff6060;
+  }
+  .cell.pick {
+    background:#2a5a4a; border-color:#a0ffd0;
+    box-shadow:0 0 20px #6affa0;
+  }
+
+  .status-area {
+    color:#a8d8c0; font-family:'Courier New',monospace;
+    font-size:13px; letter-spacing:1.5px;
+    margin:6px 0 10px; min-height:22px;
+    text-align:center; text-shadow:0 0 10px #2a8a5a;
+    font-weight:600;
+  }
+
+  .btn-reset {
+    background:transparent; border:2px solid #3a8a6a; color:#a8d8c0;
+    padding:8px 26px; border-radius:40px;
+    font-family:'Courier New',monospace; font-size:12px;
+    letter-spacing:3px; font-weight:700; cursor:pointer;
+    text-shadow:0 0 8px #2a8a5a;
+    box-shadow:0 0 20px rgba(40,160,100,.2);
+    margin-top:2px; transition:all .15s;
+  }
+  .btn-reset:active {
+    background:#1a4a3a; border-color:#7ac9a8;
+    transform:scale(.96); box-shadow:0 0 30px rgba(80,220,140,.4);
+  }
+
+  .back-hint {
+    margin-top:12px; color:#4a7a6a; font-size:9px;
+    letter-spacing:2px; font-family:'Courier New',monospace;
+    opacity:.6; text-align:center;
+  }
+
+  .cipher-target {
+    font-family:'Courier New',monospace; font-size:34px;
+    color:#8affb0; text-shadow:0 0 20px #3aff8a;
+    letter-spacing:2px; margin:4px 0 6px; font-weight:700;
+  }
+  .cipher-sum {
+    font-family:'Courier New',monospace; font-size:11px;
+    color:#6a9a7a; letter-spacing:2px;
+  }
+  .best-score {
+    font-family:'Courier New',monospace; font-size:9px;
+    color:#4a7a6a; letter-spacing:2px; margin-top:2px;
+  }
+
+  @media (max-height:600px) {
+    .game-title { font-size:16px; margin:2px 0; }
+    .grid-container { max-width:220px; gap:6px; }
+    .cell { font-size:18px; }
+    .game-view { padding-top:52px; }
+  }
+</style>
+</head>
+<body>
+<div class="app" id="app">
+
+  <!-- ================= BOOK VIEW ================= -->
+  <div class="book-view" id="bookView">
+    <div class="book-header">
+      <span>📖 FORBIDDEN KNOWLEDGE</span>
+      <span class="chapter-label" id="chapterLabel">— prologue —</span>
+    </div>
+
+    <div class="text-scroll" id="textScroll">
+      <div id="bookText">
+<!-- =========================================================
+     ▼▼▼ BEGIN BOOK TEXT ▼▼▼
+     Mark chapters with a line starting with "## "
+     Example:
+       ## Chapter Title
+       ...chapter body...
+========================================================= -->
+FORBIDDEN KNOWLEDGE
+The Complete Unabridged Edition
+
+## Prologue
+Paste your book content here. Each chapter begins with a line that starts with "## ". Plain text or HTML both work. URLs are auto-linked.
+
+<!-- =========================================================
+     ▲▲▲ END BOOK TEXT ▲▲▲
+========================================================= -->
+      </div>
+    </div>
+
+    <div class="mode-indicator" id="modeIndicator"></div>
+
+    <div class="book-footer">
+      <span class="tap-hint">
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        <span style="margin-left:4px;">tap 3× for games</span>
+      </span>
+      <span id="progressLabel">0%</span>
+    </div>
+
+    <div class="chapter-nav" id="chapterNav">
+      <button id="prevChapter" title="Previous chapter">▲</button>
+      <button id="nextChapter" title="Next chapter">▼</button>
+    </div>
+  </div>
+
+  <!-- chapter edge tab -->
+  <div class="chapter-tab" id="chapterTab" role="button" tabindex="0">
+    <span class="tab-icon">📑</span>CHAPTERS
+  </div>
+
+  <!-- chapter drawer -->
+  <div class="chapter-drawer" id="chapterDrawer">
+    <div class="chapter-panel">
+      <div class="chapter-panel-header">
+        <h2>Chapters</h2>
+        <span class="count" id="chapterCount">0 of 0</span>
+      </div>
+      <div class="chapter-list" id="chapterList"></div>
+      <div class="chapter-panel-footer">tap outside to close</div>
+    </div>
+  </div>
+
+  <!-- ================= GAME VIEW ================= -->
+  <div class="game-view" id="gameView">
+    <div class="game-selector" id="gameSelector">
+      <button data-game="sigil" class="active">VOID SIGIL</button>
+      <button data-game="echo">ECHO SEQ</button>
+      <button data-game="cipher">CIPHER</button>
+    </div>
+    <div class="game-header">
+      <span id="gameTag">◆ SIGIL HUNT</span>
+      <span id="scoreDisplay">0</span>
+    </div>
+    <div class="game-title" id="gameTitle">VOID SIGIL</div>
+    <div class="game-sub" id="gameSub">— catch the glow —</div>
+    <div class="timer-bar-wrap" id="timerWrap"><div class="timer-bar" id="timerBar"></div></div>
+    <div class="cipher-target" id="cipherTarget" style="display:none;">0</div>
+    <div class="cipher-sum" id="cipherSum" style="display:none;">sum: 0</div>
+    <div class="grid-container" id="gridContainer"></div>
+    <div class="status-area" id="statusArea">Tap the glowing sigil</div>
+    <div class="best-score" id="bestScore"></div>
+    <button class="btn-reset" id="resetBtn">↺ RESTART</button>
+    <div class="back-hint">tap 3× to return to book</div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ============================================================
+  // DOM refs
+  // ============================================================
+  var bookTextEl    = document.getElementById('bookText');
+  var textScroll    = document.getElementById('textScroll');
+  var bookView      = document.getElementById('bookView');
+  var gameView      = document.getElementById('gameView');
+  var chapterLabel  = document.getElementById('chapterLabel');
+  var chapterTab    = document.getElementById('chapterTab');
+  var chapterDrawer = document.getElementById('chapterDrawer');
+  var chapterList   = document.getElementById('chapterList');
+  var chapterCount  = document.getElementById('chapterCount');
+  var prevBtn       = document.getElementById('prevChapter');
+  var nextBtn       = document.getElementById('nextChapter');
+  var progressLabel = document.getElementById('progressLabel');
+  var modeIndicator = document.getElementById('modeIndicator');
+
+  var gridContainer = document.getElementById('gridContainer');
+  var statusArea    = document.getElementById('statusArea');
+  var gameTitle     = document.getElementById('gameTitle');
+  var gameSub       = document.getElementById('gameSub');
+  var gameTag       = document.getElementById('gameTag');
+  var scoreDisplay  = document.getElementById('scoreDisplay');
+  var timerBar      = document.getElementById('timerBar');
+  var timerWrap     = document.getElementById('timerWrap');
+  var cipherTarget  = document.getElementById('cipherTarget');
+  var cipherSum     = document.getElementById('cipherSum');
+  var bestScoreEl   = document.getElementById('bestScore');
+  var resetBtn      = document.getElementById('resetBtn');
+  var gameSelector  = document.getElementById('gameSelector');
+
+  // ============================================================
+  // BOOK ENGINE
+  // ============================================================
+  var rawHTML = bookTextEl.innerHTML;
+
+  function escapeHTML(s){
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;')
+            .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function linkifyText(text){
+    var urlRegex = /\b(https?:\/\/[^\s<]+)/g;
+    return text.replace(urlRegex, function(url){
+      return '<a href="' + url + '" target="_blank" rel="noopener">' + url + '</a>';
+    });
+  }
+
+  function buildChapters(html){
+    var lines = html.split('\n');
+    var chapters = [];
+    var current = { title: null, body: [] };
+    for (var i = 0; i < lines.length; i++){
+      var m = lines[i].match(/^\s*##\s+(.*)$/);
+      if (m){
+        if (current.body.length || current.title !== null){
+          chapters.push(current);
+        }
+        current = { title: m[1].trim(), body: [] };
+      } else {
+        current.body.push(lines[i]);
+      }
+    }
+    if (current.body.length || current.title !== null){
+      chapters.push(current);
+    }
+    if (chapters.length === 0 || (chapters.length === 1 && chapters[0].title === null)){
+      return [{ title: 'FORBIDDEN KNOWLEDGE', body: lines }];
+    }
+    if (chapters[0].title === null && chapters[0].body.join('').trim() === ''){
+      chapters.shift();
+    }
+    return chapters.length ? chapters : [{ title: 'FORBIDDEN KNOWLEDGE', body: lines }];
+  }
+
+  function renderBook(chapters){
+    var out = '';
+    for (var i = 0; i < chapters.length; i++){
+      var ch = chapters[i];
+      if (ch.title !== null){
+        out += '<span class="chapter-heading" data-chapter="' + i + '">';
+        out += '<span class="chapter-num">Chapter ' + (i + 1) + '</span>';
+        out += '<span class="chapter-title">' + escapeHTML(ch.title) + '</span>';
+        out += '</span>';
+      }
+      var bodyText = ch.body.join('\n');
+      if (/<[a-z][\s\S]*>/i.test(bodyText)){
+        out += bodyText;
+      } else {
+        out += linkifyText(escapeHTML(bodyText));
+      }
+    }
+    bookTextEl.innerHTML = out;
+  }
+
+  var chapters = [];
+  var currentChapter = 0;
+  var scrollObserver = null;
+
+  function initBook(){
+    chapters = buildChapters(rawHTML);
+    renderBook(chapters);
+    buildChapterList();
+    updateChapterLabel(0);
+    updateProgress();
+    setupScrollSpy();
+    setupChapterNavigation();
+    setupDrawer();
+    setupTap();
+    updateNavButtons();
+  }
+
+  function buildChapterList(){
+    chapterList.innerHTML = '';
+    for (var i = 0; i < chapters.length; i++){
+      var div = document.createElement('div');
+      div.className = 'chapter-item' + (i === 0 ? ' current' : '');
+      div.dataset.chapter = i;
+      div.innerHTML = '<span class="num">' + String(i+1).padStart(2,'0') + '</span>' +
+                      '<span class="name">' + escapeHTML(chapters[i].title || 'Untitled') + '</span>';
+      (function(idx){
+        div.addEventListener('click', function(){
+          goToChapter(idx);
+          closeDrawer();
+        });
+      })(i);
+      chapterList.appendChild(div);
+    }
+    chapterCount.textContent = '0 of ' + chapters.length;
+  }
+
+  function goToChapter(idx){
+    if (idx < 0 || idx >= chapters.length) return;
+    var heading = bookTextEl.querySelector('.chapter-heading[data-chapter="' + idx + '"]');
+    if (heading){
+      heading.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      textScroll.scrollTop = 0;
+    }
+    currentChapter = idx;
+    updateChapterLabel(idx);
+    updateChapterListCurrent();
+    updateNavButtons();
+  }
+
+  function updateChapterLabel(idx){
+    var ch = chapters[idx];
+    if (ch && ch.title){
+      chapterLabel.textContent = '— ' + ch.title + ' —';
+    } else {
+      chapterLabel.textContent = '— prologue —';
+    }
+  }
+
+  function updateChapterListCurrent(){
+    var items = chapterList.querySelectorAll('.chapter-item');
+    for (var i = 0; i < items.length; i++){
+      items[i].classList.toggle('current', i === currentChapter);
+    }
+    chapterCount.textContent = (currentChapter+1) + ' of ' + chapters.length;
+  }
+
+  function updateNavButtons(){
+    prevBtn.disabled = currentChapter <= 0;
+    nextBtn.disabled = currentChapter >= chapters.length - 1;
+  }
+
+  function setupScrollSpy(){
+    if (scrollObserver) scrollObserver.disconnect();
+    var headings = bookTextEl.querySelectorAll('.chapter-heading');
+    if (!headings.length) return;
+
+    scrollObserver = new IntersectionObserver(function(entries){
+      for (var i = 0; i < entries.length; i++){
+        var entry = entries[i];
+        if (entry.isIntersecting){
+          var idx = parseInt(entry.target.dataset.chapter, 10);
+          if (!isNaN(idx) && idx !== currentChapter){
+            currentChapter = idx;
+            updateChapterLabel(idx);
+            updateChapterListCurrent();
+            updateNavButtons();
+          }
+        }
+      }
+    }, { root: textScroll, rootMargin: '0px 0px -60% 0px', threshold: 0 });
+
+    for (var j = 0; j < headings.length; j++){
+      scrollObserver.observe(headings[j]);
+    }
+    textScroll.addEventListener('scroll', updateProgress);
+  }
+
+  function updateProgress(){
+    var scrollTop = textScroll.scrollTop;
+    var scrollHeight = textScroll.scrollHeight - textScroll.clientHeight;
+    var pct = scrollHeight > 0 ? Math.min(100, Math.round((scrollTop / scrollHeight) * 100)) : 0;
+    progressLabel.textContent = pct + '%';
+  }
+
+  function setupChapterNavigation(){
+    prevBtn.addEventListener('click', function(){
+      if (currentChapter > 0) goToChapter(currentChapter - 1);
+    });
+    nextBtn.addEventListener('click', function(){
+      if (currentChapter < chapters.length - 1) goToChapter(currentChapter + 1);
+    });
+  }
+
+  function setupDrawer(){
+    chapterTab.addEventListener('click', openDrawer);
+    chapterTab.addEventListener('keydown', function(e){
+      if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); openDrawer(); }
+    });
+    chapterDrawer.addEventListener('click', function(e){
+      if (e.target === chapterDrawer) closeDrawer();
+    });
+    document.addEventListener('keydown', function(e){
+      if (e.key === 'Escape') closeDrawer();
+    });
+  }
+
+  function openDrawer(){
+    chapterDrawer.classList.add('open');
+    updateChapterListCurrent();
+  }
+  function closeDrawer(){
+    chapterDrawer.classList.remove('open');
+  }
+
+  // ============================================================
+  // 3-TAP TOGGLE
+  // ============================================================
+  var tapCount = 0;
+  var tapTimer = null;
+
+  function setupTap(){
+    bookView.addEventListener('click', function(e){
+      if (e.target.closest('a, button, .chapter-tab, .chapter-drawer, .chapter-nav, input, textarea, select')) return;
+      handleTap();
+    });
+    gameView.addEventListener('click', function(e){
+      if (e.target.closest('button, .game-selector, .cell, .btn-reset, a, input, textarea, select')) return;
+      handleTap();
+    });
+  }
+
+  function handleTap(){
+    tapCount++;
+    if (tapTimer) clearTimeout(tapTimer);
+    tapTimer = setTimeout(function(){ tapCount = 0; }, 700);
+    if (tapCount >= 3){
+      tapCount = 0;
+      toggleGameView();
+    }
+  }
+
+  function toggleGameView(){
+    var goingToGame = !gameView.classList.contains('active');
+    if (goingToGame){
+      bookView.classList.add('hidden');
+      gameView.classList.add('active');
+      modeIndicator.textContent = '◆ GAME MODE';
+      setTimeout(function(){ startGame(activeGame); }, 60);
+    } else {
+      bookView.classList.remove('hidden');
+      gameView.classList.remove('active');
+      modeIndicator.textContent = '';
+      pauseAll
+      <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Forbidden Knowledge · Sovereign Operator</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html, body { height:100%; width:100%; overflow:hidden; }
+  body {
+    background:#1a0e0b; display:flex; align-items:center; justify-content:center;
+    font-family:'Georgia','Times New Roman',serif;
+    touch-action:manipulation;
+  }
+
+  /* ============ APP SHELL ============ */
+  .app {
+    width:100%; max-width:440px; height:100vh; height:100dvh; max-height:900px;
+    position:relative; overflow:hidden;
+    border-radius:12px;
+    box-shadow:0 20px 40px rgba(0,0,0,.8),0 0 0 1px #5a3e2b;
+    background:#f7f0e0;
+  }
+
+  /* ============ BOOK VIEW ============ */
+  .book-view {
+    position:absolute; top:0; left:0; width:100%; height:100%;
+    background:#f7f0e0;
+    background-image:
+      linear-gradient(90deg,#e8dcc8 0%,#f7f0e0 8%,#f7f0e0 92%,#e8dcc8 100%),
+      repeating-linear-gradient(0deg,rgba(180,140,100,.05) 0px,rgba(180,140,100,.05) 1px,transparent 1px,transparent 24px);
+    padding:18px 16px 14px;
+    display:flex; flex-direction:column;
+    border:2px solid #b59a7a; border-radius:8px;
+    box-shadow:inset 0 0 40px rgba(120,80,50,.15);
+    z-index:2;
+    transition:opacity .25s ease, transform .25s ease;
+    overflow:hidden;
+  }
+  .book-view.hidden { opacity:0; transform:scale(.96); pointer-events:none; visibility:hidden; }
+
+  .book-header {
+    display:flex; justify-content:space-between; align-items:center;
+    font-size:11px; letter-spacing:2px; color:#8b6b4a; text-transform:uppercase;
+    border-bottom:1px solid #d4c0a8; padding-bottom:8px; margin-bottom:10px;
+    font-weight:600; flex-shrink:0; gap:8px;
+  }
+  .book-header .chapter-label {
+    font-family:'Courier New',monospace; font-size:9px;
+    letter-spacing:1px; color:#8b3a1a; text-transform:none;
+    font-weight:700; max-width:60%; overflow:hidden;
+    text-overflow:ellipsis; white-space:nowrap;
+  }
+
+  .text-scroll {
+    flex:1; overflow-y:auto; overflow-x:hidden;
+    padding:4px 10px 4px 4px;
+    scrollbar-width:thin; scrollbar-color:#c9b294 #f7f0e0;
+    font-size:16px; line-height:1.7; color:#2e1e12;
+    word-break:break-word; text-align:justify;
+    -webkit-overflow-scrolling:touch; position:relative;
+    scroll-behavior:smooth;
+  }
+  .text-scroll::-webkit-scrollbar { width:6px; }
+  .text-scroll::-webkit-scrollbar-track { background:#f7f0e0; }
+  .text-scroll::-webkit-scrollbar-thumb { background:#c9b294; border-radius:6px; }
+
+  #bookText {
+    white-space:pre-wrap; cursor:default;
+    user-select:text; -webkit-user-select:text;
+    overflow-wrap:anywhere;
+  }
+  #bookText a {
+    color:#8b3a1a; text-decoration:underline;
+    text-decoration-color:rgba(139,58,26,.4);
+    overflow-wrap:anywhere; word-break:break-word;
+  }
+  #bookText a:hover { color:#b04a2a; }
+  #bookText h1,#bookText h2,#bookText h3 { color:#5a3e2b; margin:1em 0 .4em; line-height:1.3; }
+  #bookText p { margin:0 0 .8em; }
+  #bookText blockquote {
+    border-left:3px solid #c9b294; padding-left:12px;
+    margin:.8em 0; color:#6b4f34; font-style:italic;
+  }
+  #bookText code,#bookText pre {
+    background:rgba(181,154,122,.15); padding:2px 5px;
+    border-radius:3px; font-family:'Courier New',monospace;
+    font-size:.9em; white-space:pre-wrap; overflow-wrap:anywhere;
+  }
+  #bookText pre { padding:10px; display:block; margin:.8em 0; }
+  #bookText ul,#bookText ol { margin:.6em 0 .8em 1.4em; }
+  #bookText img { max-width:100%; height:auto; border-radius:4px; margin:.6em 0; }
+  #bookText hr { border:0; border-top:1px solid #d4c0a8; margin:1em 0; }
+
+  .chapter-heading {
+    display:block; margin:2em 0 1em; padding-top:1.4em;
+    border-top:1px solid #d4c0a8; position:relative;
+    scroll-margin-top:20px;
+  }
+  .chapter-heading:first-child { margin-top:0; padding-top:0; border-top:none; }
+  .chapter-heading .chapter-num {
+    display:block; font-family:'Courier New',monospace;
+    font-size:10px; letter-spacing:3px; color:#a88b68;
+    text-transform:uppercase; font-weight:700; margin-bottom:4px;
+  }
+  .chapter-heading .chapter-title {
+    display:block; font-family:'Georgia',serif;
+    font-size:22px; font-weight:700; color:#5a3e2b;
+    letter-spacing:.5px; line-height:1.2;
+  }
+  .chapter-heading .chapter-title::first-letter {
+    font-size:2.4em; float:left; line-height:.9;
+    padding:2px 8px 0 0; color:#8b3a1a;
+  }
+
+  .mode-indicator {
+    font-size:10px; color:#8b6b4a; letter-spacing:1px;
+    font-family:'Courier New',monospace; padding:4px 0 0;
+    text-align:center; flex-shrink:0; min-height:16px;
+  }
+  .book-footer {
+    margin-top:8px; padding-top:8px; border-top:1px solid #d4c0a8;
+    display:flex; justify-content:space-between; align-items:center;
+    font-size:10px; color:#a88b68; font-style:italic; letter-spacing:1px;
+    flex-shrink:0; font-family:'Courier New',monospace;
+  }
+  .tap-hint { display:flex; gap:4px; align-items:center; }
+  .tap-hint .dot {
+    width:5px; height:5px; border-radius:50%; background:#b59a7a;
+    animation:pulse 1.8s infinite;
+  }
+  .tap-hint .dot:nth-child(2){ animation-delay:.3s; }
+  .tap-hint .dot:nth-child(3){ animation-delay:.6s; }
+  @keyframes pulse {
+    0%,100%{opacity:.3;transform:scale(.9);}
+    50%{opacity:1;transform:scale(1.2);background:#8b5e3c;}
+  }
+
+  /* ============ CHAPTER TAB & DRAWER ============ */
+  .chapter-tab {
+    position:absolute; left:0; top:50%; transform:translateY(-50%);
+    background:linear-gradient(90deg,#8b6b4a,#a88b68);
+    color:#f7f0e0; font-family:'Courier New',monospace;
+    font-size:9px; font-weight:700; letter-spacing:2px;
+    writing-mode:vertical-rl; text-orientation:mixed;
+    padding:14px 5px; border-radius:0 6px 6px 0;
+    box-shadow:2px 0 10px rgba(0,0,0,.25);
+    cursor:pointer; z-index:5;
+    border:1px solid #6b4f34; border-left:none;
+    transition:all .15s; user-select:none;
+  }
+  .chapter-tab:active { background:#6b4f34; padding-right:9px; }
+  .chapter-tab .tab-icon {
+    font-size:12px; display:block; margin-bottom:6px;
+    writing-mode:horizontal-tb;
+  }
+
+  .chapter-drawer {
+    position:absolute; top:0; left:0; width:100%; height:100%;
+    z-index:20; background:rgba(20,10,6,.55);
+    opacity:0; pointer-events:none;
+    transition:opacity .25s ease;
+  }
+  .chapter-drawer.open { opacity:1; pointer-events:auto; }
+  .chapter-panel {
+    position:absolute; top:0; bottom:0; left:0;
+    width:82%; max-width:330px; background:#f7f0e0;
+    background-image:linear-gradient(90deg,#f7f0e0 0%,#f2e8d5 100%);
+    border-right:2px solid #8b6b4a;
+    box-shadow:8px 0 30px rgba(0,0,0,.4);
+    transform:translateX(-100%);
+    transition:transform .3s cubic-bezier(.22,1,.36,1);
+    display:flex; flex-direction:column;
+  }
+  .chapter-drawer.open .chapter-panel { transform:translateX(0); }
+  .chapter-panel-header {
+    padding:16px 16px 12px; border-bottom:1px solid #d4c0a8;
+    display:flex; justify-content:space-between; align-items:baseline;
+  }
+  .chapter-panel-header h2 {
+    font-family:'Georgia',serif; font-size:16px; color:#5a3e2b;
+    letter-spacing:1px; font-weight:700;
+  }
+  .chapter-panel-header .count {
+    font-family:'Courier New',monospace; font-size:9px;
+    color:#a88b68; letter-spacing:1px;
+  }
+  .chapter-list {
+    flex:1; overflow-y:auto; padding:8px 0;
+    scrollbar-width:thin; scrollbar-color:#c9b294 #f2e8d5;
+  }
+  .chapter-list::-webkit-scrollbar { width:5px; }
+  .chapter-list::-webkit-scrollbar-thumb { background:#c9b294; border-radius:6px; }
+  .chapter-item {
+    display:flex; align-items:baseline; gap:10px;
+    padding:9px 16px; cursor:pointer;
+    transition:background .12s;
+    border-left:3px solid transparent;
+  }
+  .chapter-item:active { background:rgba(181,154,122,.25); }
+  .chapter-item.current {
+    background:rgba(181,154,122,.18);
+    border-left-color:#8b3a1a;
+  }
+  .chapter-item .num {
+    font-family:'Courier New',monospace; font-size:10px;
+    color:#a88b68; letter-spacing:1px; font-weight:700;
+    min-width:22px; flex-shrink:0;
+  }
+  .chapter-item.current .num { color:#8b3a1a; }
+  .chapter-item .name {
+    font-family:'Georgia',serif; font-size:13px;
+    color:#2e1e12; line-height:1.3; flex:1;
+  }
+  .chapter-item.current .name { color:#5a3e2b; font-weight:700; }
+  .chapter-panel-footer {
+    padding:10px 16px; border-top:1px solid #d4c0a8;
+    font-family:'Courier New',monospace; font-size:9px;
+    color:#a88b68; letter-spacing:1px; text-align:center;
+  }
+
+  .chapter-nav {
+    position:absolute; right:10px; bottom:52px;
+    display:flex; flex-direction:column; gap:6px; z-index:4;
+  }
+  .chapter-nav button {
+    width:34px; height:34px; border-radius:50%;
+    background:rgba(139,107,74,.85); color:#f7f0e0;
+    border:1px solid #6b4f34; cursor:pointer;
+    font-size:14px; line-height:1;
+    box-shadow:0 3px 10px rgba(0,0,0,.3);
+    transition:all .15s; font-family:'Courier New',monospace;
+    padding:0;
+  }
+  .chapter-nav button:active { transform:scale(.9); background:#6b4f34; }
+  .chapter-nav button:disabled { opacity:.3; cursor:default; }
+
+  /* ============ GAME VIEW ============ */
+  .game-view {
+    position:absolute; top:0; left:0; width:100%; height:100%;
+    background:#0b1a1f;
+    background-image:
+      radial-gradient(circle at 20% 30%,#1e3a44 0%,transparent 40%),
+      radial-gradient(circle at 80% 70%,#2a4a3a 0%,transparent 40%),
+      repeating-linear-gradient(45deg,rgba(100,200,150,.03) 0px,rgba(100,200,150,.03) 2px,transparent 2px,transparent 8px);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    padding:60px 16px 16px;
+    z-index:30;
+    opacity:0; pointer-events:none; visibility:hidden;
+    transition:opacity .3s ease;
+    overflow:hidden;
+  }
+  .game-view.active {
+    opacity:1; pointer-events:auto; visibility:visible;
+  }
+
+  .game-selector {
+    position:absolute; top:10px; left:10px; right:10px;
+    display:flex; gap:4px; z-index:6;
+  }
+  .game-selector button {
+    flex:1; background:rgba(14,42,34,.8);
+    border:1px solid #2a6a4a; color:#8fc9a8;
+    font-family:'Courier New',monospace; font-size:9px;
+    letter-spacing:1px; padding:6px 3px; border-radius:6px;
+    cursor:pointer; font-weight:700;
+    transition:all .15s;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .game-selector button:active { transform:scale(.96); }
+  .game-selector button.active {
+    background:#2a7a5a; color:#e0fff0;
+    border-color:#8affb0; box-shadow:0 0 12px #3aff8a;
+  }
+
+  .game-header {
+    position:absolute; top:48px; left:0; right:0;
+    display:flex; justify-content:space-between; padding:0 20px;
+    color:#8fc9a8; font-family:'Courier New',monospace;
+    font-size:12px; letter-spacing:2px;
+    text-shadow:0 0 10px #2a7a5a;
+  }
+
+  .game-title {
+    font-size:20px; font-weight:700; color:#b8e6d0;
+    text-shadow:0 0 15px #3a9a6a,0 0 30px #1a5a3a;
+    margin:8px 0 2px; letter-spacing:3px;
+    font-family:'Courier New',monospace; text-transform:uppercase;
+    text-align:center;
+  }
+  .game-sub {
+    color:#6a9a7a; font-size:10px; letter-spacing:2px;
+    margin-bottom:12px; font-family:'Courier New',monospace;
+    text-align:center;
+  }
+  .timer-bar-wrap {
+    width:100%; max-width:280px; height:5px; background:#0e2a22;
+    border-radius:6px; overflow:hidden; margin-bottom:10px;
+    border:1px solid #2a6a4a;
+  }
+  .timer-bar {
+    height:100%; width:100%;
+    background:linear-gradient(90deg,#3a9a6a,#8affb0);
+    transition:width .1s linear; border-radius:6px;
+  }
+
+  .grid-container {
+    display:grid; grid-template-columns:repeat(3,1fr);
+    gap:8px; width:100%; max-width:280px; margin:4px 0 12px;
+  }
+  .cell {
+    aspect-ratio:1/1; background:#0e2a22;
+    border:2px solid #2a6a4a; border-radius:10px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:22px; font-weight:700; color:#b8e6d0;
+    text-shadow:0 0 10px #3a9a6a; cursor:pointer;
+    transition:all .1s ease; font-family:'Courier New',monospace;
+    box-shadow:0 0 15px rgba(40,120,80,.3),inset 0 0 15px rgba(0,0,0,.5);
+    user-select:none; position:relative;
+  }
+  .cell:active { transform:scale(.94); }
+  .cell.lit {
+    background:#1e5a3a; border-color:#8affb0;
+    box-shadow:0 0 30px #3aff8a,inset 0 0 25px #2a8a5a;
+    color:#fff; text-shadow:0 0 20px #8affb0;
+  }
+  .cell.hit {
+    background:#5a8a3a; border-color:#ffffa0;
+    box-shadow:0 0 35px #ffff80;
+  }
+  .cell.wrong {
+    background:#5a2a2a; border-color:#ff8080;
+    box-shadow:0 0 25px #ff6060;
+  }
+  .cell.pick {
+    background:#2a5a4a; border-color:#a0ffd0;
+    box-shadow:0 0 20px #6affa0;
+  }
+
+  .status-area {
+    color:#a8d8c0; font-family:'Courier New',monospace;
+    font-size:13px; letter-spacing:1.5px;
+    margin:6px 0 10px; min-height:22px;
+    text-align:center; text-shadow:0 0 10px #2a8a5a;
+    font-weight:600;
+  }
+
+  .btn-reset {
+    background:transparent; border:2px solid #3a8a6a; color:#a8d8c0;
+    padding:8px 26px; border-radius:40px;
+    font-family:'Courier New',monospace; font-size:12px;
+    letter-spacing:3px; font-weight:700; cursor:pointer;
+    text-shadow:0 0 8px #2a8a5a;
+    box-shadow:0 0 20px rgba(40,160,100,.2);
+    margin-top:2px; transition:all .15s;
+  }
+  .btn-reset:active {
+    background:#1a4a3a; border-color:#7ac9a8;
+    transform:scale(.96); box-shadow:0 0 30px rgba(80,220,140,.4);
+  }
+
+  .back-hint {
+    margin-top:12px; color:#4a7a6a; font-size:9px;
+    letter-spacing:2px; font-family:'Courier New',monospace;
+    opacity:.6; text-align:center;
+  }
+
+  .cipher-target {
+    font-family:'Courier New',monospace; font-size:34px;
+    color:#8affb0; text-shadow:0 0 20px #3aff8a;
+    letter-spacing:2px; margin:4px 0 6px; font-weight:700;
+  }
+  .cipher-sum {
+    font-family:'Courier New',monospace; font-size:11px;
+    color:#6a9a7a; letter-spacing:2px;
+  }
+  .best-score {
+    font-family:'Courier New',monospace; font-size:9px;
+    color:#4a7a6a; letter-spacing:2px; margin-top:2px;
+  }
+
+  @media (max-height:600px) {
+    .game-title { font-size:16px; margin:2px 0; }
+    .grid-container { max-width:220px; gap:6px; }
+    .cell { font-size:18px; }
+    .game-view { padding-top:52px; }
+  }
+</style>
+</head>
+<body>
+<div class="app" id="app">
+
+  <!-- ================= BOOK VIEW ================= -->
+  <div class="book-view" id="bookView">
+    <div class="book-header">
+      <span>📖 FORBIDDEN KNOWLEDGE</span>
+      <span class="chapter-label" id="chapterLabel">— prologue —</span>
+    </div>
+
+    <div class="text-scroll" id="textScroll">
+      <div id="bookText">
+<!-- =========================================================
+     ▼▼▼ BEGIN BOOK TEXT ▼▼▼
+     Mark chapters with a line starting with "## "
+     Example:
+       ## Chapter Title
+       ...chapter body...
+========================================================= -->
+FORBIDDEN KNOWLEDGE
+The Complete Unabridged Edition
+
+## Prologue
+Paste your book content here. Each chapter begins with a line that starts with "## ". Plain text or HTML both work. URLs are auto-linked.
+
+<!-- =========================================================
+     ▲▲▲ END BOOK TEXT ▲▲▲
+========================================================= -->
+      </div>
+    </div>
+
+    <div class="mode-indicator" id="modeIndicator"></div>
+
+    <div class="book-footer">
+      <span class="tap-hint">
+        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+        <span style="margin-left:4px;">tap 3× for games</span>
+      </span>
+      <span id="progressLabel">0%</span>
+    </div>
+
+    <div class="chapter-nav" id="chapterNav">
+      <button id="prevChapter" title="Previous chapter">▲</button>
+      <button id="nextChapter" title="Next chapter">▼</button>
+    </div>
+  </div>
+
+  <!-- chapter edge tab -->
+  <div class="chapter-tab" id="chapterTab" role="button" tabindex="0">
+    <span class="tab-icon">📑</span>CHAPTERS
+  </div>
+
+  <!-- chapter drawer -->
+  <div class="chapter-drawer" id="chapterDrawer">
+    <div class="chapter-panel">
+      <div class="chapter-panel-header">
+        <h2>Chapters</h2>
+        <span class="count" id="chapterCount">0 of 0</span>
+      </div>
+      <div class="chapter-list" id="chapterList"></div>
+      <div class="chapter-panel-footer">tap outside to close</div>
+    </div>
+  </div>
+
+  <!-- ================= GAME VIEW ================= -->
+  <div class="game-view" id="gameView">
+    <div class="game-selector" id="gameSelector">
+      <button data-game="sigil" class="active">VOID SIGIL</button>
+      <button data-game="echo">ECHO SEQ</button>
+      <button data-game="cipher">CIPHER</button>
+    </div>
+    <div class="game-header">
+      <span id="gameTag">◆ SIGIL HUNT</span>
+      <span id="scoreDisplay">0</span>
+    </div>
+    <div class="game-title" id="gameTitle">VOID SIGIL</div>
+    <div class="game-sub" id="gameSub">— catch the glow —</div>
+    <div class="timer-bar-wrap" id="timerWrap"><div class="timer-bar" id="timerBar"></div></div>
+    <div class="cipher-target" id="cipherTarget" style="display:none;">0</div>
+    <div class="cipher-sum" id="cipherSum" style="display:none;">sum: 0</div>
+    <div class="grid-container" id="gridContainer"></div>
+    <div class="status-area" id="statusArea">Tap the glowing sigil</div>
+    <div class="best-score" id="bestScore"></div>
+    <button class="btn-reset" id="resetBtn">↺ RESTART</button>
+    <div class="back-hint">tap 3× to return to book</div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // ============================================================
+  // DOM refs
+  // ============================================================
+  var bookTextEl    = document.getElementById('bookText');
+  var textScroll    = document.getElementById('textScroll');
+  var bookView      = document.getElementById('bookView');
+  var gameView      = document.getElementById('gameView');
+  var chapterLabel  = document.getElementById('chapterLabel');
+  var chapterTab    = document.getElementById('chapterTab');
+  var chapterDrawer = document.getElementById('chapterDrawer');
+  var chapterList   = document.getElementById('chapterList');
+  var chapterCount  = document.getElementById('chapterCount');
+  var prevBtn       = document.getElementById('prevChapter');
+  var nextBtn       = document.getElementById('nextChapter');
+  var progressLabel = document.getElementById('progressLabel');
+  var modeIndicator = document.getElementById('modeIndicator');
+
+  var gridContainer = document.getElementById('gridContainer');
+  var statusArea    = document.getElementById('statusArea');
+  var gameTitle     = document.getElementById('gameTitle');
+  var gameSub       = document.getElementById('gameSub');
+  var gameTag       = document.getElementById('gameTag');
+  var scoreDisplay  = document.getElementById('scoreDisplay');
+  var timerBar      = document.getElementById('timerBar');
+  var timerWrap     = document.getElementById('timerWrap');
+  var cipherTarget  = document.getElementById('cipherTarget');
+  var cipherSum     = document.getElementById('cipherSum');
+  var bestScoreEl   = document.getElementById('bestScore');
+  var resetBtn      = document.getElementById('resetBtn');
+  var gameSelector  = document.getElementById('gameSelector');
+
+  // ============================================================
+  // BOOK ENGINE
+  // ============================================================
+  var rawHTML = bookTextEl.innerHTML;
+
+  function escapeHTML(s){
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;')
+            .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+
+  function linkifyText(text){
+    var urlRegex = /\b(https?:\/\/[^\s<]+)/g;
+    return text.replace(urlRegex, function(url){
+      return '<a href="' + url + '" target="_blank" rel="noopener">' + url + '</a>';
+    });
+  }
+
+  function buildChapters(html){
+    var lines = html.split('\n');
+    var chapters = [];
+    var current = { title: null, body: [] };
+    for (var i = 0; i < lines.length; i++){
+      var m = lines[i].match(/^\s*##\s+(.*)$/);
+      if (m){
+        if (current.body.length || current.title !== null){
+          chapters.push(current);
+        }
+        current = { title: m[1].trim(), body: [] };
+      } else {
+        current.body.push(lines[i]);
+      }
+    }
+    if (current.body.length || current.title !== null){
+      chapters.push(current);
+    }
+    if (chapters.length === 0 || (chapters.length === 1 && chapters[0].title === null)){
+      return [{ title: 'FORBIDDEN KNOWLEDGE', body: lines }];
+    }
+    if (chapters[0].title === null && chapters[0].body.join('').trim() === ''){
+      chapters.shift();
+    }
+    return chapters.length ? chapters : [{ title: 'FORBIDDEN KNOWLEDGE', body: lines }];
+  }
+
+  function renderBook(chapters){
+    var out = '';
+    for (var i = 0; i < chapters.length; i++){
+      var ch = chapters[i];
+      if (ch.title !== null){
+        out += '<span class="chapter-heading" data-chapter="' + i + '">';
+        out += '<span class="chapter-num">Chapter ' + (i + 1) + '</span>';
+        out += '<span class="chapter-title">' + escapeHTML(ch.title) + '</span>';
+        out += '</span>';
+      }
+      var bodyText = ch.body.join('\n');
+      if (/<[a-z][\s\S]*>/i.test(bodyText)){
+        out += bodyText;
+      } else {
+        out += linkifyText(escapeHTML(bodyText));
+      }
+    }
+    bookTextEl.innerHTML = out;
+  }
+
+  var chapters = [];
+  var currentChapter = 0;
+  var scrollObserver = null;
+
+  function initBook(){
+    chapters = buildChapters(rawHTML);
+    renderBook(chapters);
+    buildChapterList();
+    updateChapterLabel(0);
+    updateProgress();
+    setupScrollSpy();
+    setupChapterNavigation();
+    setupDrawer();
+    setupTap();
+    updateNavButtons();
+  }
+
+  function buildChapterList(){
+    chapterList.innerHTML = '';
+    for (var i = 0; i < chapters.length; i++){
+      var div = document.createElement('div');
+      div.className = 'chapter-item' + (i === 0 ? ' current' : '');
+      div.dataset.chapter = i;
+      div.innerHTML = '<span class="num">' + String(i+1).padStart(2,'0') + '</span>' +
+                      '<span class="name">' + escapeHTML(chapters[i].title || 'Untitled') + '</span>';
+      (function(idx){
+        div.addEventListener('click', function(){
+          goToChapter(idx);
+          closeDrawer();
+        });
+      })(i);
+      chapterList.appendChild(div);
+    }
+    chapterCount.textContent = '0 of ' + chapters.length;
+  }
+
+  function goToChapter(idx){
+    if (idx < 0 || idx >= chapters.length) return;
+    var heading = bookTextEl.querySelector('.chapter-heading[data-chapter="' + idx + '"]');
+    if (heading){
+      heading.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    } else {
+      textScroll.scrollTop = 0;
+    }
+    currentChapter = idx;
+    updateChapterLabel(idx);
+    updateChapterListCurrent();
+    updateNavButtons();
+  }
+
+  function updateChapterLabel(idx){
+    var ch = chapters[idx];
+    if (ch && ch.title){
+      chapterLabel.textContent = '— ' + ch.title + ' —';
+    } else {
+      chapterLabel.textContent = '— prologue —';
+    }
+  }
+
+  function updateChapterListCurrent(){
+    var items = chapterList.querySelectorAll('.chapter-item');
+    for (var i = 0; i < items.length; i++){
+      items[i].classList.toggle('current', i === currentChapter);
+    }
+    chapterCount.textContent = (currentChapter+1) + ' of ' + chapters.length;
+  }
+
+  function updateNavButtons(){
+    prevBtn.disabled = currentChapter <= 0;
+    nextBtn.disabled = currentChapter >= chapters.length - 1;
+  }
+
+  function setupScrollSpy(){
+    if (scrollObserver) scrollObserver.disconnect();
+    var headings = bookTextEl.querySelectorAll('.chapter-heading');
+    if (!headings.length) return;
+
+    scrollObserver = new IntersectionObserver(function(entries){
+      for (var i = 0; i < entries.length; i++){
+        var entry = entries[i];
+        if (entry.isIntersecting){
+          var idx = parseInt(entry.target.dataset.chapter, 10);
+          if (!isNaN(idx) && idx !== currentChapter){
+            currentChapter = idx;
+            updateChapterLabel(idx);
+            updateChapterListCurrent();
+            updateNavButtons();
+          }
+        }
+      }
+    }, { root: textScroll, rootMargin: '0px 0px -60% 0px', threshold: 0 });
+
+    for (var j = 0; j < headings.length; j++){
+      scrollObserver.observe(headings[j]);
+    }
+    textScroll.addEventListener('scroll', updateProgress);
+  }
+
+  function updateProgress(){
+    var scrollTop = textScroll.scrollTop;
+    var scrollHeight = textScroll.scrollHeight - textScroll.clientHeight;
+    var pct = scrollHeight > 0 ? Math.min(100, Math.round((scrollTop / scrollHeight) * 100)) : 0;
+    progressLabel.textContent = pct + '%';
+  }
+
+  function setupChapterNavigation(){
+    prevBtn.addEventListener('click', function(){
+      if (currentChapter > 0) goToChapter(currentChapter - 1);
+    });
+    nextBtn.addEventListener('click', function(){
+      if (currentChapter < chapters.length - 1) goToChapter(currentChapter + 1);
+    });
+  }
+
+  function setupDrawer(){
+    chapterTab.addEventListener('click', openDrawer);
+    chapterTab.addEventListener('keydown', function(e){
+      if (e.key === 'Enter' || e.key === ' '){ e.preventDefault(); openDrawer(); }
+    });
+    chapterDrawer.addEventListener('click', function(e){
+      if (e.target === chapterDrawer) closeDrawer();
+    });
+    document.addEventListener('keydown', function(e){
+      if (e.key === 'Escape') closeDrawer();
+    });
+  }
+
+  function openDrawer(){
+    chapterDrawer.classList.add('open');
+    updateChapterListCurrent();
+  }
+  function closeDrawer(){
+    chapterDrawer.classList.remove('open');
+  }
+
+  // ============================================================
+  // 3-TAP TOGGLE
+  // ============================================================
+  var tapCount = 0;
+  var tapTimer = null;
+
+  function setupTap(){
+    bookView.addEventListener('click', function(e){
+      if (e.target.closest('a, button, .chapter-tab, .chapter-drawer, .chapter-nav, input, textarea, select')) return;
+      handleTap();
+    });
+    gameView.addEventListener('click', function(e){
+      if (e.target.closest('button, .game-selector, .cell, .btn-reset, a, input, textarea, select')) return;
+      handleTap();
+    });
+  }
+
+  function handleTap(){
+    tapCount++;
+    if (tapTimer) clearTimeout(tapTimer);
+    tapTimer = setTimeout(function(){ tapCount = 0; }, 700);
+    if (tapCount >= 3){
+      tapCount = 0;
+      toggleGameView();
+    }
+  }
+
+  function toggleGameView(){
+    var goingToGame = !gameView.classList.contains('active');
+    if (goingToGame){
+      bookView.classList.add('hidden');
+      gameView.classList.add('active');
+      modeIndicator.textContent = '◆ GAME MODE';
+      setTimeout(function(){ startGame(activeGame);
+                                  }, 60);
+    } else {
+      bookView.classList.remove('hidden');
+      gameView.classList.remove('active');
+      modeIndicator.textContent = '';
+      pauseAll();
+    }
+  }
+
+  // ============================================================
+  // GAME ENGINE
+  // ============================================================
+  var activeGame = 'sigil';
+  var score = 0;
+  var bestScores = { sigil: 0, echo: 0, cipher: 0 };
+  var timerInterval = null;
+  var timeLeft = 0;
+  var timeMax = 0;
+  var running = false;
+  var waiting = false;
+
+  // Sigil state
+  var sigilIndex = -1;
+  var sigilTimeout = null;
+  var sigilLifetime = 1200;
+
+  // Echo state
+  var echoSequence = [];
+  var echoInput = [];
+  var echoPlaying = false;
+  var echoStep = 0;
+
+  // Cipher state
+  var cipherAnswer = 0;
+  var cipherValue = 0;
+
+  var GAMES = {
+    sigil:  { title:'VOID SIGIL', sub:'— catch the glow —',    tag:'◆ SIGIL HUNT'  },
+    echo:   { title:'ECHO SEQUENCE', sub:'— repeat the path —', tag:'◆ ECHO MEMORY' },
+    cipher: { title:'CIPHER LOCK', sub:'— reach the target —',  tag:'◆ NUMBER LOCK' }
+  };
+
+  function setScore(n){
+    score = n;
+    if (score > bestScores[activeGame]) bestScores[activeGame] = score;
+    scoreDisplay.textContent = score;
+    var label = { sigil:'BEST', echo:'BEST', cipher:'BEST' }[activeGame];
+    bestScoreEl.textContent = label + ': ' + bestScores[activeGame];
+  }
+
+  function clearTimer(){
+    if (timerInterval){ clearInterval(timerInterval); timerInterval = null; }
+  }
+
+  function startTimer(seconds){
+    clearTimer();
+    timeMax = seconds;
+    timeLeft = seconds;
+    timerBar.style.width = '100%';
+    timerInterval = setInterval(function(){
+      timeLeft -= 0.1;
+      if (timeLeft <= 0){
+        timeLeft = 0;
+        timerBar.style.width = '0%';
+        clearTimer();
+        endGame();
+        return;
+      }
+      timerBar.style.width = Math.max(0, (timeLeft/timeMax)*100) + '%';
+    }, 100);
+  }
+
+  function pauseAll(){
+    running = false;
+    waiting = false;
+    clearTimer();
+    if (sigilTimeout){ clearTimeout(sigilTimeout); sigilTimeout = null; }
+    clearCellClasses();
+    clearCellTimers();
+  }
+
+  function clearCellClasses(){
+    var cells = gridContainer.children;
+    for (var i=0;i<cells.length;i++){
+      cells[i].className = 'cell';
+      cells[i].textContent = '';
+    }
+  }
+
+  var cellTimers = [];
+  function clearCellTimers(){
+    for (var i=0;i<cellTimers.length;i++) clearTimeout(cellTimers[i]);
+    cellTimers = [];
+  }
+
+  function buildGrid(count, labels){
+    gridContainer.innerHTML = '';
+    for (var i=0;i<count;i++){
+      var d = document.createElement('div');
+      d.className = 'cell';
+      d.dataset.index = i;
+      if (labels && labels[i] != null) d.textContent = labels[i];
+      d.addEventListener('click', onCellClick);
+      gridContainer.appendChild(d);
+    }
+  }
+
+  function cellEl(i){ return gridContainer.children[i]; }
+
+  function flashCell(i, cls, ms){
+    var el = cellEl(i);
+    if (!el) return;
+    el.classList.add(cls);
+    var t = setTimeout(function(){
+      el.classList.remove(cls);
+    }, ms || 300);
+    cellTimers.push(t);
+  }
+
+  // ============================================================
+  // GAME: VOID SIGIL
+  // ============================================================
+  function startSigil(){
+    score = 0;
+    setScore(0);
+    clearCellClasses();
+    buildGrid(9, null);
+    statusArea.textContent = 'Tap the glowing sigil';
+    running = true;
+    waiting = false;
+    startTimer(30);
+    sigilLifetime = 1200;
+    spawnSigil();
+  }
+
+  function spawnSigil(){
+    if (!running) return;
+    clearTimeout(sigilTimeout);
+    if (sigilIndex >= 0) cellEl(sigilIndex).classList.remove('lit');
+    sigilIndex = Math.floor(Math.random()*9);
+    cellEl(sigilIndex).classList.add('lit');
+    sigilTimeout = setTimeout(function(){
+      if (!running) return;
+      if (sigilIndex >= 0) cellEl(sigilIndex).classList.remove('lit');
+      spawnSigil();
+    }, sigilLifetime);
+  }
+
+  function sigilHit(i){
+    if (!running || waiting) return;
+    if (i === sigilIndex){
+      cellEl(i).classList.remove('lit');
+      cellEl(i).classList.add('hit');
+      var t = setTimeout(function(){ if (cellEl(i)) cellEl(i).classList.remove('hit'); }, 200);
+      cellTimers.push(t);
+      setScore(score + 1);
+      sigilLifetime = Math.max(420, sigilLifetime - 30);
+      statusArea.textContent = 'Sigil struck!';
+      spawnSigil();
+    } else {
+      flashCell(i, 'wrong', 260);
+      setScore(Math.max(0, score - 1));
+      statusArea.textContent = 'Misfire — sigil lost';
+    }
+  }
+
+  // ============================================================
+  // GAME: ECHO SEQUENCE
+  // ============================================================
+  function startEcho(){
+    score = 0;
+    setScore(0);
+    clearCellClasses();
+    buildGrid(9, null);
+    echoSequence = [];
+    echoInput = [];
+    echoPlaying = false;
+    running = true;
+    waiting = true;
+    statusArea.textContent = 'Watch the sequence…';
+    startTimer(40);
+    nextEchoRound();
+  }
+
+  function nextEchoRound(){
+    if (!running) return;
+    echoInput = [];
+    echoSequence.push(Math.floor(Math.random()*9));
+    echoPlaying = true;
+    waiting = true;
+    statusArea.textContent = 'Watch the sequence…';
+    echoStep = 0;
+    playEchoStep();
+  }
+
+  function playEchoStep(){
+    if (!running) return;
+    if (echoStep >= echoSequence.length){
+      echoPlaying = false;
+      waiting = false;
+      statusArea.textContent = 'Repeat the sequence (' + echoSequence.length + ')';
+      return;
+    }
+    var idx = echoSequence[echoStep];
+    cellEl(idx).classList.add('lit');
+    var t = setTimeout(function(){
+      if (cellEl(idx)) cellEl(idx).classList.remove('lit');
+      echoStep++;
+      var t2 = setTimeout(playEchoStep, 140);
+      cellTimers.push(t2);
+    }, 420);
+    cellTimers.push(t);
+  }
+
+  function echoInputHit(i){
+    if (!running || echoPlaying || waiting) return;
+    echoInput.push(i);
+    cellEl(i).classList.add('pick');
+    var t = setTimeout(function(){ if (cellEl(i)) cellEl(i).classList.remove('pick'); }, 200);
+    cellTimers.push(t);
+    var pos = echoInput.length - 1;
+    if (echoInput[pos] !== echoSequence[pos]){
+      flashCell(i, 'wrong', 300);
+      statusArea.textContent = 'Echo broken';
+      endGame();
+      return;
+    }
+    if (echoInput.length === echoSequence.length){
+      setScore(score + 1);
+      statusArea.textContent = 'Sequence matched!';
+      waiting = true;
+      var t2 = setTimeout(nextEchoRound, 550);
+      cellTimers.push(t2);
+    }
+  }
+
+  // ============================================================
+  // GAME: CIPHER
+  // ============================================================
+  function startCipher(){
+    score = 0;
+    setScore(0);
+    clearCellClasses();
+    cipherTarget.style.display = 'block';
+    cipherSum.style.display = 'block';
+    timerWrap.style.display = 'block';
+    running = true;
+    waiting = false;
+    statusArea.textContent = 'Use the digits to reach the target';
+    startTimer(45);
+    newCipherRound();
+  }
+
+  function newCipherRound(){
+    if (!running) return;
+    cipherAnswer = 2 + Math.floor(Math.random()*9);
+    cipherValue = 0;
+    cipherTarget.textContent = '∑ ' + cipherAnswer;
+    updateCipherSum();
+    var labels = [1,2,3,4,5,6,7,8,9];
+    buildGrid(9, labels);
+  }
+
+  function updateCipherSum(){
+    cipherSum.textContent = 'sum: ' + cipherValue + ' / ' + cipherAnswer;
+  }
+
+  function cipherTap(i, btn){
+    if (!running || waiting) return;
+    var n = i + 1;
+    cipherValue += n;
+    flashCell(i, 'pick', 180);
+    updateCipherSum();
+    if (cipherValue === cipherAnswer){
+      setScore(score + 1);
+      statusArea.textContent = 'Lock opened!';
+      waiting = true;
+      var t = setTimeout(function(){
+        waiting = false;
+        statusArea.textContent = 'Use the digits to reach the target';
+        newCipherRound();
+      }, 500);
+      cellTimers.push(t);
+    } else if (cipherValue > cipherAnswer){
+      flashCell(i, 'wrong', 300);
+      setScore(Math.max(0, score - 1));
+      statusArea.textContent = 'Overshoot — reset';
+      waiting = true;
+      var t2 = setTimeout(function(){
+        waiting = false;
+        cipherValue = 0;
+        updateCipherSum();
+        statusArea.textContent = 'Use the digits to reach the target';
+      }, 600);
+      cellTimers.push(t2);
+    }
+  }
+
+  // ============================================================
+  // GAME DISPATCH
+  // ============================================================
+  function onCellClick(e){
+    var el = e.currentTarget;
+    var i = parseInt(el.dataset.index, 10);
+    if (isNaN(i)) return;
+    if (activeGame === 'sigil') sigilHit(i);
+    else if (activeGame === 'echo') echoInputHit(i);
+    else if (activeGame === 'cipher') cipherTap(i, el);
+  }
+
+  function startGame(game){
+    activeGame = game;
+    clearTimer();
+    clearCellTimers();
+    if (sigilTimeout){ clearTimeout(sigilTimeout); sigilTimeout = null; }
+    cipherTarget.style.display = 'none';
+    cipherSum.style.display = 'none';
+    timerWrap.style.display = 'block';
+
+    var cfg = GAMES[game];
+    gameTitle.textContent = cfg.title;
+    gameSub.textContent = cfg.sub;
+    gameTag.textContent = cfg.tag;
+
+    var btns = gameSelector.querySelectorAll('button');
+    for (var i=0;i<btns.length;i++){
+      btns[i].classList.toggle('active', btns[i].dataset.game === game);
+    }
+
+    setScore(0);
+
+    if (game === 'sigil') startSigil();
+    else if (game === 'echo') startEcho();
+    else if (game === 'cipher') startCipher();
+  }
+
+  function endGame(){
+    running = false;
+    waiting = false;
+    clearTimer();
+    if (sigilTimeout){ clearTimeout(sigilTimeout); sigilTimeout = null; }
+    statusArea.textContent = 'Game over — score ' + score;
+    bestScoreEl.textContent = 'BEST: ' + bestScores[activeGame];
+    timerBar.style.width = '0%';
+  }
+
+  gameSelector.addEventListener('click', function(e){
+    var btn = e.target.closest('button[data-game]');
+    if (!btn) return;
+    startGame(btn.dataset.game);
+  });
+
+  resetBtn.addEventListener('click', function(){
+    startGame(activeGame);
+  });
+
+  // ============================================================
+  // BOOT
+  // ============================================================
+  initBook();
+
+})();
+</script>
+</body>
+</html>
