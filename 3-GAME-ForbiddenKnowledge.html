@@ -1596,4 +1596,599 @@ Visit https://example.com/forbidden-archive to see more.
 
 
 </body>
+<script>
+(function(){
+  'use strict';
+
+  var APP_VERSION = '3.0.0';
+  var LS_KEY_PREFIX = 'fk_v3_';
+
+  /* ==============================================================
+     1. LINKIFY — turn bare URLs into real <a> tags.
+     Walks text nodes only. Skips existing <a>, <script>, <style>.
+     Strips trailing punctuation. Forces target=_blank.
+     ============================================================== */
+  function linkifyBookText(root){
+    var URL_RE = /\b(https?:\/\/[^\s<>"']+|www\.[^\s<>"']+)/gi;
+
+    function walk(node){
+      if(node.nodeType === 1){
+        var tag = node.tagName.toLowerCase();
+        if(tag === 'a' || tag === 'script' || tag === 'style' || tag === 'textarea') return;
+        var kids = Array.prototype.slice.call(node.childNodes);
+        for(var i = 0; i < kids.length; i++) walk(kids[i]);
+        return;
+      }
+      if(node.nodeType !== 3) return;
+      var text = node.nodeValue;
+      if(!text) return;
+      URL_RE.lastIndex = 0;
+      if(!URL_RE.test(text)) { URL_RE.lastIndex = 0; return; }
+      URL_RE.lastIndex = 0;
+
+      var frag = document.createDocumentFragment();
+      var lastIndex = 0, m;
+      while((m = URL_RE.exec(text)) !== null){
+        if(m.index > lastIndex){
+          frag.appendChild(document.createTextNode(text.slice(lastIndex, m.index)));
+        }
+        var raw = m[1];
+        var trailing = '';
+        while(/[.,;:!?)\]]$/.test(raw)){
+          trailing = raw.slice(-1) + trailing;
+          raw = raw.slice(0, -1);
+        }
+        var href = raw;
+        if(!/^https?:\/\//i.test(href)) href = 'https://' + href;
+        var a = document.createElement('a');
+        a.href = href;
+        a.textContent = raw;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        frag.appendChild(a);
+        if(trailing) frag.appendChild(document.createTextNode(trailing));
+        lastIndex = m.index + m[0].length;
+      }
+      if(lastIndex < text.length){
+        frag.appendChild(document.createTextNode(text.slice(lastIndex)));
+      }
+      node.parentNode.replaceChild(frag, node);
+    }
+
+    walk(root);
+    var anchors = root.querySelectorAll('a');
+    for(var i = 0; i < anchors.length; i++){
+      anchors[i].target = '_blank';
+      anchors[i].rel = 'noopener noreferrer';
+    }
+  }
+
+  /* ==============================================================
+     2. CAPTURE-PHASE CLICK GUARD FOR LINKS
+     Link taps stop here — never reach the 3-tap hide logic.
+     ============================================================== */
+  document.addEventListener('click', function(e){
+    var a = e.target.closest && e.target.closest('a');
+    if(a && a.href){
+      e.stopPropagation();
+    }
+  }, true);
+
+  /* ==============================================================
+     3. DOM REFS
+     ============================================================== */
+  var bookView     = document.getElementById('bookView');
+  var gameView     = document.getElementById('gameView');
+  var bookText     = document.getElementById('bookText');
+  var textScroll   = document.getElementById('textScroll');
+  var modeInd      = document.getElementById('modeIndicator');
+  var gridContainer= document.getElementById('gridContainer');
+  var statusArea   = document.getElementById('statusArea');
+  var resetBtn     = document.getElementById('resetBtn');
+  var scoreDisplay = document.getElementById('scoreDisplay');
+  var bestScoreEl  = document.getElementById('bestScore');
+  var timerBar     = document.getElementById('timerBar');
+  var timerWrap    = document.getElementById('timerWrap');
+  var cipherTarget = document.getElementById('cipherTarget');
+  var cipherSum    = document.getElementById('cipherSum');
+  var gameTag      = document.getElementById('gameTag');
+  var gameTitle    = document.getElementById('gameTitle');
+  var gameSub      = document.getElementById('gameSub');
+  var gameSelector = document.getElementById('gameSelector');
+
+  /* ==============================================================
+     4. TEXT LOADING — URL param + localStorage cache + linkify
+     ============================================================== */
+  function getParam(name){
+    var m = new RegExp('[?&]' + name + '=([^&]+)').exec(window.location.search);
+    return m ? decodeURIComponent(m[1]) : null;
+  }
+
+  function installBookText(html){
+    var current = bookText.innerHTML;
+    var beginIdx = current.indexOf('▼▼▼ BEGIN BOOK TEXT ▼▼▼');
+    var endIdx = current.indexOf('▲▲▲ END BOOK TEXT ▲▲▲');
+    if(beginIdx === -1 || endIdx === -1){ bookText.innerHTML = html; return; }
+    var closeBegin = current.indexOf('-->', beginIdx);
+    var openEnd = current.lastIndexOf('<!--', endIdx);
+    var before = current.slice(0, closeBegin + 3);
+    var after = current.slice(openEnd);
+    bookText.innerHTML = before + '\n\n' + html + '\n\n' + after;
+  }
+
+  function loadTextFromUrl(url){
+    modeInd.textContent = 'loading text…';
+    fetch(url, {cache:'no-store'}).then(function(r){
+      if(!r.ok) throw new Error('HTTP ' + r.status);
+      return r.text();
+    }).then(function(txt){
+      try { localStorage.setItem(LS_KEY_PREFIX + 'text', txt); } catch(e){}
+      installBookText(txt);
+      linkifyBookText(bookText);
+      modeInd.textContent = 'text loaded';
+      setTimeout(function(){ modeInd.textContent = ''; }, 2000);
+    }).catch(function(err){
+      modeInd.textContent = 'load failed: ' + err.message;
+    });
+  }
+
+  (function bootText(){
+    var url = getParam('t');
+    if(url){ loadTextFromUrl(url); return; }
+    var cached = null;
+    try { cached = localStorage.getItem(LS_KEY_PREFIX + 'text'); } catch(e){}
+    if(cached){ installBookText(cached); }
+    linkifyBookText(bookText);
+  })();
+
+  /* ==============================================================
+     5. 3-TAP DETECTION (pointer-based, movement & time guarded)
+     ============================================================== */
+  var TAP_TIMEOUT = 750;
+  var tapCountBook = 0, tapTimerBook = null;
+  var tapCountGame = 0, tapTimerGame = null;
+  var pointerDownPos = null, pointerDownTime = 0;
+
+  function resetBookTaps(){ tapCountBook = 0; if(tapTimerBook){clearTimeout(tapTimerBook); tapTimerBook = null;} }
+  function resetGameTaps(){ tapCountGame = 0; if(tapTimerGame){clearTimeout(tapTimerGame); tapTimerGame = null;} }
+
+  function isInteractive(el){
+    if(!el || !el.closest) return false;
+    return !!(el.closest('a') || el.closest('button') || el.closest('.cell') ||
+              el.closest('.game-selector'));
+  }
+
+  bookView.addEventListener('pointerdown', function(e){
+    pointerDownPos = {x: e.clientX, y: e.clientY}; pointerDownTime = Date.now();
+  });
+  bookView.addEventListener('pointerup', function(e){
+    if(!pointerDownPos) return;
+    var dx = Math.abs(e.clientX - pointerDownPos.x);
+    var dy = Math.abs(e.clientY - pointerDownPos.y);
+    var dt = Date.now() - pointerDownTime;
+    pointerDownPos = null;
+    if(dx > 12 || dy > 12 || dt > 500) return;
+    if(isInteractive(e.target)) return;
+    tapCountBook++;
+    if(tapCountBook === 3){ switchToGame(); resetBookTaps(); }
+    else { if(tapTimerBook) clearTimeout(tapTimerBook); tapTimerBook = setTimeout(resetBookTaps, TAP_TIMEOUT); }
+  });
+
+  gameView.addEventListener('pointerdown', function(e){
+    if(!gameView.classList.contains('active')) return;
+    if(isInteractive(e.target)) return;
+    tapCountGame++;
+    if(tapCountGame === 3){ switchToBook(); resetGameTaps(); }
+    else { if(tapTimerGame) clearTimeout(tapTimerGame); tapTimerGame = setTimeout(resetGameTaps, TAP_TIMEOUT); }
+  });
+
+  function switchToGame(){
+    bookView.classList.add('hidden');
+    gameView.classList.add('active');
+    resetBookTaps(); resetGameTaps();
+    startCurrentGame();
+  }
+  function switchToBook(){
+    gameView.classList.remove('active');
+    bookView.classList.remove('hidden');
+    resetBookTaps(); resetGameTaps();
+    stopCurrentGame();
+    textScroll.scrollTop = 0;
+  }
+
+  /* ==============================================================
+     6. GRID
+     ============================================================== */
+  var gridCells = [];
+  for(var i = 0; i < 9; i++){
+    (function(idx){
+      var cell = document.createElement('div');
+      cell.className = 'cell';
+      cell.dataset.index = idx;
+      cell.textContent = '';
+      cell.addEventListener('click', function(){ onCellClick(idx); });
+      gridContainer.appendChild(cell);
+      gridCells.push(cell);
+    })(i);
+  }
+
+  function resetBoardVisuals(){
+    gridCells.forEach(function(c){
+      c.classList.remove('lit','hit','wrong','pick');
+      c.textContent = '';
+    });
+  }
+
+  function bestKey(gameId){ return LS_KEY_PREFIX + 'best_' + gameId; }
+  function getBest(gameId){
+    try { var v = localStorage.getItem(bestKey(gameId)); return v ? parseInt(v, 10) : 0; }
+    catch(e){ return 0; }
+  }
+  function setBest(gameId, v){
+    try { localStorage.setItem(bestKey(gameId), String(v)); } catch(e){}
+  }
+  function showBest(gameId, label){
+    var b = getBest(gameId);
+    bestScoreEl.textContent = b > 0 ? 'best ' + label + ': ' + b : '';
+  }
+
+  /* ==============================================================
+     7. GAME REGISTRY
+     ============================================================== */
+  var games = {};
+
+  /* ---------- GAME 1: VOID SIGIL ---------- */
+  games.sigil = (function(){
+    var running = false, score = 0, active = -1;
+    var timer = null, tick = null, duration = 1800, MIN = 600;
+
+    function clearTimers(){ if(timer){clearTimeout(timer); timer = null;} if(tick){clearInterval(tick); tick = null;} }
+
+    function nextRound(){
+      if(!running) return;
+      resetBoardVisuals();
+      var idx; do { idx = Math.floor(Math.random()*9); } while(idx === active && 9 > 1);
+      active = idx;
+      gridCells[idx].classList.add('lit');
+      gridCells[idx].textContent = '✦';
+      var start = performance.now();
+      timerBar.style.width = '100%';
+      clearTimers();
+      tick = setInterval(function(){
+        var elapsed = performance.now() - start;
+        var rem = Math.max(0, duration - elapsed);
+        timerBar.style.width = (rem / duration * 100) + '%';
+        if(rem <= 0) miss();
+      }, 30);
+      timer = setTimeout(function(){ miss(); }, duration + 50);
+    }
+
+    function miss(){
+      if(!running) return;
+      running = false;
+      clearTimers();
+      if(active !== -1){
+        gridCells[active].classList.remove('lit');
+        gridCells[active].textContent = '';
+      }
+      active = -1;
+      timerBar.style.width = '0%';
+      if(score > getBest('sigil')) setBest('sigil', score);
+      showBest('sigil', 'streak');
+      statusArea.textContent = '— sigil escaped —  score: ' + score;
+    }
+
+    return {
+      id: 'sigil',
+      title: 'VOID SIGIL',
+      sub: '— catch the glow —',
+      tag: '◆ SIGIL HUNT',
+      setup: function(){
+        timerWrap.style.display = '';
+        cipherTarget.style.display = 'none';
+        cipherSum.style.display = 'none';
+        showBest('sigil', 'streak');
+      },
+      start: function(){
+        stop.call(this);
+        resetBoardVisuals();
+        score = 0; scoreDisplay.textContent = '0';
+        running = true; duration = 1800;
+        statusArea.textContent = 'Tap the glowing sigil';
+        timerWrap.style.display = '';
+        timerBar.style.width = '100%';
+        showBest('sigil', 'streak');
+        nextRound();
+      },
+      stop: function(){
+        running = false;
+        clearTimers();
+        active = -1;
+        timerBar.style.width = '100%';
+      },
+      onCell: function(i){
+        if(!running) return;
+        if(i !== active){ miss(); return; }
+        gridCells[i].classList.remove('lit');
+        gridCells[i].classList.add('hit');
+        gridCells[i].textContent = '✓';
+        score++; scoreDisplay.textContent = score;
+        clearTimers();
+        duration = Math.max(MIN, duration - 100);
+        statusArea.textContent = 'Sigil caught!';
+        setTimeout(function(){ if(running) nextRound(); }, 350);
+      }
+    };
+  })();
+
+  /* ---------- GAME 2: ECHO SEQUENCE ---------- */
+  games.echo = (function(){
+    var running = false, sequence = [], userPos = 0, showing = false;
+    var showTimers = [];
+
+    function clearShowTimers(){
+      showTimers.forEach(function(t){ clearTimeout(t); });
+      showTimers = [];
+    }
+
+    function flashCell(idx, on){
+      if(on) gridCells[idx].classList.add('lit');
+      else   gridCells[idx].classList.remove('lit');
+    }
+
+    function playSequence(){
+      showing = true;
+      statusArea.textContent = 'Watch...';
+      clearShowTimers();
+      sequence.forEach(function(idx, i){
+        showTimers.push(setTimeout(function(){ flashCell(idx, true); }, i * 500));
+        showTimers.push(setTimeout(function(){ flashCell(idx, false); }, i * 500 + 320));
+      });
+      var total = sequence.length * 500;
+      showTimers.push(setTimeout(function(){
+        showing = false;
+        userPos = 0;
+        statusArea.textContent = 'Your turn — repeat it';
+      }, total + 50));
+    }
+
+    function addStep(){
+      sequence.push(Math.floor(Math.random()*9));
+      scoreDisplay.textContent = sequence.length - 1;
+      playSequence();
+    }
+
+    return {
+      id: 'echo',
+      title: 'ECHO SEQUENCE',
+      sub: '— repeat the pattern —',
+      tag: '◆ ECHO',
+      setup: function(){
+        timerWrap.style.display = 'none';
+        cipherTarget.style.display = 'none';
+        cipherSum.style.display = 'none';
+        resetBoardVisuals();
+        showBest('echo', 'length');
+      },
+      start: function(){
+        stop.call(this);
+        resetBoardVisuals();
+        sequence = []; userPos = 0; running = true;
+        timerWrap.style.display = 'none';
+        scoreDisplay.textContent = '0';
+        showBest('echo', 'length');
+        addStep();
+      },
+      stop: function(){
+        running = false; showing = false;
+        clearShowTimers();
+        resetBoardVisuals();
+      },
+      onCell: function(i){
+        if(!running || showing) return;
+        if(i === sequence[userPos]){
+          gridCells[i].classList.add('hit');
+          setTimeout(function(){ gridCells[i].classList.remove('hit'); }, 200);
+          userPos++;
+          if(userPos === sequence.length){
+            statusArea.textContent = 'Correct!';
+            setTimeout(function(){ if(running) addStep(); }, 500);
+          }
+        } else {
+          gridCells[i].classList.add('wrong');
+          setTimeout(function(){ gridCells[i].classList.remove('wrong'); }, 400);
+          running = false;
+          clearShowTimers();
+          var reached = sequence.length - 1;
+          if(reached > getBest('echo')) setBest('echo', reached);
+          showBest('echo', 'length');
+          statusArea.textContent = '— pattern broken —  score: ' + reached;
+        }
+      }
+    };
+  })();
+
+  /* ---------- GAME 3: CIPHER GRID ---------- */
+  games.cipher = (function(){
+    var running = false, target = 0, sum = 0, picks = [], streak = 0;
+    var MAX_CELL = 9;
+
+    function updateDisplay(){
+      cipherTarget.textContent = target;
+      cipherSum.textContent = 'sum: ' + sum + ' / ' + target;
+    }
+
+    function newTarget(){
+      target = Math.min(27, 5 + streak * 2 + Math.floor(Math.random()*4));
+      sum = 0; picks = [];
+      resetBoardVisuals();
+      var values = [];
+      for(var i = 0; i < 9; i++){
+        var v = 1 + Math.floor(Math.random() * MAX_CELL);
+        values.push(v);
+        gridCells[i].textContent = v;
+      }
+      gridCells.forEach(function(c, i){ c.dataset.value = values[i]; });
+      updateDisplay();
+      statusArea.textContent = 'Tap cells that add up to ' + target;
+    }
+
+    function fail(){
+      running = false;
+      var best = getBest('cipher');
+      if(streak > best) setBest('cipher', streak);
+      showBest('cipher', 'streak');
+      statusArea.textContent = '— cipher broken —  streak: ' + streak;
+      gridCells.forEach(function(c){ c.classList.add('wrong'); });
+      setTimeout(function(){
+        gridCells.forEach(function(c){ c.classList.remove('wrong'); });
+      }, 600);
+    }
+
+    return {
+      id: 'cipher',
+      title: 'CIPHER GRID',
+      sub: '— sum to the target —',
+      tag: '◆ CIPHER',
+      setup: function(){
+        timerWrap.style.display = 'none';
+        cipherTarget.style.display = '';
+        cipherSum.style.display = '';
+        showBest('cipher', 'streak');
+      },
+      start: function(){
+        stop.call(this);
+        streak = 0; scoreDisplay.textContent = '0';
+        running = true;
+        timerWrap.style.display = 'none';
+        cipherTarget.style.display = '';
+        cipherSum.style.display = '';
+        showBest('cipher', 'streak');
+        newTarget();
+      },
+      stop: function(){
+        running = false;
+        resetBoardVisuals();
+      },
+      onCell: function(i){
+        if(!running) return;
+        var cell = gridCells[i];
+        var val = parseInt(cell.dataset.value, 10);
+        if(isNaN(val)) return;
+
+        if(picks.indexOf(i) !== -1){
+          picks.splice(picks.indexOf(i), 1);
+          sum -= val;
+          cell.classList.remove('pick');
+          updateDisplay();
+          return;
+        }
+
+        sum += val;
+        picks.push(i);
+        cell.classList.add('pick');
+        updateDisplay();
+
+        if(sum === target){
+          running = false;
+          streak++; scoreDisplay.textContent = streak;
+          statusArea.textContent = 'Cipher solved!  streak: ' + streak;
+          gridCells.forEach(function(c){ c.classList.add('hit'); });
+          setTimeout(function(){
+            gridCells.forEach(function(c){ c.classList.remove('hit','pick'); });
+            if(streak > 0){ running = true; newTarget(); }
+          }, 700);
+        } else if(sum > target){
+          fail();
+        }
+      }
+    };
+  })();
+
+  /* ==============================================================
+     8. GAME SELECTOR + LIFECYCLE
+     ============================================================== */
+  var currentGameId = 'sigil';
+  try {
+    var saved = localStorage.getItem(LS_KEY_PREFIX + 'game');
+    if(saved && games[saved]) currentGameId = saved;
+  } catch(e){}
+
+  function setActiveButton(){
+    var btns = gameSelector.querySelectorAll('button');
+    for(var i = 0; i < btns.length; i++){
+      btns[i].classList.toggle('active', btns[i].dataset.game === currentGameId);
+    }
+  }
+
+  function applyGame(id){
+    if(!games[id]) return;
+    currentGameId = id;
+    try { localStorage.setItem(LS_KEY_PREFIX + 'game', id); } catch(e){}
+    var g = games[id];
+    gameTitle.textContent = g.title;
+    gameSub.textContent = g.sub;
+    gameTag.textContent = g.tag;
+    setActiveButton();
+    if(g.setup) g.setup();
+  }
+
+  function startCurrentGame(){
+    applyGame(currentGameId);
+    games[currentGameId].start();
+  }
+
+  function stopCurrentGame(){
+    if(games[currentGameId] && games[currentGameId].stop){
+      games[currentGameId].stop();
+    }
+  }
+
+  function onCellClick(i){
+    if(games[currentGameId] && games[currentGameId].onCell){
+      games[currentGameId].onCell(i);
+    }
+  }
+  window.onCellClick = onCellClick;
+
+  gameSelector.addEventListener('click', function(e){
+    var btn = e.target.closest('button');
+    if(!btn) return;
+    var id = btn.dataset.game;
+    if(!id || id === currentGameId) return;
+    stopCurrentGame();
+    applyGame(id);
+    games[id].start();
+  });
+
+  resetBtn.addEventListener('click', function(){
+    stopCurrentGame();
+    games[currentGameId].start();
+  });
+
+  /* ==============================================================
+     9. INIT
+     ============================================================== */
+  applyGame(currentGameId);
+
+  /* ==============================================================
+     10. CONSOLE HELPER
+     ============================================================== */
+  window.ForbiddenKnowledge = {
+    version: APP_VERSION,
+    clearCache: function(){
+      try {
+        Object.keys(localStorage).forEach(function(k){
+          if(k.indexOf(LS_KEY_PREFIX) === 0) localStorage.removeItem(k);
+        });
+        console.log('Cache cleared. Reload to reset.');
+      } catch(e){ console.warn(e); }
+    },
+    loadTextFrom: function(url){ loadTextFromUrl(url); },
+    games: function(){ return Object.keys(games); }
+  };
+
+})();
+</script>
+
 </html>
