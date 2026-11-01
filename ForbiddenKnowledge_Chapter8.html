@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Bloodline Terminal — Forbidden Knowledge, Chapter 8</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600;700&display=swap');
+
+  :root {
+    --bg: #0a0a0c;
+    --surface: #121216;
+    --surface-2: #1a1a20;
+    --border: #2a2a32;
+    --text: #e8e6e3;
+    --text-dim: #9a978f;
+    --accent: #c9a227;
+    --accent-dim: #8a6f1a;
+    --record: #3a7d5c;
+    --suppressed: #b03a2e;
+    --gap: #8a6f1a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    line-height: 1.65;
+    font-weight: 300;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 0 24px 120px; }
+
+  header {
+    padding: 64px 0 32px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 48px;
+  }
+
+  .kicker {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 20px;
+  }
+
+  h1 {
+    font-size: clamp(28px, 5vw, 44px);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    margin-bottom: 16px;
+  }
+
+  .subtitle {
+    font-size: 17px;
+    color: var(--text-dim);
+    max-width: 720px;
+    font-weight: 300;
+  }
+
+  .operator-note {
+    background: var(--surface-2);
+    border: 1px solid var(--accent-dim);
+    border-left: 3px solid var(--accent);
+    border-radius: 4px;
+    padding: 20px 24px;
+    margin: 28px 0;
+    font-size: 14px;
+    color: var(--text-dim);
+  }
+
+  .operator-note strong { color: var(--accent); }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin: 20px 0;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+  }
+
+  .legend span { display: flex; align-items: center; gap: 6px; }
+
+  .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  .dot-record { background: var(--record); }
+  .dot-suppressed { background: var(--suppressed); }
+  .dot-gap { background: var(--gap); }
+
+  h2 {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 56px 0 16px;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+  }
+
+  h2 .num {
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--accent);
+    font-size: 14px;
+    margin-right: 12px;
+  }
+
+  .claim-header {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+
+  .claim-sub {
+    font-size: 14px;
+    color: var(--text-dim);
+    margin-bottom: 20px;
+    font-style: italic;
+  }
+
+  .dual {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin: 24px 0;
+  }
+
+  @media (max-width: 800px) {
+    .dual { grid-template-columns: 1fr; }
+  }
+
+  .col {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 20px 22px;
+  }
+
+  .col-record { border-top: 3px solid var(--record); }
+  .col-suppressed { border-top: 3px solid var(--suppressed); }
+
+  .col-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+
+  .col-record .col-label { color: var(--record); }
+  .col-suppressed .col-label { color: var(--suppressed); }
+
+  .col p { font-size: 14px; margin-bottom: 12px; color: var(--text-dim); }
+  .col p:last-child { margin-bottom: 0; }
+  .col strong { color: var(--text); }
+
+  .suppressed-links {
+    list-style: none;
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid var(--border);
+  }
+
+  .suppressed-links li {
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .suppressed-links li:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+
+  .suppressed-links a {
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 13px;
+    text-decoration: none;
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .suppressed-links a:hover { text-decoration: underline; }
+
+  .suppressed-links .url {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--text-dim);
+    word-break: break-all;
+    display: block;
+    margin-bottom: 4px;
+  }
+
+  .suppressed-links .note {
+    font-size: 12px;
+    color: var(--text-dim);
+    line-height: 1.5;
+  }
+
+  .verdict-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 16px 0;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+  }
+
+  .verdict-tag {
+    padding: 4px 10px;
+    border-radius: 2px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .v-record { background: rgba(58,125,92,0.15); color: var(--record); border: 1px solid var(--record); }
+  .v-suppressed { background: rgba(176,58,46,0.15); color: var(--suppressed); border: 1px solid var(--suppressed); }
+  .v-gap { background: rgba(138,111,26,0.15); color: var(--gap); border: 1px solid var(--gap); }
+
+  .gap-note {
+    background: var(--surface-2);
+    border: 1px solid var(--gap);
+    border-left: 3px solid var(--gap);
+    border-radius: 4px;
+    padding: 18px 22px;
+    margin: 20px 0;
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+
+  .gap-note strong { color: var(--gap); }
+
+  .disclaimer {
+    background: var(--surface-2);
+    border: 1px solid var(--suppressed);
+    border-radius: 4px;
+    padding: 20px 24px;
+    margin: 32px 0;
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+
+  .disclaimer strong { color: var(--suppressed); }
+
+  .footer-note {
+    margin-top: 64px;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    text-align: center;
+    line-height: 2;
+  }
+
+  .footer-note .glory { color: var(--accent); font-weight: 600; }
+
+  a { color: var(--accent); }
+
+  @media (max-width: 600px) {
+    .wrap { padding: 0 16px 80px; }
+    header { padding: 40px 0 24px; }
+    h2 { margin-top: 40px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="kicker">Forbidden Knowledge · Chapter 8 · The Bloodline Terminal</div>
+  <h1>What the Record Says. What Is Being Silenced. You Decide.</h1>
+  <p class="subtitle">This terminal does not tell you what to believe. It shows you the official verdict and the suppressed counter-claim, side by side, with every link live. The reader is the judge.</p>
+  <div class="operator-note">
+    <strong>OPERATOR NOTE:</strong> This terminal does not confirm or deny. It shows you two things: what the official record says, and what is being said on the platforms that get banned, throttled, or dismissed. Green = the official record. Red = the suppressed claim. Amber = the gap where no record exists. You draw the conclusion. You do the work.
+  </div>
+  <div class="legend">
+    <span><span class="dot dot-record"></span> The Record (official / mainstream)</span>
+    <span><span class="dot dot-suppressed"></span> The Suppressed (alternative / banned)</span>
+    <span><span class="dot dot-gap"></span> Gap (no record exists either way)</span>
+  </div>
+</header>
+
+<!-- CLAIM 1: PRIORY OF SION -->
+<h2><span class="num">01</span> The Priory of Sion & the Merovingian Bloodline</h2>
+
+<div class="claim-header">The Claim</div>
+<p class="claim-sub">The Merovingians were the keepers of a bloodline descended from Jesus and Mary Magdalene, protected by a secret society called the Priory of Sion.</p>
+
+<div class="verdict-bar">
+  <span class="verdict-tag v-record">Record: Hoax, admitted under oath</span>
+  <span class="verdict-tag v-suppressed">Suppressed: The bloodline question survives the hoax</span>
+</div>
+
+<div class="dual">
+  <div class="col col-record">
+    <div class="col-label">The Record</div>
+    <p><strong>The Priory of Sion was registered with the French government on May 7, 1956</strong>, in Annemasse, by Pierre Plantard and three associates. The French National Library catalog states Plantard "sought to make believe that this association had secretly existed since the Middle Ages."</p>
+    <p><strong>In September 1993, Plantard admitted the hoax under oath</strong> during a judicial investigation. He received a severe warning and was told not to "play" with the French judicial system.</p>
+    <p><strong>In 1996, co-founder André Bonhomme told the BBC:</strong> "We were four friends who got together to have fun... he always had a great imagination."</p>
+    <p>The "Dossiers Secrets" were fabricated by Plantard and Philippe de Chérisey. The grand masters list (Leonardo, Newton, Hugo) was fabricated.</p>
+  </div>
+  <div class="col col-suppressed">
+    <div class="col-label">The Suppressed</div>
+    <p><strong>The vehicle was a hoax. The question survives the vehicle.</strong> Did Jesus have a bloodline? Did it survive into European royalty? The record does not answer that question. It answers a different question: did Pierre Plantard invent a secret society to prove it? Yes. He did.</p>
+    <p><strong>The DNA test that "settled" it tested the wrong person.</strong> In 2006, the History Channel tested Arnegonde, the fifth wife of Clotaire I. She married into the dynasty. She was not a blood descendant. The Merovingian line passed through the male line.</p>
+    <p>The underground texts that kept the claim alive — Gardner, Church, Zaid — are dismissed as pseudo-history. Some of them may be. But the dismissal is not a genealogical refutation. It is a label.</p>
+    <ul class="suppressed-links">
+      <li>
+        <a href="https://archive.org/download/CainsCreedOmarZaid2011/Cain%27s%20Creed%2C%20Omar%20Zaid%20%282011%29.pdf" target="_blank" rel="noopener">Omar Zaid, *Cain's Creed* (Archive.org PDF)</a>
+        <span class="url">archive.org/download/CainsCreedOmarZaid2011</span>
+        <span class="note">Traces the Merovingian line through Trojans, Cimmerians, Sicambri. Self-published. Assertion, not archival proof. Included because it is the most explicit underground text found.</span>
+      </li>
+      <li>
+        <a href="https://archive.org/details/20240209_20240209_0631/Bloodline%20of%20the%20Holy%20Grail%20_%20the%20hidden%20lineage%20of%20Jesus%20--%20Laurence%20Gardner%20--%20First%20Edition,%201996%20--%20Element%20Books%20--%209781852308704%20--%2099de60b12b39d823325ab53e72af57ac%20--%20Anna%E2%80%99s%20Archive" target="_blank" rel="noopener">Laurence Gardner, *Bloodline of the Holy Grail* (1996)</a>
+        <span class="url">archive.org (Anna's Archive scan)</span>
+        <span class="note">The most widely circulated book-length version. Not accepted by academic historians. Leiden scholarship describes Gardner as adding his own ideas to Plantard's material.</span>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="gap-note">
+  <strong>GAP:</strong> The hoax is settled. The bloodline question is not. The DNA test that supposedly refuted it tested a wife who married into the dynasty, not a blood descendant. The claim is unproven. It is not disproven by the genetic evidence that has been presented.
+</div>
+
+<!-- CLAIM 2: ROTHSCHILD BLOODLINE -->
+<h2><span class="num">02</span> The Rothschild–Merovingian Bloodline Claim</h2>
+
+<div class="claim-header">The Claim</div>
+<p class="claim-sub">The Rothschild family descends from the Merovingian dynasty and carries a genetic "House of Cain" marker through Rh-negative blood.</p>
+
+<div class="verdict-bar">
+  <span class="verdict-tag v-record">Record: Real banking dynasty, no Merovingian descent documented</span>
+  <span class="verdict-tag v-suppressed">Suppressed: Elite bloodline networks are real, the lineage claim is asserted</span>
+</div>
+
+<div class="dual">
+  <div class="col col-record">
+    <div class="col-label">The Record</div>
+    <p><strong>The Rothschilds are a real, documented banking dynasty</strong> founded by Mayer Amschel Rothschild in the 18th-century Frankfurt ghetto. Their wealth peaked in the 19th century and declined after WWII. Rothschild & Co's annual revenue is under $10 billion.</p>
+    <p><strong>No peer-reviewed genealogical study connects the Rothschild name to the Merovingian line.</strong> The Merovingians ruled Francia in the 5th–8th centuries. The Rothschild name emerges in the 18th century.</p>
+    <p><strong>Rh-negative blood is a genetic polymorphism</strong> with three documented mechanisms. No peer-reviewed literature connects it to the Merovingians, to Cain, or to the Rothschilds.</p>
+  </div>
+  <div class="col col-suppressed">
+    <div class="col-label">The Suppressed</div>
+    <p><strong>Elite families do intermarry and coordinate across generations.</strong> That sociological claim is documented. The Rothschilds did intermarry and coordinate across European branches. The question is whether that coordination is merely financial or something more.</p>
+    <p><strong>The alternative channels assert the lineage. They do not document it.</strong> The most explicit underground text is Fritz Springmeier's *Bloodlines of the Illuminati*, which discusses Rothschild interlocking with other bloodlines but does not itself provide a family tree.</p>
+    <p>The official documentaries on the Rothschilds are good history. They document the antisemitic persecution the family faced. But they do not examine the specific genealogical claim. They treat "Rothschild conspiracy theory" as a single undifferentiated mass and dismiss it with the label.</p>
+    <ul class="suppressed-links">
+      <li>
+        <a href="https://archive.org/download/bloodlines-of-the-illuminati-fritz-springmeier_202307/Bloodlines%20of%20the%20Illuminati%20-%20Fritz%20Springmeier.pdf" target="_blank" rel="noopener">Fritz Springmeier, *Bloodlines of the Illuminati* (Archive.org PDF)</a>
+        <span class="url">archive.org</span>
+        <span class="note">Self-published conspiracy text. Discusses Rothschild interlocking with other bloodlines. Treated as a primary source for what the claim says, not as genealogical evidence.</span>
+      </li>
+      <li>
+        <a href="https://substack.com/@billyandrew13/note/c-132507550" target="_blank" rel="noopener">Substack: "The English Crown can be traced back to the Merovingians... which also includes the Rothschilds"</a>
+        <span class="url">substack.com/@billyandrew13</span>
+        <span class="note">Assertion only. No genealogical citation. Included because it is the exact claim as it circulates on the platforms.</span>
+      </li>
+      <li>
+        <a href="https://rumble.com/v754ezm-pandoras-payseur-unlocking-the-ultimate-unseen-hand.html" target="_blank" rel="noopener">Rumble: "Pandora's Payseur: Unlocking the Ultimate Unseen Hand"</a>
+        <span class="url">rumble.com</span>
+        <span class="note">Video description references "Fritz Springmeier's Merovingian 13th family" and frames the Payseurs as sitting above the Rothschilds. Video content not transcribed here.</span>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="gap-note">
+  <strong>GAP:</strong> Neither side has done the genealogical work. The official side dismisses without examining. The alternative side asserts without documenting. The reader is left with a label on one side and an assertion on the other.
+</div>
+
+<!-- CLAIM 3: RH-NEGATIVE -->
+<h2><span class="num">03</span> The Rh-Negative Blood Marker</h2>
+
+<div class="claim-header">The Claim</div>
+<p class="claim-sub">Rh-negative blood is a genetic marker of Watcher/Nephilim descent, disproportionately present in European aristocracy and linked to the "Cain" bloodline.</p>
+
+<div class="verdict-bar">
+  <span class="verdict-tag v-record">Record: Real polymorphism, no aristocratic or supernatural link</span>
+  <span class="verdict-tag v-suppressed">Suppressed: Population genetics is more interesting than the debunking admits</span>
+</div>
+
+<div class="dual">
+  <div class="col col-record">
+    <div class="col-label">The Record</div>
+    <p><strong>Rh-negative blood is real.</strong> About 15% of the global population is Rh-negative. It has clinical significance for pregnancy (Rh incompatibility). The Basque population has the highest recorded frequency, up to 35%.</p>
+    <p><strong>The mechanism is genetic.</strong> RHD gene deletion, RHD-CE-D hybrid genes, point mutations. High frequency in isolated populations is explained by founder effects and genetic drift.</p>
+    <p><strong>The presidential claim is fabricated.</strong> Known records: Kennedy O-positive, Reagan O-positive, Bush Sr. O-positive, Obama AB-negative. Among presidents with known records, Rh-negative is a minority. The "44 out of 45" claim is false.</p>
+    <p><strong>The aristocratic concentration claim has no study.</strong> No peer-reviewed paper has tested Rh blood type distribution in aristocratic groups. This is not "the record contradicts it" — it is "the record does not exist."</p>
+  </div>
+  <div class="col col-suppressed">
+    <div class="col-label">The Suppressed</div>
+    <p><strong>Why does this polymorphism distribute the way it does?</strong> Why do Basques have 35% Rh-negative while some populations have almost none? The founder effect is a description, not a complete explanation. Why <em>those</em> founders? Why <em>that</em> isolation?</p>
+    <p><strong>The "Nephilim" narrative is a wrong answer to a real question.</strong> The Book of Enoch, the Watchers, the Nephilim are textual traditions. They are not genetic data. But the question of why Rh-negative clusters in certain populations is a real scientific question, and the official debunking ("just a polymorphism, move on") shuts it down.</p>
+    <p>The suppressed material treats Rh-negative as a bloodline marker. That is not genetics. But the <em>curiosity</em> that drives the claim is legitimate. The population distribution is genuinely unusual. The official side gives the curious reader nothing to explore.</p>
+    <ul class="suppressed-links">
+      <li>
+        <a href="https://x.com/YujunWale/status/1935710278517497877" target="_blank" rel="noopener">X Post: Rh-negative, Anunnaki, and elite bloodlines</a>
+        <span class="url">x.com/YujunWale</span>
+        <span class="note">Claims elite families carry a non-human Anunnaki lineage marked by Rh-negative or Rh-null blood. No citation. No documentation. Included because it is the most explicit statement of the full narrative found.</span>
+      </li>
+      <li>
+        <a href="https://archive.org/download/adrenochrome-child-torture-satanism-and-global-corruption-public-domain/Adrenochrome%2C%20child%20torture%2C%20Satanism%2C%20and%20global%20corruption%20-%20Public%20Domain.pdf" target="_blank" rel="noopener">Archive.org: Adrenochrome, child torture, Satanism, and global corruption (PDF)</a>
+        <span class="url">archive.org</span>
+        <span class="note">Underground PDF that connects adrenochrome harvesting to elite bloodlines and ritual sacrifice. Self-published. Included for completeness, not endorsement.</span>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="gap-note">
+  <strong>GAP:</strong> The aristocratic concentration claim has no record because no one has ever tested it. The Nephilim claim is untestable as genetics. The population genetics question is real, and the official side does not answer it in a satisfying way.
+</div>
+
+<!-- CLAIM 4: ADRENOCHROME -->
+<h2><span class="num">04</span> Adrenochrome Harvesting</h2>
+
+<div class="claim-header">The Claim</div>
+<p class="claim-sub">Bloodline elites harvest adrenochrome from terrified children to extend their lifespans.</p>
+
+<div class="verdict-bar">
+  <span class="verdict-tag v-record">Record: Real compound, harvesting narrative unsupported</span>
+  <span class="verdict-tag v-suppressed">Suppressed: The trafficking wound is real; the drug story is the parasite</span>
+</div>
+
+<div class="dual">
+  <div class="col col-record">
+    <div class="col-label">The Record</div>
+    <p><strong>Adrenochrome is real.</strong> It is epinephrine (adrenaline) that has oxidized. It turns pink in solution. It has no established medical use. It is cheaply synthesized. Pharmaceutical-grade epinephrine costs a few dollars per dose.</p>
+    <p><strong>No peer-reviewed study supports anti-aging properties.</strong> The harvesting narrative has never been corroborated by any criminal investigation, court finding, or verified documentary record. The narrative structurally descends from medieval blood libel.</p>
+    <p><strong>The chemistry does not work.</strong> A scientific analysis notes that to obtain a single vial of adrenochrome from blood, assuming no losses, would require 2,500,000 liters of human blood — the blood of 500,000 people [citation:2]. The compound is unstable and easily synthesized.</p>
+    <p><strong>The QAnon/Pizzagate lineage is documented.</strong> The adrenochrome harvesting story evolved from the 2016 Pizzagate conspiracy theory [citation:12]. It has anti-Semitic roots [citation:2].</p>
+  </div>
+  <div class="col col-suppressed">
+    <div class="col-label">The Suppressed</div>
+    <p><strong>Child trafficking is real. The adrenochrome story is a parasite on a real wound.</strong> The US alone reports hundreds of thousands of missing children to NCIC each year. NCMEC processes the cases. The Epstein case, the NXIVM case, the Catholic Church abuse record — these are court findings. Trafficking is not a conspiracy theory.</p>
+    <p><strong>The official debunking kills the drug story and declares the wound closed.</strong> It says "not into a drug lab" and the conversation ends. It does not explain where the children go. The adrenochrome narrative attached itself to a real horror and gave it a single, vivid, false explanation. When the false explanation is debunked, the debunkers use that as permission to stop looking.</p>
+    <p><strong>The suppressed material is not all crazy.</strong> Jim Caviezel, the actor who played Jesus in *The Passion of the Christ*, has spoken publicly about child trafficking and adrenochrome . His claims are contested. But he is not a anonymous message-board poster. He is a public figure with a platform, and he is saying these things on the record.</p>
+    <ul class="suppressed-links">
+      <li>
+        <a href="https://www.thelibertybeacon.com/millions-of-children-are-abducted-and-trafficked-each-year-the-sound-of-freedom-movie-exposes-the-epidemic/" target="_blank" rel="noopener">The Liberty Beacon: "Millions of Children Are Abducted and Trafficked Each Year — The Sound of Freedom"</a>
+        <span class="url">thelibertybeacon.com</span>
+        <span class="note">Content not independently verified. The underlying subject — child trafficking scale — is separately documented by NCMEC and DOJ. The specific article's claims have not been checked line by line.</span>
+      </li>
+      <li>
+        <a href="https://conspiracydailyupdate.com/2020/06/14/adrenochrome-withdrawals-i-hope-it-hurts/" target="_blank" rel="noopener">Conspiracy Daily Update: "Adrenochrome Withdrawals — I Hope It Hurts"</a>
+        <span class="url">conspiracydailyupdate.com</span>
+        <span class="note">Content not independently verified. The "withdrawal" framing has no clinical basis — adrenochrome is not addictive in any pharmacological literature. Included for completeness.</span>
+      </li>
+      <li>
+        <a href="https://awakeningchannel.com/ending-the-elite-victimization-of-children/" target="_blank" rel="noopener">Awakening Channel: "Ending the Elite Victimization of Children"</a>
+        <span class="url">awakeningchannel.com</span>
+        <span class="note">Content not independently verified. The general subject — elite impunity in trafficking cases — has documented instances (Epstein, NXIVM).</span>
+      </li>
+      <li>
+        <a href="https://dreddymd.com/2019/10/08/children-disappear-cps-blood-adrenochrome/" target="_blank" rel="noopener">Dr. Eddy MD: "Children Disappear — CPS, Blood, Adrenochrome"</a>
+        <span class="url">dreddymd.com</span>
+        <span class="note">Content not independently verified. The CPS-to-trafficking pipeline claim would require case-level documentation. None is presented here as verified.</span>
+      </li>
+      <li>
+        <a href="https://paradigmshyft.com/2019/11/04/child-adrenochrome-globalist-cabals-immortality-drug-of-choice/" target="_blank" rel="noopener">Paradigm Shyft: "Child Adrenochrome — Globalist Cabals' Immortality Drug of Choice"</a>
+        <span class="url">paradigmshyft.com</span>
+        <span class="note">Content not independently verified. The "immortality drug" framing has no pharmacological support. Included for completeness and for the reader's own judgment.</span>
+      </li>
+      <li>
+        <a href="https://rumble.com/vfwi9j-es-el-peor-horror-que-haya-visto-el-actor-jim-caviezel-habl-del-adenocromo-.html" target="_blank" rel="noopener">Rumble: Jim Caviezel speaks about adrenochrome and child sacrifice (Spanish)</a>
+        <span class="url">rumble.com</span>
+        <span class="note">Actor Jim Caviezel, who played Jesus in *The Passion of the Christ*, speaking publicly about child trafficking and adrenochrome . Contested. Public figure, not anonymous.</span>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<div class="gap-note">
+  <strong>GAP:</strong> The drug story is false. The trafficking wound is real. The official debunking uses the false story to close the real wound. That is the manipulation. Separate the claims. Keep the true one. Drop the false one.
+</div>
+
+<!-- CLOSING -->
+<h2><span class="num">05</span> Why Is This Information Being Kept From You?</h2>
+
+<div class="disclaimer">
+  <strong>THE QUESTION THIS TERMINAL ASKS:</strong><br>
+  We are not telling you what is true. We are showing you what is censored, banned, throttled, and dismissed — and we are asking you to notice the pattern. Why is the Priory of Sion hoax so aggressively publicized while the genealogical question it was attached to is never examined? Why is the Rh-negative aristocratic claim dismissed as "conspiracy theory" when no study has ever tested it? Why is the adrenochrome drug story debunked so thoroughly while the trafficking wound it parasitized is left unaddressed?<br><br>
+  The suppressed material is not all true. Some of it is fantastical. Some of it is dangerous. But the pattern of what gets silenced and what gets amplified is itself information. The reader who notices the pattern is the reader who can ask the right questions.<br><br>
+  We give you the record. We give you the suppressed. We give you the gap. You decide.
+</div>
+
+<div class="footer-note">
+  FORBIDDEN KNOWLEDGE · THE SOVEREIGN OPERATOR<br>
+  Chapter 8 · The Bloodline Terminal<br><br>
+  Test all things. Hold fast to what is good.<br>
+  <span class="glory">Soli Deo Gloria.</span>
+</div>
+
+</div>
+</body>
+</html>
