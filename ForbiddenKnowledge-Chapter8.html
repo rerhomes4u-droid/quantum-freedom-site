@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>THE BLOODLINE TERMINAL — Forbidden Knowledge Dossier</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap');
+
+  :root {
+    --bg: #0a0a0c;
+    --panel: #111116;
+    --border: #1e1e28;
+    --text: #c8c8d0;
+    --dim: #6a6a78;
+    --accent: #c0392b;
+    --accent-dim: #7a1f15;
+    --verified: #2e7d32;
+    --contested: #b8860b;
+    --hoax: #8b0000;
+    --gap: #4a4a5a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 14px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  .terminal {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+
+  .header {
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 16px;
+    margin-bottom: 24px;
+  }
+
+  .header h1 {
+    font-family: 'Crimson Pro', serif;
+    font-size: 32px;
+    font-weight: 600;
+    color: #e8e8f0;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .header .subtitle {
+    color: var(--dim);
+    font-size: 12px;
+    margin-top: 4px;
+    letter-spacing: 1px;
+  }
+
+  .warning {
+    background: var(--panel);
+    border-left: 3px solid var(--accent);
+    padding: 12px 16px;
+    margin-bottom: 24px;
+    font-size: 12px;
+    color: var(--dim);
+  }
+
+  .warning strong { color: var(--accent); }
+
+  /* DOSSIER GRID */
+  .dossier-grid {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    gap: 20px;
+    min-height: 600px;
+  }
+
+  @media (max-width: 800px) {
+    .dossier-grid { grid-template-columns: 1fr; }
+  }
+
+  /* SIDEBAR */
+  .sidebar {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 16px;
+    height: fit-content;
+    position: sticky;
+    top: 20px;
+  }
+
+  .sidebar h2 {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--dim);
+    margin-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 8px;
+  }
+
+  .dossier-item {
+    padding: 10px 12px;
+    margin-bottom: 4px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all 0.15s;
+    font-size: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .dossier-item:hover {
+    border-color: var(--border);
+    background: #16161c;
+  }
+
+  .dossier-item.active {
+    border-color: var(--accent);
+    background: #1a1210;
+  }
+
+  .dossier-item .status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-left: 8px;
+  }
+
+  .status-dot.verified { background: var(--verified); }
+  .status-dot.contested { background: var(--contested); }
+  .status-dot.hoax { background: var(--hoax); }
+  .status-dot.gap { background: var(--gap); }
+
+  /* MAIN PANEL */
+  .main-panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    padding: 24px;
+    overflow-y: auto;
+  }
+
+  .main-panel h3 {
+    font-family: 'Crimson Pro', serif;
+    font-size: 24px;
+    color: #e8e8f0;
+    margin-bottom: 4px;
+  }
+
+  .main-panel .claim-source {
+    font-size: 11px;
+    color: var(--dim);
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .method-step {
+    margin-bottom: 20px;
+    padding-left: 16px;
+    border-left: 2px solid var(--border);
+  }
+
+  .method-step.step-1 { border-left-color: #4a90d9; }
+  .method-step.step-2 { border-left-color: var(--verified); }
+  .method-step.step-3 { border-left-color: var(--contested); }
+  .method-step.step-4 { border-left-color: var(--accent); }
+
+  .method-step h4 {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-bottom: 8px;
+  }
+
+  .step-1 h4 { color: #4a90d9; }
+  .step-2 h4 { color: var(--verified); }
+  .step-3 h4 { color: var(--contested); }
+  .step-4 h4 { color: var(--accent); }
+
+  .method-step p {
+    font-size: 13px;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+
+  .method-step .citation {
+    font-size: 11px;
+    color: var(--dim);
+    font-style: italic;
+  }
+
+  .verdict-box {
+    margin-top: 24px;
+    padding: 16px;
+    border: 1px solid var(--border);
+    background: #0d0d10;
+  }
+
+  .verdict-box h4 {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 8px;
+  }
+
+  .verdict-box .verdict-text {
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  .verdict-box.verified .verdict-text { color: var(--verified); }
+  .verdict-box.contested .verdict-text { color: var(--contested); }
+  .verdict-box.hoax .verdict-text { color: var(--hoax); }
+  .verdict-box.gap .verdict-text { color: var(--gap); }
+
+  /* SCANLINE EFFECT */
+  .scanline {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0,0,0,0.03) 2px,
+      rgba(0,0,0,0.03) 4px
+    );
+    z-index: 9999;
+  }
+
+  /* BOOT SEQUENCE */
+  .boot {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: var(--bg);
+    z-index: 10000;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-family: 'IBM Plex Mono', monospace;
+    transition: opacity 0.5s;
+  }
+
+  .boot.hidden { opacity: 0; pointer-events: none; }
+
+  .boot-line {
+    font-size: 13px;
+    color: var(--dim);
+    margin-bottom: 8px;
+    opacity: 0;
+    animation: fadeIn 0.3s forwards;
+  }
+
+  .boot-line:nth-child(1) { animation-delay: 0.1s; }
+  .boot-line:nth-child(2) { animation-delay: 0.4s; }
+  .boot-line:nth-child(3) { animation-delay: 0.7s; }
+  .boot-line:nth-child(4) { animation-delay: 1.0s; }
+  .boot-line:nth-child(5) { animation-delay: 1.3s; }
+  .boot-line.accent { color: var(--accent); }
+
+  @keyframes fadeIn {
+    to { opacity: 1; }
+  }
+
+  .blink {
+    animation: blink 1s step-end infinite;
+  }
+
+  @keyframes blink {
+    50% { opacity: 0; }
+  }
+</style>
+</head>
+<body>
+
+<div class="scanline"></div>
+
+<!-- BOOT SEQUENCE -->
+<div class="boot" id="boot">
+  <div class="boot-line">BLOODLINE TERMINAL v2.7.1</div>
+  <div class="boot-line">LOADING DOSSIER INDEX...</div>
+  <div class="boot-line">CROSS-REFERENCING RECORD...</div>
+  <div class="boot-line accent">BOUNDARY CHECK: ACTIVE</div>
+  <div class="boot-line">AWAITING OPERATOR INPUT<span class="blink">_</span></div>
+</div>
+
+<div class="terminal" id="terminal" style="opacity:0; transition: opacity 0.8s;">
+  
+  <div class="header">
+    <h1>THE BLOODLINE TERMINAL</h1>
+    <div class="subtitle">FORBIDDEN KNOWLEDGE DOSSIER // CHAPTER 8 // METHOD: NAME. CORROBORATE. MARK GAP. REFUSE OVERCLAIM.</div>
+  </div>
+
+  <div class="warning">
+    <strong>OPERATOR NOTE:</strong> This terminal does not confirm or deny. It shows you the record. 
+    Green = documented in the record. Amber = contested. Red = proven hoax. Grey = gap: no record exists either way. 
+    You draw the conclusion. You do the work.
+  </div>
+
+  <div class="dossier-grid">
+    <div class="sidebar">
+      <h2>DOSSIER INDEX</h2>
+      <div id="dossier-list"></div>
+    </div>
+    <div class="main-panel" id="main-panel">
+      <!-- Content injected by JS -->
+    </div>
+  </div>
+
+</div>
+
+<script>
+const dossiers = [
+  {
+    id: "rothschild",
+    name: "THE ROTHSCHILD CLAIM",
+    status: "contested",
+    source: "Chapter 8: 'Modern names: The Rothschilds (through the Merovingian line)'",
+    step1: "The specific claim is that the Rothschild family descends from the Merovingian bloodline and represents a 'House of Cain' genetic lineage with an Rh-negative marker.",
+    step2: "The Rothschild family is documented as a real European banking dynasty founded by Mayer Amschel Rothschild in the 18th century. Their banking network across Frankfurt, London, Paris, Vienna, and Naples is historically documented. The family's wealth peaked in the 19th century and declined significantly after WWII. Their current banking operations are a fraction of what they were; Rothschild & Co's annual revenue is under $10 billion, not the 'half of world wealth' figure circulated in some conspiracy literature.",
+    step3: "No documented genealogical record connects the Rothschilds to the Merovingian dynasty. The Merovingians ruled Francia from the 5th to 8th centuries; the Rothschild name emerges in the 18th century from the Frankfurt ghetto. The claim of Rh-negative blood as a 'Cain marker' has no genetic or historical basis in any peer-reviewed literature.",
+    step4: "The record supports: a real, historically significant banking family. The record does NOT support: Merovingian descent, genetic 'Cain' lineage, or Rh-negative as a bloodline marker. The gap: no independent genealogical verification exists for the descent claim.",
+    verdict: "CONTESTED. Real family. Real wealth. The bloodline descent claim is not supported by the record."
+  },
+  {
+    id: "merovingian",
+    name: "THE MEROVINGIAN / PRIORY OF SION CLAIM",
+    status: "hoax",
+    source: "Chapter 8: 'The Merovingian dynasty claimed descent from a sea creature... the keepers of the Holy Grail'",
+    step1: "The claim is that the Merovingians were the keepers of a bloodline descended from Jesus and Mary Magdalene, protected by a secret society called the Priory of Sion.",
+    step2: "The Priory of Sion was founded in 1956 in Annemasse, France, by Pierre Plantard and three associates. It was registered with the French government as a social organization. In 1996, co-founder André Bonhomme publicly admitted the organization was a joke created by four friends. The 'Dossiers Secrets'—the documents 'proving' the Merovingian-Jesus bloodline—were fabricated by Plantard and Philippe de Chérisey and deposited in the Bibliothèque nationale de France. The hoax was popularized by the 1982 book Holy Blood, Holy Grail and later by Dan Brown's The Da Vinci Code.",
+    step3: "The Merovingian dynasty itself is historically real (5th-8th century Francia). The claim of Jesus-Magdalene descent has zero historical documentation from any period before the 20th century. The Priory of Sion's 'grand masters' list (Leonardo, Newton, etc.) was fabricated by Plantard.",
+    step4: "The record supports: a real dynasty of Frankish kings. The record proves: the Priory of Sion bloodline claim is a documented hoax, admitted by its own creators. There is no gap here—this one is settled.",
+    verdict: "HOAX. The Priory of Sion was a 20th-century fabrication. Its creators admitted it. The Merovingian-Jesus bloodline claim has no historical basis."
+  },
+  {
+    id: "rhnegative",
+    name: "THE RH-NEGATIVE CLAIM",
+    status: "gap",
+    source: "Chapter 8: 'Genetic marker: Rh-negative blood factor, disproportionately present in European aristocracy'",
+    step1: "The claim is that Rh-negative blood is a genetic marker of Watcher/Nephilim descent, disproportionately present in European aristocracy and linked to the 'Cain' bloodline.",
+    step2: "Rh-negative blood is real and medically documented. It is present in approximately 15% of the global population, with higher frequencies in European populations (particularly Basque). It is clinically significant for pregnancy (Rh incompatibility). No peer-reviewed study links Rh-negative status to aristocracy, 'Watcher' genetics, or any supernatural lineage. The claim that 'almost every U.S. President is Rh-negative' is unverified—blood types of presidents are not systematically public record.",
+    step3: "There is no genetic, archaeological, or historical evidence connecting Rh-negative blood to any 'Nephilim' or 'Watcher' lineage. The 15% figure is real. The aristocratic concentration claim is unverified. The supernatural origin claim is outside the scope of what genetics can test.",
+    step4: "The record supports: Rh-negative blood exists and has clinical significance. The record does NOT support: aristocratic concentration or supernatural origin. The gap: no study has tested the aristocracy claim, because blood types of aristocrats are not a matter of public record.",
+    verdict: "GAP. Rh-negative is real. The bloodline connection is unverified. The supernatural claim is untestable."
+  },
+  {
+    id: "adrenochrome",
+    name: "THE ADRENOCHROME CLAIM",
+    status: "hoax",
+    source: "Chapter 8: 'The adrenochrome harvested from terrified children is not a recreational drug. It is medicine for immortals'",
+    step1: "The claim is that bloodline elites harvest adrenochrome from terrified children to extend their lifespans.",
+    step2: "Adrenochrome is a real chemical compound—it is adrenaline (epinephrine) that has oxidized. It is pink in solution. It has no established medical use. It is cheaply and easily synthesized in a laboratory. It has never been shown to have anti-aging properties. The 'harvesting from children' narrative descends from medieval 'blood libel' accusations against Jews, repackaged in the 21st century. The actual price of pharmaceutical-grade epinephrine is a few dollars per dose.",
+    step3: "There is no evidence of any child-trafficking operation for adrenochrome. The chemical is not rare, not expensive, and not medically useful for lifespan extension. No investigation has ever uncovered such an operation.",
+    step4: "The record proves: adrenochrome is a real but useless compound. The record proves: the child-harvesting narrative is a modern adaptation of a centuries-old antisemitic blood libel. There is no gap here.",
+    verdict: "HOAX. Adrenochrome is real. The harvesting narrative is fabricated. The blood libel connection is documented."
+  },
+  {
+    id: "rockefeller",
+    name: "THE ROCKEFELLER CLAIM",
+    status: "contested",
+    source: "Chapter 8: 'Modern names: The Rockefellers... House of Seth'",
+    step1: "The claim is that the Rockefeller family represents the 'House of Seth' bloodline, corrupted by Watcher intermarriage.",
+    step2: "The Rockefeller family is a historically documented American industrial and philanthropic dynasty founded by John D. Rockefeller (1839-1937), who built Standard Oil. The family's influence in banking (Chase Manhattan), medicine (Rockefeller Foundation), and politics is documented. The 'House of Seth' descent claim has no genealogical record. The Rockefellers are of German-American descent with documented ancestry in the 18th century.",
+    step3: "No documentation connects the Rockefellers to ancient Israelite lineages, Watchers, or any supernatural bloodline. The family's documented history begins in the 18th century in New Jersey.",
+    step4: "The record supports: a real family with documented influence. The record does NOT support: Sethite lineage. The gap: none—the genealogy is traceable and does not reach antiquity.",
+    verdict: "CONTESTED. Real family. Real power. Ancient bloodline claim is unsupported."
+  },
+  {
+    id: "kennedy",
+    name: "THE KENNEDY CLAIM",
+    status: "contested",
+    source: "Chapter 8: 'Modern names: ... the Kennedys... House of Japheth'",
+    step1: "The claim is that the Kennedy family represents the 'Japhethite' warmaker bloodline with a 'conqueror's gene' (MAOA-L).",
+    step2: "The Kennedy family is a documented American political dynasty of Irish descent. John F. Kennedy was assassinated in 1963; the official investigation (Warren Commission) concluded Lee Harvey Oswald acted alone, a conclusion contested by many researchers. The MAOA-L gene is real and has been studied in relation to aggression, but no study has tested the Kennedy family for it, and no connection to 'Japheth' exists.",
+    step3: "No genetic testing of the Kennedy family for MAOA-L has been published. The 'Japhethite' claim has no historical or genetic basis. The JFK assassination remains officially closed but is contested in public discourse.",
+    step4: "The record supports: a real political family. The record does NOT support: Japhethite lineage or a tested 'conqueror's gene.' The gap: MAOA-L status is unknown, untested, and irrelevant without evidence.",
+    verdict: "CONTESTED. Real family. Ancient bloodline claim is unsupported."
+  },
+  {
+    id: "pilgrims",
+    name: "THE PILGRIMS SOCIETY CLAIM",
+    status: "contested",
+    source: "Chapter 8: 'The Pilgrims Society is the core of the Anglo-American establishment... Every individual who secretly met at Jekyll Island in 1910 to draft the Federal Reserve was a Pilgrim.'",
+    step1: "The claim is that the Pilgrims Society is a secret society controlling Anglo-American policy, and that all Jekyll Island attendees were members.",
+    step2: "The Pilgrims Society is a real organization, founded in 1902 in London and New York, dedicated to promoting Anglo-American friendship. Its membership has included prominent figures in banking, politics, and media. The Jekyll Island meeting of 1910 did occur, and attendees included Senator Nelson Aldrich, A. Piatt Andrew, Henry Davison, Arthur Shelton, Frank Vanderlip, and Paul Warburg. Whether all were Pilgrims Society members is not documented in a single verifiable source; some were, some may not have been.",
+    step3: "The Pilgrims Society's actual influence and membership list are not fully public. The claim that it 'controls' policy is an interpretation, not a documented fact. The Jekyll Island connection to the Federal Reserve is historically documented; the Pilgrims membership of all attendees is not.",
+    step4: "The record supports: the Pilgrims Society exists; the Jekyll Island meeting happened. The record does NOT support: that every attendee was a Pilgrim, or that the Society 'controls' policy. The gap: membership records are incomplete.",
+    verdict: "CONTESTED. Real organization. Real meeting. The 'control' claim is interpretation, not record."
+  },
+  {
+    id: "committee300",
+    name: "THE COMMITTEE OF 300 CLAIM",
+    status: "contested",
+    source: "Chapter 8: 'The Committee of 300 is described by Dr. John Coleman as the body that ordered the creation of the Club of Rome.'",
+    step1: "The claim is that a secret Committee of 300 controls global policy and created the Club of Rome.",
+    step2: "The Committee of 300 is a claim originating from John Coleman's 1992 book Conspirators Hierarchy. Coleman was a former British intelligence officer. The book is archived on the CIA's website (as part of the Abbottabad compound materials), but archival does not equal verification. There is no publicly verified evidence that the Committee of 300 exists as described. The Club of Rome is a real organization founded in 1968, known for its 'Limits to Growth' report.",
+    step3: "The existence of the Committee of 300 is not confirmed by any independent source. The CIA archive presence is often cited as 'proof' but the CIA archives many documents without endorsing their contents.",
+    step4: "The record supports: the Club of Rome is real. The record does NOT support: the Committee of 300 as a verified organization. The gap: no independent verification exists.",
+    verdict: "CONTESTED. The Club of Rome is real. The Committee of 300 is an unverified claim."
+  },
+  {
+    id: "protocols",
+    name: "THE PROTOCOLS OF THE ELDERS OF ZION",
+    status: "hoax",
+    source: "Background: the 'network' claims in Chapter 8 draw on literature that often cites the Protocols.",
+    step1: "The Protocols of the Elders of Zion purports to be a record of a Jewish plot for world domination.",
+    step2: "The Protocols is a proven forgery. It was fabricated in Russia around 1890 by Mathieu Golovinsky, who adapted earlier French satires against Napoleon III and the Freemasons, replacing the Freemasons with Jews. The Times of London exposed the plagiarism in 1921. It was serialized in Henry Ford's newspaper in the 1920s and became a Nazi propaganda tool. Cambridge University Press describes it as 'a forgery and a plagiarism.'",
+    step3: "There is no debate among historians. The Protocols is fabricated. Its use as evidence for any bloodline or network claim discredits the claimant.",
+    step4: "The record proves: the Protocols is a forgery. Any dossier that cites it as evidence is compromised. This is a hard boundary.",
+    verdict: "HOAX. Proven forgery. Do not use. Ever."
+  },
+  {
+    id: "bathory",
+    name: "THE BÁTHORY CLAIM",
+    status: "contested",
+    source: "Chapter 8: 'Elizabeth Báthory did not act alone. She acted for the bloodlines. Her castle was a processing facility.'",
+    step1: "The claim is that Elizabeth Báthory's crimes were part of a bloodline program, not individual sadism.",
+    step2: "Elizabeth Báthory (1560-1614) was a Hungarian noblewoman accused of torturing and killing young women. The number of victims is disputed: contemporary accounts range from 80 to 300, with some sources claiming up to 600. She was tried and confined to her castle. The claim that she bathed in blood to preserve youth comes from later accounts, not contemporary trial records. The claim that she 'acted for the bloodlines' has no documentary basis.",
+    step3: "Báthory's crimes are documented. The 'bloodline program' connection is not. The 'virgin blood bath' narrative may be embellishment added after her death.",
+    step4: "The record supports: a noblewoman accused of serial murder. The record does NOT support: a bloodline conspiracy or a 'processing facility' for immortals. The gap: the blood-bathing claim is contested by historians.",
+    verdict: "CONTESTED. Real crimes. The bloodline program claim is unsupported."
+  },
+  {
+    id: "rhfactcheck",
+    name: "THE 'PRESIDENTS ARE RH-NEGATIVE' CLAIM",
+    status: "gap",
+    source: "Circulating claim referenced in Chapter 8's genetic marker sections.",
+    step1: "The claim is that nearly every U.S. President has Rh-negative blood.",
+    step2: "Blood types of U.S. Presidents are not systematically public record. Some presidents' blood types are known from medical records (e.g., JFK's medical records released after his death). There is no compiled list of presidential blood types because it is not a required public disclosure. The claim that 'almost every President is Rh-negative' cannot be verified or falsified with current public records.",
+    step3: "No source provides a complete, verified list. The claim circulates in conspiracy literature without citation.",
+    step4: "The record supports: some presidents' blood types are known. The record does NOT support: a systematic Rh-negative pattern. The gap: the data does not exist in public record.",
+    verdict: "GAP. Unverifiable. No compiled record exists."
+  },
+  {
+    id: "jpmorgan",
+    name: "THE J.P. MORGAN / CFR CLAIM",
+    status: "contested",
+    source: "Chapter 8: 'The Council on Foreign Relations (CFR) was founded as a front for J.P. Morgan and Company'",
+    step1: "The claim is that the CFR was created as a Morgan front.",
+    step2: "The Council on Foreign Relations was founded in 1921. Its founders included prominent bankers and lawyers, many associated with J.P. Morgan & Co., including Elihu Root, Henry Stimson, and others. The CFR's founding was connected to the American Round Table Group, which was inspired by Cecil Rhodes's vision. The 'front' characterization is an interpretation. The CFR is a real think tank that publishes Foreign Affairs and has influenced U.S. foreign policy.",
+    step3: "The Morgan connection to CFR's founding is documented. The characterization as a 'front' implies control that is not publicly verifiable. CFR membership lists are public; its internal decision-making is not.",
+    step4: "The record supports: Morgan associates were involved in founding the CFR. The record does NOT support: that the CFR is a 'front' in the sense of being controlled by Morgan interests today. The gap: internal influence is not publicly documented.",
+    verdict: "CONTESTED. Founding connection is real. 'Front' characterization is interpretation."
+  },
+  {
+    id: "bible-dan",
+    name: "THE TRIBE OF DAN / ANTICHRIST CLAIM",
+    status: "contested",
+    source: "Chapter 8: 'Some researchers trace this thirteenth bloodline to the tribe of Dan'",
+    step1: "The claim is that the tribe of Dan produces the Antichrist bloodline.",
+    step2: "The belief that Antichrist would come from the tribe of Dan is documented in early Christian tradition. It is based on Jacob's prophecy in Genesis 49:17 ('Dan shall be a serpent by the way') and the observation that Dan is omitted from the sealing of the tribes in Revelation 7. This is a theological interpretation with a long history, not a genetic claim. Medieval writers held this view. It is not a 'bloodline' claim in the genetic sense.",
+    step3: "The biblical texts say what they say. The interpretation that this means a literal bloodline producing a literal Antichrist is one theological reading among others. No genetic or historical evidence connects any modern family to the tribe of Dan.",
+    step4: "The record supports: an early Christian interpretive tradition about Dan. The record does NOT support: a modern identifiable bloodline. The gap: the tribe of Dan is historically lost to genealogy.",
+    verdict: "CONTESTED. Theological tradition is real. Genetic bloodline claim is unsupported."
+  }
+];
+
+let currentDossier = null;
+
+function renderList() {
+  const list = document.getElementById('dossier-list');
+  list.innerHTML = dossiers.map(d => `
+    <div class="dossier-item ${d.id === currentDossier ? 'active' : ''}" onclick="selectDossier('${d.id}')">
+      <span>${d.name}</span>
+      <span class="status-dot ${d.status}"></span>
+    </div>
+  `).join('');
+}
+
+function selectDossier(id) {
+  currentDossier = id;
+  renderList();
+  const d = dossiers.find(x => x.id === id);
+  const panel = document.getElementById('main-panel');
+  
+  const statusLabel = {
+    verified: 'DOCUMENTED',
+    contested: 'CONTESTED',
+    hoax: 'PROVEN HOAX',
+    gap: 'GAP — NO RECORD'
+  };
+
+  panel.innerHTML = `
+    <h3>${d.name}</h3>
+    <div class="claim-source">SOURCE: ${d.source}</div>
+
+    <div class="method-step step-1">
+      <h4>1. NAME THE SPECIFIC</h4>
+      <p>${d.step1}</p>
+    </div>
+
+    <div class="method-step step-2">
+      <h4>2. FIND THE CORROBORATION</h4>
+      <p>${d.step2}</p>
+    </div>
+
+    <div class="method-step step-3">
+      <h4>3. MARK THE GAP</h4>
+      <p>${d.step3}</p>
+    </div>
+
+    <div class="method-step step-4">
+      <h4>4. REFUSE TO OVERCLAIM</h4>
+      <p>${d.step4}</p>
+    </div>
+
+    <div class="verdict-box ${d.status}">
+      <h4>VERDICT // ${statusLabel[d.status]}</h4>
+      <div class="verdict-text">${d.verdict}</div>
+    </div>
+  `;
+}
+
+// Boot sequence
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    document.getElementById('boot').classList.add('hidden');
+    document.getElementById('terminal').style.opacity = '1';
+    renderList();
+    selectDossier('merovingian');
+  }, 1800);
+});
+</script>
+
+</body>
+</html>
