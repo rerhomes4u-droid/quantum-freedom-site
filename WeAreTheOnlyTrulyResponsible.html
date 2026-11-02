@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>THE MIRROR — We Are the Only Truly Responsible?</title>
+<style>
+  :root{
+    --ink:#1a1a1a; --paper:#f4f0e8; --blood:#8b1a1a; --gold:#b8860b;
+    --fog:#6b6b6b; --line:#d4cbb8; --good:#2d5a3d; --bad:#7a2e2e;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:var(--paper); color:var(--ink);
+    font-family:Georgia,'Times New Roman',serif; line-height:1.6;
+    padding:0 0 4rem;
+  }
+  header{
+    background:var(--ink); color:var(--paper); padding:3rem 1.5rem 2.5rem;
+    text-align:center; border-bottom:6px solid var(--blood);
+  }
+  header h1{font-size:clamp(1.8rem,5vw,3rem); letter-spacing:.04em; font-weight:400;}
+  header .sub{color:var(--gold); font-style:italic; margin-top:.75rem; font-size:clamp(.95rem,2.5vw,1.15rem);}
+  header .quote{color:#c9c2b2; max-width:640px; margin:1.5rem auto 0; font-size:.95rem; line-height:1.5;}
+  .wrap{max-width:820px; margin:0 auto; padding:0 1.25rem;}
+  .intro{margin:2.5rem auto; font-size:1.05rem;}
+  .intro p{margin-bottom:1rem;}
+  .intro .drop::first-letter{
+    float:left; font-size:3.4rem; line-height:.8; padding-right:.5rem; color:var(--blood); font-weight:700;
+  }
+  .progress-shell{
+    position:sticky; top:0; z-index:20; background:var(--paper);
+    padding:.85rem 0 .6rem; border-bottom:1px solid var(--line); margin-top:2rem;
+  }
+  .progress-track{height:6px; background:var(--line); border-radius:3px; overflow:hidden;}
+  .progress-fill{height:100%; width:0%; background:linear-gradient(90deg,var(--blood),var(--gold)); transition:width .35s ease;}
+  .progress-label{font-size:.8rem; color:var(--fog); margin-top:.4rem; letter-spacing:.08em; text-transform:uppercase;}
+  .card{
+    background:#fffdf8; border:1px solid var(--line); border-left:6px solid var(--blood);
+    margin:1.75rem 0; padding:1.5rem 1.5rem 1.25rem; box-shadow:0 2px 0 rgba(0,0,0,.04);
+  }
+  .card h2{font-size:1.15rem; font-weight:700; letter-spacing:.01em; margin-bottom:.25rem;}
+  .card .num{color:var(--gold); font-size:.78rem; letter-spacing:.18em; text-transform:uppercase; display:block; margin-bottom:.35rem;}
+  .card .claim{font-style:italic; color:var(--blood); margin:.6rem 0 1rem; font-size:1rem;}
+  .case{border-left:3px solid var(--line); padding:.5rem 0 .5rem .9rem; margin:.75rem 0;}
+  .case .tag{font-size:.72rem; letter-spacing:.14em; text-transform:uppercase; font-weight:700; display:block; margin-bottom:.2rem;}
+  .case.for .tag{color:var(--good);}
+  .case.against .tag{color:var(--bad);}
+  .case p{font-size:.94rem; color:#2c2c2c;}
+  .verdict{margin-top:1.1rem; border-top:1px dashed var(--line); padding-top:1rem;}
+  .verdict .ask{font-size:.82rem; letter-spacing:.1em; text-transform:uppercase; color:var(--fog); margin-bottom:.55rem;}
+  .btns{display:flex; gap:.5rem; flex-wrap:wrap;}
+  .btns button{
+    font-family:inherit; font-size:.86rem; padding:.5rem .95rem; cursor:pointer;
+    border:1px solid var(--line); background:#faf7ef; color:var(--ink);
+    transition:all .15s ease; border-radius:2px;
+  }
+  .btns button:hover{border-color:var(--gold);}
+  .btns button.sel[data-v="responsible"]{background:var(--bad); color:#fff; border-color:var(--bad);}
+  .btns button.sel[data-v="shared"]{background:var(--gold); color:#fff; border-color:var(--gold);}
+  .btns button.sel[data-v="not"]{background:var(--good); color:#fff; border-color:var(--good);}
+  .btns button.sel[data-v="unclear"]{background:var(--fog); color:#fff; border-color:var(--fog);}
+  .note{margin-top:.7rem;}
+  .note textarea{
+    width:100%; min-height:52px; resize:vertical; font-family:inherit; font-size:.88rem;
+    padding:.5rem; border:1px solid var(--line); background:#faf7ef; color:var(--ink); border-radius:2px;
+  }
+  .final{
+    margin:3rem 0 1rem; padding:2rem 1.5rem; background:var(--ink); color:var(--paper);
+    border-left:6px solid var(--gold);
+  }
+  .final h2{color:var(--gold); font-size:1.3rem; margin-bottom:1rem; font-weight:400; letter-spacing:.03em;}
+  .final p{margin-bottom:.9rem; font-size:.98rem; color:#dcd6c8;}
+  .final .glory{color:var(--gold); font-style:italic; margin-top:1.25rem; text-align:center; letter-spacing:.05em;}
+  .summary{margin:1.5rem 0;}
+  .summary h3{font-size:.95rem; letter-spacing:.12em; text-transform:uppercase; color:var(--fog); margin-bottom:.75rem;}
+  .bar{display:flex; align-items:center; gap:.6rem; margin-bottom:.45rem; font-size:.86rem;}
+  .bar .lbl{width:130px; text-transform:capitalize;}
+  .bar .track{flex:1; height:12px; background:var(--line); border-radius:2px; overflow:hidden;}
+  .bar .fill{height:100%; width:0%; transition:width .4s ease;}
+  .bar .count{width:44px; text-align:right; color:var(--fog);}
+  footer{text-align:center; color:var(--fog); font-size:.78rem; margin-top:3rem; letter-spacing:.08em;}
+  .reset{
+    display:block; margin:1.5rem auto 0; background:none; border:1px solid var(--line);
+    color:var(--fog); font-family:inherit; font-size:.8rem; padding:.5rem 1rem; cursor:pointer;
+    letter-spacing:.1em; text-transform:uppercase;
+  }
+  .reset:hover{border-color:var(--blood); color:var(--blood);}
+  @media print{
+    .progress-shell,.btns,.note,.reset{display:none;}
+    body{background:#fff;}
+    .card{break-inside:avoid;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>THE MIRROR</h1>
+  <div class="sub">An Interactive Breakdown of "We Are the Only Truly Responsible"</div>
+  <p class="quote">"El problema no es Abelardo. El problema somos nosotros."<br>— Rafael Pacheco, as read by Ramiro Ramirez</p>
+</header>
+
+<div class="wrap">
+
+  <div class="intro">
+    <p class="drop">This app tests a single assertion: that <strong>we — the people, the voters, the consumers, the silent majority — are the only truly responsible ones</strong> for the state of our politics and our country. Not the politicians. Not the billionaires. Not the media. Us.</p>
+    <p>The assertion is not self-evidently true. It is not self-evidently false. It is a claim, and like every claim it must be broken into its parts, tested against the record, and marked where the record runs out. That is what this app does.</p>
+    <p>For each of the twelve components below, you will see <strong>the claim</strong>, <strong>the strongest case for it</strong>, and <strong>the strongest case against it</strong>. Then you must mark your own verdict. You cannot finish without taking a position on every piece. There is no "skip." There is no "neutral." There is only <em>responsible</em>, <em>shared</em>, <em>not responsible</em>, or <em>record unclear</em>.</p>
+    <p>Answer honestly. The mirror does not lie, but it only shows what you bring to it.</p>
+  </div>
+
+  <div class="progress-shell">
+    <div class="progress-track"><div class="progress-fill" id="pfill"></div></div>
+    <div class="progress-label" id="plabel">0 of 12 marked</div>
+  </div>
+
+  <div id="cards"></div>
+
+  <div class="summary" id="summary" style="display:none;">
+    <h3>Your Verdict Distribution</h3>
+    <div class="bar"><span class="lbl">Responsible</span><span class="track"><span class="fill" data-k="responsible" style="background:var(--bad)"></span></span><span class="count" data-c="responsible">0</span></div>
+    <div class="bar"><span class="lbl">Shared</span><span class="track"><span class="fill" data-k="shared" style="background:var(--gold)"></span></span><span class="count" data-c="shared">0</span></div>
+    <div class="bar"><span class="lbl">Not responsible</span><span class="track"><span class="fill" data-k="not" style="background:var(--good)"></span></span><span class="count" data-c="not">0</span></div>
+    <div class="bar"><span class="lbl">Record unclear</span><span class="track"><span class="fill" data-k="unclear" style="background:var(--fog)"></span></span><span class="count" data-c="unclear">0</span></div>
+  </div>
+
+  <div class="final" id="final" style="display:none;">
+    <h2>You have marked all twelve.</h2>
+    <p>The mirror has done its work. It has not told you what to think. It has shown you what you think — and, more importantly, <em>why</em> you think it, and where the record supports you and where it does not.</p>
+    <p>If your verdicts skew toward "responsible," ask yourself what follows from that. Guilt without action is just another form of entertainment. If your verdicts skew toward "shared," ask yourself who the other shareholders are and whether you have named them specifically. If your verdicts skew toward "not responsible," ask yourself whether the record you relied on was complete — and whether you marked the gap honestly.</p>
+    <p>Responsibility is not a single point. It is a chain. Anyone who tells you the chain begins and ends in one place — whether that place is "the people" or "the elites" — is selling you something. The honest answer is usually: the chain is real, every link matters, and the link you can actually move is the one closest to your hands.</p>
+    <p>Now go do something with it.</p>
+    <div class="glory">Soli Deo Gloria.</div>
+    <button class="reset" onclick="if(confirm('Clear all verdicts and start over?')){localStorage.removeItem('mirror_verdicts'); location.reload();}">Reset the mirror</button>
+  </div>
+
+</div>
+
+<footer>THE MIRROR · a companion app · method: name the specific · find the corroboration · mark the gap · refuse to overclaim</footer>
+
+<script>
+const CARDS = [
+  {
+    n:"I",
+    title:"The Voter Elects the Politician",
+    claim:"If the people elect a demagogue, the people are responsible for the demagogue.",
+    for:"In a formal democracy the ballot is the mechanism of authorization. De la Espriella does not govern by accident; he governs because a plurality of voters chose him. Pacheco's point stands: the demagogue is the symptom, the electorate is the cause. You cannot claim sovereignty at the ballot box and then disclaim responsibility for what the ballot produces.",
+    against:"Elections are constrained by the options presented. Voters choose between candidates shaped by party machinery, media gatekeeping, and money they do not control. Duverger's law, ballot-access rules, and campaign finance all narrow the menu before the voter ever arrives. Responsibility for the menu is not the same as responsibility for the meal."
+  },
+  {
+    n:"II",
+    title:"The Consumer Funds the Billionaire",
+    claim:"Gilinski, the Santo Domingos, and the rest are rich only because we buy their products. Consumption is complicity.",
+    for:"Capital accumulation requires revenue, revenue requires customers, and customers are us. The Postobón fortune is built on millions of individual purchases of a product the speaker calls 'una porquería de cerveza.' No consumption, no fortune. The consumer is the base of the pyramid, and the base is where the money enters.",
+    against:"Consumers operate inside systems designed to make alternatives costly or invisible. Monopolies, distribution control, addictive formulation, and marketing infrastructure are not neutral. To say the consumer 'chose' is to ignore the architecture of the choice. The billionaire funds the architecture; the consumer navigates it."
+  },
+  {
+    n:"III",
+    title:"The Media Shapes What We Know",
+    claim:"If the media hides the debate, we are responsible for not knowing what was hidden.",
+    for:"The speaker notes that the economic groups' media did not want to talk about the Cepeda debate. But information has never been more available. A citizen who wants the record can find it. Willful ignorance is a choice, and the chooser is responsible for it.",
+    against:"Attention is scarce and manipulation is sophisticated. Algorithmic curation, ownership concentration, and the sheer volume of noise make 'just go find it' a fantasy for most working people. The media does not merely fail to inform; it actively frames. Responsibility for the frame belongs to the framer."
+  },
+  {
+    n:"IV",
+    title:"The Silent Majority Ratifies the Status Quo",
+    claim:"Abstention and silence are votes for the way things are. Non-participation is participation.",
+    for:"Every non-voter reduces the threshold the demagogue must clear. Every person who shrugs at corruption subsidizes it. The silent majority is not innocent; it is the reservoir from which both the demagogue and the apathy that enables him are drawn.",
+    against:"Abstention is often a rational response to a system that offers no real choice. In a country where both candidates serve the same economic bloc, refusing to choose is a form of dissent, not consent. Blaming the non-voter lets the system off the hook for failing to earn participation."
+  },
+  {
+    n:"V",
+    title:"The Class That Praises Escobar",
+    claim:"A society that admires Pablo Escobar is responsible for producing an Abelardo.",
+    for:"The speaker cites a poll in which Escobar ranked first in admiration. If a society's heroes are narcos, its politics will reflect that. Culture precedes politics. You cannot want democratic institutions while celebrating the men who destroyed them.",
+    against:"Polls on admiration measure name recognition and taboo fascination, not endorsement. Escobar is famous, not beloved. Reading a poll as a cultural verdict is a methodological overreach. The admiration of notoriety is not the same as the endorsement of the notorious."
+  },
+  {
+    n:"VI",
+    title:"The Middle Class That Wants to Be Absolved",
+    claim:"The middle class votes for the demagogue to be told it is not guilty — and that is the middle class's responsibility.",
+    for:"Pacheco's Sartrean reading is sharp: the voter who says 'he represents me' is not deceived, he is identified. The demagogue absolves. The absolution is the product the voter is buying. The transaction is voluntary on both sides.",
+    against:"The desire for absolution is manufactured by decades of elite messaging that told the middle class it was the problem — the 'estúpida y sinvergüenza clase media' the speaker himself invokes. If you tell people they are guilty long enough, they will buy the man who tells them they are not. The manufacturer is responsible too."
+  },
+  {
+    n:"VII",
+    title:"The Chain Has a Single Point",
+    claim:"We are the only truly responsible ones — responsibility terminates at the people.",
+    for:"A chain of responsibility that never terminates anywhere is a chain that never holds anyone accountable. If the people are not ultimately responsible, then no one is, and the powerful are permanently excused. Terminating responsibility at the people is the only way to keep the concept meaningful.",
+    against:"Every link in a chain is responsible for what it transmits. The billionaire who funds the media, the media that frames the debate, the party that narrows the ballot, and the voter who pulls the lever are all links. Singular responsibility is a category error. It is also convenient for everyone except the voter."
+  },
+  {
+    n:"VIII",
+    title:"Billionaires Earn Nothing They Did Not Extract",
+    claim:"The fortune is extracted from Colombian sweat, blood, and tears. It is not 'earned.'",
+    for:"Gilinski gives a large gift to a U.S. university and nothing to the National University of Colombia. The speaker's point is stark: the money came from Colombian consumption and Colombian labor, and it goes abroad. Extraction is the right word. The surplus is social; the disposition is private.",
+    against:"Every commercial fortune is a mix of extraction, coordination, risk-bearing, and provision of something people wanted. Calling it pure extraction is a rhetorical move, not an economic analysis. The normative question — should the wealthy give back more? — is real, but it is not settled by calling the fortune 'unearned.'"
+  },
+  {
+    n:"IX",
+    title:"The Constitution Was a Step, Not a Destination",
+    claim:"The 1991 Constitution was signed by a trio — Álvaro Gómez, Navarro, Serpa — and it was a step. We are responsible for not having taken the next one.",
+    for:"The speaker's own framing: 'eso fue un paso.' A constitution is a framework, not a finished product. If the framework has not produced the democracy it promised, the failure is shared by every generation that declined to push it further. That includes ours.",
+    against:"Constitutions are captured by the same economic blocs that capture everything else. The 1991 text has been amended repeatedly in ways that served capital. Blaming the people for not 'taking the next step' ignores the fact that the step was blocked, not missed."
+  },
+  {
+    n:"X",
+    title:"Culture Is the Only Real Antidote",
+    claim:"You do not defeat what Abelardo represents with votes. You defeat it with culture, memory, and a long pedagogy.",
+    for:"This is the most defensible claim in the whole speech. Elections are episodic; culture is continuous. If a society celebrates indecency as authenticity, no ballot will fix it. The work of memory — the Book of Witness, the archive, the pedagogy — is the only lever long enough to move the root.",
+    against:"Culture is shaped by institutions with money and reach: schools, media, churches, platforms. 'Culture' is not a free-floating substance the people control. A pedagogy without institutional power is a sermon. Noble, and usually ineffective."
+  },
+  {
+    n:"XI",
+    title:"The Demagogue Is Transparent, So the Voter Cannot Claim Deception",
+    claim:"Abelardo does not hide. He is what he is. The voter who chose him was not deceived.",
+    for:"Pacheco's Socratic point is elegant: the man has made his being and his seeming coincide. There is no Machiavellian veil. The voter cannot say 'I was fooled' when the product was labeled in bold letters. That transparency shifts responsibility decisively onto the chooser.",
+    against:"Transparency of character is not transparency of consequence. A voter may see the man clearly and still be deceived about what the man will do to the institutions, the economy, or the peace process. Knowing the salesman is a bigot is not the same as knowing what the bigot will sign."
+  },
+  {
+    n:"XII",
+    title:"The Guilt Is Real, and It Is a Gift",
+    claim:"If we are responsible, then we can act. Responsibility is not a burden; it is the precondition of agency.",
+    for:"This is the existentialist core. To be responsible is to be free. A people that says 'the system did it' has already surrendered. A people that says 'we did it' has retained the only power that matters: the power to do otherwise. Guilt, honestly accepted, becomes capacity.",
+    against:"Guilt without power is just demoralization. Telling a working mother in Soacha that she is 'responsible' for the capture of the state by economic blocs is not empowerment; it is cruelty dressed as philosophy. Responsibility without agency is a trap."
+  }
+];
+
+const KEY = 'mirror_verdicts';
+let verdicts = {};
+try { verdicts = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch(e){ verdicts = {}; }
+
+const cardsEl = document.getElementById('cards');
+
+CARDS.forEach((c, i) => {
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.innerHTML = `
+    <span class="num">Assertion ${c.n}</span>
+    <h2>${c.title}</h2>
+    <p class="claim">"${c.claim}"</p>
+    <div class="case for"><span class="tag">The strongest case for</span><p>${c.for}</p></div>
+    <div class="case against"><span class="tag">The strongest case against</span><p>${c.against}</p></div>
+    <div class="verdict">
+      <div class="ask">Your verdict</div>
+      <div class="btns" data-idx="${i}">
+        <button data-v="responsible">We are responsible</button>
+        <button data-v="shared">Responsibility is shared</button>
+        <button data-v="not">We are not responsible</button>
+        <button data-v="unclear">Record unclear</button>
+      </div>
+      <div class="note"><textarea placeholder="Optional: name the specific. What record, what source, what gap?" data-note="${i}"></textarea></div>
+    </div>
+  `;
+  cardsEl.appendChild(card);
+});
+
+function paint(){
+  document.querySelectorAll('.btns').forEach(group => {
+    const idx = group.dataset.idx;
+    const v = verdicts[idx];
+    group.querySelectorAll('button').forEach(b => {
+      b.classList.toggle('sel', b.dataset.v === v);
+    });
+  });
+  const count = Object.keys(verdicts).length;
+  document.getElementById('plabel').textContent = `${count} of 12 marked`;
+  document.getElementById('pfill').style.width = (count/12*100) + '%';
+  const done = count === 12;
+  document.getElementById('summary').style.display = done ? 'block' : 'none';
+  document.getElementById('final').style.display = done ? 'block' : 'none';
+  if(done) renderSummary();
+}
+
+function renderSummary(){
+  const tally = {responsible:0, shared:0, not:0, unclear:0};
+  Object.values(verdicts).forEach(v => { if(tally[v]!==undefined) tally[v]++; });
+  document.querySelectorAll('.fill[data-k]').forEach(el => {
+    el.style.width = (tally[el.dataset.k]/12*100) + '%';
+  });
+  document.querySelectorAll('.count[data-c]').forEach(el => {
+    el.textContent = tally[el.dataset.c];
+  });
+}
+
+document.addEventListener('click', e => {
+  if(e.target.matches('.btns button')){
+    const group = e.target.closest('.btns');
+    const idx = group.dataset.idx;
+    verdicts[idx] = e.target.dataset.v;
+    localStorage.setItem(KEY, JSON.stringify(verdicts));
+    paint();
+  }
+});
+
+document.querySelectorAll('textarea[data-note]').forEach(ta => {
+  const idx = ta.dataset.note;
+  try { ta.value = (JSON.parse(localStorage.getItem(KEY+'_notes')||'{}'))[idx] || ''; } catch(e){}
+  ta.addEventListener('input', () => {
+    let notes = {};
+    try { notes = JSON.parse(localStorage.getItem(KEY+'_notes')||'{}'); } catch(e){}
+    notes[idx] = ta.value;
+    localStorage.setItem(KEY+'_notes', JSON.stringify(notes));
+  });
+});
+
+paint();
+</script>
+</body>
+</html>
