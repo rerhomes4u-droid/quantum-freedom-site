@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FOOL vs. FOOLISH — The Willingness Test</title>
+<style>
+  :root{
+    --ink:#1a1a1a; --paper:#f4f0e8; --blood:#8b1a1a; --gold:#b8860b;
+    --fog:#6b6b6b; --line:#d4cbb8; --good:#2d5a3d; --bad:#7a2e2e;
+    --blue:#2a4d6e;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:var(--paper); color:var(--ink);
+    font-family:Georgia,'Times New Roman',serif; line-height:1.65;
+    padding:0 0 4rem;
+  }
+  header{
+    background:var(--ink); color:var(--paper); padding:3rem 1.5rem 2.5rem;
+    text-align:center; border-bottom:6px solid var(--gold);
+  }
+  header h1{font-size:clamp(1.8rem,5vw,3rem); letter-spacing:.05em; font-weight:400;}
+  header h1 .f{color:#c9c2b2;}
+  header h1 .i{color:var(--gold);}
+  header .sub{color:#c9c2b2; font-style:italic; margin-top:.75rem; font-size:clamp(.95rem,2.5vw,1.1rem);}
+  header .attr{color:var(--fog); font-size:.8rem; margin-top:1.25rem; letter-spacing:.08em; text-transform:uppercase;}
+  .wrap{max-width:820px; margin:0 auto; padding:0 1.25rem;}
+  .intro{margin:2.5rem auto;}
+  .intro p{margin-bottom:1rem; font-size:1.05rem;}
+  .intro .drop::first-letter{
+    float:left; font-size:3.4rem; line-height:.8; padding-right:.5rem; color:var(--gold); font-weight:700;
+  }
+  .defs{
+    display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin:2rem 0;
+  }
+  @media(max-width:600px){.defs{grid-template-columns:1fr;}}
+  .def{
+    background:#fffdf8; border:1px solid var(--line); padding:1.25rem;
+    border-top:4px solid var(--blue);
+  }
+  .def.foo{border-top-color:var(--bad);}
+  .def h3{font-size:.85rem; letter-spacing:.15em; text-transform:uppercase; color:var(--fog); margin-bottom:.5rem;}
+  .def .word{font-size:1.4rem; font-weight:700; margin-bottom:.5rem; letter-spacing:.03em;}
+  .def.fl .word{color:var(--blue);}
+  .def.foo .word{color:var(--bad);}
+  .def p{font-size:.92rem; color:#2c2c2c;}
+  .progress-shell{
+    position:sticky; top:0; z-index:20; background:var(--paper);
+    padding:.85rem 0 .6rem; border-bottom:1px solid var(--line); margin-top:1rem;
+  }
+  .progress-track{height:6px; background:var(--line); border-radius:3px; overflow:hidden;}
+  .progress-fill{height:100%; width:0%; background:linear-gradient(90deg,var(--blue),var(--gold),var(--bad)); transition:width .35s ease;}
+  .progress-label{font-size:.8rem; color:var(--fog); margin-top:.4rem; letter-spacing:.08em; text-transform:uppercase;}
+  .card{
+    background:#fffdf8; border:1px solid var(--line); border-left:6px solid var(--gold);
+    margin:1.75rem 0; padding:1.5rem 1.5rem 1.25rem; box-shadow:0 2px 0 rgba(0,0,0,.04);
+  }
+  .card h2{font-size:1.15rem; font-weight:700; margin-bottom:.35rem;}
+  .card .num{color:var(--gold); font-size:.78rem; letter-spacing:.18em; text-transform:uppercase; display:block; margin-bottom:.4rem;}
+  .card .prompt{font-style:italic; color:#2c2c2c; margin:.6rem 0 1.1rem; font-size:1rem; border-left:3px solid var(--line); padding-left:.9rem;}
+  .btns{display:flex; gap:.5rem; flex-wrap:wrap;}
+  .btns button{
+    font-family:inherit; font-size:.86rem; padding:.55rem 1rem; cursor:pointer;
+    border:1px solid var(--line); background:#faf7ef; color:var(--ink);
+    transition:all .15s ease; border-radius:2px; flex:1; min-width:120px;
+  }
+  .btns button:hover{border-color:var(--gold);}
+  .btns button.sel[data-v="fool"]{background:var(--blue); color:#fff; border-color:var(--blue);}
+  .btns button.sel[data-v="foolish"]{background:var(--bad); color:#fff; border-color:var(--bad);}
+  .btns button.sel[data-v="neither"]{background:var(--good); color:#fff; border-color:var(--good);}
+  .note{margin-top:.9rem;}
+  .note textarea{
+    width:100%; min-height:52px; resize:vertical; font-family:inherit; font-size:.88rem;
+    padding:.5rem; border:1px solid var(--line); background:#faf7ef; color:var(--ink); border-radius:2px;
+  }
+  .final{
+    margin:3rem 0 1rem; padding:2rem 1.5rem; background:var(--ink); color:var(--paper);
+    border-left:6px solid var(--gold);
+  }
+  .final h2{color:var(--gold); font-size:1.35rem; margin-bottom:1rem; font-weight:400; letter-spacing:.03em;}
+  .final p{margin-bottom:.9rem; font-size:.98rem; color:#dcd6c8;}
+  .final .question{
+    background:rgba(184,134,11,.12); border-left:3px solid var(--gold);
+    padding:1rem 1.15rem; margin:1.25rem 0; font-style:italic; color:#f0e6d2;
+  }
+  .final .glory{color:var(--gold); font-style:italic; margin-top:1.5rem; text-align:center; letter-spacing:.05em;}
+  .summary{margin:1.5rem 0;}
+  .summary h3{font-size:.95rem; letter-spacing:.12em; text-transform:uppercase; color:var(--fog); margin-bottom:.85rem;}
+  .bar{display:flex; align-items:center; gap:.6rem; margin-bottom:.5rem; font-size:.86rem;}
+  .bar .lbl{width:150px; text-transform:uppercase; letter-spacing:.05em; font-size:.78rem;}
+  .bar .track{flex:1; height:14px; background:var(--line); border-radius:2px; overflow:hidden;}
+  .bar .fill{height:100%; width:0%; transition:width .4s ease;}
+  .bar .count{width:44px; text-align:right; color:var(--fog);}
+  .insight{
+    background:#fffdf8; border:1px solid var(--line); border-left:6px solid var(--gold);
+    padding:1.25rem; margin:1.5rem 0; font-size:.95rem;
+  }
+  .insight strong{color:var(--blood);}
+  footer{text-align:center; color:var(--fog); font-size:.78rem; margin-top:3rem; letter-spacing:.08em;}
+  .reset{
+    display:block; margin:1.5rem auto 0; background:none; border:1px solid var(--line);
+    color:var(--fog); font-family:inherit; font-size:.8rem; padding:.5rem 1rem; cursor:pointer;
+    letter-spacing:.1em; text-transform:uppercase;
+  }
+  .reset:hover{border-color:var(--blood); color:var(--blood);}
+  @media print{
+    .progress-shell,.btns,.note,.reset{display:none;}
+    body{background:#fff;}
+    .card{break-inside:avoid;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1><span class="f">FOOL</span> <span style="color:#c9c2b2">vs.</span> <span class="i">FOOLISH</span></h1>
+  <div class="sub">The Willingness Test</div>
+  <div class="attr">for Ramiro · from his father · via Santiago Ávila</div>
+</header>
+
+<div class="wrap">
+
+  <div class="intro">
+    <p class="drop">My father sent me a message one day about the difference between a fool and a foolish man. I read it three times and then I sat with it. The distinction is not a joke. It is a scalpel.</p>
+
+    <div class="defs">
+      <div class="def fl">
+        <h3>The one who does not know</h3>
+        <div class="word">FOOL</div>
+        <p>Wrong because he does not know. We are all fools about something. Recoverable: he thanks you for helping, he changes when he learns. Being a fool is <em>temporary</em>.</p>
+      </div>
+      <div class="def foo">
+        <h3>The one who will not know</h3>
+        <div class="word">FOOLISH</div>
+        <p>He knows. He has the data. He sees the evidence. And he denies it. He is offended if corrected, he affirms his error harder when everything goes wrong. Being foolish is <em>optional</em>.</p>
+      </div>
+    </div>
+
+    <p>This app does not tell you that you are a fool. It does not tell you that you are foolish. It shows you the structure of the difference — twelve markers that separate the two categories — and it asks you, honestly, to mark where you have been in the conversations that matter most. Not as an insult. As a diagnostic. Because the only way to stay out of the second category is to keep checking whether you have slipped into it.</p>
+
+    <p>There is no "skip." There is no "neutral." There is only <em>fool</em>, <em>foolish</em>, or <em>neither</em>. Answer honestly. The mirror does not lie, but it only shows what you bring to it.</p>
+  </div>
+
+  <div class="progress-shell">
+    <div class="progress-track"><div class="progress-fill" id="pfill"></div></div>
+    <div class="progress-label" id="plabel">0 of 12 marked</div>
+  </div>
+
+  <div id="cards"></div>
+
+  <div class="summary" id="summary" style="display:none;">
+    <h3>Your Distribution</h3>
+    <div class="bar"><span class="lbl">Fool</span><span class="track"><span class="fill" data-k="fool" style="background:var(--blue)"></span></span><span class="count" data-c="fool">0</span></div>
+    <div class="bar"><span class="lbl">Foolish</span><span class="track"><span class="fill" data-k="foolish" style="background:var(--bad)"></span></span><span class="count" data-c="foolish">0</span></div>
+    <div class="bar"><span class="lbl">Neither</span><span class="track"><span class="fill" data-k="neither" style="background:var(--good)"></span></span><span class="count" data-c="neither">0</span></div>
+  </div>
+
+  <div id="insight" class="insight" style="display:none;"></div>
+
+  <div class="final" id="final" style="display:none;">
+    <h2>You have marked all twelve.</h2>
+    <p>The mirror has done its work. It has not told you what to think. It has shown you where you have been — and, more importantly, where you can be tomorrow if you do not check yourself.</p>
+    <p>Being a fool is temporary. We are all fools about something. The question is not whether you were wrong; the question is what you do when you are shown that you were wrong.</p>
+    <div class="question">Am I willing to learn, or am I clinging to my error?</div>
+    <p>Because being a fool is temporary. Being foolish is optional.</p>
+    <div class="glory">Soli Deo Gloria.</div>
+    <button class="reset" onclick="if(confirm('Clear all marks and start over?')){localStorage.removeItem('ff_marks'); location.reload();}">Reset the mirror</button>
+  </div>
+
+</div>
+
+<footer>FOOL vs. FOOLISH · a companion app · the difference is simple: the fool can learn, the foolish man does not want to</footer>
+
+<script>
+const CARDS = [
+  {
+    n:"I",
+    title:"The response to correction",
+    prompt:"Someone shows you that you were wrong about something you said. What do you do first?",
+    fool:"I listen. I ask where the correction is coming from. If it is right, I admit it and change.",
+    foolish:"I am offended. I feel attacked. I look for a way to defend what I said, not a way to find out whether it was true.",
+    neither:"Not applicable: no one has corrected me on this yet."
+  },
+  {
+    n:"II",
+    title:"The contradicting evidence",
+    prompt:"A datum, a document, a study appears that contradicts what you believed.",
+    fool:"I read it. I review it. If it is solid, I adjust what I believed.",
+    foolish:"I dismiss it out of hand. I look for the defect in the source, not in my belief. If I find no defect, I ignore it.",
+    neither:"This has not happened to me on a matter that matters."
+  },
+  {
+    n:"III",
+    title:"The gratitude",
+    prompt:"When someone teaches you something you did not know, what do you feel?",
+    fool:"Gratitude. They saved me time and error.",
+    foolish:"Irritation. I feel they treated me like an ignoramus. I want to strike back.",
+    neither:"It depends too much on context to answer."
+  },
+  {
+    n:"IV",
+    title:"The identity",
+    prompt:"How tightly is your opinion bound to who you are?",
+    fool:"My opinion is a hypothesis. If it changes, I do not change.",
+    foolish:"My opinion is me. Changing it would be betraying myself. That is why I do not change it.",
+    neither:"I do not have a sufficiently formed opinion on this."
+  },
+  {
+    n:"V",
+    title:"The cost of being right",
+    prompt:"You prefer being right or knowing the truth, when the two do not coincide.",
+    fool:"Knowing the truth. Even if it hurts. Even if I have to admit I was wrong.",
+    foolish:"Being right. The truth can wait. My consistency cannot.",
+    neither:"I have not been in that disjunction consciously."
+  },
+  {
+    n:"VI",
+    title:"The conversation with the one who thinks differently",
+    prompt:"Someone who thinks differently from you explains their position calmly.",
+    fool:"I listen to the end. I ask questions. I can disagree and still learn something.",
+    foolish:"I wait impatiently for my turn to refute. I do not listen: I prepare the counterattack.",
+    neither:"I do not usually have those conversations."
+  },
+  {
+    n:"VII",
+    title:"Your own error",
+    prompt:"When you discover that you were wrong about something important.",
+    fool:"I admit it, first to myself and then to others. I learn.",
+    foolish:"I hide it. I rephrase it. I say that 'I always meant something else.'",
+    neither:"It has been so long since this happened that I cannot answer honestly."
+  },
+  {
+    n:"VIII",
+    title:"The group",
+    prompt:"Your group — your family, your party, your guild — asserts something the evidence contradicts.",
+    fool:"I say so, with respect. Even if it is uncomfortable. Loyalty to the group does not sit above the truth.",
+    foolish:"I defend it. The group is right because it is my group. The evidence is interpreted from the inside.",
+    neither:"I am not sure I have been in that situation."
+  },
+  {
+    n:"IX",
+    title:"The result that does not arrive",
+    prompt:"You have spent years defending an idea and the results are not arriving.",
+    fool:"I review the idea. Perhaps it was wrong. Perhaps context was missing. I adjust.",
+    foolish:"I double down. If it is not working, it is because it has not been applied well, or because there are enemies, or because more faith is needed.",
+    neither:"I have not held an idea long enough to know."
+  },
+  {
+    n:"X",
+    title:"The art of conviction",
+    prompt:"When someone describes the way you defend your ideas, what would you like them to say?",
+    fool:"'He is someone who listens and changes when there is reason.'",
+    foolish:"'He is someone who does not bend. Firm to the end.'",
+    neither:"I do not care how I am described."
+  },
+  {
+    n:"XI",
+    title:"The silence before the one who knows more",
+    prompt:"You are in a conversation with someone who knows more than you about the subject.",
+    fool:"I fall silent and listen. I ask questions. I take mental notes.",
+    foolish:"I talk anyway. I cannot leave the space empty. Silence feels like defeat.",
+    neither:"I have rarely been in that situation."
+  },
+  {
+    n:"XII",
+    title:"The review",
+    prompt:"When was the last time you changed your mind about something important?",
+    fool:"I can name it. I remember the date, the topic, and what made me change.",
+    foolish:"I do not remember. And if I think about it, I feel that changing my mind would be a defeat.",
+    neither:"I do not keep track of those things."
+  }
+];
+
+const KEY = 'ff_marks';
+let marks = {};
+try { marks = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch(e){ marks = {}; }
+
+const cardsEl = document.getElementById('cards');
+
+CARDS.forEach((c, i) => {
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.innerHTML = `
+    <span class="num">Marker ${c.n}</span>
+    <h2>${c.title}</h2>
+    <p class="prompt">${c.prompt}</p>
+    <div class="btns" data-idx="${i}">
+      <button data-v="fool">Fool</button>
+      <button data-v="foolish">Foolish</button>
+      <button data-v="neither">Neither</button>
+    </div>
+    <div class="note"><textarea placeholder="Optional: name the specific. What topic, what conversation, what evidence?" data-note="${i}"></textarea></div>
+  `;
+  cardsEl.appendChild(card);
+});
+
+function paint(){
+  document.querySelectorAll('.btns').forEach(group => {
+    const idx = group.dataset.idx;
+    const v = marks[idx];
+    group.querySelectorAll('button').forEach(b => {
+      b.classList.toggle('sel', b.dataset.v === v);
+    });
+  });
+  const count = Object.keys(marks).length;
+  document.getElementById('plabel').textContent = `${count} of 12 marked`;
+  document.getElementById('pfill').style.width = (count/12*100) + '%';
+  const done = count === 12;
+  document.getElementById('summary').style.display = done ? 'block' : 'none';
+  document.getElementById('final').style.display = done ? 'block' : 'none';
+  if(done){ renderSummary(); renderInsight(); }
+}
+
+function tally(){
+  const t = {fool:0, foolish:0, neither:0};
+  Object.values(marks).forEach(v => { if(t[v]!==undefined) t[v]++; });
+  return t;
+}
+
+function renderSummary(){
+  const t = tally();
+  document.querySelectorAll('.fill[data-k]').forEach(el => {
+    el.style.width = (t[el.dataset.k]/12*100) + '%';
+  });
+  document.querySelectorAll('.count[data-c]').forEach(el => {
+    el.textContent = t[el.dataset.c];
+  });
+}
+
+function renderInsight(){
+  const t = tally();
+  const box = document.getElementById('insight');
+  let msg = '';
+  if(t.foolish >= 6){
+    msg = "<strong>The mirror is uncomfortable.</strong> You have marked the foolish column in half or more of the twelve markers. That does not condemn you. Being foolish is optional, and the option is exercised every day. The question is not whether you were foolish; the question is whether you will stop being so. Start with the marker that stung the most to admit.";
+  } else if(t.foolish >= 3){
+    msg = "<strong>There is a gray zone.</strong> You recognize markers of the foolish man, but they do not dominate. That is the most human zone: the one who knows and sometimes does not want to know. The discipline is to review those markers one by one and see which one you can release first.";
+  } else if(t.fool >= 8){
+    msg = "<strong>The mirror shows you a fool, and that is a blessing.</strong> Being a fool is temporary. It means that most of your errors are of information, not of will. The door is open. You only have to keep walking through it.";
+  } else if(t.fool + t.foolish >= 10){
+    msg = "<strong>Almost everything you marked is fool or foolish.</strong> That is honesty. Most people live in those two columns without knowing it. You already know where you are. The next step is to move toward the fool column — and from there, toward the willingness to learn.";
+  } else {
+    msg = "<strong>You marked 'neither' many times.</strong> That can mean two things: that you have not been in those situations, or that you have not looked with enough honesty. The second is more common than the first. Go back and read the markers where you put 'neither' and ask yourself whether they really do not apply.";
+  }
+  box.innerHTML = msg;
+  box.style.display = 'block';
+}
+
+document.addEventListener('click', e => {
+  if(e.target.matches('.btns button')){
+    const group = e.target.closest('.btns');
+    const idx = group.dataset.idx;
+    marks[idx] = e.target.dataset.v;
+    localStorage.setItem(KEY, JSON.stringify(marks));
+    paint();
+  }
+});
+
+document.querySelectorAll('textarea[data-note]').forEach(ta => {
+  const idx = ta.dataset.note;
+  try { ta.value = (JSON.parse(localStorage.getItem(KEY+'_notes')||'{}'))[idx] || ''; } catch(e){}
+  ta.addEventListener('input', () => {
+    let notes = {};
+    try { notes = JSON.parse(localStorage.getItem(KEY+'_notes')||'{}'); } catch(e){}
+    notes[idx] = ta.value;
+    localStorage.setItem(KEY+'_notes', JSON.stringify(notes));
+  });
+});
+
+paint();
+</script>
+</body>
+</html>
