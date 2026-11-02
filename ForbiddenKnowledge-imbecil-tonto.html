@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TONTO vs. IMBÉCIL — El Test de la Disposición</title>
+<style>
+  :root{
+    --ink:#1a1a1a; --paper:#f4f0e8; --blood:#8b1a1a; --gold:#b8860b;
+    --fog:#6b6b6b; --line:#d4cbb8; --good:#2d5a3d; --bad:#7a2e2e;
+    --blue:#2a4d6e;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:var(--paper); color:var(--ink);
+    font-family:Georgia,'Times New Roman',serif; line-height:1.65;
+    padding:0 0 4rem;
+  }
+  header{
+    background:var(--ink); color:var(--paper); padding:3rem 1.5rem 2.5rem;
+    text-align:center; border-bottom:6px solid var(--gold);
+  }
+  header h1{font-size:clamp(1.8rem,5vw,3rem); letter-spacing:.05em; font-weight:400;}
+  header h1 .t{color:#c9c2b2;}
+  header h1 .i{color:var(--gold);}
+  header .sub{color:#c9c2b2; font-style:italic; margin-top:.75rem; font-size:clamp(.95rem,2.5vw,1.1rem);}
+  header .attr{color:var(--fog); font-size:.8rem; margin-top:1.25rem; letter-spacing:.08em; text-transform:uppercase;}
+  .wrap{max-width:820px; margin:0 auto; padding:0 1.25rem;}
+  .intro{margin:2.5rem auto;}
+  .intro p{margin-bottom:1rem; font-size:1.05rem;}
+  .intro .drop::first-letter{
+    float:left; font-size:3.4rem; line-height:.8; padding-right:.5rem; color:var(--gold); font-weight:700;
+  }
+  .defs{
+    display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin:2rem 0;
+  }
+  @media(max-width:600px){.defs{grid-template-columns:1fr;}}
+  .def{
+    background:#fffdf8; border:1px solid var(--line); padding:1.25rem;
+    border-top:4px solid var(--blue);
+  }
+  .def.imb{border-top-color:var(--bad);}
+  .def h3{font-size:.85rem; letter-spacing:.15em; text-transform:uppercase; color:var(--fog); margin-bottom:.5rem;}
+  .def .word{font-size:1.4rem; font-weight:700; margin-bottom:.5rem; letter-spacing:.03em;}
+  .def.ton .word{color:var(--blue);}
+  .def.imb .word{color:var(--bad);}
+  .def p{font-size:.92rem; color:#2c2c2c;}
+  .progress-shell{
+    position:sticky; top:0; z-index:20; background:var(--paper);
+    padding:.85rem 0 .6rem; border-bottom:1px solid var(--line); margin-top:1rem;
+  }
+  .progress-track{height:6px; background:var(--line); border-radius:3px; overflow:hidden;}
+  .progress-fill{height:100%; width:0%; background:linear-gradient(90deg,var(--blue),var(--gold),var(--bad)); transition:width .35s ease;}
+  .progress-label{font-size:.8rem; color:var(--fog); margin-top:.4rem; letter-spacing:.08em; text-transform:uppercase;}
+  .card{
+    background:#fffdf8; border:1px solid var(--line); border-left:6px solid var(--gold);
+    margin:1.75rem 0; padding:1.5rem 1.5rem 1.25rem; box-shadow:0 2px 0 rgba(0,0,0,.04);
+  }
+  .card h2{font-size:1.15rem; font-weight:700; margin-bottom:.35rem;}
+  .card .num{color:var(--gold); font-size:.78rem; letter-spacing:.18em; text-transform:uppercase; display:block; margin-bottom:.4rem;}
+  .card .prompt{font-style:italic; color:#2c2c2c; margin:.6rem 0 1.1rem; font-size:1rem; border-left:3px solid var(--line); padding-left:.9rem;}
+  .btns{display:flex; gap:.5rem; flex-wrap:wrap;}
+  .btns button{
+    font-family:inherit; font-size:.86rem; padding:.55rem 1rem; cursor:pointer;
+    border:1px solid var(--line); background:#faf7ef; color:var(--ink);
+    transition:all .15s ease; border-radius:2px; flex:1; min-width:120px;
+  }
+  .btns button:hover{border-color:var(--gold);}
+  .btns button.sel[data-v="tonto"]{background:var(--blue); color:#fff; border-color:var(--blue);}
+  .btns button.sel[data-v="imbecil"]{background:var(--bad); color:#fff; border-color:var(--bad);}
+  .btns button.sel[data-v="ninguno"]{background:var(--good); color:#fff; border-color:var(--good);}
+  .note{margin-top:.9rem;}
+  .note textarea{
+    width:100%; min-height:52px; resize:vertical; font-family:inherit; font-size:.88rem;
+    padding:.5rem; border:1px solid var(--line); background:#faf7ef; color:var(--ink); border-radius:2px;
+  }
+  .final{
+    margin:3rem 0 1rem; padding:2rem 1.5rem; background:var(--ink); color:var(--paper);
+    border-left:6px solid var(--gold);
+  }
+  .final h2{color:var(--gold); font-size:1.35rem; margin-bottom:1rem; font-weight:400; letter-spacing:.03em;}
+  .final p{margin-bottom:.9rem; font-size:.98rem; color:#dcd6c8;}
+  .final .question{
+    background:rgba(184,134,11,.12); border-left:3px solid var(--gold);
+    padding:1rem 1.15rem; margin:1.25rem 0; font-style:italic; color:#f0e6d2;
+  }
+  .final .glory{color:var(--gold); font-style:italic; margin-top:1.5rem; text-align:center; letter-spacing:.05em;}
+  .summary{margin:1.5rem 0;}
+  .summary h3{font-size:.95rem; letter-spacing:.12em; text-transform:uppercase; color:var(--fog); margin-bottom:.85rem;}
+  .bar{display:flex; align-items:center; gap:.6rem; margin-bottom:.5rem; font-size:.86rem;}
+  .bar .lbl{width:150px; text-transform:uppercase; letter-spacing:.05em; font-size:.78rem;}
+  .bar .track{flex:1; height:14px; background:var(--line); border-radius:2px; overflow:hidden;}
+  .bar .fill{height:100%; width:0%; transition:width .4s ease;}
+  .bar .count{width:44px; text-align:right; color:var(--fog);}
+  .insight{
+    background:#fffdf8; border:1px solid var(--line); border-left:6px solid var(--gold);
+    padding:1.25rem; margin:1.5rem 0; font-size:.95rem;
+  }
+  .insight strong{color:var(--blood);}
+  footer{text-align:center; color:var(--fog); font-size:.78rem; margin-top:3rem; letter-spacing:.08em;}
+  .reset{
+    display:block; margin:1.5rem auto 0; background:none; border:1px solid var(--line);
+    color:var(--fog); font-family:inherit; font-size:.8rem; padding:.5rem 1rem; cursor:pointer;
+    letter-spacing:.1em; text-transform:uppercase;
+  }
+  .reset:hover{border-color:var(--blood); color:var(--blood);}
+  @media print{
+    .progress-shell,.btns,.note,.reset{display:none;}
+    body{background:#fff;}
+    .card{break-inside:avoid;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1><span class="t">TONTO</span> <span style="color:#c9c2b2">vs.</span> <span class="i">IMBÉCIL</span></h1>
+  <div class="sub">El Test de la Disposición</div>
+  <div class="attr">para Ramiro · de su padre · vía Santiago Ávila</div>
+</header>
+
+<div class="wrap">
+
+  <div class="intro">
+    <p class="drop">Mi padre me mandó un mensaje un día sobre la diferencia entre un tonto y un imbécil. Lo leí tres veces y luego me senté con él. La distinción no es un chiste. Es un bisturí.</p>
+
+    <div class="defs">
+      <div class="def ton">
+        <h3>El que no sabe</h3>
+        <div class="word">TONTO</div>
+        <p>Se equivoca porque no sabe. Todos lo somos en algo. Es recuperable: agradece que le ayuden, cambia cuando aprende. Ser tonto es <em>temporal</em>.</p>
+      </div>
+      <div class="def imb">
+        <h3>El que no quiere saber</h3>
+        <div class="word">IMBÉCIL</div>
+        <p>Sabe. Tiene los datos. Ve la evidencia. Y la niega. Se ofende si le corrigen, afirma su error más fuerte cuando todo va mal. Ser imbécil es <em>opcional</em>.</p>
+      </div>
+    </div>
+
+    <p>Esta app no te dice que eres un tonto. Tampoco te dice que eres un imbécil. Te muestra la estructura de la diferencia — doce marcas que separan las dos categorías — y te pide que, honestamente, marques dónde has estado tú en las conversaciones que más importan. No como insulto. Como diagnóstico. Porque la única forma de no caer en la segunda categoría es revisar constantemente si ya caíste.</p>
+
+    <p>No hay "saltar." No hay "neutral." Solo hay <em>tonto</em>, <em>imbécil</em>, o <em>ninguno de los dos</em>. Responde con honestidad. El espejo no miente, pero solo muestra lo que traes.</p>
+  </div>
+
+  <div class="progress-shell">
+    <div class="progress-track"><div class="progress-fill" id="pfill"></div></div>
+    <div class="progress-label" id="plabel">0 de 12 marcadas</div>
+  </div>
+
+  <div id="cards"></div>
+
+  <div class="summary" id="summary" style="display:none;">
+    <h3>Tu Distribución</h3>
+    <div class="bar"><span class="lbl">Tonto</span><span class="track"><span class="fill" data-k="tonto" style="background:var(--blue)"></span></span><span class="count" data-c="tonto">0</span></div>
+    <div class="bar"><span class="lbl">Imbécil</span><span class="track"><span class="fill" data-k="imbecil" style="background:var(--bad)"></span></span><span class="count" data-c="imbecil">0</span></div>
+    <div class="bar"><span class="lbl">Ninguno</span><span class="track"><span class="fill" data-k="ninguno" style="background:var(--good)"></span></span><span class="count" data-c="ninguno">0</span></div>
+  </div>
+
+  <div id="insight" class="insight" style="display:none;"></div>
+
+  <div class="final" id="final" style="display:none;">
+    <h2>Has marcado las doce.</h2>
+    <p>El espejo ha hecho su trabajo. No te ha dicho qué pensar. Te ha mostrado dónde has estado — y, más importante, dónde puedes estar mañana si no revisas.</p>
+    <p>Ser tonto es temporal. Todos lo somos en algo. La pregunta no es si te equivocaste; la pregunta es qué haces cuando te muestran que te equivocaste.</p>
+    <div class="question">¿Estoy dispuesto a aprender, o me estoy aferrando a mi error?</div>
+    <p>Porque ser tonto es temporal. Ser imbécil es opcional.</p>
+    <div class="glory">Soli Deo Gloria.</div>
+    <button class="reset" onclick="if(confirm('¿Borrar todas las marcas y empezar de nuevo?')){localStorage.removeItem('tvi_marks'); location.reload();}">Reiniciar el espejo</button>
+  </div>
+
+</div>
+
+<footer>TONTO vs. IMBÉCIL · una app de acompañamiento · la diferencia es simple: el tonto puede aprender, el imbécil no quiere</footer>
+
+<script>
+const CARDS = [
+  {
+    n:"I",
+    title:"La respuesta a la corrección",
+    prompt:"Alguien te muestra que estabas equivocado en algo que dijiste. ¿Qué haces primero?",
+    tonto:"Escucho. Pregunto de dónde viene la corrección. Si tiene razón, lo admito y cambio.",
+    imbecil:"Me ofendo. Siento que me atacan. Busco la manera de defender lo que dije, no de saber si era verdad.",
+    ninguno:"No aplica: nadie me ha corregido en esto todavía."
+  },
+  {
+    n:"II",
+    title:"La evidencia que contradice",
+    prompt:"Aparece un dato, un documento, un estudio que contradice lo que creías.",
+    tonto:"Lo leo. Lo reviso. Si es sólido, ajusto lo que creía.",
+    imbecil:"Lo descarto de entrada. Busco el defecto en la fuente, no en mi creencia. Si no encuentro defecto, lo ignoro.",
+    ninguno:"No me ha pasado con un tema que me importe."
+  },
+  {
+    n:"III",
+    title:"El agradecimiento",
+    prompt:"Cuando alguien te enseña algo que no sabías, ¿qué sientes?",
+    tonto:"Gratitud. Me ahorró tiempo y error.",
+    imbecil:"Molestia. Siento que me trataron como ignorante. Quiero devolver el golpe.",
+    ninguno:"Depende demasiado del contexto para responder."
+  },
+  {
+    n:"IV",
+    title:"La identidad",
+    prompt:"¿Qué tan pegada está tu opinión a quién eres?",
+    tonto:"Mi opinión es una hipótesis. Si cambia, yo no cambio.",
+    imbecil:"Mi opinión soy yo. Cambiarla sería traicionarme. Por eso no la cambio.",
+    ninguno:"No tengo una opinión lo bastante formada en esto."
+  },
+  {
+    n:"V",
+    title:"El costo de tener razón",
+    prompt:"Prefieres tener razón o saber la verdad, cuando las dos no coinciden.",
+    tonto:"Saber la verdad. Aunque duela. Aunque tenga que admitir que estaba mal.",
+    imbecil:"Tener razón. La verdad puede esperar. Mi coherencia no.",
+    ninguno:"No he estado en esa disyuntiva de forma consciente."
+  },
+  {
+    n:"VI",
+    title:"La conversación con el que piensa distinto",
+    prompt:"Alguien que piensa distinto a ti te explica su posición con calma.",
+    tonto:"Escucho hasta el final. Pregunto. Puedo no estar de acuerdo y aun así aprender algo.",
+    imbecil:"Espero impaciente mi turno para refutar. No escucho: preparo el contraataque.",
+    ninguno:"No suelo tener esas conversaciones."
+  },
+  {
+    n:"VII",
+    title:"El error propio",
+    prompt:"Cuando descubres que estabas equivocado en algo importante.",
+    tonto:"Lo admito, primero ante mí y luego ante los demás. Aprendo.",
+    imbecil:"Lo escondo. Lo reformulo. Digo que 'siempre quise decir otra cosa.'",
+    ninguno:"Hace tanto que no me pasa que no puedo responder con honestidad."
+  },
+  {
+    n:"VIII",
+    title:"El grupo",
+    prompt:"Tu grupo — tu familia, tu partido, tu gremio — afirma algo que la evidencia contradice.",
+    tonto:"Lo digo, con respeto. Aunque incomode. La lealtad al grupo no está por encima de la verdad.",
+    imbecil:"Lo defiendo. El grupo tiene razón porque es mi grupo. La evidencia se interpreta desde adentro.",
+    ninguno:"No estoy seguro de haber estado en esa situación."
+  },
+  {
+    n:"IX",
+    title:"El resultado que no llega",
+    prompt:"Llevas años defendiendo una idea y los resultados no llegan.",
+    tonto:"Reviso la idea. Quizás estaba mal. Quizás faltó contexto. Ajusto.",
+    imbecil:"Redoblo. Si no funciona es porque no se ha aplicado bien, o porque hay enemigos, o porque falta más fe.",
+    ninguno:"No he sostenido una idea el tiempo suficiente para saberlo."
+  },
+  {
+    n:"X",
+    title:"El arte de la convicción",
+    prompt:"Cuando alguien describe tu manera de defender tus ideas, ¿qué te gustaría que dijera?",
+    tonto:"'Es alguien que escucha y cambia cuando hay razón.'",
+    imbecil:"'Es alguien que no se dobla. Firme hasta el final.'",
+    ninguno:"No me importa cómo me describan."
+  },
+  {
+    n:"XI",
+    title:"El silencio ante el que sabe más",
+    prompt:"Estás en una conversación con alguien que sabe más que tú del tema.",
+    tonto:"Callo y escucho. Pregunto. Tomo notas mentales.",
+    imbecil:"Hablo igual. No puedo dejar el espacio vacío. El silencio se siente como derrota.",
+    ninguno:"Rara vez me he visto en esa situación."
+  },
+  {
+    n:"XII",
+    title:"La revisión",
+    prompt:"¿Cuándo fue la última vez que cambiaste de opinión sobre algo importante?",
+    tonto:"Puedo nombrarlo. Recuerdo la fecha, el tema, y qué me hizo cambiar.",
+    imbecil:"No recuerdo. Y si lo pienso, siento que cambiar de opinión sería una derrota.",
+    ninguno:"No llevo registro de esas cosas."
+  }
+];
+
+const KEY = 'tvi_marks';
+let marks = {};
+try { marks = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch(e){ marks = {}; }
+
+const cardsEl = document.getElementById('cards');
+
+CARDS.forEach((c, i) => {
+  const card = document.createElement('div');
+  card.className = 'card';
+  card.innerHTML = `
+    <span class="num">Marca ${c.n}</span>
+    <h2>${c.title}</h2>
+    <p class="prompt">${c.prompt}</p>
+    <div class="btns" data-idx="${i}">
+      <button data-v="tonto">Tonto</button>
+      <button data-v="imbecil">Imbécil</button>
+      <button data-v="ninguno">Ninguno</button>
+    </div>
+    <div class="note"><textarea placeholder="Opcional: nombra lo específico. ¿Qué tema, qué conversación, qué evidencia?" data-note="${i}"></textarea></div>
+  `;
+  cardsEl.appendChild(card);
+});
+
+function paint(){
+  document.querySelectorAll('.btns').forEach(group => {
+    const idx = group.dataset.idx;
+    const v = marks[idx];
+    group.querySelectorAll('button').forEach(b => {
+      b.classList.toggle('sel', b.dataset.v === v);
+    });
+  });
+  const count = Object.keys(marks).length;
+  document.getElementById('plabel').textContent = `${count} de 12 marcadas`;
+  document.getElementById('pfill').style.width = (count/12*100) + '%';
+  const done = count === 12;
+  document.getElementById('summary').style.display = done ? 'block' : 'none';
+  document.getElementById('final').style.display = done ? 'block' : 'none';
+  if(done){ renderSummary(); renderInsight(); }
+}
+
+function tally(){
+  const t = {tonto:0, imbecil:0, ninguno:0};
+  Object.values(marks).forEach(v => { if(t[v]!==undefined) t[v]++; });
+  return t;
+}
+
+function renderSummary(){
+  const t = tally();
+  document.querySelectorAll('.fill[data-k]').forEach(el => {
+    el.style.width = (t[el.dataset.k]/12*100) + '%';
+  });
+  document.querySelectorAll('.count[data-c]').forEach(el => {
+    el.textContent = t[el.dataset.c];
+  });
+}
+
+function renderInsight(){
+  const t = tally();
+  const box = document.getElementById('insight');
+  let msg = '';
+  if(t.imbecil >= 6){
+    msg = "<strong>El espejo es incómodo.</strong> Has marcado la columna del imbécil en la mitad o más de las doce marcas. Eso no te condena. Ser imbécil es opcional, y la opción se ejerce cada día. La pregunta no es si lo fuiste; la pregunta es si vas a dejar de serlo. Empieza por la marca que más te dolió reconocer.";
+  } else if(t.imbecil >= 3){
+    msg = "<strong>Hay una zona gris.</strong> Reconoces marcas del imbécil, pero no dominan. Esa es la zona más humana: la del que sabe y a veces no quiere saber. La disciplina está en revisar esas marcas una por una y ver cuál puedes soltar primero.";
+  } else if(t.tonto >= 8){
+    msg = "<strong>El espejo te muestra tonto, y eso es una bendición.</strong> Ser tonto es temporal. Significa que la mayoría de tus errores son de información, no de voluntad. La puerta está abierta. Solo tienes que seguir entrando por ella.";
+  } else if(t.tonto + t.imbecil >= 10){
+    msg = "<strong>Casi todo lo que marcaste es tonto o imbécil.</strong> Eso es honestidad. La mayoría de las personas viven en esas dos columnas sin saberlo. Tú ya sabes dónde estás. El siguiente paso es moverte hacia la columna del tonto — y desde ahí, hacia la disposición a aprender.";
+  } else {
+    msg = "<strong>Marcaste 'ninguno' muchas veces.</strong> Eso puede significar dos cosas: que no has estado en esas situaciones, o que no has mirado con suficiente honestidad. La segunda es más común que la primera. Vuelve a leer las marcas donde pusiste 'ninguno' y pregúntate si de verdad no aplican.";
+  }
+  box.innerHTML = msg;
+  box.style.display = 'block';
+}
+
+document.addEventListener('click', e => {
+  if(e.target.matches('.btns button')){
+    const group = e.target.closest('.btns');
+    const idx = group.dataset.idx;
+    marks[idx] = e.target.dataset.v;
+    localStorage.setItem(KEY, JSON.stringify(marks));
+    paint();
+  }
+});
+
+document.querySelectorAll('textarea[data-note]').forEach(ta => {
+  const idx = ta.dataset.note;
+  try { ta.value = (JSON.parse(localStorage.getItem(KEY+'_notes')||'{}'))[idx] || ''; } catch(e){}
+  ta.addEventListener('input', () => {
+    let notes = {};
+    try { notes = JSON.parse(localStorage.getItem(KEY+'_notes')||'{}'); } catch(e){}
+    notes[idx] = ta.value;
+    localStorage.setItem(KEY+'_notes', JSON.stringify(notes));
+  });
+});
+
+paint();
+</script>
+</body>
+</html>
