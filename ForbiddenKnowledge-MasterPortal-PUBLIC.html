@@ -1,0 +1,3486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Forbidden Knowledge — Master Hub</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600;700&display=swap');
+  :root {
+    --bg: #0a0a0c; --surface: #121216; --surface-2: #1a1a20; --border: #2a2a32;
+    --text: #e8e6e3; --text-dim: #9a978f; --accent: #c9a227; --accent-dim: #8a6f1a;
+    --record: #3a7d5c; --suppressed: #b03a2e; --gap: #8a6f1a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'IBM Plex Sans', system-ui, sans-serif; line-height: 1.6; font-weight: 300; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 0 24px 120px; }
+
+  header { padding: 64px 0 32px; border-bottom: 1px solid var(--border); margin-bottom: 32px; }
+  .kicker { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--accent); margin-bottom: 20px; }
+  h1 { font-size: clamp(30px, 5vw, 48px); font-weight: 700; line-height: 1.05; letter-spacing: -0.02em; margin-bottom: 16px; }
+  .subtitle { font-size: 17px; color: var(--text-dim); max-width: 760px; font-weight: 300; margin-bottom: 8px; }
+  .count { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--accent); letter-spacing: 0.08em; margin-top: 16px; }
+
+  .controls { display: flex; flex-wrap: wrap; gap: 12px; margin: 28px 0; align-items: center; }
+  .search-box { flex: 1; min-width: 240px; position: relative; }
+  .search-box input {
+    width: 100%; padding: 12px 16px; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 4px; color: var(--text); font-family: 'IBM Plex Sans', sans-serif; font-size: 14px;
+    font-weight: 300; outline: none; transition: border-color 0.2s;
+  }
+  .search-box input:focus { border-color: var(--accent-dim); }
+  .search-box input::placeholder { color: var(--text-dim); }
+
+  .section-nav { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 32px; }
+  .section-nav a {
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px; padding: 6px 10px;
+    border: 1px solid var(--border); border-radius: 2px; color: var(--text-dim);
+    text-decoration: none; letter-spacing: 0.04em; transition: all 0.2s;
+  }
+  .section-nav a:hover { border-color: var(--accent-dim); color: var(--accent); }
+
+  h2.section-title {
+    font-size: 22px; font-weight: 600; letter-spacing: -0.01em;
+    margin: 48px 0 8px; padding-top: 32px; border-top: 1px solid var(--border);
+  }
+  h2.section-title .num { font-family: 'IBM Plex Mono', monospace; color: var(--accent); font-size: 13px; margin-right: 12px; }
+  .section-desc { font-size: 14px; color: var(--text-dim); margin-bottom: 20px; font-style: italic; }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 14px; margin-bottom: 8px; }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 4px;
+    padding: 18px 20px; transition: border-color 0.2s, transform 0.15s; display: flex;
+    flex-direction: column; min-height: 140px;
+  }
+  .card:hover { border-color: var(--accent-dim); transform: translateY(-1px); }
+  .card a { text-decoration: none; color: inherit; display: flex; flex-direction: column; flex: 1; }
+
+  .card-title { font-weight: 600; font-size: 15px; color: var(--text); margin-bottom: 6px; display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+  .card-title .arrow { color: var(--accent); font-family: 'IBM Plex Mono', monospace; font-size: 12px; opacity: 0.6; transition: opacity 0.2s; }
+  .card:hover .arrow { opacity: 1; }
+  .card-desc { font-size: 13px; color: var(--text-dim); line-height: 1.55; flex: 1; }
+
+  .tag { display: inline-block; font-family: 'IBM Plex Mono', monospace; font-size: 9px; padding: 2px 6px; border-radius: 2px; letter-spacing: 0.08em; text-transform: uppercase; margin-top: 10px; align-self: flex-start; }
+  .tag-terminal { background: rgba(176,58,46,0.12); color: var(--suppressed); border: 1px solid rgba(176,58,46,0.4); }
+  .tag-tool { background: rgba(58,125,92,0.12); color: var(--record); border: 1px solid rgba(58,125,92,0.4); }
+  .tag-book { background: rgba(201,162,39,0.12); color: var(--accent); border: 1px solid rgba(201,162,39,0.4); }
+  .tag-core { background: rgba(201,162,39,0.18); color: var(--accent); border: 1px solid var(--accent); }
+
+  .no-results { text-align: center; padding: 40px 20px; color: var(--text-dim); font-style: italic; display: none; }
+  .no-results.show { display: block; }
+
+  .footer-note {
+    margin-top: 80px; padding-top: 32px; border-top: 1px solid var(--border);
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--text-dim);
+    letter-spacing: 0.08em; text-align: center; line-height: 2;
+  }
+  .footer-note .glory { color: var(--accent); font-weight: 600; }
+
+  a { color: var(--accent); }
+
+  @media (max-width: 600px) {
+    .wrap { padding: 0 16px 80px; }
+    header { padding: 40px 0 24px; }
+    .grid { grid-template-columns: 1fr; }
+    h2.section-title { margin-top: 40px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="kicker">Forbidden Knowledge · Master Hub</div>
+  <h1>Every Terminal. Every Tool. Every Door.</h1>
+  <p class="subtitle">The complete Forbidden Knowledge archive in one place. The claims. The record. The suppressed. The gap. Each card opens the app. Each app shows you both sides. You decide.</p>
+  <div class="count" id="countLabel"></div>
+</header>
+
+<div class="controls">
+  <div class="search-box">
+    <input type="text" id="searchInput" placeholder="Search the archive — titles, descriptions, keywords..." oninput="filterCards()">
+  </div>
+</div>
+
+<div class="section-nav">
+  <a href="#core">Core</a>
+  <a href="#terminal">Terminals</a>
+  <a href="#chapter">Chapters</a>
+  <a href="#martyr">Martyrs</a>
+  <a href="#legal">Legal</a>
+  <a href="#financial">Financial</a>
+  <a href="#sovereignty">Sovereignty</a>
+  <a href="#colombia">Colombia</a>
+  <a href="#book">Book</a>
+  <a href="#training">Training</a>
+</div>
+
+<!-- CORE -->
+<h2 class="section-title" id="core"><span class="num">01</span>The Core</h2>
+<p class="section-desc">The front door. The map. The share kit. Start here.</p>
+<div class="grid" data-section>
+
+  <div class="card" data-search="portal front door start here forbidden knowledge portal">
+    <a href="https://quantum-freedom-site.vercel.app/FK-Portal.html" target="_blank" rel="noopener">
+      <div class="card-title">FK Portal <span class="arrow">→</span></div>
+      <div class="card-desc">The front door. Everything else is behind it. If you are new, start here. If you are not new, this is where you send the person who asked what you have been reading.</div>
+      <span class="tag tag-core">Core</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="master hub map archive forbidden knowledge">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-MasterHub.html" target="_blank" rel="noopener">
+      <div class="card-title">Master Hub <span class="arrow">→</span></div>
+      <div class="card-desc">The map of the whole archive. The terminals. The tools. The dossiers. One page. Every door.</div>
+      <span class="tag tag-core">Core</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="buttons share kit copy links spread">
+    <a href="https://quantum-freedom-site.vercel.app/Buttons.html" target="_blank" rel="noopener">
+      <div class="card-title">Buttons — Share Kit <span class="arrow">→</span></div>
+      <div class="card-desc">Every button, every link, every terminal, ready to copy. Built for the person who wants to spread the work without rebuilding the wheel.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="manifesto declaration mission who we are">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-Manifesto.html" target="_blank" rel="noopener">
+      <div class="card-title">Manifesto <span class="arrow">→</span></div>
+      <div class="card-desc">The declaration. Why this work exists. What it is for. Who it serves. Read it before you read anything else.</div>
+      <span class="tag tag-core">Core</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="nation builder you are not alone community">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-NationBuilder.html" target="_blank" rel="noopener">
+      <div class="card-title">Nation Builder <span class="arrow">→</span></div>
+      <div class="card-desc">You are not alone. The builder. The community. The nation that is forming. Built for the operator who is done standing alone.</div>
+      <span class="tag tag-core">Core</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="oath sovereign operator gateway amnesty">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-AmnestyGateway.html" target="_blank" rel="noopener">
+      <div class="card-title">Oath of the Sovereign Operator <span class="arrow">→</span></div>
+      <div class="card-desc">The oath. The commitment. The gateway. Read it before you decide to become an operator. If you take it, you are in.</div>
+      <span class="tag tag-core">Core</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="amnesty application coalition unity 25 pillars">
+    <a href="https://quantum-freedom-site.vercel.app/AmnestyApplication.html" target="_blank" rel="noopener">
+      <div class="card-title">Amnesty Application — 25 Pillars <span class="arrow">→</span></div>
+      <div class="card-desc">The 25 pillars. The Amnesty Coalition for Unity. The application. Built for the operator who wants to join, not just read.</div>
+      <span class="tag tag-core">Core</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="debate alchemy argument conversation victory">
+    <a href="https://quantum-freedom-site.vercel.app/DEBATE.html" target="_blank" rel="noopener">
+      <div class="card-title">Debate Alchemy <span class="arrow">→</span></div>
+      <div class="card-desc">The method for turning a confrontation into a conversation, and a conversation into a victory. Built for the operator who wants to win without shouting.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="spanish debate alchemy">
+    <a href="https://quantum-freedom-site.vercel.app/Spanish-DEBATE.html" target="_blank" rel="noopener">
+      <div class="card-title">Debate Alchemy — Spanish <span class="arrow">→</span></div>
+      <div class="card-desc">The Spanish version. The same method. The same victory.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+</div>
+
+<!-- TERMINALS -->
+<h2 class="section-title" id="terminal"><span class="num">02</span>The Terminals</h2>
+<p class="section-desc">The disclosure terminals. Each one shows the record, the suppressed claim, and the gap. The reader decides.</p>
+<div class="grid" data-section>
+
+  <div class="card" data-search="bloodline priory sion rothschild rh negative adrenochrome chapter 8">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge_Chapter8.html" target="_blank" rel="noopener">
+      <div class="card-title">The Bloodline Terminal <span class="arrow">→</span></div>
+      <div class="card-desc">The Priory was a hoax. The Rothschild lineage claim has no genealogy. Rh-negative has no aristocratic link. Adrenochrome harvesting has no corroboration. But the trafficking wound underneath is real. The record, the suppressed, the gap.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="priory of sion merovingian jesus bloodline plantard hoax">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-PrioryOfSion.html" target="_blank" rel="noopener">
+      <div class="card-title">The Priory of Sion <span class="arrow">→</span></div>
+      <div class="card-desc">The hoaxer confessed under oath. The co-founder laughed on the BBC. The Dossiers were fabricated. And the DNA test that "settled" it tested a woman who married into the dynasty. The vehicle was a hoax. The question survives the vehicle.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="rothschild merovingian bloodline rh negative cain">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-Rothschilds.html" target="_blank" rel="noopener">
+      <div class="card-title">The Rothschild Claim <span class="arrow">→</span></div>
+      <div class="card-desc">A real banking dynasty. A real medieval dynasty. No documented line between them. A real genetic polymorphism with no documented connection to either. The alternative channels assert. The official channels dismiss. The gap is the genealogy neither side has done.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="remphan saturn molech baphomet star david pentagram">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-RemphanTerminal.html" target="_blank" rel="noopener">
+      <div class="card-title">The Star of Remphan <span class="arrow">→</span></div>
+      <div class="card-desc">Chiun is Saturn. That is documented. The Tophet yielded infant bones, but the archaeology does not support the scale. Baphomet's pentagram was drawn in 1856. The Star of David claim is being made in 2026 by people who believe it. The synthesis is the leap.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="immortal blood 13 families cain seth ham japheth esau korah merovech">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-immortal-blood-terminal.html" target="_blank" rel="noopener">
+      <div class="card-title">Immortal Blood — The 13 Families (Biblical) <span class="arrow">→</span></div>
+      <div class="card-desc">Cain. Seth. Ham. Japheth. Esau. Korah. Merovech. The bloodline claim in its oldest form. The record. The claim. The gap.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="immortal blood astor bundy collins dupont freeman kennedy li onassis rockefeller rothschild russell van duyn merovingian">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-immortalBlood.html" target="_blank" rel="noopener">
+      <div class="card-title">Immortal Blood — The 13 Families (Modern) <span class="arrow">→</span></div>
+      <div class="card-desc">Astor. Bundy. Collins. DuPont. Freeman. Kennedy. Li. Onassis. Rockefeller. Rothschild. Russell. Van Duyn. Merovingian. The modern version. The record. The claim. The gap.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="frazzledrip weiner laptop clinton video snuff">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-Frazzledrip.html" target="_blank" rel="noopener">
+      <div class="card-title">Frazzledrip <span class="arrow">→</span></div>
+      <div class="card-desc">The video no one has seen. The claim no one can kill. It was read into the Congressional Record. It was reported by the Washington Post. Millions watched. No copy has ever surfaced. The claim, the record, the gap.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="frazzledrip congressional question boebert clinton deposition">
+    <a href="https://quantum-freedom-site.vercel.app/Frazzledrip-CongressionalQuestion.html" target="_blank" rel="noopener">
+      <div class="card-title">Frazzledrip — The Congressional Question <span class="arrow">→</span></div>
+      <div class="card-desc">Boebert asked Hillary Clinton about the snuff film. Under oath. In a deposition. The chair ruled it out of scope. The question was asked. The lie is now part of the official record.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="franklin cover up credit union lawrence king nebraska grand jury">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-Franklin.html" target="_blank" rel="noopener">
+      <div class="card-title">The Franklin Cover-Up <span class="arrow">→</span></div>
+      <div class="card-desc">$40 million vanished. The investigator died. The psychiatrists said the witness was credible. The grand jury said hoax. The template for every trafficking narrative that came after it.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="epstein pol 4chan moot pizzagate qanon origin">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-Epstein.html" target="_blank" rel="noopener">
+      <div class="card-title">The /pol/ Origin <span class="arrow">→</span></div>
+      <div class="card-desc">Epstein met the founder of 4chan. /pol/ was created days later. The board that birthed Pizzagate and QAnon was born in his shadow. The hunters were on the hunted man's board.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="palm beach pete teeth lookalike epstein alive">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-PalmBeachPete.html" target="_blank" rel="noopener">
+      <div class="card-title">Palm Beach Pete <span class="arrow">→</span></div>
+      <div class="card-desc">The teeth. The denial. The viral spread. The master tape was destroyed. The copy has a hole. The fake body is in the file. The island is still active. The official story has more holes than the public was told.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="epstein associates names network connections">
+    <a href="https://quantum-freedom-site.vercel.app/EpsteinAssociates.html" target="_blank" rel="noopener">
+      <div class="card-title">Epstein Associates <span class="arrow">→</span></div>
+      <div class="card-desc">The names. The connections. The network. The record of who was there and who has not been asked to explain why.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="epstein trump connections record">
+    <a href="https://quantum-freedom-site.vercel.app/EpsteinTrump.html" target="_blank" rel="noopener">
+      <div class="card-title">Epstein & Trump <span class="arrow">→</span></div>
+      <div class="card-desc">The documented connection. The record. The claim. The gap. The reader decides what the record means.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="bubba email mark epstein clinton putin">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-Bubba.html" target="_blank" rel="noopener">
+      <div class="card-title">Bubba <span class="arrow">→</span></div>
+      <div class="card-desc">One word. One email. The internet detonated. The denials poured in. And "Bubba" still has no name.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="blackout grid agenda 2030 great reset emergency">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-Blackout.html" target="_blank" rel="noopener">
+      <div class="card-title">The Blackout & The Blueprint <span class="arrow">→</span></div>
+      <div class="card-desc">The grid is failing. The government is issuing emergency orders. AI data centers are consuming record power. The 18-month blackout warning exists. The people who declare the emergency are the ones who sell the solution.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="november 17 prophecy dark web internet apocalypse gta 6">
+    <a href="https://quantum-freedom-site.vercel.app/Nov17.html" target="_blank" rel="noopener">
+      <div class="card-title">The November 17 Prophecy <span class="arrow">→</span></div>
+      <div class="card-desc">A dark web prophecy. A dated collapse. A three-month blackout. And GTA 6 launches two days later. The date will pass. The reader will know something about how these narratives work.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="vatican bannon epstein pope francis rothschild bank pauly">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-Vatican.html" target="_blank" rel="noopener">
+      <div class="card-title">The Vatican Plot <span class="arrow">→</span></div>
+      <div class="card-desc">Bannon emailed Epstein about making a film to smear the Pope. Epstein replied: "Better to reign." A Rothschild banker now runs the Vatican's money. The record proves the plot. It does not prove the conspiracy.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="vatican tunnels max lowen trafficking party favors cannibalism">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-VaticanTunnels.html" target="_blank" rel="noopener">
+      <div class="card-title">The Vatican Tunnels <span class="arrow">→</span></div>
+      <div class="card-desc">She says she was trafficked through tunnels beneath the Vatican. She says children were party favors. She says they ate flesh and drank blood. The researcher who exposed the network is dead. The record does not contain the verification.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="vatican abuse burn everything archive sealed pope leo">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-VaticanAbuse.html" target="_blank" rel="noopener">
+      <div class="card-title">The Vatican Abuse — BURN EVERYTHING <span class="arrow">→</span></div>
+      <div class="card-desc">"Burn everything." The order is in the documents. The archive is still sealed. The Pope was asked in person. He has not answered.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="music industry sacrifice nicki minaj astroworld hunting parties witches">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-Music.html" target="_blank" rel="noopener">
+      <div class="card-title">The Music Industry Sacrifice <span class="arrow">→</span></div>
+      <div class="card-desc">Nicki Minaj said they take babies for sacrifice. A man filmed himself describing the sex ritual he witnessed. A researcher said she would never commit suicide and was found dead. The claims are real. The proof is not in the record.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="spirit cooking podesta abramovic hampstead hoax x dossiers dutroux">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-Ritual.html" target="_blank" rel="noopener">
+      <div class="card-title">The Ritual, the Hoax, and the Shield <span class="arrow">→</span></div>
+      <div class="card-desc">The Spirit Cooking email is real. The dinner was soup. The Hampstead hoax sent a woman to prison. The X-Dossiers name royalty. Some of these are hoaxes. Some are not. The hoaxes are the shield.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="network max lowen fiona barnett cathy obrien ronald bernard epstein cannibalism">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-TheNetwork.html" target="_blank" rel="noopener">
+      <div class="card-title">The Network <span class="arrow">→</span></div>
+      <div class="card-desc">Max Lowen named them. The ex-banker who refused to sacrifice a child. The Epstein files that say "ritualistic sacrifice" and "cannibalism." The pattern is real. The proof is not in the record.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="people of the book muhammad phantom prophet islam covenant">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-PeopleOfTheBook.html" target="_blank" rel="noopener">
+      <div class="card-title">The People of the Book <span class="arrow">→</span></div>
+      <div class="card-desc">The possibility that Muhammad never existed. And the covenant that survives the question. The record, the suppressed, the gap.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="palestine genocide gaza children un record silence">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-Palestine.html" target="_blank" rel="noopener">
+      <div class="card-title">Palestine <span class="arrow">→</span></div>
+      <div class="card-desc">The record is the crime. The gap is the silence. The world is being groomed to do nothing.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="palestine rescue fund extraction sanctuary colombia">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-PalestineRescue.html" target="_blank" rel="noopener">
+      <div class="card-title">Palestine Rescue <span class="arrow">→</span></div>
+      <div class="card-desc">One person. One extraction. One life moved to safety. The rescue fund. The public page.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="rescue host agreement palestine sanctuary">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-RescueHostAgreement.html" target="_blank" rel="noopener">
+      <div class="card-title">Rescue Host Agreement <span class="arrow">→</span></div>
+      <div class="card-desc">The agreement a PMA member signs when they commit to hosting a rescued family.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="sal checklist camara comercio esal rescue legal">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-SALchecklist.html" target="_blank" rel="noopener">
+      <div class="card-title">SAL Checklist for Cámara de Comercio <span class="arrow">→</span></div>
+      <div class="card-desc">The legal foundation. The ESAL registration checklist for the attorney.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="missing 15 steps witness network donor receipt host vetting">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-Missing15.html" target="_blank" rel="noopener">
+      <div class="card-title">Ramiro's Missing 15 Steps <span class="arrow">→</span></div>
+      <div class="card-desc">Every piece you have not yet built. The Witness Network. The donor receipt. The host vetting. The evacuation protocol. The succession plan.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="palestine rescue field manual response team lead">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-RescueFieldManual.html" target="_blank" rel="noopener">
+      <div class="card-title">Palestine Rescue Field Manual <span class="arrow">→</span></div>
+      <div class="card-desc">The document the Response Team Lead carries when the first code word arrives.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="first extraction protocol lawful documented repeatable">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-FirstExtraction.html" target="_blank" rel="noopener">
+      <div class="card-title">First Extraction <span class="arrow">→</span></div>
+      <div class="card-desc">The step-by-step protocol. Lawful. Documented. Repeatable.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="eyes purge kash patel fbi loyalty tests epstein gaps">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-PurgeEyes.html" target="_blank" rel="noopener">
+      <div class="card-title">The Eyes and the Purge <span class="arrow">→</span></div>
+      <div class="card-desc">The eyes are the meme. The purge is the record. Kash Patel, the loyalty tests, and the Epstein file gaps.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="fbi purge record pattern">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-FBI.html" target="_blank" rel="noopener">
+      <div class="card-title">FBI <span class="arrow">→</span></div>
+      <div class="card-desc">The FBI. The record. The purge. The pattern.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+</div>
+
+<!-- CHAPTERS -->
+<h2 class="section-title" id="chapter"><span class="num">03</span>Chapter Apps</h2>
+<p class="section-desc">The chapters of the book, as interactive apps. Each one is a door into the record.</p>
+<div class="grid" data-section>
+
+  <div class="card" data-search="pcr deception chapter 1 covid test">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-PCRdeception.html" target="_blank" rel="noopener">
+      <div class="card-title">PCR Deception — Chapter 1 <span class="arrow">→</span></div>
+      <div class="card-desc">The PCR. The deception. The record. The proof of how the test was used to deceive the world.</div>
+      <span class="tag tag-book">Chapter</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="mask tyranny hypnosis chapter 2">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-MaskTyranny.html" target="_blank" rel="noopener">
+      <div class="card-title">Mask Tyranny — Chapter 2 <span class="arrow">→</span></div>
+      <div class="card-desc">The mask. The tyranny. The hypnosis. How they used the mask to program the population. The record. The proof.</div>
+      <span class="tag tag-book">Chapter</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="christopher key vaccine bioweapon chapter 3">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledgeChapter3.html" target="_blank" rel="noopener">
+      <div class="card-title">The Vaccine Bioweapon — Chapter 3 <span class="arrow">→</span></div>
+      <div class="card-desc">Christopher Key. The bioweapon. The vaccine. The record. The proof.</div>
+      <span class="tag tag-book">Chapter</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="sovereign shield 55 billion trust chapter 4">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledgeChapter4.html" target="_blank" rel="noopener">
+      <div class="card-title">Sovereign Shield — Chapter 4 <span class="arrow">→</span></div>
+      <div class="card-desc">The $55 billion trust. The shield. The record. Built for the operator who wants to protect what they have.</div>
+      <span class="tag tag-book">Chapter</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="prep act nuremberg code immunity chapter 5">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-Chapter5.html" target="_blank" rel="noopener">
+      <div class="card-title">The Immunity Architecture — Chapter 5 <span class="arrow">→</span></div>
+      <div class="card-desc">The PREP Act is real. The Nuremberg Code is real. The mandates were real. The question of consent never reached a courtroom. The gap is the courtroom that never convened.</div>
+      <span class="tag tag-book">Chapter</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="harvest fear economy chapter 6 harvester confession">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-Chapter6.html" target="_blank" rel="noopener">
+      <div class="card-title">The Harvest — Chapter 6 <span class="arrow">→</span></div>
+      <div class="card-desc">The fear economy. The harvest. The record. The claim. The gap. Built for the operator who wants to stop being the crop.</div>
+      <span class="tag tag-book">Chapter</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="harvester terminal fear audit protocol">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-HarvesterTerminal.html" target="_blank" rel="noopener">
+      <div class="card-title">The Harvester's Terminal <span class="arrow">→</span></div>
+      <div class="card-desc">The fear audit. The seven-day protocol. The record. The claim. The gap. Built for the operator who wants to test the claim in their own body.</div>
+      <span class="tag tag-book">Chapter</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="linguist chapter 7 language control words">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-Chapter7.html" target="_blank" rel="noopener">
+      <div class="card-title">The Linguist — Chapter 7 <span class="arrow">→</span></div>
+      <div class="card-desc">The language. The words. The manipulation. The record of how they use language to control what you can think.</div>
+      <span class="tag tag-book">Chapter</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="suppressed record chapter 8 what is being kept from you">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-Chapter08.html" target="_blank" rel="noopener">
+      <div class="card-title">The Suppressed Record — Chapter 8 <span class="arrow">→</span></div>
+      <div class="card-desc">What is being kept from you. The record. The claim. The gap. The full terminal for the bloodline chapters.</div>
+      <span class="tag tag-book">Chapter</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="outbreak hanta frequency grid chapter 11">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-Chapter11.html" target="_blank" rel="noopener">
+      <div class="card-title">Outbreak Is Real — Chapter 11 <span class="arrow">→</span></div>
+      <div class="card-desc">The outbreak. The frequency. The record. What they are doing to your body. The children are the gap.</div>
+      <span class="tag tag-book">Chapter</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="what the record shows chapter 12 silenced">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-Chapter12.html" target="_blank" rel="noopener">
+      <div class="card-title">What the Record Shows — Chapter 12 <span class="arrow">→</span></div>
+      <div class="card-desc">The record. The suppression. The gap. The reader decides which is which.</div>
+      <span class="tag tag-book">Chapter</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="two meanings within kingdom chapter 13 god program">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-Chapter13.html" target="_blank" rel="noopener">
+      <div class="card-title">Two Meanings of Within — Chapter 13 <span class="arrow">→</span></div>
+      <div class="card-desc">The kingdom. The within. The two readings. The institution and the internal. The record does not settle which one Jesus meant.</div>
+      <span class="tag tag-book">Chapter</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="hugo protocol hospital death panel">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-HugoProtocol.html" target="_blank" rel="noopener">
+      <div class="card-title">The Hugo Protocol <span class="arrow">→</span></div>
+      <div class="card-desc">The hospital protocol. The death. The record. Built for the family who wants to be ready before the hospital calls.</div>
+      <span class="tag tag-book">Chapter</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="ice enforcement know your rights">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-ICE.html" target="_blank" rel="noopener">
+      <div class="card-title">ICE <span class="arrow">→</span></div>
+      <div class="card-desc">The ICE. The enforcement. The record.</div>
+      <span class="tag tag-book">Chapter</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="the knock know your rights">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-KnowYourRights.html" target="_blank" rel="noopener">
+      <div class="card-title">The Knock — Know Your Rights <span class="arrow">→</span></div>
+      <div class="card-desc">The knock. The rights. The record. Know your rights before they knock.</div>
+      <span class="tag tag-book">Chapter</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="jonestown protocol ovens conditioning">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-JonestownProtocol.html" target="_blank" rel="noopener">
+      <div class="card-title">Jonestown Protocol <span class="arrow">→</span></div>
+      <div class="card-desc">The training. The conditioning. The ovens. How they trained us to accept what was coming.</div>
+      <span class="tag tag-book">Chapter</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="great reset digital id">
+    <a href="https://quantum-freedom-site.vercel.app/Digital-ID.html" target="_blank" rel="noopener">
+      <div class="card-title">The Great Reset — Digital ID <span class="arrow">→</span></div>
+      <div class="card-desc">The reset. The digital ID. The record. The plan. The gap.</div>
+      <span class="tag tag-book">Chapter</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="criminalization truth mekorot plan andinia colombia silenced">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-ColombiaSilenced.html" target="_blank" rel="noopener">
+      <div class="card-title">Criminalization of Truth — Plan Andinia <span class="arrow">→</span></div>
+      <div class="card-desc">The criminalization. The truth. The plan. The record.</div>
+      <span class="tag tag-book">Chapter</span>
+    </a>
+  </div>
+
+</div>
+
+<!-- MARTYRS -->
+<h2 class="section-title" id="martyr"><span class="num">04</span>Martyrs & Heroes</h2>
+<p class="section-desc">The ones who stood. The ones who paid. The record of the cost.</p>
+<div class="grid" data-section>
+
+  <div class="card" data-search="diego saul reynosa hero">
+    <a href="https://quantum-freedom-site.vercel.app/DiegoSaulReynosa.html" target="_blank" rel="noopener">
+      <div class="card-title">Diego Saul Reynosa <span class="arrow">→</span></div>
+      <div class="card-desc">The hero. The one who stood when standing cost everything. Read the story before you decide what you are willing to lose.</div>
+      <span class="tag tag-core">Hero</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="michelo picante hero">
+    <a href="https://quantum-freedom-site.vercel.app/MicheloPicante.html" target="_blank" rel="noopener">
+      <div class="card-title">Michelo Picante <span class="arrow">→</span></div>
+      <div class="card-desc">The hero. The one who fought. The record.</div>
+      <span class="tag tag-core">Hero</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="resonate 369 frequency">
+    <a href="https://quantum-freedom-site.vercel.app/Resonate369.html" target="_blank" rel="noopener">
+      <div class="card-title">Resonate 369 <span class="arrow">→</span></div>
+      <div class="card-desc">The frequency. The resonance. The record.</div>
+      <span class="tag tag-core">Hero</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="martyrs hall of martyrs wall names">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-TheMartyrs.html" target="_blank" rel="noopener">
+      <div class="card-title">The Martyrs <span class="arrow">→</span></div>
+      <div class="card-desc">The master graph. Every name, every death, every pattern. The archive of the ones who did not survive the work. Read it and ask why the list keeps growing.</div>
+      <span class="tag tag-core">Martyrs</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="complete truth martyrs">
+    <a href="https://quantum-freedom-site.vercel.app/MartyrsApp.html" target="_blank" rel="noopener">
+      <div class="card-title">Complete Truth of the Martyrs <span class="arrow">→</span></div>
+      <div class="card-desc">The complete truth. The full record. The deeper cut.</div>
+      <span class="tag tag-core">Martyrs</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="martyr master graph pattern">
+    <a href="https://quantum-freedom-site.vercel.app/MasterGraph.html" target="_blank" rel="noopener">
+      <div class="card-title">Martyr Master Graph <span class="arrow">→</span></div>
+      <div class="card-desc">The master graph. The visual. The pattern.</div>
+      <span class="tag tag-core">Martyrs</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="forbidden knowledge archive master index">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledgeArchive.html" target="_blank" rel="noopener">
+      <div class="card-title">Forbidden Knowledge Archive <span class="arrow">→</span></div>
+      <div class="card-desc">The master index. Every martyr, every document, every case. The full record in one place.</div>
+      <span class="tag tag-core">Martyrs</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="claus knapp">
+    <a href="https://quantum-freedom-site.vercel.app/ClausKnapp.html" target="_blank" rel="noopener">
+      <div class="card-title">Claus Knapp <span class="arrow">→</span></div>
+      <div class="card-desc">One name in the archive. One story. One death. Read it and understand that these are not statistics.</div>
+      <span class="tag tag-core">Martyr</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="frank suarez">
+    <a href="https://quantum-freedom-site.vercel.app/FrankSuarez.html" target="_blank" rel="noopener">
+      <div class="card-title">Frank Suarez <span class="arrow">→</span></div>
+      <div class="card-desc">Another name. Another story. The archive does not let them disappear.</div>
+      <span class="tag tag-core">Martyr</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="david wilcock researcher witness">
+    <a href="https://quantum-freedom-site.vercel.app/DavidWilcock.html" target="_blank" rel="noopener">
+      <div class="card-title">David Wilcock <span class="arrow">→</span></div>
+      <div class="card-desc">The researcher. The witness. The one who brought the questions into the mainstream and paid the price.</div>
+      <span class="tag tag-core">Witness</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="randy mills martyr">
+    <a href="https://quantum-freedom-site.vercel.app/RandyMills.html" target="_blank" rel="noopener">
+      <div class="card-title">Randy Mills <span class="arrow">→</span></div>
+      <div class="card-desc">The martyr. The record. The proof.</div>
+      <span class="tag tag-core">Martyr</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="rashid buttar doctor martyr">
+    <a href="https://quantum-freedom-site.vercel.app/RashidButtar.html" target="_blank" rel="noopener">
+      <div class="card-title">Rashid Buttar <span class="arrow">→</span></div>
+      <div class="card-desc">The doctor. The martyr. The record.</div>
+      <span class="tag tag-core">Martyr</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="shoshana strook martyr">
+    <a href="https://quantum-freedom-site.vercel.app/ShoshanaStrook.html" target="_blank" rel="noopener">
+      <div class="card-title">Shoshana Strook <span class="arrow">→</span></div>
+      <div class="card-desc">The martyr. The record. The proof.</div>
+      <span class="tag tag-core">Martyr</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="hall of martyrs wall every name">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-HallOfMartyrs.html" target="_blank" rel="noopener">
+      <div class="card-title">Hall of Martyrs <span class="arrow">→</span></div>
+      <div class="card-desc">The wall. Every name. Every face. Every death. The ones who did not make it. Read it and understand that this work has a cost.</div>
+      <span class="tag tag-core">Martyrs</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="martyrs archive documents investigations testimony">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-MartyrsArchive.html" target="_blank" rel="noopener">
+      <div class="card-title">Martyrs Archive <span class="arrow">→</span></div>
+      <div class="card-desc">The deeper record. The documents. The investigations. The testimony behind the names on the wall.</div>
+      <span class="tag tag-core">Martyrs</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="hashem khader abu maria palestine martyr">
+    <a href="https://quantum-freedom-site.vercel.app/HashemKhaderAbuMaria.html" target="_blank" rel="noopener">
+      <div class="card-title">Hashem Khader Abu Maria <span class="arrow">→</span></div>
+      <div class="card-desc">The martyr. The record. The proof.</div>
+      <span class="tag tag-core">Martyr</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="virginia giuffre witness martyr">
+    <a href="https://quantum-freedom-site.vercel.app/VirginiaGiuffre.html" target="_blank" rel="noopener">
+      <div class="card-title">Virginia Giuffre <span class="arrow">→</span></div>
+      <div class="card-desc">The martyr. The witness. The record.</div>
+      <span class="tag tag-core">Martyr</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="herbert needleman martyr">
+    <a href="https://quantum-freedom-site.vercel.app/HerbertNeedleman.html" target="_blank" rel="noopener">
+      <div class="card-title">Herbert Needleman <span class="arrow">→</span></div>
+      <div class="card-desc">The martyr. The record. The proof.</div>
+      <span class="tag tag-core">Martyr</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="hind martyr">
+    <a href="https://quantum-freedom-site.vercel.app/Hind.html" target="_blank" rel="noopener">
+      <div class="card-title">Hind <span class="arrow">→</span></div>
+      <div class="card-desc">The martyr. The record. The proof.</div>
+      <span class="tag tag-core">Martyr</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="isaac kappy hollywood whistleblower martyr">
+    <a href="https://quantum-freedom-site.vercel.app/IsaacKappy.html" target="_blank" rel="noopener">
+      <div class="card-title">Isaac Kappy <span class="arrow">→</span></div>
+      <div class="card-desc">The martyr. The record. The proof.</div>
+      <span class="tag tag-core">Martyr</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="jesus ramiro zapata martyr">
+    <a href="https://quantum-freedom-site.vercel.app/JesusRamiroZapata.html" target="_blank" rel="noopener">
+      <div class="card-title">Jesus Ramiro Zapata <span class="arrow">→</span></div>
+      <div class="card-desc">The martyr. The record. The proof.</div>
+      <span class="tag tag-core">Martyr</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="joe felz martyr">
+    <a href="https://quantum-freedom-site.vercel.app/JoeFelz.html" target="_blank" rel="noopener">
+      <div class="card-title">Joe Felz <span class="arrow">→</span></div>
+      <div class="card-desc">The martyr. The record. The proof.</div>
+      <span class="tag tag-core">Martyr</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="joseph recarey detective martyr">
+    <a href="https://quantum-freedom-site.vercel.app/JosephRecarey.html" target="_blank" rel="noopener">
+      <div class="card-title">Joseph Recarey <span class="arrow">→</span></div>
+      <div class="card-desc">The martyr. The detective. The record.</div>
+      <span class="tag tag-core">Martyr</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="kenneth akena watmon martyr">
+    <a href="https://quantum-freedom-site.vercel.app/KennethAkenaWatmon.html" target="_blank" rel="noopener">
+      <div class="card-title">Kenneth Akena Watmon <span class="arrow">→</span></div>
+      <div class="card-desc">The martyr. The record. The proof.</div>
+      <span class="tag tag-core">Martyr</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="colombia silenced los 112 criminalization truth mekorot plan andinia">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-ColombiaSilenced.html" target="_blank" rel="noopener">
+      <div class="card-title">Colombia Silenced — Los 112 <span class="arrow">→</span></div>
+      <div class="card-desc">The 112. The silenced. The ones who asked the wrong questions in the wrong country. The record of what happens when truth meets the Colombian state.</div>
+      <span class="tag tag-core">Martyrs</span>
+    </a>
+  </div>
+
+</div>
+
+<!-- LEGAL -->
+<h2 class="section-title" id="legal"><span class="num">05</span>Legal Arsenal</h2>
+<p class="section-desc">The real law. Trusts. Equity. Jurisdiction. The tools that survive scrutiny.</p>
+<div class="grid" data-section>
+
+  <div class="card" data-search="nuremberg code informed consent">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-NurembergCode.html" target="_blank" rel="noopener">
+      <div class="card-title">The Nuremberg Code <span class="arrow">→</span></div>
+      <div class="card-desc">The code. The Nuremberg. The record. The first principle: voluntary consent is absolutely essential. The foundation.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="constitutional jurisdiction court">
+    <a href="https://quantum-freedom-site.vercel.app/ConstitutionalJurisdiction.html" target="_blank" rel="noopener">
+      <div class="card-title">Constitutional Jurisdiction <span class="arrow">→</span></div>
+      <div class="card-desc">The jurisdiction. The Constitution. The record. Built for the operator who wants to understand the court before they walk into it.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="court case killer power tools">
+    <a href="https://quantum-freedom-site.vercel.app/CourtCaseKillerPowerTools.html" target="_blank" rel="noopener">
+      <div class="card-title">Court Case Killer Power Tools <span class="arrow">→</span></div>
+      <div class="card-desc">The killer. The power tools. The record. Built for the operator who wants to win.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="power tools court suite">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledgePowerTools-COURT.html" target="_blank" rel="noopener">
+      <div class="card-title">Power Tools Suite — Court <span class="arrow">→</span></div>
+      <div class="card-desc">The court suite. The tools. The record. Every document, every motion, every objection, ready to use.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="constitutional objection">
+    <a href="https://quantum-freedom-site.vercel.app/ConstitutionalObjection.html" target="_blank" rel="noopener">
+      <div class="card-title">Constitutional Objection <span class="arrow">→</span></div>
+      <div class="card-desc">The objection. The Constitution. The record. Built for the operator who wants to object with authority.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="jurisdiction consent remedy truth toolkit">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledgeToolkit.html" target="_blank" rel="noopener">
+      <div class="card-title">Jurisdiction · Consent · Remedy · Truth <span class="arrow">→</span></div>
+      <div class="card-desc">The toolkit. The jurisdiction. The consent. The remedy. The truth. The four pillars.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="motion to compel">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-MotionToCompel.html" target="_blank" rel="noopener">
+      <div class="card-title">Motion to Compel <span class="arrow">→</span></div>
+      <div class="card-desc">The motion. The compel. The record. Built for the operator who wants to force the court to act.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="negative averments">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-NegativeAverment.html" target="_blank" rel="noopener">
+      <div class="card-title">Negative Averments <span class="arrow">→</span></div>
+      <div class="card-desc">The negative averments. The record. The doctrine. Built for the operator who wants to use the court's own rules.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="requests for admissions">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-RequestsForAdmission.html" target="_blank" rel="noopener">
+      <div class="card-title">Requests for Admissions <span class="arrow">→</span></div>
+      <div class="card-desc">The requests. The admissions. The record. Built for the operator who wants to force the other side to admit.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="unclean hands doctrine">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-UncleanHands.html" target="_blank" rel="noopener">
+      <div class="card-title">Unclean Hands <span class="arrow">→</span></div>
+      <div class="card-desc">The unclean hands. The doctrine. The record. Built for the operator who wants to use the court's own doctrine against it.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="ucc-1 uniform commercial code">
+    <a href="https://quantum-freedom-site.vercel.app/UCC-1.html" target="_blank" rel="noopener">
+      <div class="card-title">UCC-1 <span class="arrow">→</span></div>
+      <div class="card-desc">The UCC-1. The record. The tool.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="ucc-1 blueprint mastery">
+    <a href="https://quantum-freedom-site.vercel.app/UCC-1_Mastery.html" target="_blank" rel="noopener">
+      <div class="card-title">UCC-1 Blueprint <span class="arrow">→</span></div>
+      <div class="card-desc">The blueprint. The UCC-1. The mastery.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="legal arsenal amnesty coalition">
+    <a href="https://quantum-freedom-site.vercel.app/LegalArsenal.html" target="_blank" rel="noopener">
+      <div class="card-title">Legal Arsenal <span class="arrow">→</span></div>
+      <div class="card-desc">The arsenal. The Amnesty. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="legal shield">
+    <a href="https://quantum-freedom-site.vercel.app/LegalShield.html" target="_blank" rel="noopener">
+      <div class="card-title">Legal Shield <span class="arrow">→</span></div>
+      <div class="card-desc">The shield. The legal. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="guardian legal shield">
+    <a href="https://quantum-freedom-site.vercel.app/GuardianLegalShield.html" target="_blank" rel="noopener">
+      <div class="card-title">Guardian Legal Shield <span class="arrow">→</span></div>
+      <div class="card-desc">The guardian. The shield. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="jurisdiction shield freemium">
+    <a href="https://quantum-freedom-site.vercel.app/FREEMIUM.html" target="_blank" rel="noopener">
+      <div class="card-title">Jurisdiction Shield <span class="arrow">→</span></div>
+      <div class="card-desc">The shield. The jurisdiction. The record. Built for the operator who wants to be outside the reach of the court.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="sovereign justice system">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledgeJustice.html" target="_blank" rel="noopener">
+      <div class="card-title">Sovereign Justice System <span class="arrow">→</span></div>
+      <div class="card-desc">The justice. The sovereign. The system. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="jurisdictional challenge">
+    <a href="https://quantum-freedom-site.vercel.app/JurisdictionalChallenge.html" target="_blank" rel="noopener">
+      <div class="card-title">Jurisdictional Challenge <span class="arrow">→</span></div>
+      <div class="card-desc">The challenge. The jurisdiction. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="state court remover">
+    <a href="https://quantum-freedom-site.vercel.app/StateCourtRemover.html" target="_blank" rel="noopener">
+      <div class="card-title">State Court Remover <span class="arrow">→</span></div>
+      <div class="card-desc">The remover. The state court. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="writ quo warranto">
+    <a href="https://quantum-freedom-site.vercel.app/WritOfQuoWarranto.html" target="_blank" rel="noopener">
+      <div class="card-title">Writ of Quo Warranto <span class="arrow">→</span></div>
+      <div class="card-desc">The writ. The quo warranto. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="rico racketeer influenced corrupt organizations">
+    <a href="https://quantum-freedom-site.vercel.app/theRICO.html" target="_blank" rel="noopener">
+      <div class="card-title">The RICO <span class="arrow">→</span></div>
+      <div class="card-desc">The RICO. The record. The proof.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="ens legis master system">
+    <a href="https://quantum-freedom-site.vercel.app/EnsLegisMasterSystem.html" target="_blank" rel="noopener">
+      <div class="card-title">Ens Legis Master System <span class="arrow">→</span></div>
+      <div class="card-desc">The master system. The Ens Legis. The record. Built for the operator who wants to understand the law that governs them.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="ens legis english">
+    <a href="https://quantum-freedom-site.vercel.app/ENS-LEGIS-master-system-eng.html" target="_blank" rel="noopener">
+      <div class="card-title">Ens Legis — English <span class="arrow">→</span></div>
+      <div class="card-desc">The Ens Legis. The English. The master system.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="ens legis spanish">
+    <a href="https://quantum-freedom-site.vercel.app/ENS-LEGIS-master-system-esp.html" target="_blank" rel="noopener">
+      <div class="card-title">Ens Legis — Spanish <span class="arrow">→</span></div>
+      <div class="card-desc">The Ens Legis. The Spanish. The master system.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="ens legis sovereignty education">
+    <a href="https://quantum-freedom-site.vercel.app/EnsLegisSovereigntyEducation.html" target="_blank" rel="noopener">
+      <div class="card-title">Ens Legis Sovereignty Education <span class="arrow">→</span></div>
+      <div class="card-desc">The education. The sovereignty. The Ens Legis.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="person doctrine legal fiction">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-Person.html" target="_blank" rel="noopener">
+      <div class="card-title">Person <span class="arrow">→</span></div>
+      <div class="card-desc">The person. The record. The doctrine. Built for the operator who wants to understand what the word means in law.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="14th amendment obituary final octagon">
+    <a href="https://quantum-freedom-site.vercel.app/FinalOctagon.html" target="_blank" rel="noopener">
+      <div class="card-title">14th Amendment Obituary <span class="arrow">→</span></div>
+      <div class="card-desc">The 14th. The obituary. The record. The proof of what was lost.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="legal slavery">
+    <a href="https://quantum-freedom-site.vercel.app/LegalSlavery.html" target="_blank" rel="noopener">
+      <div class="card-title">Legal Slavery <span class="arrow">→</span></div>
+      <div class="card-desc">The legal slavery. The record. The proof.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="legalization of slavery 3024">
+    <a href="https://quantum-freedom-site.vercel.app/3024.html" target="_blank" rel="noopener">
+      <div class="card-title">Legalization of Slavery <span class="arrow">→</span></div>
+      <div class="card-desc">The legalization. The slavery. The record. The proof of how they made it legal.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="natural law forbidden knowledge arsenal">
+    <a href="https://quantum-freedom-site.vercel.app/Forbidden_Knowledge_Arsenal.html" target="_blank" rel="noopener">
+      <div class="card-title">Natural Law Arsenal <span class="arrow">→</span></div>
+      <div class="card-desc">The natural law. The arsenal. The record. Built for the operator who wants to operate under natural law.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="sovereignty forge trust">
+    <a href="https://quantum-freedom-site.vercel.app/TRUST.html" target="_blank" rel="noopener">
+      <div class="card-title">Sovereignty Forge <span class="arrow">→</span></div>
+      <div class="card-desc">The forge. The sovereignty. The trust. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="trust asset recovery">
+    <a href="https://quantum-freedom-site.vercel.app/TrustAssetRecovery.html" target="_blank" rel="noopener">
+      <div class="card-title">Trust Asset Recovery <span class="arrow">→</span></div>
+      <div class="card-desc">The recovery. The asset. The trust.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="trust freedom engine">
+    <a href="https://quantum-freedom-site.vercel.app/TrustFreedomEngine.html" target="_blank" rel="noopener">
+      <div class="card-title">Trust Freedom Engine <span class="arrow">→</span></div>
+      <div class="card-desc">The engine. The freedom. The trust.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="trust planning">
+    <a href="https://quantum-freedom-site.vercel.app/TrustPlanning.html" target="_blank" rel="noopener">
+      <div class="card-title">Trust Planning <span class="arrow">→</span></div>
+      <div class="card-desc">The planning. The trust. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="trustee trap">
+    <a href="https://quantum-freedom-site.vercel.app/TrusteeTrap.html" target="_blank" rel="noopener">
+      <div class="card-title">Trustee Trap <span class="arrow">→</span></div>
+      <div class="card-desc">The trap. The trustee. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="sovereignty vault">
+    <a href="https://quantum-freedom-site.vercel.app/VAULT.html" target="_blank" rel="noopener">
+      <div class="card-title">Sovereignty Vault <span class="arrow">→</span></div>
+      <div class="card-desc">The vault. The sovereignty. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="sovereignty calculator">
+    <a href="https://quantum-freedom-site.vercel.app/SovereigntyCalculator.html" target="_blank" rel="noopener">
+      <div class="card-title">Sovereignty Calculator <span class="arrow">→</span></div>
+      <div class="card-desc">The calculator. The sovereignty. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+</div>
+
+<!-- FINANCIAL -->
+<h2 class="section-title" id="financial"><span class="num">06</span>Financial Tools</h2>
+<p class="section-desc">The debt. The bank. The trap. The way out.</p>
+<div class="grid" data-section>
+
+  <div class="card" data-search="debt you never owed mortgage">
+    <a href="https://quantum-freedom-site.vercel.app/DebtNotOwed.html" target="_blank" rel="noopener">
+      <div class="card-title">Debt You Never Owed <span class="arrow">→</span></div>
+      <div class="card-desc">The mortgage. The debt. The record. The proof that you never owed it.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="debt nullification widget">
+    <a href="https://quantum-freedom-site.vercel.app/DebtNullificationWidget.html" target="_blank" rel="noopener">
+      <div class="card-title">Debt Nullification Widget <span class="arrow">→</span></div>
+      <div class="card-desc">The widget. The nullification. The tool. Built for the operator who wants to clear the debt in real time.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="financial freedom debt validation generator">
+    <a href="https://quantum-freedom-site.vercel.app/FinancialFreedomSystem.html" target="_blank" rel="noopener">
+      <div class="card-title">Financial Freedom — Debt Validation <span class="arrow">→</span></div>
+      <div class="card-desc">The generator. The validation. The tool for clearing the debt they say you owe.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="clean your credit">
+    <a href="https://quantum-freedom-site.vercel.app/CreditAmnesty.html" target="_blank" rel="noopener">
+      <div class="card-title">Clean Your Credit <span class="arrow">→</span></div>
+      <div class="card-desc">The credit. The debt. The record of how they trap you and how to get out.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="bank fight defense system">
+    <a href="https://quantum-freedom-site.vercel.app/BankFight.html" target="_blank" rel="noopener">
+      <div class="card-title">Bank Fight Defense System <span class="arrow">→</span></div>
+      <div class="card-desc">The fight. The defense. The record. Built for the operator who wants to fight the bank.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="bank reversal system">
+    <a href="https://quantum-freedom-site.vercel.app/BankReversal.html" target="_blank" rel="noopener">
+      <div class="card-title">Bank Reversal System <span class="arrow">→</span></div>
+      <div class="card-desc">The reversal. The system. The record. Built for the operator who wants to reverse the transaction.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="bank reversal app">
+    <a href="https://quantum-freedom-site.vercel.app/BANK-REVERSAL.html" target="_blank" rel="noopener">
+      <div class="card-title">Bank Reversal App <span class="arrow">→</span></div>
+      <div class="card-desc">The reversal. The app. The record. Built for the operator who wants the tool in their pocket.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="banking system collapse protocol">
+    <a href="https://quantum-freedom-site.vercel.app/BankingSystemCollapse.html" target="_blank" rel="noopener">
+      <div class="card-title">Banking System Collapse Protocol <span class="arrow">→</span></div>
+      <div class="card-desc">The collapse. The protocol. The record. Built for the operator who wants to be ready when the banks fail.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="banca internacional colombianos offshore">
+    <a href="https://quantum-freedom-site.vercel.app/BancaOffshore.html" target="_blank" rel="noopener">
+      <div class="card-title">Banca Internacional para Colombianos <span class="arrow">→</span></div>
+      <div class="card-desc">The international bank. The Colombian. The record. Built for the operator who wants to move money.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="fideicomiso internacional proteccion patrimonial trust">
+    <a href="https://quantum-freedom-site.vercel.app/FideicomisoInternacionalProteccionPatrimonial.html" target="_blank" rel="noopener">
+      <div class="card-title">Fideicomiso Internacional <span class="arrow">→</span></div>
+      <div class="card-desc">The international trust. The protection. The record. Built for the operator who wants to protect what they have.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="fideicomiso banco dashboard colombia">
+    <a href="https://quantum-freedom-site.vercel.app/DashboardColombia.html" target="_blank" rel="noopener">
+      <div class="card-title">Fideicomiso y Banco <span class="arrow">→</span></div>
+      <div class="card-desc">The trust. The bank. The Spanish. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="forbidden crypto arsenal privacy">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenCryptoArsenal.html" target="_blank" rel="noopener">
+      <div class="card-title">Forbidden Crypto Arsenal <span class="arrow">→</span></div>
+      <div class="card-desc">The crypto. The arsenal. The free tools. The record. Built for the operator who wants to move outside the system.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="crypto vigilante">
+    <a href="https://quantum-freedom-site.vercel.app/CryptoVigilante.html" target="_blank" rel="noopener">
+      <div class="card-title">Crypto Vigilante <span class="arrow">→</span></div>
+      <div class="card-desc">The crypto. The vigilante. The freedom. The record of how to move outside the system.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="cripto privacidad total spanish">
+    <a href="https://quantum-freedom-site.vercel.app/CriptoPrivacidadTotal.html" target="_blank" rel="noopener">
+      <div class="card-title">Cripto y Privacidad Total <span class="arrow">→</span></div>
+      <div class="card-desc">The Spanish version. The crypto. The privacy. The freedom.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="ai wealth engine">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-ai-wealth-engine.html" target="_blank" rel="noopener">
+      <div class="card-title">AI Wealth Engine <span class="arrow">→</span></div>
+      <div class="card-desc">The wealth. The engine. The record. Built for the operator who wants to generate the money to buy their freedom.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="income builder">
+    <a href="https://quantum-freedom-site.vercel.app/incomeBuilder.html" target="_blank" rel="noopener">
+      <div class="card-title">Income Builder <span class="arrow">→</span></div>
+      <div class="card-desc">The income. The builder. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="gift financial freedom tool">
+    <a href="https://quantum-freedom-site.vercel.app/Gift-Financial-Freedom-Tool.html" target="_blank" rel="noopener">
+      <div class="card-title">Gift — Financial Freedom Tool <span class="arrow">→</span></div>
+      <div class="card-desc">The gift. The financial freedom. The tool.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="quantum financial os debt elimination">
+    <a href="https://quantum-freedom-site.vercel.app/QuantumFinancialOS-CompleteDebtEliminationSystem.html" target="_blank" rel="noopener">
+      <div class="card-title">Quantum Financial OS <span class="arrow">→</span></div>
+      <div class="card-desc">The OS. The quantum. The debt elimination.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="quantum financial face interface">
+    <a href="https://quantum-freedom-site.vercel.app/QuantumFinancialSystemInterface.html" target="_blank" rel="noopener">
+      <div class="card-title">Quantum Financial Face <span class="arrow">→</span></div>
+      <div class="card-desc">The face. The quantum. The interface.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="your debt already paid">
+    <a href="https://quantum-freedom-site.vercel.app/YOUR-DEBT-IS-ALREADY-PAID.html" target="_blank" rel="noopener">
+      <div class="card-title">Your Debt Is Already Paid <span class="arrow">→</span></div>
+      <div class="card-desc">The debt. The paid. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="tu deuda ya esta pagada spanish">
+    <a href="https://quantum-freedom-site.vercel.app/TuDeudaYaEstaPagada.html" target="_blank" rel="noopener">
+      <div class="card-title">Tu Deuda Ya Está Pagada <span class="arrow">→</span></div>
+      <div class="card-desc">The Spanish. The debt. The paid.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="your debt quantum discharged libertad cuantica">
+    <a href="https://quantum-freedom-site.vercel.app/YourDebt-QuantumDischarged.html" target="_blank" rel="noopener">
+      <div class="card-title">Your Debt — Quantum Discharged <span class="arrow">→</span></div>
+      <div class="card-desc">The quantum. The discharged. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="monetary trust theory">
+    <a href="https://quantum-freedom-site.vercel.app/MonetaryTrustTheory.html" target="_blank" rel="noopener">
+      <div class="card-title">Monetary Trust Theory <span class="arrow">→</span></div>
+      <div class="card-desc">The monetary. The trust. The theory.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="negotiable instruments">
+    <a href="https://quantum-freedom-site.vercel.app/NegotiableInstruments.html" target="_blank" rel="noopener">
+      <div class="card-title">Negotiable Instruments <span class="arrow">→</span></div>
+      <div class="card-desc">The instruments. The negotiable. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="negotiable instruments studio">
+    <a href="https://quantum-freedom-site.vercel.app/NegotiableInstrumentStudio.html" target="_blank" rel="noopener">
+      <div class="card-title">Negotiable Instruments Studio <span class="arrow">→</span></div>
+      <div class="card-desc">The studio. The instruments. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="omega tool trust asset recovery">
+    <a href="https://quantum-freedom-site.vercel.app/OMEGA-tool.html" target="_blank" rel="noopener">
+      <div class="card-title">OMEGA Tool — Trust Asset Recovery <span class="arrow">→</span></div>
+      <div class="card-desc">The tool. The Omega. The recovery.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="jubilee protocol">
+    <a href="https://quantum-freedom-site.vercel.app/JubileeProtocol.html" target="_blank" rel="noopener">
+      <div class="card-title">Jubilee Protocol <span class="arrow">→</span></div>
+      <div class="card-desc">The jubilee. The protocol. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="forbidden financial knowledge walker todd">
+    <a href="https://quantum-freedom-site.vercel.app/WalkerTodd.html" target="_blank" rel="noopener">
+      <div class="card-title">Forbidden Financial Knowledge <span class="arrow">→</span></div>
+      <div class="card-desc">The financial. The forbidden. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="death industry">
+    <a href="https://quantum-freedom-site.vercel.app/death-industry.html" target="_blank" rel="noopener">
+      <div class="card-title">Death Industry <span class="arrow">→</span></div>
+      <div class="card-desc">The death. The industry. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="power audit 48 laws">
+    <a href="https://quantum-freedom-site.vercel.app/PowerAudit-48Laws.html" target="_blank" rel="noopener">
+      <div class="card-title">Power Audit — 48 Laws <span class="arrow">→</span></div>
+      <div class="card-desc">The audit. The power. The 48 laws.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="power command center">
+    <a href="https://quantum-freedom-site.vercel.app/PowerCommandCenter.html" target="_blank" rel="noopener">
+      <div class="card-title">Power Command Center <span class="arrow">→</span></div>
+      <div class="card-desc">The command. The power. The center.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="principles sovereignty financial freedom">
+    <a href="https://quantum-freedom-site.vercel.app/PrinciplesOfSovereignty-FinancialFreedom.html" target="_blank" rel="noopener">
+      <div class="card-title">Principles of Sovereignty — Financial Freedom <span class="arrow">→</span></div>
+      <div class="card-desc">The principles. The sovereignty. The financial freedom.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="recovery">
+    <a href="https://quantum-freedom-site.vercel.app/RECOVERY.html" target="_blank" rel="noopener">
+      <div class="card-title">Recovery <span class="arrow">→</span></div>
+      <div class="card-desc">The recovery. The record. The proof.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="payouts">
+    <a href="https://quantum-freedom-site.vercel.app/PAYOUTS.html" target="_blank" rel="noopener">
+      <div class="card-title">Payouts <span class="arrow">→</span></div>
+      <div class="card-desc">The payouts. The record. The proof.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+</div>
+
+<!-- SOVEREIGNTY -->
+<h2 class="section-title" id="sovereignty"><span class="num">07</span>Sovereignty</h2>
+<p class="section-desc">The operator. The path. The daily practice. The nation that is forming.</p>
+<div class="grid" data-section>
+
+  <div class="card" data-search="become the operator sovereign dashboard mission control">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-SovereignOperatorPath.html" target="_blank" rel="noopener">
+      <div class="card-title">Become the Operator <span class="arrow">→</span></div>
+      <div class="card-desc">The sovereign operator dashboard. Mission Control. The command center. Built for the operator who wants to run their life like a mission.</div>
+      <span class="tag tag-core">Core</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="sovereignty tracker water fire theft of land">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-SovereigntyTracker.html" target="_blank" rel="noopener">
+      <div class="card-title">Sovereignty Tracker <span class="arrow">→</span></div>
+      <div class="card-desc">The tracker. Water. Fire. The theft of land. The record of what has been taken and what is being reclaimed.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="embodiment process sovereignty daily practice">
+    <a href="https://quantum-freedom-site.vercel.app/EmbodimentProcess.html" target="_blank" rel="noopener">
+      <div class="card-title">Embodiment Process <span class="arrow">→</span></div>
+      <div class="card-desc">The daily practice. The embodiment. The process of becoming the sovereign you already are.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="find your path colombia">
+    <a href="https://quantum-freedom-site.vercel.app/FindYourPathCOLOMBIA.html" target="_blank" rel="noopener">
+      <div class="card-title">The Sovereign's Path <span class="arrow">→</span></div>
+      <div class="card-desc">The path. The Colombia. The record. Built for the operator who wants to find their way.</div>
+      <span class="tag tag-core">Core</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="stolen centuries history">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-StolenCenturies.html" target="_blank" rel="noopener">
+      <div class="card-title">Stolen Centuries <span class="arrow">→</span></div>
+      <div class="card-desc">The history. The stolen time. The record of what was taken and what was hidden.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="tartaria suppressed history civilization">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-Tartaria.html" target="_blank" rel="noopener">
+      <div class="card-title">Tartaria <span class="arrow">→</span></div>
+      <div class="card-desc">The suppressed history. The civilization that was erased. The record of what they do not want you to know.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="the ascent trauma fuel">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-TheAscent.html" target="_blank" rel="noopener">
+      <div class="card-title">The Ascent — Trauma = Fuel <span class="arrow">→</span></div>
+      <div class="card-desc">The transformation. The trauma. The fuel. Built for the operator who knows that the wound is the engine.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="first lie original deception">
+    <a href="https://quantum-freedom-site.vercel.app/FirstLie.html" target="_blank" rel="noopener">
+      <div class="card-title">First Lie <span class="arrow">→</span></div>
+      <div class="card-desc">The first lie. The original deception. The foundation of the control system.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="flesh veil body illusion">
+    <a href="https://quantum-freedom-site.vercel.app/FleshVeil.html" target="_blank" rel="noopener">
+      <div class="card-title">Flesh Veil <span class="arrow">→</span></div>
+      <div class="card-desc">The veil. The body. The illusion. Built for the operator who wants to see through the veil.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="censored truth they hid this">
+    <a href="https://quantum-freedom-site.vercel.app/CensoredTruth-TheyHidThis.html" target="_blank" rel="noopener">
+      <div class="card-title">Censored Truth <span class="arrow">→</span></div>
+      <div class="card-desc">The truth they hid. The record. The proof. Built for the operator who wants to see what was removed.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="psyops exposed psychological warfare">
+    <a href="https://quantum-freedom-site.vercel.app/ExposedPsyOps.html" target="_blank" rel="noopener">
+      <div class="card-title">PsyOps Exposed <span class="arrow">→</span></div>
+      <div class="card-desc">The operations. The psychological warfare. The record of how they manipulate the population.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="extermination frequency 6g grid">
+    <a href="https://quantum-freedom-site.vercel.app/ExterminationFrequency.html" target="_blank" rel="noopener">
+      <div class="card-title">Extermination Frequency 6G <span class="arrow">→</span></div>
+      <div class="card-desc">The frequency. The 6G. The extermination. Built for the operator who knows the grid is the weapon.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="frequency grid 6g microwave syndrome">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-6GFrequencyGrid.html" target="_blank" rel="noopener">
+      <div class="card-title">The Frequency Grid <span class="arrow">→</span></div>
+      <div class="card-desc">The grid. The frequencies. The record of what is being done to your body. The claim. The gap.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="microwave syndrome electromagnetic hypersensitivity">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-FrequencyGrid.html" target="_blank" rel="noopener">
+      <div class="card-title">Microwave Syndrome <span class="arrow">→</span></div>
+      <div class="card-desc">The syndrome. The symptoms. The record of the harm. The peer-reviewed case reports the official side ignores.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="frequency shield">
+    <a href="https://quantum-freedom-site.vercel.app/FrequencyShield.html" target="_blank" rel="noopener">
+      <div class="card-title">Frequency Shield <span class="arrow">→</span></div>
+      <div class="card-desc">The shield. The frequency. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="digital id great reset">
+    <a href="https://quantum-freedom-site.vercel.app/Digital-ID.html" target="_blank" rel="noopener">
+      <div class="card-title">The Great Reset — Digital ID <span class="arrow">→</span></div>
+      <div class="card-desc">The reset. The digital ID. The record. The plan. The gap.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="jonestown protocol ovens conditioning">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-JonestownProtocol.html" target="_blank" rel="noopener">
+      <div class="card-title">Jonestown Protocol <span class="arrow">→</span></div>
+      <div class="card-desc">The training. The conditioning. The ovens. How they trained us to accept what was coming.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="escape protocol bullet bunker blueprint">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-EscapeProtocol.html" target="_blank" rel="noopener">
+      <div class="card-title">Escape Protocol <span class="arrow">→</span></div>
+      <div class="card-desc">The escape. The bunker. The blueprint. Built for the operator who wants to be ready when the grid goes down.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="broken mirror self reflection">
+    <a href="https://quantum-freedom-site.vercel.app/BrokenMirror.html" target="_blank" rel="noopener">
+      <div class="card-title">Broken Mirror <span class="arrow">→</span></div>
+      <div class="card-desc">The broken mirror. The record. The reflection. Built for the operator who wants to see themselves.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="final awakening mirror you have been avoiding">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-AwakeningTerminal.html" target="_blank" rel="noopener">
+      <div class="card-title">You Already Knew <span class="arrow">→</span></div>
+      <div class="card-desc">The mirror. The avoidance. The record. Built for the operator who is ready to look.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="final call invitation">
+    <a href="https://quantum-freedom-site.vercel.app/FinalCall.html" target="_blank" rel="noopener">
+      <div class="card-title">Final Call <span class="arrow">→</span></div>
+      <div class="card-desc">The final call. The record. The invitation. Read it and decide.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="final download last transmission">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-FinalDownload.html" target="_blank" rel="noopener">
+      <div class="card-title">Final Download — Last Transmission <span class="arrow">→</span></div>
+      <div class="card-desc">The last transmission. The record. The final message.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="forbidden question">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-ForbiddenQuestion.html" target="_blank" rel="noopener">
+      <div class="card-title">The Forbidden Question <span class="arrow">→</span></div>
+      <div class="card-desc">The question. The forbidden. The record. Built for the operator who wants to ask what no one else will ask.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="burn notice chapter they will try to burn">
+    <a href="https://quantum-freedom-site.vercel.app/BurnNotice.html" target="_blank" rel="noopener">
+      <div class="card-title">Burn Notice <span class="arrow">→</span></div>
+      <div class="card-desc">The chapter they will try to burn. The record. The proof. Read it before they do.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="family unit first government">
+    <a href="https://quantum-freedom-site.vercel.app/FamilyUnit.html" target="_blank" rel="noopener">
+      <div class="card-title">Family Unit — Your First Government <span class="arrow">→</span></div>
+      <div class="card-desc">The family. The first government. The record. Built for the operator who wants to understand the foundation.</div>
+      <span class="tag tag-core">Core</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="we are responsible accountability">
+    <a href="https://quantum-freedom-site.vercel.app/WeAreTheOnlyTrulyResponsible.html" target="_blank" rel="noopener">
+      <div class="card-title">We Are Responsible <span class="arrow">→</span></div>
+      <div class="card-desc">The responsibility. The accountability. The only ones who can save us are us.</div>
+      <span class="tag tag-core">Core</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="divine consciousness bridge">
+    <a href="https://quantum-freedom-site.vercel.app/DivineConsciousnessBridge.html" target="_blank" rel="noopener">
+      <div class="card-title">Divine Consciousness Bridge <span class="arrow">→</span></div>
+      <div class="card-desc">The bridge. The connection between the human and the divine. Built for the operator who wants to operate from the higher frequency.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="triune consciousness bridge">
+    <a href="https://quantum-freedom-site.vercel.app/TriuneConsciousnessBridge.html" target="_blank" rel="noopener">
+      <div class="card-title">Triune Consciousness <span class="arrow">→</span></div>
+      <div class="card-desc">The triune. The consciousness. The bridge.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="divine sovereignty engine">
+    <a href="https://quantum-freedom-site.vercel.app/DivineSovereigntyEngine.html" target="_blank" rel="noopener">
+      <div class="card-title">Divine Sovereignty Engine <span class="arrow">→</span></div>
+      <div class="card-desc">The engine. The divine. The sovereignty. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="consciousness matrix decoder">
+    <a href="https://quantum-freedom-site.vercel.app/ConsciousnessMatrixDecoder.html" target="_blank" rel="noopener">
+      <div class="card-title">Consciousness Matrix Decoder <span class="arrow">→</span></div>
+      <div class="card-desc">The decoder. The matrix. The consciousness. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="aether shield digital exorcist prayers">
+    <a href="https://quantum-freedom-site.vercel.app/DigitalExorcist.html" target="_blank" rel="noopener">
+      <div class="card-title">Aether Shield — Digital Exorcist <span class="arrow">→</span></div>
+      <div class="card-desc">The prayers. The deliverance. The spiritual warfare. Built for the operator who knows the fight is not only in the courtroom.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="deliverance prayers catholic spiritual warfare">
+    <a href="https://quantum-freedom-site.vercel.app/DeliverancePrayers-CatholicSpiritualWarfare.html" target="_blank" rel="noopener">
+      <div class="card-title">Deliverance Prayers <span class="arrow">→</span></div>
+      <div class="card-desc">The Catholic version. The prayers. The deliverance. The tradition.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="scutum fidei shield of faith">
+    <a href="https://quantum-freedom-site.vercel.app/ScutumFidei.html" target="_blank" rel="noopener">
+      <div class="card-title">Scutum Fidei <span class="arrow">→</span></div>
+      <div class="card-desc">The shield of faith. The sealing prayers. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="scutum fidei daily armory">
+    <a href="https://quantum-freedom-site.vercel.app/Scutum-Fidei-DailyArmory.html" target="_blank" rel="noopener">
+      <div class="card-title">Scutum Fidei — Daily Armory <span class="arrow">→</span></div>
+      <div class="card-desc">The daily armory. The shield of faith. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="scutum fidei quantum spiritual warfare">
+    <a href="https://quantum-freedom-site.vercel.app/ScutumFidei-QuantumSpiritualWarfare.html" target="_blank" rel="noopener">
+      <div class="card-title">Scutum Fidei — Quantum Spiritual Warfare <span class="arrow">→</span></div>
+      <div class="card-desc">The quantum. The spiritual warfare. The shield of faith.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="suppressed scriptures discover">
+    <a href="https://quantum-freedom-site.vercel.app/DiscoverTheSuppressedScriptures.html" target="_blank" rel="noopener">
+      <div class="card-title">Suppressed Scriptures <span class="arrow">→</span></div>
+      <div class="card-desc">The texts that were removed. The scriptures that were buried. The record of what the institution did not want you to read.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="apocalypse of peter">
+    <a href="https://quantum-freedom-site.vercel.app/ApocalypseOfPeter.html" target="_blank" rel="noopener">
+      <div class="card-title">Apocalypse of Peter <span class="arrow">→</span></div>
+      <div class="card-desc">The Apocalypse. The Peter. The record. The suppressed text.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="ethiopic book of ecclesiastes">
+    <a href="https://quantum-freedom-site.vercel.app/BookOfEcclesiastes.html" target="_blank" rel="noopener">
+      <div class="card-title">Ethiopic Book of Ecclesiastes <span class="arrow">→</span></div>
+      <div class="card-desc">The Ecclesiastes. The Ethiopic. The record. The suppressed text.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="the book of enoch">
+    <a href="https://quantum-freedom-site.vercel.app/theBookOfEnoch.html" target="_blank" rel="noopener">
+      <div class="card-title">The Book of Enoch <span class="arrow">→</span></div>
+      <div class="card-desc">The Enoch. The record. The suppressed text.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="the didache">
+    <a href="https://quantum-freedom-site.vercel.app/theDidache.html" target="_blank" rel="noopener">
+      <div class="card-title">The Didache <span class="arrow">→</span></div>
+      <div class="card-desc">The Didache. The record. The suppressed text.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="gospel of philip">
+    <a href="https://quantum-freedom-site.vercel.app/TheGospelOfPhilip.html" target="_blank" rel="noopener">
+      <div class="card-title">Gospel of Philip <span class="arrow">→</span></div>
+      <div class="card-desc">The Philip. The gospel. The suppressed text.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="gospel of thomas hidden sayings jesus">
+    <a href="https://quantum-freedom-site.vercel.app/GospelOfThomas-TheHiddenSayingsOfJesus.html" target="_blank" rel="noopener">
+      <div class="card-title">Gospel of Thomas <span class="arrow">→</span></div>
+      <div class="card-desc">The Thomas. The hidden sayings. The record.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="wisdom of solomon">
+    <a href="https://quantum-freedom-site.vercel.app/WisdomOfSolomon.html" target="_blank" rel="noopener">
+      <div class="card-title">Wisdom of Solomon <span class="arrow">→</span></div>
+      <div class="card-desc">The wisdom. The Solomon. The record.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="ancient wisdom soul contract sacred scrolls">
+    <a href="https://quantum-freedom-site.vercel.app/AncientWisdomAwaits.html" target="_blank" rel="noopener">
+      <div class="card-title">Ancient Wisdom Awaits <span class="arrow">→</span></div>
+      <div class="card-desc">The ancient. The wisdom. The soul contract. The sacred scrolls. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="forbidden beautiful knowledge angel transmissions">
+    <a href="https://quantum-freedom-site.vercel.app/AngelTransmissions.html" target="_blank" rel="noopener">
+      <div class="card-title">Forbidden Beautiful Knowledge <span class="arrow">→</span></div>
+      <div class="card-desc">The beautiful. The forbidden. The record. Built for the operator who wants the beautiful as well as the dark.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="silence beyond words">
+    <a href="https://quantum-freedom-site.vercel.app/BeyondSilence.html" target="_blank" rel="noopener">
+      <div class="card-title">Silence Beyond Words <span class="arrow">→</span></div>
+      <div class="card-desc">The silence. The beyond. The words. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="forbidden blueprint royal jelly">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenBlueprint.html" target="_blank" rel="noopener">
+      <div class="card-title">Forbidden Blueprint — Royal Jelly <span class="arrow">→</span></div>
+      <div class="card-desc">The blueprint. The royal jelly. The record. The claim.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="666 number of beast mohamed">
+    <a href="https://quantum-freedom-site.vercel.app/666.html" target="_blank" rel="noopener">
+      <div class="card-title">666 and the Number of the Beast <span class="arrow">→</span></div>
+      <div class="card-desc">The 666. The record. The claim. The gap.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="number of the beast antichrist">
+    <a href="https://quantum-freedom-site.vercel.app/AntiChrist.html" target="_blank" rel="noopener">
+      <div class="card-title">Number of the Beast <span class="arrow">→</span></div>
+      <div class="card-desc">The number. The beast. The record. The claim.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="archons">
+    <a href="https://quantum-freedom-site.vercel.app/Archons.html" target="_blank" rel="noopener">
+      <div class="card-title">Archons <span class="arrow">→</span></div>
+      <div class="card-desc">The archons. The record. The claim. The gap.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="grimoire complete app bible 6year">
+    <a href="https://quantum-freedom-site.vercel.app/6year.html" target="_blank" rel="noopener">
+      <div class="card-title">The Grimoire Complete App Bible <span class="arrow">→</span></div>
+      <div class="card-desc">The grimoire. The bible. The record. The complete.</div>
+      <span class="tag tag-book">Book</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="the grimoire">
+    <a href="https://quantum-freedom-site.vercel.app/TheGrimoire.html" target="_blank" rel="noopener">
+      <div class="card-title">The Grimoire <span class="arrow">→</span></div>
+      <div class="card-desc">The grimoire. The record. The complete.</div>
+      <span class="tag tag-book">Book</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="the awakening">
+    <a href="https://quantum-freedom-site.vercel.app/TheAwakening.html" target="_blank" rel="noopener">
+      <div class="card-title">The Awakening <span class="arrow">→</span></div>
+      <div class="card-desc">The awakening. The record. The mirror.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="wake up">
+    <a href="https://quantum-freedom-site.vercel.app/WakeUp.html" target="_blank" rel="noopener">
+      <div class="card-title">Wake Up <span class="arrow">→</span></div>
+      <div class="card-desc">The wake up. The record.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="how awake level">
+    <a href="https://quantum-freedom-site.vercel.app/HOW-AWAKE.html" target="_blank" rel="noopener">
+      <div class="card-title">How Awake? <span class="arrow">→</span></div>
+      <div class="card-desc">The level. The awake. The record.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="loser logic">
+    <a href="https://quantum-freedom-site.vercel.app/LoserLogic.html" target="_blank" rel="noopener">
+      <div class="card-title">Loser Logic <span class="arrow">→</span></div>
+      <div class="card-desc">The loser. The logic. The record.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="manchurian candidates">
+    <a href="https://quantum-freedom-site.vercel.app/ManchurianCandidate.html" target="_blank" rel="noopener">
+      <div class="card-title">Manchurian Candidates <span class="arrow">→</span></div>
+      <div class="card-desc">The candidates. The Manchurian. The record.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="the untouchables exposed documented crimes powerful">
+    <a href="https://quantum-freedom-site.vercel.app/TheUntouchablesExposed-DocumentedCrimesofthePowerful.html" target="_blank" rel="noopener">
+      <div class="card-title">The Untouchables <span class="arrow">→</span></div>
+      <div class="card-desc">The untouchables. The crimes. The record.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="untouchables">
+    <a href="https://quantum-freedom-site.vercel.app/untouchables.html" target="_blank" rel="noopener">
+      <div class="card-title">Untouchables <span class="arrow">→</span></div>
+      <div class="card-desc">The untouchables. The record.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="steaming pile">
+    <a href="https://quantum-freedom-site.vercel.app/SteamingPile.html" target="_blank" rel="noopener">
+      <div class="card-title">Steaming Pile <span class="arrow">→</span></div>
+      <div class="card-desc">The steaming pile. The record.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="hmmmmmmm">
+    <a href="https://quantum-freedom-site.vercel.app/hmmm.html" target="_blank" rel="noopener">
+      <div class="card-title">Hmmmmmmm <span class="arrow">→</span></div>
+      <div class="card-desc">The hmmmmmm. The record.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="final lock">
+    <a href="https://quantum-freedom-site.vercel.app/FinalLock.html" target="_blank" rel="noopener">
+      <div class="card-title">Final Lock <span class="arrow">→</span></div>
+      <div class="card-desc">The lock. The final. The record.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="final chapter you will never finish">
+    <a href="https://quantum-freedom-site.vercel.app/FinalChapterUnfinished.html" target="_blank" rel="noopener">
+      <div class="card-title">Final Chapter You Will Never Finish <span class="arrow">→</span></div>
+      <div class="card-desc">The unfinished. The final chapter. The record.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="forbidden knowledge engine">
+    <a href="https://quantum-freedom-site.vercel.app/Forbidden_Knowledge_Freemium.html" target="_blank" rel="noopener">
+      <div class="card-title">Forbidden Knowledge Engine <span class="arrow">→</span></div>
+      <div class="card-desc">The engine. The knowledge. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="forbidden knowledge osint">
+    <a href="https://quantum-freedom-site.vercel.app/OSINT.html" target="_blank" rel="noopener">
+      <div class="card-title">Forbidden Knowledge OSINT <span class="arrow">→</span></div>
+      <div class="card-desc">The OSINT. The knowledge. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="detective colombo truth engine">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-TruthEngine.html" target="_blank" rel="noopener">
+      <div class="card-title">Detective Colombo — Truth Engine <span class="arrow">→</span></div>
+      <div class="card-desc">The detective. The truth engine. The record. Built for the operator who wants to find what is hidden.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="viral video factory">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-ViralVideoFactory.html" target="_blank" rel="noopener">
+      <div class="card-title">Viral Video Factory <span class="arrow">→</span></div>
+      <div class="card-desc">The viral. The video. The factory. Built for the operator who wants to spread the truth.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="reality hacker toolkit">
+    <a href="https://quantum-freedom-site.vercel.app/RealityHackerToolkit.html" target="_blank" rel="noopener">
+      <div class="card-title">Reality Hacker Toolkit <span class="arrow">→</span></div>
+      <div class="card-desc">The reality. The hacker. The toolkit.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="reality reclamation matrix">
+    <a href="https://quantum-freedom-site.vercel.app/RealityReclamationMatrix.html" target="_blank" rel="noopener">
+      <div class="card-title">Reality Reclamation Matrix <span class="arrow">→</span></div>
+      <div class="card-desc">The reality. The reclamation. The matrix.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="soul recognition engine">
+    <a href="https://quantum-freedom-site.vercel.app/SoulRecognitionEngine.html" target="_blank" rel="noopener">
+      <div class="card-title">Soul Recognition Engine <span class="arrow">→</span></div>
+      <div class="card-desc">The soul. The recognition. The engine.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="sacred wound">
+    <a href="https://quantum-freedom-site.vercel.app/SacredWound.html" target="_blank" rel="noopener">
+      <div class="card-title">Sacred Wound <span class="arrow">→</span></div>
+      <div class="card-desc">The sacred. The wound. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="optic guillotine">
+    <a href="https://quantum-freedom-site.vercel.app/TheOpticGuillotine.html" target="_blank" rel="noopener">
+      <div class="card-title">The Optic Guillotine <span class="arrow">→</span></div>
+      <div class="card-desc">The optic. The guillotine. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="timeclock">
+    <a href="https://quantum-freedom-site.vercel.app/TIMECLOCK.html" target="_blank" rel="noopener">
+      <div class="card-title">TIMECLOCK <span class="arrow">→</span></div>
+      <div class="card-desc">The timeclock. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="traffic stop rights">
+    <a href="https://quantum-freedom-site.vercel.app/TrafficStop.html" target="_blank" rel="noopener">
+      <div class="card-title">Traffic Stop <span class="arrow">→</span></div>
+      <div class="card-desc">The traffic. The stop. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="jax slater free car path">
+    <a href="https://quantum-freedom-site.vercel.app/Jax-Slaters-Free-Car-Path.html" target="_blank" rel="noopener">
+      <div class="card-title">Jax Slater's Free Car Path <span class="arrow">→</span></div>
+      <div class="card-desc">The free car. The path. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="graphene os exploit protection">
+    <a href="https://quantum-freedom-site.vercel.app/GrapheneOS.html" target="_blank" rel="noopener">
+      <div class="card-title">Graphene OS <span class="arrow">→</span></div>
+      <div class="card-desc">The OS. The Graphene. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="graphene exploit protection">
+    <a href="https://quantum-freedom-site.vercel.app/Graphene.html" target="_blank" rel="noopener">
+      <div class="card-title">Graphene Exploit Protection <span class="arrow">→</span></div>
+      <div class="card-desc">The exploit. The protection. The Graphene.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="quantum resurrection">
+    <a href="https://quantum-freedom-site.vercel.app/QuantumResurrection.html" target="_blank" rel="noopener">
+      <div class="card-title">Quantum Resurrection <span class="arrow">→</span></div>
+      <div class="card-desc">The quantum. The resurrection. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="quantum freedom os">
+    <a href="https://quantum-freedom-site.vercel.app/QuantumFreedomOSv2.0.html" target="_blank" rel="noopener">
+      <div class="card-title">Quantum Freedom OS <span class="arrow">→</span></div>
+      <div class="card-desc">The quantum. The freedom. The OS.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="quantum freedom suite nacu">
+    <a href="https://quantum-freedom-site.vercel.app/NACU-NUKE.html" target="_blank" rel="noopener">
+      <div class="card-title">Quantum Freedom Suite <span class="arrow">→</span></div>
+      <div class="card-desc">The suite. The quantum. The freedom.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="nacu hub ciudadano cielo">
+    <a href="https://quantum-freedom-site.vercel.app/NACU-HUB.html" target="_blank" rel="noopener">
+      <div class="card-title">NACU Hub <span class="arrow">→</span></div>
+      <div class="card-desc">The hub. The NACU. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="global impact economy">
+    <a href="https://quantum-freedom-site.vercel.app/GlobalImpactEconomy.html" target="_blank" rel="noopener">
+      <div class="card-title">Global Impact Economy <span class="arrow">→</span></div>
+      <div class="card-desc">The global. The impact. The economy.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="global liberation calendar">
+    <a href="https://quantum-freedom-site.vercel.app/GlobalLiberationCalendar.html" target="_blank" rel="noopener">
+      <div class="card-title">Global Liberation Calendar <span class="arrow">→</span></div>
+      <div class="card-desc">The calendar. The liberation. The global.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+</div>
+
+<!-- COLOMBIA -->
+<h2 class="section-title" id="colombia"><span class="num">08</span>Colombia Sanctuary</h2>
+<p class="section-desc">The sanctuary in the mountains. The country. The dossier. The door.</p>
+<div class="grid" data-section>
+
+  <div class="card" data-search="colombia complete dossier 2026">
+    <a href="https://quantum-freedom-site.vercel.app/Colombia2026.html" target="_blank" rel="noopener">
+      <div class="card-title">Colombia Complete Dossier <span class="arrow">→</span></div>
+      <div class="card-desc">The complete dossier. The country. The sanctuary. The record. Everything you need to know before you come.</div>
+      <span class="tag tag-core">Sanctuary</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="colombia invitation konami">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-KONAMI.html" target="_blank" rel="noopener">
+      <div class="card-title">Colombia Invitation — Konami <span class="arrow">→</span></div>
+      <div class="card-desc">The invitation. The Konami door. The record. Built for the operator who is ready to come.</div>
+      <span class="tag tag-core">Sanctuary</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="colombia sanctuary global collapse">
+    <a href="https://quantum-freedom-site.vercel.app/Colombia_Sanctuary.html" target="_blank" rel="noopener">
+      <div class="card-title">Colombia Sanctuary <span class="arrow">→</span></div>
+      <div class="card-desc">The collapse. The sanctuary. The Colombia. The record. Built for the operator who wants to be ready when the system fails.</div>
+      <span class="tag tag-core">Sanctuary</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="colombia awaits your heart">
+    <a href="https://quantum-freedom-site.vercel.app/ColombiaAwaitsYourHeart.html" target="_blank" rel="noopener">
+      <div class="card-title">Colombia Awaits Your Heart <span class="arrow">→</span></div>
+      <div class="card-desc">The heart. The Colombia. The record. Built for the operator who is ready to come.</div>
+      <span class="tag tag-core">Sanctuary</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="colombia is a door">
+    <a href="https://quantum-freedom-site.vercel.app/Door.html" target="_blank" rel="noopener">
+      <div class="card-title">Colombia Is a Door <span class="arrow">→</span></div>
+      <div class="card-desc">The door. The Colombia. The record. Built for the operator who is ready to walk through.</div>
+      <span class="tag tag-core">Sanctuary</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="colombia travel companion">
+    <a href="https://quantum-freedom-site.vercel.app/ColombiaTravelCompanion.html" target="_blank" rel="noopener">
+      <div class="card-title">Colombia Travel Companion <span class="arrow">→</span></div>
+      <div class="card-desc">The companion. The travel. The record. The Colombia. Built for the operator who is coming.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="discover the magic of colombia">
+    <a href="https://quantum-freedom-site.vercel.app/DiscoverMagicColombia.html" target="_blank" rel="noopener">
+      <div class="card-title">Discover the Magic of Colombia <span class="arrow">→</span></div>
+      <div class="card-desc">The magic. The Colombia. The record. The beauty of the sanctuary.</div>
+      <span class="tag tag-core">Sanctuary</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="colombia promised land exodus">
+    <a href="https://quantum-freedom-site.vercel.app/Exodus-Miracles-Control.html" target="_blank" rel="noopener">
+      <div class="card-title">Colombia Promised Land <span class="arrow">→</span></div>
+      <div class="card-desc">The exodus. The miracles. The control. The record. The promised land.</div>
+      <span class="tag tag-core">Sanctuary</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="colombian freedom toolkit">
+    <a href="https://quantum-freedom-site.vercel.app/ColombianFreedomToolkit.html" target="_blank" rel="noopener">
+      <div class="card-title">Colombian Freedom Toolkit <span class="arrow">→</span></div>
+      <div class="card-desc">The toolkit. The freedom. The Colombian. The record. Built for the operator who is coming.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="colombian freedom toolkit 2">
+    <a href="https://quantum-freedom-site.vercel.app/ColombianFreedomTookit2.html" target="_blank" rel="noopener">
+      <div class="card-title">Colombian Freedom Toolkit 2 <span class="arrow">→</span></div>
+      <div class="card-desc">The second toolkit. The freedom. The Colombian. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="colombian artisan freedom global connect">
+    <a href="https://quantum-freedom-site.vercel.app/ColombianArtisanFreedom.html" target="_blank" rel="noopener">
+      <div class="card-title">Colombian Artisan Freedom <span class="arrow">→</span></div>
+      <div class="card-desc">The artisan. The freedom. The Colombian. The record. Built for the operator who wants to build in Colombia.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="colombian artisan global connect">
+    <a href="https://quantum-freedom-site.vercel.app/ColombianArtisanGlobalConnect.html" target="_blank" rel="noopener">
+      <div class="card-title">Colombian Artisan Global Connect <span class="arrow">→</span></div>
+      <div class="card-desc">The artisan. The global. The connect. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="colombian business system tutorial">
+    <a href="https://quantum-freedom-site.vercel.app/ColombianBusinessSystemTutorial.html" target="_blank" rel="noopener">
+      <div class="card-title">Colombian Business System Tutorial <span class="arrow">→</span></div>
+      <div class="card-desc">The tutorial. The business. The system. The Colombian. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="colombian culinary freedom app">
+    <a href="https://quantum-freedom-site.vercel.app/ColombianCulinaryFreedomAPP.html" target="_blank" rel="noopener">
+      <div class="card-title">Colombian Culinary Freedom <span class="arrow">→</span></div>
+      <div class="card-desc">The culinary. The freedom. The Colombian. The record. The food of the sanctuary.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="colombian rhythm revolution">
+    <a href="https://quantum-freedom-site.vercel.app/ColombianRhythmRevolution.html" target="_blank" rel="noopener">
+      <div class="card-title">Colombian Rhythm Revolution <span class="arrow">→</span></div>
+      <div class="card-desc">The rhythm. The revolution. The Colombian. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="eco cultura andina">
+    <a href="https://quantum-freedom-site.vercel.app/EcoCultura.html" target="_blank" rel="noopener">
+      <div class="card-title">Eco Cultura Andina <span class="arrow">→</span></div>
+      <div class="card-desc">The Andes. The culture. The sanctuary. The record.</div>
+      <span class="tag tag-core">Sanctuary</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="eco cultura andina emergency">
+    <a href="https://quantum-freedom-site.vercel.app/EcoCulturaAndina-EmergencyAPP.html" target="_blank" rel="noopener">
+      <div class="card-title">Eco Cultura — Emergency Response <span class="arrow">→</span></div>
+      <div class="card-desc">The emergency. The response. The companion. Built for the operator who wants to be ready.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="eco cultura cosmic ancient wisdom">
+    <a href="https://quantum-freedom-site.vercel.app/EcoCulturaAndina=Cosmic.html" target="_blank" rel="noopener">
+      <div class="card-title">Eco Cultura — Cosmic Wisdom <span class="arrow">→</span></div>
+      <div class="card-desc">The wisdom. The Andes. The cosmic. The record.</div>
+      <span class="tag tag-core">Sanctuary</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="ark colombian solutions nexus">
+    <a href="https://quantum-freedom-site.vercel.app/ARK-ColombianSolutionsNexus.html" target="_blank" rel="noopener">
+      <div class="card-title">ARK — Colombian Solutions Nexus <span class="arrow">→</span></div>
+      <div class="card-desc">The ARK. The nexus. The record. The Colombian solutions.</div>
+      <span class="tag tag-core">Sanctuary</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="ark">
+    <a href="https://quantum-freedom-site.vercel.app/ARK.html" target="_blank" rel="noopener">
+      <div class="card-title">ARK <span class="arrow">→</span></div>
+      <div class="card-desc">The ARK. The record. The sanctuary.</div>
+      <span class="tag tag-core">Sanctuary</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="host del arca spanish">
+    <a href="https://quantum-freedom-site.vercel.app/ArkHost.html" target="_blank" rel="noopener">
+      <div class="card-title">Host del Arca <span class="arrow">→</span></div>
+      <div class="card-desc">The host. The ark. The Spanish. The record.</div>
+      <span class="tag tag-core">Sanctuary</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="camino libertad">
+    <a href="https://quantum-freedom-site.vercel.app/Camino-Libertad.html" target="_blank" rel="noopener">
+      <div class="card-title">Camino a la Libertad <span class="arrow">→</span></div>
+      <div class="card-desc">The path. The freedom. The record. The Spanish.</div>
+      <span class="tag tag-core">Sanctuary</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="cielo limpio salento">
+    <a href="https://quantum-freedom-site.vercel.app/CieloLimpioSalento.html" target="_blank" rel="noopener">
+      <div class="card-title">Cielo Limpio — Salento <span class="arrow">→</span></div>
+      <div class="card-desc">The clean sky. The Salento. The record. The proof.</div>
+      <span class="tag tag-core">Sanctuary</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="salento skies">
+    <a href="https://quantum-freedom-site.vercel.app/SalentoSkies.html" target="_blank" rel="noopener">
+      <div class="card-title">Salento Skies <span class="arrow">→</span></div>
+      <div class="card-desc">The skies. The Salento. The record.</div>
+      <span class="tag tag-core">Sanctuary</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="salento chemtrail">
+    <a href="https://quantum-freedom-site.vercel.app/SalentoChemtrail.html" target="_blank" rel="noopener">
+      <div class="card-title">Salento Chemtrail <span class="arrow">→</span></div>
+      <div class="card-desc">The chemtrail. The Salento. The record.</div>
+      <span class="tag tag-core">Sanctuary</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="signal cannon chemtrails detected">
+    <a href="https://quantum-freedom-site.vercel.app/SignalCannon.html" target="_blank" rel="noopener">
+      <div class="card-title">Signal Cannon — Chemtrails Detected <span class="arrow">→</span></div>
+      <div class="card-desc">The signal. The cannon. The chemtrails. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="silent killer infrasound">
+    <a href="https://quantum-freedom-site.vercel.app/SilentKiller.html" target="_blank" rel="noopener">
+      <div class="card-title">Silent Killer — Infrasound <span class="arrow">→</span></div>
+      <div class="card-desc">The silent. The killer. The infrasound. The record.</div>
+      <span class="tag tag-terminal">Terminal</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="equilibrio">
+    <a href="https://quantum-freedom-site.vercel.app/Equilibrio.html" target="_blank" rel="noopener">
+      <div class="card-title">Equilibrio <span class="arrow">→</span></div>
+      <div class="card-desc">The balance. The record. The Spanish. The wisdom.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="equilibrio2">
+    <a href="https://quantum-freedom-site.vercel.app/Equilibrio2.html" target="_blank" rel="noopener">
+      <div class="card-title">Equilibrio 2 <span class="arrow">→</span></div>
+      <div class="card-desc">The second. The balance. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="equilibrio4">
+    <a href="https://quantum-freedom-site.vercel.app/Equilibrio4.html" target="_blank" rel="noopener">
+      <div class="card-title">Equilibrio 4 <span class="arrow">→</span></div>
+      <div class="card-desc">The fourth. The balance. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="equilibrio5">
+    <a href="https://quantum-freedom-site.vercel.app/Equilibrio5.html" target="_blank" rel="noopener">
+      <div class="card-title">Equilibrio 5 <span class="arrow">→</span></div>
+      <div class="card-desc">The fifth. The balance. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="equilibrio6 conocimiento prohibido">
+    <a href="https://quantum-freedom-site.vercel.app/Equilibrio6.html" target="_blank" rel="noopener">
+      <div class="card-title">Equilibrio 6 — Conocimiento Prohibido <span class="arrow">→</span></div>
+      <div class="card-desc">The sixth. The forbidden knowledge. The balance. The record. The Spanish.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="trips colombia app">
+    <a href="https://quantum-freedom-site.vercel.app/TripsToColombia-APP.html" target="_blank" rel="noopener">
+      <div class="card-title">TripsToColombia <span class="arrow">→</span></div>
+      <div class="card-desc">The app. The trips. The Colombia. The record.</div>
+      <span class="tag tag-core">Sanctuary</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="andean connection app">
+    <a href="https://quantum-freedom-site.vercel.app/AndeanConnectionAPP.html" target="_blank" rel="noopener">
+      <div class="card-title">Andean Connection APP <span class="arrow">→</span></div>
+      <div class="card-desc">The connection. The Andes. The app. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="colombian soulmate">
+    <a href="https://quantum-freedom-site.vercel.app/ColombianSoulmate.html" target="_blank" rel="noopener">
+      <div class="card-title">Colombian Soulmate <span class="arrow">→</span></div>
+      <div class="card-desc">The soulmate. The Colombian. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="colombia amor verdadero">
+    <a href="https://quantum-freedom-site.vercel.app/Colombia-Amor-Verdadero.html" target="_blank" rel="noopener">
+      <div class="card-title">Colombia Amor Verdadero <span class="arrow">→</span></div>
+      <div class="card-desc">The love. The true. The record. The Colombia.</div>
+      <span class="tag tag-core">Sanctuary</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="colombia business success blueprint">
+    <a href="https://quantum-freedom-site.vercel.app/ColombiaBusinessSuccessBlueprint.html" target="_blank" rel="noopener">
+      <div class="card-title">Colombia Business Success Blueprint <span class="arrow">→</span></div>
+      <div class="card-desc">The blueprint. The business. The record. The proof.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="colombia 10% sign up business">
+    <a href="https://quantum-freedom-site.vercel.app/ConviertePasionEnNegocio.html" target="_blank" rel="noopener">
+      <div class="card-title">Colombia 10% Sign Up Business <span class="arrow">→</span></div>
+      <div class="card-desc">The 10%. The business. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="colombia travel mate">
+    <a href="https://quantum-freedom-site.vercel.app/Travel.html" target="_blank" rel="noopener">
+      <div class="card-title">Colombia Travel Mate <span class="arrow">→</span></div>
+      <div class="card-desc">The mate. The travel. The Colombia. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="yolo adventure">
+    <a href="https://quantum-freedom-site.vercel.app/YOLO-ADVENTURE.html" target="_blank" rel="noopener">
+      <div class="card-title">YOLO Adventure <span class="arrow">→</span></div>
+      <div class="card-desc">The YOLO. The adventure. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="moto colombia">
+    <a href="https://quantum-freedom-site.vercel.app/MotoColombia.html" target="_blank" rel="noopener">
+      <div class="card-title">Moto Colombia <span class="arrow">→</span></div>
+      <div class="card-desc">The moto. The Colombia. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="moto salento">
+    <a href="https://quantum-freedom-site.vercel.app/MotoSalento.html" target="_blank" rel="noopener">
+      <div class="card-title">Moto Salento <span class="arrow">→</span></div>
+      <div class="card-desc">The moto. The Salento. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="marroko">
+    <a href="https://quantum-freedom-site.vercel.app/Marroko.html" target="_blank" rel="noopener">
+      <div class="card-title">Marroko <span class="arrow">→</span></div>
+      <div class="card-desc">The Marroko. The moto. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="mountain land network">
+    <a href="https://quantum-freedom-site.vercel.app/MountainLandNetwork.html" target="_blank" rel="noopener">
+      <div class="card-title">Mountain Land Network <span class="arrow">→</span></div>
+      <div class="card-desc">The mountain. The land. The network.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="secure mountain network contact">
+    <a href="https://quantum-freedom-site.vercel.app/SecureMountainNetworkContact.html" target="_blank" rel="noopener">
+      <div class="card-title">Secure Mountain Network Contact <span class="arrow">→</span></div>
+      <div class="card-desc">The secure. The mountain. The network.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="land">
+    <a href="https://quantum-freedom-site.vercel.app/Land.html" target="_blank" rel="noopener">
+      <div class="card-title">Land <span class="arrow">→</span></div>
+      <div class="card-desc">The land. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="land stewardship agreement helper">
+    <a href="https://quantum-freedom-site.vercel.app/LandStewardshipAgreementHelper.html" target="_blank" rel="noopener">
+      <div class="card-title">Land Stewardship Agreement Helper <span class="arrow">→</span></div>
+      <div class="card-desc">The stewardship. The agreement. The land.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="the hearth">
+    <a href="https://quantum-freedom-site.vercel.app/the-Hearth.html" target="_blank" rel="noopener">
+      <div class="card-title">The Hearth <span class="arrow">→</span></div>
+      <div class="card-desc">The hearth. The record.</div>
+      <span class="tag tag-core">Sanctuary</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="ark of the unseen multidimensional sanctuary">
+    <a href="https://quantum-freedom-site.vercel.app/MultiDimensionalSanctuary.html" target="_blank" rel="noopener">
+      <div class="card-title">The Ark of the Unseen <span class="arrow">→</span></div>
+      <div class="card-desc">The ark. The unseen. The sanctuary.</div>
+      <span class="tag tag-core">Sanctuary</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="the sanctuary liberation library">
+    <a href="https://quantum-freedom-site.vercel.app/LiberationLibrary.html" target="_blank" rel="noopener">
+      <div class="card-title">The Sanctuary <span class="arrow">→</span></div>
+      <div class="card-desc">The sanctuary. The liberation. The library.</div>
+      <span class="tag tag-core">Sanctuary</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="the lions den">
+    <a href="https://quantum-freedom-site.vercel.app/TheLionsDen.html" target="_blank" rel="noopener">
+      <div class="card-title">The Lion's Den <span class="arrow">→</span></div>
+      <div class="card-desc">The lion's den. The record.</div>
+      <span class="tag tag-core">Sanctuary</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="lions club access members">
+    <a href="https://quantum-freedom-site.vercel.app/LionsClub-AccessoMiembros.html" target="_blank" rel="noopener">
+      <div class="card-title">Lions Club <span class="arrow">→</span></div>
+      <div class="card-desc">The club. The lions. The freedom. The financial. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="miembros lions dashboard">
+    <a href="https://quantum-freedom-site.vercel.app/Miembros-Lions.html" target="_blank" rel="noopener">
+      <div class="card-title">Miembros Lions <span class="arrow">→</span></div>
+      <div class="card-desc">The members. The lions. The dashboard.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="club leones construye libertad financiera">
+    <a href="https://quantum-freedom-site.vercel.app/ClubLeones-ConstruyeLibertadFinanciera.html" target="_blank" rel="noopener">
+      <div class="card-title">Club Leones <span class="arrow">→</span></div>
+      <div class="card-desc">The club. The lions. The freedom. The financial. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="plan quinquenal">
+    <a href="https://quantum-freedom-site.vercel.app/PlanQuinquenal.html" target="_blank" rel="noopener">
+      <div class="card-title">Plan Quinquenal <span class="arrow">→</span></div>
+      <div class="card-desc">The plan. The quinquenal. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="himno leonistico">
+    <a href="https://quantum-freedom-site.vercel.app/Himno-Leonistico-LetraOficial.html" target="_blank" rel="noopener">
+      <div class="card-title">Himno Leonístico <span class="arrow">→</span></div>
+      <div class="card-desc">The anthem. The lion. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="origen vive la experiencia">
+    <a href="https://quantum-freedom-site.vercel.app/Origen.ViveLaExperiencia.html" target="_blank" rel="noopener">
+      <div class="card-title">Origen — Vive la Experiencia <span class="arrow">→</span></div>
+      <div class="card-desc">The origin. The experience. The record.</div>
+      <span class="tag tag-core">Sanctuary</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="origen parapente">
+    <a href="https://quantum-freedom-site.vercel.app/OrigenParapente.html" target="_blank" rel="noopener">
+      <div class="card-title">Origen Parapente <span class="arrow">→</span></div>
+      <div class="card-desc">The origin. The paragliding. The record.</div>
+      <span class="tag tag-core">Sanctuary</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="origen salento">
+    <a href="https://quantum-freedom-site.vercel.app/OrigenSalento.html" target="_blank" rel="noopener">
+      <div class="card-title">Origen Salento <span class="arrow">→</span></div>
+      <div class="card-desc">The origin. The Salento. The record.</div>
+      <span class="tag tag-core">Sanctuary</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="pijao rotary">
+    <a href="https://quantum-freedom-site.vercel.app/Pijao.html" target="_blank" rel="noopener">
+      <div class="card-title">Pijao — Rotary <span class="arrow">→</span></div>
+      <div class="card-desc">The Pijao. The Rotary. The record.</div>
+      <span class="tag tag-core">Sanctuary</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="ayni santuario">
+    <a href="https://quantum-freedom-site.vercel.app/Ayni.html" target="_blank" rel="noopener">
+      <div class="card-title">Ayni Santuario <span class="arrow">→</span></div>
+      <div class="card-desc">The Ayni. The sanctuary. The record.</div>
+      <span class="tag tag-core">Sanctuary</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="damafre origen">
+    <a href="https://quantum-freedom-site.vercel.app/DamafreOrigen.html" target="_blank" rel="noopener">
+      <div class="card-title">Damafre Origen <span class="arrow">→</span></div>
+      <div class="card-desc">The Daniel. The origin. The record.</div>
+      <span class="tag tag-core">Sanctuary</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="aura serena spa">
+    <a href="https://quantum-freedom-site.vercel.app/Aura_Serena.html" target="_blank" rel="noopener">
+      <div class="card-title">Aura Serena Spa <span class="arrow">→</span></div>
+      <div class="card-desc">The spa. The record.</div>
+      <span class="tag tag-core">Sanctuary</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="aura serena romance">
+    <a href="https://quantum-freedom-site.vercel.app/AuraSerenaRomance.html" target="_blank" rel="noopener">
+      <div class="card-title">Aura Serena Romance <span class="arrow">→</span></div>
+      <div class="card-desc">The romance. The record.</div>
+      <span class="tag tag-core">Sanctuary</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="cristian">
+    <a href="https://quantum-freedom-site.vercel.app/Cristian.html" target="_blank" rel="noopener">
+      <div class="card-title">Cristian <span class="arrow">→</span></div>
+      <div class="card-desc">The Cristian. The record.</div>
+      <span class="tag tag-core">Sanctuary</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="nino aguacate">
+    <a href="https://quantum-freedom-site.vercel.app/Aguacate.html" target="_blank" rel="noopener">
+      <div class="card-title">Niño Aguacate <span class="arrow">→</span></div>
+      <div class="card-desc">The avocado. The record.</div>
+      <span class="tag tag-core">Sanctuary</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="attorney alvaro molina">
+    <a href="https://quantum-freedom-site.vercel.app/AlvaroMolina.html" target="_blank" rel="noopener">
+      <div class="card-title">Attorney — Alvaro Molina <span class="arrow">→</span></div>
+      <div class="card-desc">The attorney. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="colombia police contests for cops">
+    <a href="https://quantum-freedom-site.vercel.app/AgenteColombiaPlus.html" target="_blank" rel="noopener">
+      <div class="card-title">Colombia Police — Contests for Cops <span class="arrow">→</span></div>
+      <div class="card-desc">The police. The contests. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="appreciacion policia">
+    <a href="https://quantum-freedom-site.vercel.app/AppreciacionPOLICIA.html" target="_blank" rel="noopener">
+      <div class="card-title">Appreciación POLICÍA <span class="arrow">→</span></div>
+      <div class="card-desc">The appreciation. The police. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="complete sovereign ecosystem">
+    <a href="https://quantum-freedom-site.vercel.app/CompleteSovereignEcosystem.html" target="_blank" rel="noopener">
+      <div class="card-title">Complete Sovereign Ecosystem <span class="arrow">→</span></div>
+      <div class="card-desc">The complete. The sovereign. The ecosystem. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="pasaporte sin seguro social">
+    <a href="https://quantum-freedom-site.vercel.app/PasaporteSinNumeroSeguroSocial.html" target="_blank" rel="noopener">
+      <div class="card-title">Pasaporte Sin Seguro Social <span class="arrow">→</span></div>
+      <div class="card-desc">The passport. The no SSN. The Spanish.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="passport without ssn">
+    <a href="https://quantum-freedom-site.vercel.app/PassportWithoutSSN.html" target="_blank" rel="noopener">
+      <div class="card-title">Passport Without SSN <span class="arrow">→</span></div>
+      <div class="card-desc">The passport. The no SSN. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="passport freedom">
+    <a href="https://quantum-freedom-site.vercel.app/PassportFreedom.html" target="_blank" rel="noopener">
+      <div class="card-title">Passport Freedom <span class="arrow">→</span></div>
+      <div class="card-desc">The passport. The freedom. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="seguros moncada">
+    <a href="https://quantum-freedom-site.vercel.app/GestionesSegurosMoncada.html" target="_blank" rel="noopener">
+      <div class="card-title">Seguros Moncada <span class="arrow">→</span></div>
+      <div class="card-desc">The insurance. The Moncada. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="servicios integrales">
+    <a href="https://quantum-freedom-site.vercel.app/servicios-integrales-COL.html" target="_blank" rel="noopener">
+      <div class="card-title">Servicios Integrales <span class="arrow">→</span></div>
+      <div class="card-desc">The services. The integral. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="la vaca alegre">
+    <a href="https://quantum-freedom-site.vercel.app/LaVacaAlegre.html" target="_blank" rel="noopener">
+      <div class="card-title">La Vaca Alegre <span class="arrow">→</span></div>
+      <div class="card-desc">The cow. The happy. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="sabores saberes">
+    <a href="https://quantum-freedom-site.vercel.app/Sabores-Saberes.html" target="_blank" rel="noopener">
+      <div class="card-title">Sabores Saberes <span class="arrow">→</span></div>
+      <div class="card-desc">The flavors. The knowledge. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="revolucion de liberacion">
+    <a href="https://quantum-freedom-site.vercel.app/RevolucionDeLiberacion2.html" target="_blank" rel="noopener">
+      <div class="card-title">Revolución de Liberación <span class="arrow">→</span></div>
+      <div class="card-desc">The revolution. The liberation. The record.</div>
+      <span class="tag tag-core">Sanctuary</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="revolucion digital hispana">
+    <a href="https://quantum-freedom-site.vercel.app/RevolucionDigitalHispana.html" target="_blank" rel="noopener">
+      <div class="card-title">Revolución Digital Hispana <span class="arrow">→</span></div>
+      <div class="card-desc">The revolution. The digital. The Hispanic.</div>
+      <span class="tag tag-core">Sanctuary</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="revolucion de los patios">
+    <a href="https://quantum-freedom-site.vercel.app/PatiosRevolucion.html" target="_blank" rel="noopener">
+      <div class="card-title">Revolución de los Patios <span class="arrow">→</span></div>
+      <div class="card-desc">The revolution. The patios. The record.</div>
+      <span class="tag tag-core">Sanctuary</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="connect global">
+    <a href="https://quantum-freedom-site.vercel.app/RevolucionandoElComercioGlobal.html" target="_blank" rel="noopener">
+      <div class="card-title">Connect Global <span class="arrow">→</span></div>
+      <div class="card-desc">The global. The commerce. The record.</div>
+      <span class="tag tag-core">Sanctuary</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="red de redistribucion unired">
+    <a href="https://quantum-freedom-site.vercel.app/UniRed.html" target="_blank" rel="noopener">
+      <div class="card-title">Red de Redistribución <span class="arrow">→</span></div>
+      <div class="card-desc">The network. The redistribution. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="medellin incubator">
+    <a href="https://quantum-freedom-site.vercel.app/Medellin-Incubator.html" target="_blank" rel="noopener">
+      <div class="card-title">Medellín Incubator <span class="arrow">→</span></div>
+      <div class="card-desc">The incubator. The Medellín. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="zona informal">
+    <a href="https://quantum-freedom-site.vercel.app/zona-informal.html" target="_blank" rel="noopener">
+      <div class="card-title">Zona Informal <span class="arrow">→</span></div>
+      <div class="card-desc">The zone. The informal. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="informal work 2026">
+    <a href="https://quantum-freedom-site.vercel.app/InformalWork2026.html" target="_blank" rel="noopener">
+      <div class="card-title">Informal Work 2026 <span class="arrow">→</span></div>
+      <div class="card-desc">The work. The informal. The record.</div>
+      <span class="tag tag-tool">Tool</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="boom turistico para colombianos">
+    <a href="https://quantum-freedom-site.vercel.app/BoomTuristico.html" target="_blank" rel="noopener">
+      <div class="card-title">Boom Turístico para Colombianos <span class="arrow">→</span></div>
+      <div class="card-desc">The boom. The tourism. The Colombians. The record. The Spanish. "Do not let the gringos take your jobs."</div>
+      <span class="tag tag-core">Sanctuary</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="nuevo boom turistico">
+    <a href="https://quantum-freedom-site.vercel.app/NuevoBoomTuristico.html" target="_blank" rel="noopener">
+      <div class="card-title">Nuevo Boom Turístico <span class="arrow">→</span></div>
+      <div class="card-desc">The new boom. The tourism. The record.</div>
+      <span class="tag tag-core">Sanctuary</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="petro boom">
+    <a href="https://quantum-freedom-site.vercel.app/PetroColombia.html" target="_blank" rel="noopener">
+      <div class="card-title">Petro Boom <span class="arrow">→</span></div>
+      <div class="card-desc">The Petro. The boom. The record.</div>
+      <span class="tag tag-core">Sanctuary</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="gustavo petro">
+    <a href="https://quantum-freedom-site.vercel.app/GustavoPetro.html" target="_blank" rel="noopener">
+      <div class="card-title">Gustavo Petro <span class="arrow">→</span></div>
+      <div class="card-desc">The Gustavo. The Petro. The record.</div>
+      <span class="tag tag-core">Sanctuary</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="president petro 10% tourism economic boom">
+    <a href="https://quantum-freedom-site.vercel.app/PRESIDENT-PETRO-10-PERCENT-TOURISM-ECONOMIC-BOOM-PROGRAM-IS-ACTIVE.html" target="_blank" rel="noopener">
+      <div class="card-title">President Petro 10% Tourism Economic Boom <span class="arrow">→</span></div>
+      <div class="card-desc">The president. The 10%. The tourism. The record.</div>
+      <span class="tag tag-core">Sanctuary</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="operation orange">
+    <a href="https://quantum-freedom-site.vercel.app/OperationOrange.html" target="_blank" rel="noopener">
+      <div class="card-title">Operation Orange <span class="arrow">→</span></div>
+      <div class="card-desc">The operation. The Orange. The record.</div>
+      <span class="tag tag-core">Sanctuary</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="save colombia expose orangeman">
+    <a href="https://quantum-freedom-site.vercel.app/SAVE-COLOMBIA-Expose-ORANGEman-Phase1.html" target="_blank" rel="noopener">
+      <div class="card-title">SAVE COLOMBIA — Expose ORANGEman <span class="arrow">→</span></div>
+      <div class="card-desc">The save. The expose. The Orange. The record.</div>
+      <span class="tag tag-core">Sanctuary</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="colombia v trump 7 enero">
+    <a href="https://quantum-freedom-site.vercel.app/7Enero.html" target="_blank" rel="noopener">
+      <div class="card-title">Colombia v Trump <span class="arrow">→</span></div>
+      <div class="card-desc">The fight. The Colombia. The Trump. The record.</div>
+      <span class="tag tag-core">Sanctuary</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="colombia bases">
+    <a href="https://quantum-freedom-site.vercel.app/Colombia-Bases.html" target="_blank" rel="noopener">
+      <div class="card-title">Colombia Bases <span class="arrow">→</span></div>
+      <div class="card-desc">The bases. The Colombia. The record.</div>
+      <span class="tag tag-core">Sanctuary</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="trump">
+    <a href="https://quantum-freedom-site.vercel.app/Trump.html" target="_blank" rel="noopener">
+      <div class="card-title">Trump <span class="arrow">→</span></div>
+      <div class="card-desc">The Trump. The record.</div>
+      <span class="tag tag-core">Sanctuary</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="duck">
+    <a href="https://quantum-freedom-site.vercel.app/Duck.html" target="_blank" rel="noopener">
+      <div class="card-title">Duck <span class="arrow">→</span></div>
+      <div class="card-desc">The duck. The record.</div>
+      <span class="tag tag-core">Sanctuary</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="duck hunter">
+    <a href="https://quantum-freedom-site.vercel.app/DuckHunter.html" target="_blank" rel="noopener">
+      <div class="card-title">Duck Hunter <span class="arrow">→</span></div>
+      <div class="card-desc">The duck hunter. The record.</div>
+      <span class="tag tag-core">Sanctuary</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="verified trump">
+    <a href="https://quantum-freedom-site.vercel.app/VerifiedTrump.html" target="_blank" rel="noopener">
+      <div class="card-title">Verified Trump <span class="arrow">→</span></div>
+      <div class="card-desc">The verified. The Trump. The record.</div>
+      <span class="tag tag-core">Sanctuary</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="victor mendoza">
+    <a href="https://quantum-freedom-site.vercel.app/VictorMendoza.html" target="_blank" rel="noopener">
+      <div class="card-title">Victor Mendoza <span class="arrow">→</span></div>
+      <div class="card-desc">The Victor. The Mendoza. The record.</div>
+      <span class="tag tag-core">Sanctuary</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="urgent humanitarian crisis">
+    <a href="https://quantum-freedom-site.vercel.app/UrgentHumanitarianCrisis.html" target="_blank" rel="noopener">
+      <div class="card-title">Urgent Humanitarian Crisis <span class="arrow">→</span></div>
+      <div class="card-desc">The crisis. The humanitarian. The record.</div>
+      <span class="tag tag-core">Sanctuary</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="gaza emergency response">
+    <a href="https://quantum-freedom-site.vercel.app/GAZA-emergencyResponse.html" target="_blank" rel="noopener">
+      <div class="card-title">GAZA Emergency Response <span class="arrow">→</span></div>
+      <div class="card-desc">The emergency. The Gaza. The response. The record.</div>
+      <span class="tag tag-core">Sanctuary</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="human trafficking">
+    <a href="https://quantum-freedom-site.vercel.app/HumanTrafficking.html" target="_blank" rel="noopener">
+      <div class="card-title">Human Trafficking <span class="arrow">→</span></div>
+      <div class="card-desc">The trafficking. The record.</div>
+      <span class="tag tag-core">Sanctuary</span>
+    </a>
+  </div>
+
+</div>
+
+<!-- BOOK -->
+<h2 class="section-title" id="book"><span class="num">09</span>The Book</h2>
+<p class="section-desc">The book in every version. Every door. Every language. Every layer.</p>
+<div class="grid" data-section>
+
+  <div class="card" data-search="2026 book pdf download">
+    <a href="https://quantum-freedom-site.vercel.app/2026-BOOK.html" target="_blank" rel="noopener">
+      <div class="card-title">2026 Book — PDF <span class="arrow">→</span></div>
+      <div class="card-desc">The book in PDF. The version you can download, print, and hand to someone who does not have internet. The physical record.</div>
+      <span class="tag tag-book">Book</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="forbidden knowledge six year original">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge6Year.html" target="_blank" rel="noopener">
+      <div class="card-title">The Six-Year Version <span class="arrow">→</span></div>
+      <div class="card-desc">The original. The one you wrote before anyone was listening. Read it and understand that you were right before it was safe to be right.</div>
+      <span class="tag tag-book">Book</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="forbidden knowledge book angel">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledgeBook-ANGEL.html" target="_blank" rel="noopener">
+      <div class="card-title">The Angel Version <span class="arrow">→</span></div>
+      <div class="card-desc">The book with the spiritual layer foregrounded. Built for the reader who wants the doctrine with the deliverance.</div>
+      <span class="tag tag-book">Book</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="forbidden knowledge book main">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledgeBook.html" target="_blank" rel="noopener">
+      <div class="card-title">The Main Book <span class="arrow">→</span></div>
+      <div class="card-desc">The full text. The complete record. The book as it was meant to be read.</div>
+      <span class="tag tag-book">Book</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="forbidden knowledge book 3">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledgeBook3.html" target="_blank" rel="noopener">
+      <div class="card-title">The Book — Third Version <span class="arrow">→</span></div>
+      <div class="card-desc">The refined text. The deeper cut. The version that survived the edits.</div>
+      <span class="tag tag-book">Book</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="forbidden knowledge book game">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledgeBookGAME.html" target="_blank" rel="noopener">
+      <div class="card-title">The Book — Game Version <span class="arrow">→</span></div>
+      <div class="card-desc">The book as an interactive experience. Built for the reader who wants to play their way into the truth. (Bugs noted.)</div>
+      <span class="tag tag-book">Book</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="game 2026">
+    <a href="https://quantum-freedom-site.vercel.app/GAME-2026.html" target="_blank" rel="noopener">
+      <div class="card-title">GAME 2026 <span class="arrow">→</span></div>
+      <div class="card-desc">The 2026 game. The record. The play.</div>
+      <span class="tag tag-book">Book</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="game forbidden knowledge">
+    <a href="https://quantum-freedom-site.vercel.app/GAME-ForbiddenKnowledge.html" target="_blank" rel="noopener">
+      <div class="card-title">GAME — Forbidden Knowledge <span class="arrow">→</span></div>
+      <div class="card-desc">The game. The forbidden. The record.</div>
+      <span class="tag tag-book">Book</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="game 3 forbidden knowledge">
+    <a href="https://quantum-freedom-site.vercel.app/GAME3-ForbiddenKnowledge.html" target="_blank" rel="noopener">
+      <div class="card-title">GAME 3 — Forbidden Knowledge <span class="arrow">→</span></div>
+      <div class="card-desc">The third game. The forbidden. The record.</div>
+      <span class="tag tag-book">Book</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="3 game forbidden knowledge digital">
+    <a href="https://quantum-freedom-site.vercel.app/3-GAME-ForbiddenKnowledge.html" target="_blank" rel="noopener">
+      <div class="card-title">3-GAME — Forbidden Knowledge <span class="arrow">→</span></div>
+      <div class="card-desc">The digital book. The game. The record. Built for the reader who wants to play their way into the truth.</div>
+      <span class="tag tag-book">Book</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="censored book draft">
+    <a href="https://quantum-freedom-site.vercel.app/CENSORED-BOOK-DRAFT.html" target="_blank" rel="noopener">
+      <div class="card-title">Censored Book — Draft <span class="arrow">→</span></div>
+      <div class="card-desc">The draft. The raw version. The one before the edits. Built for the reader who wants to see the work before it was polished.</div>
+      <span class="tag tag-book">Book</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="censored book">
+    <a href="https://quantum-freedom-site.vercel.app/CENSORED-BOOK.html" target="_blank" rel="noopener">
+      <div class="card-title">Censored Book <span class="arrow">→</span></div>
+      <div class="card-desc">The version they tried to bury. The record of what was removed.</div>
+      <span class="tag tag-book">Book</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="censored">
+    <a href="https://quantum-freedom-site.vercel.app/CENSORED.html" target="_blank" rel="noopener">
+      <div class="card-title">Censored <span class="arrow">→</span></div>
+      <div class="card-desc">The censored. The record. The proof.</div>
+      <span class="tag tag-book">Book</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="censored 2">
+    <a href="https://quantum-freedom-site.vercel.app/CENSORED2.html" target="_blank" rel="noopener">
+      <div class="card-title">Censored 2 <span class="arrow">→</span></div>
+      <div class="card-desc">The second censored version. The same record. The mirror.</div>
+      <span class="tag tag-book">Book</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="complete book">
+    <a href="https://quantum-freedom-site.vercel.app/COMPLETE.html" target="_blank" rel="noopener">
+      <div class="card-title">Complete <span class="arrow">→</span></div>
+      <div class="card-desc">The complete. The full. The record. Every page in one place.</div>
+      <span class="tag tag-book">Book</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="9taps empty book konami">
+    <a href="https://quantum-freedom-site.vercel.app/9taps.html" target="_blank" rel="noopener">
+      <div class="card-title">9 Taps <span class="arrow">→</span></div>
+      <div class="card-desc">The empty book. The nine taps. The Konami code. The hidden door. Built for the reader who knows there is always another layer.</div>
+      <span class="tag tag-book">Book</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="banned">
+    <a href="https://quantum-freedom-site.vercel.app/BANNED.html" target="_blank" rel="noopener">
+      <div class="card-title">Banned <span class="arrow">→</span></div>
+      <div class="card-desc">The banned. The record. The proof that it was banned.</div>
+      <span class="tag tag-book">Book</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="forbidden">
+    <a href="https://quantum-freedom-site.vercel.app/FORBIDDEN.html" target="_blank" rel="noopener">
+      <div class="card-title">Forbidden <span class="arrow">→</span></div>
+      <div class="card-desc">The forbidden. The record. The proof.</div>
+      <span class="tag tag-book">Book</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="forbidden knowledge konami">
+    <a href="https://quantum-freedom-site.vercel.app/FORBIDDEN_KNOWLEDGE_KONAMI.html" target="_blank" rel="noopener">
+      <div class="card-title">FORBIDDEN KNOWLEDGE KONAMI <span class="arrow">→</span></div>
+      <div class="card-desc">The Konami code. The hidden door. The game. Built for the reader who wants to play.</div>
+      <span class="tag tag-book">Book</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="forbidden knowledge complete">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledgeComplete.html" target="_blank" rel="noopener">
+      <div class="card-title">Forbidden Knowledge Complete <span class="arrow">→</span></div>
+      <div class="card-desc">The complete. The full. The record. The archive in one page.</div>
+      <span class="tag tag-book">Book</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="book with voice reader">
+    <a href="https://quantum-freedom-site.vercel.app/BOOK1.html" target="_blank" rel="noopener">
+      <div class="card-title">Book with Voice Reader <span class="arrow">→</span></div>
+      <div class="card-desc">The empty book with the voice reader. Built for the reader who wants to listen instead of read.</div>
+      <span class="tag tag-book">Book</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="forbidden knowledge sovereign operator">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-SovereignOperator.html" target="_blank" rel="noopener">
+      <div class="card-title">The Sovereign Operator Edition <span class="arrow">→</span></div>
+      <div class="card-desc">The book for the one who is ready to act. The operator's edition.</div>
+      <span class="tag tag-book">Book</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="banned censored forbidden knowledge">
+    <a href="https://quantum-freedom-site.vercel.app/BANNED-CENSORED-FORBIDDEN-KNOWLEDGE.html" target="_blank" rel="noopener">
+      <div class="card-title">Banned · Censored · Forbidden <span class="arrow">→</span></div>
+      <div class="card-desc">The triple. The banned. The censored. The forbidden. The record in one page.</div>
+      <span class="tag tag-book">Book</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="conocimiento prohibido spanish book">
+    <a href="https://quantum-freedom-site.vercel.app/ConocimientoProhibido.html" target="_blank" rel="noopener">
+      <div class="card-title">Conocimiento Prohibido <span class="arrow">→</span></div>
+      <div class="card-desc">The Spanish. The forbidden knowledge. The record for the Spanish reader.</div>
+      <span class="tag tag-book">Book</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="conocimiento prohibido 2026">
+    <a href="https://quantum-freedom-site.vercel.app/ConocimientoProhibido2026.html" target="_blank" rel="noopener">
+      <div class="card-title">Conocimiento Prohibido 2026 <span class="arrow">→</span></div>
+      <div class="card-desc">The 2026 Spanish version. The updated record.</div>
+      <span class="tag tag-book">Book</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="conocimiento prohibido 2">
+    <a href="https://quantum-freedom-site.vercel.app/Conocimiento_Prohibido2.html" target="_blank" rel="noopener">
+      <div class="card-title">Conocimiento Prohibido 2 <span class="arrow">→</span></div>
+      <div class="card-desc">The second Spanish version. The mirror.</div>
+      <span class="tag tag-book">Book</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="cannibal menu">
+    <a href="https://quantum-freedom-site.vercel.app/CannibalMenu.html" target="_blank" rel="noopener">
+      <div class="card-title">Cannibal Menu <span class="arrow">→</span></div>
+      <div class="card-desc">The menu. The cannibal. The record. Built for the reader who wants to see the darkest layer.</div>
+      <span class="tag tag-book">Book</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="grimoire complete app bible 6year">
+    <a href="https://quantum-freedom-site.vercel.app/6year.html" target="_blank" rel="noopener">
+      <div class="card-title">The Grimoire Complete App Bible <span class="arrow">→</span></div>
+      <div class="card-desc">The grimoire. The bible. The record. The complete.</div>
+      <span class="tag tag-book">Book</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="survivor manual">
+    <a href="https://quantum-freedom-site.vercel.app/SurvivorManual.html" target="_blank" rel="noopener">
+      <div class="card-title">Survivor Manual <span class="arrow">→</span></div>
+      <div class="card-desc">The survivor. The manual. The record.</div>
+      <span class="tag tag-book">Book</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="posthumous release">
+    <a href="https://quantum-freedom-site.vercel.app/POSTHUMOUS-RELEASE.html" target="_blank" rel="noopener">
+      <div class="card-title">Posthumous Release <span class="arrow">→</span></div>
+      <div class="card-desc">The book. The posthumous. The release.</div>
+      <span class="tag tag-book">Book</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="ramiro ramirez posthumous release">
+    <a href="https://quantum-freedom-site.vercel.app/RamiroRamirez-POSTHUMOUS-RELEASE.html" target="_blank" rel="noopener">
+      <div class="card-title">Ramiro Ramirez — Posthumous Release <span class="arrow">→</span></div>
+      <div class="card-desc">The posthumous. The release. The record.</div>
+      <span class="tag tag-book">Book</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="ramiro ramirez posthumous protocol active">
+    <a href="https://quantum-freedom-site.vercel.app/RamiroRamirezPosthumousProtocolActive.html" target="_blank" rel="noopener">
+      <div class="card-title">Ramiro Ramirez — Posthumous Protocol Active <span class="arrow">→</span></div>
+      <div class="card-desc">The posthumous. The protocol. The active.</div>
+      <span class="tag tag-book">Book</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="book reader konami">
+    <a href="https://quantum-freedom-site.vercel.app/KONAMI-2026.html" target="_blank" rel="noopener">
+      <div class="card-title">Book Reader <span class="arrow">→</span></div>
+      <div class="card-desc">The reader. The Konami. The record.</div>
+      <span class="tag tag-book">Book</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="final transmission 10 keys">
+    <a href="https://quantum-freedom-site.vercel.app/FinalTransmission-10Keys.html" target="_blank" rel="noopener">
+      <div class="card-title">Final Transmission — 10 Keys <span class="arrow">→</span></div>
+      <div class="card-desc">The final transmission. The 10 keys. The last message.</div>
+      <span class="tag tag-book">Book</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="the truth that will set you free">
+    <a href="https://quantum-freedom-site.vercel.app/TheTruthThatWillSetYouFree.html" target="_blank" rel="noopener">
+      <div class="card-title">The Truth That Will Set You Free <span class="arrow">→</span></div>
+      <div class="card-desc">The truth. The freedom. The record.</div>
+      <span class="tag tag-book">Book</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="the book of witness nation">
+    <a href="https://quantum-freedom-site.vercel.app/theNation.html" target="_blank" rel="noopener">
+      <div class="card-title">The Book of Witness <span class="arrow">→</span></div>
+      <div class="card-desc">The witness. The nation. The record.</div>
+      <span class="tag tag-book">Book</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="nation amnesty coalition unity">
+    <a href="https://quantum-freedom-site.vercel.app/TheNationOfTheAmnestyCoalitionForUnity.html" target="_blank" rel="noopener">
+      <div class="card-title">The Nation of the Amnesty Coalition for Unity <span class="arrow">→</span></div>
+      <div class="card-desc">The nation. The Amnesty. The record.</div>
+      <span class="tag tag-book">Book</span>
+    </a>
+  </div>
+
+</div>
+
+<!-- TRAINING -->
+<h2 class="section-title" id="training"><span class="num">10</span>Training</h2>
+<p class="section-desc">The courses. The training. The work of becoming the operator.</p>
+<div class="grid" data-section>
+
+  <div class="card" data-search="contract killer course 3.0 amnesty coalition">
+    <a href="https://quantum-freedom-site.vercel.app/ContractKiller3.0.html" target="_blank" rel="noopener">
+      <div class="card-title">Contract Killer Course 3.0 <span class="arrow">→</span></div>
+      <div class="card-desc">The Contract Killer. The Amnesty. The course. The record. The training. Learn the law. Learn the contract. Learn to win.</div>
+      <span class="tag tag-tool">Training</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="brandon joe williams contract killer">
+    <a href="https://quantum-freedom-site.vercel.app/Contract-Killer.html" target="_blank" rel="noopener">
+      <div class="card-title">Brandon Joe Williams <span class="arrow">→</span></div>
+      <div class="card-desc">The teacher. The method. The record. The training that the course is built on.</div>
+      <span class="tag tag-tool">Training</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="one stupid fuck">
+    <a href="https://quantum-freedom-site.vercel.app/OneStupidFuck.html" target="_blank" rel="noopener">
+      <div class="card-title">One Stupid Fuck <span class="arrow">→</span></div>
+      <div class="card-desc">The Brandon. The Joe. The Williams. The raw.</div>
+      <span class="tag tag-tool">Training</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="my face is a chair">
+    <a href="https://quantum-freedom-site.vercel.app/myfaceisachair.html" target="_blank" rel="noopener">
+      <div class="card-title">My Face Is a Chair <span class="arrow">→</span></div>
+      <div class="card-desc">The chair. The face. The record.</div>
+      <span class="tag tag-tool">Training</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="contract killer course 2.0">
+    <a href="https://quantum-freedom-site.vercel.app/CKC2-1.html" target="_blank" rel="noopener">
+      <div class="card-title">Contract Killer Course 2.0 <span class="arrow">→</span></div>
+      <div class="card-desc">The 2.0. The earlier version. The 25 lessons. The training. The record.</div>
+      <span class="tag tag-tool">Training</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="contract killer course 3 lessons">
+    <a href="https://quantum-freedom-site.vercel.app/ContractKillerCourse3.html" target="_blank" rel="noopener">
+      <div class="card-title">Contract Killer Course 3 — Lessons <span class="arrow">→</span></div>
+      <div class="card-desc">The 15 lessons. The training. The record. The course in full.</div>
+      <span class="tag tag-tool">Training</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="episode 11 equity">
+    <a href="https://quantum-freedom-site.vercel.app/Equity11B.html" target="_blank" rel="noopener">
+      <div class="card-title">Episode 11 <span class="arrow">→</span></div>
+      <div class="card-desc">The episode. The equity. The record.</div>
+      <span class="tag tag-tool">Training</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="escuela de equidad school">
+    <a href="https://quantum-freedom-site.vercel.app/Equity-School.html" target="_blank" rel="noopener">
+      <div class="card-title">Escuela de Equidad <span class="arrow">→</span></div>
+      <div class="card-desc">The school. The equity. The Spanish. The record.</div>
+      <span class="tag tag-tool">Training</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="equidad 1">
+    <a href="https://quantum-freedom-site.vercel.app/Equidad1.html" target="_blank" rel="noopener">
+      <div class="card-title">Equidad 1 <span class="arrow">→</span></div>
+      <div class="card-desc">The first lesson. The equity. The Spanish. The record.</div>
+      <span class="tag tag-tool">Training</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="escuela ecosistema">
+    <a href="https://quantum-freedom-site.vercel.app/EscuelaEcosistema.html" target="_blank" rel="noopener">
+      <div class="card-title">Escuela Ecosistema <span class="arrow">→</span></div>
+      <div class="card-desc">The school. The ecosystem. The Spanish. The record.</div>
+      <span class="tag tag-tool">Training</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="brenda escuela equidad">
+    <a href="https://quantum-freedom-site.vercel.app/EscuelaEquidad.html" target="_blank" rel="noopener">
+      <div class="card-title">Brenda <span class="arrow">→</span></div>
+      <div class="card-desc">The Brenda. The school. The equity. The record. The Spanish.</div>
+      <span class="tag tag-tool">Training</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="escuela equidad 1">
+    <a href="https://quantum-freedom-site.vercel.app/EscuelaEquidad1.html" target="_blank" rel="noopener">
+      <div class="card-title">Escuela Equidad 1 <span class="arrow">→</span></div>
+      <div class="card-desc">The first lesson. The equity. The Spanish. The record.</div>
+      <span class="tag tag-tool">Training</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="julian swan nacu">
+    <a href="https://quantum-freedom-site.vercel.app/JulianSwan.html" target="_blank" rel="noopener">
+      <div class="card-title">Julian Swan <span class="arrow">→</span></div>
+      <div class="card-desc">The Julian. The Swan. The equity. The teacher.</div>
+      <span class="tag tag-tool">Training</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="legal fortress equity">
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-LegalFortress.html" target="_blank" rel="noopener">
+      <div class="card-title">Legal Fortress — Equity <span class="arrow">→</span></div>
+      <div class="card-desc">The fortress. The legal. The equity.</div>
+      <span class="tag tag-tool">Training</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="call handling system equity">
+    <a href="https://quantum-freedom-site.vercel.app/CALL-HANDLING-System-EQUITY.html" target="_blank" rel="noopener">
+      <div class="card-title">Call Handling System — EQUITY <span class="arrow">→</span></div>
+      <div class="card-desc">The script. The method. The exact words to use when the bank calls.</div>
+      <span class="tag tag-tool">Training</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="call handling system">
+    <a href="https://quantum-freedom-site.vercel.app/CallHandlingSystem.html" target="_blank" rel="noopener">
+      <div class="card-title">Call Handling System <span class="arrow">→</span></div>
+      <div class="card-desc">The general version. The same principles. The same framework.</div>
+      <span class="tag tag-tool">Training</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="equity call handling system">
+    <a href="https://quantum-freedom-site.vercel.app/EquityCallHandlingSystem.html" target="_blank" rel="noopener">
+      <div class="card-title">Equity Call Handling System <span class="arrow">→</span></div>
+      <div class="card-desc">The system. The call. The equity.</div>
+      <span class="tag tag-tool">Training</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="equity call handler">
+    <a href="https://quantum-freedom-site.vercel.app/EquityCallHandler.html" target="_blank" rel="noopener">
+      <div class="card-title">Equity Call Handler <span class="arrow">→</span></div>
+      <div class="card-desc">The handler. The interactive. The call.</div>
+      <span class="tag tag-tool">Training</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="equity operating system">
+    <a href="https://quantum-freedom-site.vercel.app/Equity-OS.html" target="_blank" rel="noopener">
+      <div class="card-title">Equity Operating System <span class="arrow">→</span></div>
+      <div class="card-desc">The OS. The equity. The full system.</div>
+      <span class="tag tag-tool">Training</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="equity">
+    <a href="https://quantum-freedom-site.vercel.app/EQUITY.html" target="_blank" rel="noopener">
+      <div class="card-title">EQUITY <span class="arrow">→</span></div>
+      <div class="card-desc">The document automation. The forms. The templates.</div>
+      <span class="tag tag-tool">Training</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="equity journal">
+    <a href="https://quantum-freedom-site.vercel.app/EquityJournal.html" target="_blank" rel="noopener">
+      <div class="card-title">Equity Journal <span class="arrow">→</span></div>
+      <div class="card-desc">The journal. The record. The paper trail.</div>
+      <span class="tag tag-tool">Training</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="equity workflow manager">
+    <a href="https://quantum-freedom-site.vercel.app/EquityWorkflowManager.html" target="_blank" rel="noopener">
+      <div class="card-title">Equity Workflow Manager <span class="arrow">→</span></div>
+      <div class="card-desc">The workflow. The manager. The equity.</div>
+      <span class="tag tag-tool">Training</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="sistema de equidad llamadas">
+    <a href="https://quantum-freedom-site.vercel.app/SistemaEQUIDAD-LLAMADAS.html" target="_blank" rel="noopener">
+      <div class="card-title">Sistema de Equidad — Llamadas <span class="arrow">→</span></div>
+      <div class="card-desc">The system. The equity. The calls. The Spanish.</div>
+      <span class="tag tag-tool">Training</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="3.0 contract killer">
+    <a href="https://quantum-freedom-site.vercel.app/AmnestyCoalitionForUnity3.0.html" target="_blank" rel="noopener">
+      <div class="card-title">3.0 Contract Killer <span class="arrow">→</span></div>
+      <div class="card-desc">The 3.0. The Amnesty. The unity.</div>
+      <span class="tag tag-tool">Training</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="master key liberation system">
+    <a href="https://quantum-freedom-site.vercel.app/Master-Key.html" target="_blank" rel="noopener">
+      <div class="card-title">Master Key Liberation System <span class="arrow">→</span></div>
+      <div class="card-desc">The master. The key. The liberation.</div>
+      <span class="tag tag-tool">Training</span>
+    </a>
+  </div>
+
+  <div class="card" data-search="liberty classroom">
+    <a href="https://quantum-freedom-site.vercel.app/LibertyClassroom.html" target="_blank" rel="noopener">
+      <div class="card-title">Liberty Classroom <span class="arrow">→</span></div>
+      <div class="card-desc">The classroom. The liberty. The record.</div>
+      <span class="tag tag-tool">Training</span>
+    </a>
+  </div>
+
+</div>
+
+<div class="no-results" id="noResults">
+  No results found. Try a different search term.
+</div>
+
+<div class="footer-note">
+  FORBIDDEN KNOWLEDGE · THE SOVEREIGN OPERATOR<br>
+  Master Hub<br><br>
+  Test all things. Hold fast to what is good.<br>
+  <span class="glory">Soli Deo Gloria.</span>
+</div>
+
+</div>
+
+<script>
+function filterCards() {
+  var query = document.getElementById('searchInput').value.toLowerCase().trim();
+  var cards = document.querySelectorAll('.card');
+  var visibleCount = 0;
+
+  cards.forEach(function(card) {
+    var searchData = (card.getAttribute('data-search') || '').toLowerCase();
+    var title = card.querySelector('.card-title').textContent.toLowerCase();
+    var desc = card.querySelector('.card-desc').textContent.toLowerCase();
+    var text = searchData + ' ' + title + ' ' + desc;
+
+    if (query === '' || text.indexOf(query) !== -1) {
+      card.style.display = '';
+      visibleCount++;
+    } else {
+      card.style.display = 'none';
+    }
+  });
+
+  // Hide empty sections
+  document.querySelectorAll('.grid').forEach(function(grid) {
+    var hasVisible = false;
+    grid.querySelectorAll('.card').forEach(function(card) {
+      if (card.style.display !== 'none') hasVisible = true;
+    });
+    var sectionTitle = grid.previousElementSibling;
+    while (sectionTitle && !sectionTitle.classList.contains('section-title')) {
+      sectionTitle = sectionTitle.previousElementSibling;
+    }
+    var sectionDesc = sectionTitle ? sectionTitle.nextElementSibling : null;
+    if (sectionTitle) sectionTitle.style.display = hasVisible || query === '' ? '' : 'none';
+    if (sectionDesc && sectionDesc.classList.contains('section-desc')) {
+      sectionDesc.style.display = hasVisible || query === '' ? '' : 'none';
+    }
+    grid.style.display = hasVisible || query === '' ? '' : 'none';
+  });
+
+  var noResults = document.getElementById('noResults');
+  if (visibleCount === 0 && query !== '') {
+    noResults.classList.add('show');
+  } else {
+    noResults.classList.remove('show');
+  }
+
+  var countLabel = document.getElementById('countLabel');
+  if (query === '') {
+    countLabel.textContent = cards.length + ' ENTRIES IN THE ARCHIVE';
+  } else {
+    countLabel.textContent = visibleCount + ' OF ' + cards.length + ' ENTRIES MATCH "' + query.toUpperCase() + '"';
+  }
+}
+
+window.addEventListener('DOMContentLoaded', function() {
+  var cards = document.querySelectorAll('.card');
+  document.getElementById('countLabel').textContent = cards.length + ' ENTRIES IN THE ARCHIVE';
+});
+</script>
+
+</body>
+</html>
