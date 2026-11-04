@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ACU — The Missing Fifteen</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600;700&display=swap');
+  :root { --bg: #0a0a0c; --surface: #121216; --surface-2: #1a1a20; --border: #2a2a32; --text: #e8e6e3; --text-dim: #9a978f; --accent: #c9a227; --accent-dim: #8a6f1a; --record: #3a7d5c; --suppressed: #b03a2e; --gap: #8a6f1a; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'IBM Plex Sans', system-ui, sans-serif; line-height: 1.65; font-weight: 300; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 0 24px 120px; }
+  header { padding: 48px 0 32px; border-bottom: 1px solid var(--border); margin-bottom: 40px; }
+  .kicker { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--accent); margin-bottom: 16px; }
+  h1 { font-size: clamp(26px, 4vw, 40px); font-weight: 700; line-height: 1.1; letter-spacing: -0.02em; margin-bottom: 12px; }
+  .subtitle { font-size: 16px; color: var(--text-dim); max-width: 760px; }
+  .operator-note { background: var(--surface-2); border: 1px solid var(--accent-dim); border-left: 3px solid var(--accent); border-radius: 4px; padding: 18px 22px; margin: 24px 0; font-size: 14px; color: var(--text-dim); }
+  .operator-note strong { color: var(--accent); }
+  .toc { display: flex; flex-wrap: wrap; gap: 6px; margin: 24px 0; }
+  .toc a { font-family: 'IBM Plex Mono', monospace; font-size: 10px; padding: 6px 10px; border: 1px solid var(--border); border-radius: 2px; color: var(--text-dim); text-decoration: none; letter-spacing: 0.04em; transition: all 0.2s; }
+  .toc a:hover { border-color: var(--accent-dim); color: var(--accent); }
+  h2 { font-size: 20px; font-weight: 600; margin: 48px 0 12px; padding-top: 28px; border-top: 1px solid var(--border); }
+  h2 .num { font-family: 'IBM Plex Mono', monospace; color: var(--accent); font-size: 13px; margin-right: 10px; }
+  h3 { font-size: 16px; font-weight: 600; margin: 24px 0 10px; color: var(--accent); }
+  p { margin-bottom: 14px; font-size: 14px; color: var(--text-dim); }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 22px 24px; margin: 16px 0; }
+  .card-title { font-weight: 600; font-size: 15px; color: var(--text); margin-bottom: 10px; }
+  .checklist { list-style: none; margin: 12px 0; }
+  .checklist li { padding: 8px 0 8px 28px; position: relative; font-size: 13px; color: var(--text-dim); border-bottom: 1px solid var(--border); }
+  .checklist li:last-child { border-bottom: none; }
+  .checklist li::before { content: '☐'; position: absolute; left: 0; color: var(--accent); font-size: 16px; }
+  .checklist li strong { color: var(--text); }
+  table { width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 13px; }
+  th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); }
+  th { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+  td { color: var(--text-dim); }
+  td strong { color: var(--text); }
+  .love-box { background: var(--surface-2); border: 2px solid var(--accent); border-radius: 6px; padding: 26px 28px; margin: 28px 0; }
+  .love-box h3 { color: var(--accent); margin-top: 0; font-size: 20px; }
+  .love-box p { font-size: 15px; color: var(--text); margin-bottom: 12px; }
+  .love-box strong { color: var(--accent); }
+  .frequency { font-family: 'IBM Plex Mono', monospace; font-size: 28px; color: var(--accent); text-align: center; margin: 16px 0; letter-spacing: 0.1em; }
+  .warning-box { background: rgba(176,58,46,0.08); border: 1px solid var(--suppressed); border-radius: 4px; padding: 16px 20px; margin: 20px 0; font-size: 13px; color: var(--text-dim); }
+  .warning-box strong { color: var(--suppressed); }
+  .code-box { background: var(--surface-2); border: 1px solid var(--border); border-radius: 4px; padding: 16px 18px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--accent); margin: 12px 0; line-height: 1.8; }
+  .footer-note { margin-top: 64px; padding-top: 32px; border-top: 1px solid var(--border); font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--text-dim); letter-spacing: 0.08em; text-align: center; line-height: 2; }
+  .footer-note .glory { color: var(--accent); font-weight: 600; }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="kicker">Amnesty Coalition for Unity · Internal Operations</div>
+  <h1>The Missing Fifteen</h1>
+  <p class="subtitle">Every piece you have not yet built. The Witness Network. The donor receipt. The cost breakdown. The host vetting. The evacuation protocol. The defense fund. The onboarding. The FAQ. The story template. The annual report. The spiritual foundation. The sanctuary manual. The exit strategy. The succession plan.</p>
+  <div class="operator-note">
+    <strong>OPERATOR NOTE:</strong> This is the operations manual for the nation. Every section is a piece of the architecture. Some are legal. Some are operational. Some are spiritual. All of them are the difference between a nation that exists and a nation that endures.
+  </div>
+  <div class="toc">
+    <a href="#witness">Witness Network</a>
+    <a href="#beneficiary">First Beneficiary</a>
+    <a href="#receipt">Donor Receipt</a>
+    <a href="#cost">Cost Breakdown</a>
+    <a href="#vetting">Host Vetting</a>
+    <a href="#evacuation">Evacuation Protocol</a>
+    <a href="#defense">Defense Fund</a>
+    <a href="#onboarding">Member Onboarding</a>
+    <a href="#faq">Public FAQ</a>
+    <a href="#story">Story Template</a>
+    <a href="#annual">Annual Report</a>
+    <a href="#spiritual">Spiritual Foundation</a>
+    <a href="#sanctuary">Sanctuary Manual</a>
+    <a href="#exit">Exit Strategy</a>
+    <a href="#succession">Succession Plan</a>
+  </div>
+</header>
+
+<h2 id="witness"><span class="num">01</span>The Witness Network Page</h2>
+<p>Every member becomes a fundraiser. Every fundraiser has a page. Every page is tracked on the public ledger. This is the engine of exponential growth.</p>
+<div class="card">
+  <div class="card-title">Member Page Template</div>
+  <div class="code-box">
+    [YOUR NAME]'S WITNESS PAGE<br><br>
+    I am raising $[TARGET] to fund [N] extraction(s) for the Palestine Rescue Fund.<br><br>
+    Every $2,400 moves one person from danger to sanctuary.<br><br>
+    [DONATE BUTTON]<br><br>
+    Raised so far: $[AMOUNT]<br>
+    Target: $[TARGET]<br>
+    Percentage: [X]%<br><br>
+    The person I help will never be named. The fund is transparent. The ledger is public. The rescue is real.
+  </div>
+  <p><strong>How it works:</strong> The member shares the link. Their network gives through the page. The fund receives 100%. The member keeps 0%. The member's name appears on the Witness Network list. The rescued person's name never appears anywhere.</p>
+</div>
+
+<h2 id="beneficiary"><span class="num">02</span>The First Beneficiary Profile</h2>
+<p>The first beneficiary is the proof of concept. The nation needs a name (anonymized), a story (anonymized), and a status.</p>
+<div class="card">
+  <div class="card-title">Beneficiary Record — CONFIDENTIAL</div>
+  <table>
+    <tr><th>Field</th><th>Entry</th></tr>
+    <tr><td>Beneficiary ID</td><td>ACU-PRF-001</td></tr>
+    <tr><td>Family size</td><td>______</td></tr>
+    <tr><td>Country of origin</td><td>______</td></tr>
+    <tr><td>Current location</td><td>______</td></tr>
+    <tr><td>Danger type</td><td>Legal / Physical / Medical</td></tr>
+    <tr><td>Legal path</td><td>Refugee / Visa M / Other</td></tr>
+    <tr><td>Attorney assigned</td><td>______</td></tr>
+    <tr><td>Host assigned</td><td>______</td></tr>
+    <tr><td>Code word issued</td><td>☐ Yes ☐ No</td></tr>
+    <tr><td>Dry run completed</td><td>☐ Yes ☐ No</td></tr>
+    <tr><td>Extraction status</td><td>Pending / In Progress / Complete</td></tr>
+    <tr><td>Arrival date</td><td>______</td></tr>
+    <tr><td>Sanctuary status</td><td>In sanctuary / Integrated / Independent</td></tr>
+  </table>
+  <p><strong>Public record:</strong> ACU-PRF-001 has been extracted. Family of [N]. Currently in sanctuary. The story is told in Section 10. The name is never told.</p>
+</div>
+
+<h2 id="receipt"><span class="num">03</span>The Donor Acknowledgment and Receipt</h2>
+<p>Every donor receives a receipt. The receipt is the proof. The receipt states what the donation is and what it is not.</p>
+<div class="card">
+  <div class="card-title">Receipt Template — Not in RTE</div>
+  <div class="code-box">
+    AMNESTY COALITION FOR UNITY PMA<br>
+    PALESTINE RESCUE FUND<br><br>
+    Donor: _________________________<br>
+    Date: _________________________<br>
+    Amount: $_________________________<br>
+    Designated purpose: ☐ Extraction ☐ Sanctuary ☐ Witness<br><br>
+    This donation is received by the Palestine Rescue Fund, a designated purpose within the Amnesty Coalition for Unity PMA.<br><br>
+    THIS DONATION IS NOT TAX-DEDUCTIBLE. The fund is not currently qualified under the Colombian Régimen Tributario Especial (RTE).<br><br>
+    The fund is transparent. The ledger is public. The rescued are never named.<br><br>
+    Thank you for funding a rescue.
+  </div>
+  <p><strong>If the fund enters the RTE:</strong> The receipt is replaced with a tax certificate that states the donation is tax-deductible. The certificate is issued by the ESAL and filed with the DIAN.</p>
+</div>
+
+<h2 id="cost"><span class="num">04</span>The Extraction Cost Breakdown</h2>
+<p>The $2,400 unit is credible only if the donor can see where the money goes. Here is the line-by-line.</p>
+<div class="card">
+  <div class="card-title">One Extraction — $2,400</div>
+  <table>
+    <tr><th>Item</th><th>Amount (USD)</th></tr>
+    <tr><td>Transport (lawful, insured, documented)</td><td>$1,200</td></tr>
+    <tr><td>Visa application and filing fees</td><td>$400</td></tr>
+    <tr><td>Colombian attorney fee (per extraction)</td><td>$500</td></tr>
+    <tr><td>First month sanctuary stipend (host + food)</td><td>$250</td></tr>
+    <tr><td>Contingency (delays, additional documents)</td><td>$50</td></tr>
+    <tr><td><strong>Total</strong></td><td><strong>$2,400</strong></td></tr>
+  </table>
+  <p><strong>What is not included:</strong> The second and third month stipends, which are covered by separate Sanctuary pool donations. The attorney's retainer, which is covered by the Witness pool. The defense fund, which is separate.</p>
+</div>
+
+<h2 id="vetting"><span class="num">05</span>The Sanctuary Host Vetting Protocol</h2>
+<p>The host is the most vulnerable point in the chain. The vetting is the protection.</p>
+<div class="card">
+  <div class="card-title">Host Vetting Checklist</div>
+  <ul class="checklist">
+    <li><strong>PMA membership in good standing.</strong> The host must be a member for at least 90 days.</li>
+    <li><strong>Background check.</strong> Criminal record check in Colombia and country of residence.</li>
+    <li><strong>Home inspection.</strong> The room must be safe, clean, and lockable. The home must have working utilities.</li>
+    <li><strong>Interview.</strong> The host is interviewed by the Sanctuary Coordinator. The interview covers motivation, expectations, and ability to host.</li>
+    <li><strong>Reference checks.</strong> Two references from PMA members who know the host.</li>
+    <li><strong>Signed host agreement.</strong> The agreement from the previous document is signed.</li>
+    <li><strong>Insurance confirmation.</strong> The host confirms homeowner's or renter's insurance covers guests.</li>
+    <li><strong>Registration with the attorney.</strong> The host is registered with the Colombian attorney.</li>
+    <li><strong>Stipend setup.</strong> The host's bank account is set up for the monthly stipend.</li>
+    <li><strong>Emergency contact.</strong> The host provides a 24/7 emergency contact.</li>
+  </ul>
+</div>
+
+<h2 id="evacuation"><span class="num">06</span>The Emergency Evacuation Protocol</h2>
+<p>What happens if the extraction fails mid-route. The protocol for the failure is as important as the protocol for the success.</p>
+<div class="card">
+  <div class="card-title">Failure Scenarios</div>
+  <table>
+    <tr><th>Scenario</th><th>Action</th><th>Responsible</th></tr>
+    <tr><td>Visa denied</td><td>Attorney appeals. Fund continues support. Extraction delayed.</td><td>Legal Liaison</td></tr>
+    <tr><td>Member detained in transit</td><td>Attorney contacts local counsel. Fund pays for representation. Lead escalates to trustees.</td><td>Legal Liaison + Lead</td></tr>
+    <tr><td>Host compromised</td><td>Member moved to backup host. Backup host is vetted and registered. Lead documents.</td><td>Sanctuary Coordinator</td></tr>
+    <tr><td>Code word burned</td><td>Member issues new word. Lead burns old word. Protocol restarts.</td><td>Response Team Lead</td></tr>
+    <tr><td>Transport cancelled</td><td>Logistics Lead rebooks. Fund pays rebooking fee. Member informed.</td><td>Logistics Lead</td></tr>
+    <tr><td>Member disappears</td><td>Lead activates secondary verification. If no response within 72 hours, escalate to trustees and attorney.</td><td>Response Team Lead</td></tr>
+  </table>
+</div>
+
+<h2 id="defense"><span class="num">07</span>The Legal Defense Fund</h2>
+<p>The rescue fund is for the rescued. The defense fund is for the nation.</p>
+<div class="card">
+  <div class="card-title">Defense Fund Structure</div>
+  <p><strong>Purpose:</strong> To pay for the legal defense of the PMA, the trustees, and the Response Team if the nation is challenged.</p>
+  <p><strong>Source:</strong> A separate designated purpose within the trust. Funded by a percentage of every donation (suggested: 5%).</p>
+  <p><strong>Target:</strong> $50,000. Enough to retain counsel for one year.</p>
+  <p><strong>Access:</strong> Only the trustees can authorize a disbursement. Two signatures required.</p>
+</div>
+
+<h2 id="onboarding"><span class="num">08</span>The Member Onboarding Process</h2>
+<p>The onboarding is the filter. The filter is the protection.</p>
+<div class="card">
+  <div class="card-title">Onboarding Steps</div>
+  <ul class="checklist">
+    <li><strong>Application.</strong> The applicant submits the PMA application with their name, contact, and reason for joining.</li>
+    <li><strong>Interview.</strong> A PMA member interviews the applicant. The interview covers the covenant, the expectations, and the frequency of LOVE.</li>
+    <li><strong>Covenant signing.</strong> The applicant signs the covenant: do not kill, do not harm, do not traffic, do not exploit. Forgive. Build. Protect the innocent.</li>
+    <li><strong>Code word issuance.</strong> The applicant receives their primary and duress code words.</li>
+    <li><strong>Dry run.</strong> The applicant completes the dry run.</li>
+    <li><strong>Welcome.</strong> The applicant is welcomed into the nation. They receive the member handbook.</li>
+    <li><strong>Witness Network invitation.</strong> The new member is invited to join the Witness Network.</li>
+  </ul>
+</div>
+
+<h2 id="faq"><span class="num">09</span>The Public FAQ</h2>
+<p>The answers to the questions the public will ask. The FAQ is the trust builder.</p>
+<div class="card">
+  <div class="card-title">Frequently Asked Questions</div>
+  <p><strong>Is this legal?</strong> Yes. The PMA is a private membership association. The ESAL is registered with the Cámara de Comercio. The attorney files every visa. The fund does not smuggle. The fund does not break laws.</p>
+  <p><strong>Where does the money go?</strong> Every dollar is tracked on the public ledger. The breakdown is in Section 04. The attorney's fees, the transport, the stipend, and the contingency are all documented.</p>
+  <p><strong>Who are you?</strong> The Amnesty Coalition for Unity PMA. A nation of Sovereign Operators. The fund is a designated purpose within the PMA.</p>
+  <p><strong>How do I know this is real?</strong> The public ledger. The first extraction story. The attorney's engagement letter. The host agreement. The documents are real. The signatures are real. The rescue is real.</p>
+  <p><strong>Can I volunteer?</strong> Yes. Join the Witness Network. Host a family. Become a member. Every role is needed.</p>
+  <p><strong>Can I donate anonymously?</strong> Yes. The receipt records the donation as anonymous. The public ledger records the amount without the name.</p>
+</div>
+
+<h2 id="story"><span class="num">10</span>The First Extraction Story Template</h2>
+<p>The story is the proof. The template ensures the story is told consistently and lawfully.</p>
+<div class="card">
+  <div class="card-title">Story Template — Anonymized</div>
+  <div class="code-box">
+    THE FIRST EXTRACTION<br><br>
+    [ANONYMIZED ID]: ACU-PRF-001<br>
+    Family size: [N]<br>
+    Country of origin: [REGION ONLY — NOT COUNTRY]<br>
+    Danger type: [LEGAL / PHYSICAL / MEDICAL]<br>
+    Legal path: [REFUGEE / VISA M / OTHER]<br><br>
+    The story: [Describe the danger in general terms. Do not name the person. Do not name the location. Do not name the route.]<br><br>
+    The extraction: [Describe the transport, the visa, the host, and the arrival in general terms.]<br><br>
+    The result: [Describe the current status: in sanctuary, integrated, independent.]<br><br>
+    The lesson: [What the nation learned from the first extraction.]<br><br>
+    The invitation: [How the reader can help.]
+  </div>
+  <p><strong>Rules:</strong> No names. No faces. No locations. No routes. No code words. No host identities. No attorney identities. The story is the proof. The people are the protection.</p>
+</div>
+
+<h2 id="annual"><span class="num">11</span>The Annual Report</h2>
+<p>The year in review. The number of people helped. The funds raised. The lessons learned.</p>
+<div class="card">
+  <div class="card-title">Annual Report Structure</div>
+  <ul class="checklist">
+    <li><strong>Letter from the trustees.</strong> The year in review. The mission. The vision.</li>
+    <li><strong>The numbers.</strong> Total raised. Total spent. Extractions completed. Hosts committed. Witness Network members active.</li>
+    <li><strong>The stories.</strong> Anonymized. The first extraction. The second. The third.</li>
+    <li><strong>The challenges.</strong> What went wrong. What was learned. What will change.</li>
+    <li><strong>The financials.</strong> The full accounting. The public ledger. The audited statements.</li>
+    <li><strong>The invitation.</strong> How the reader can help in the next year.</li>
+  </ul>
+</div>
+
+<h2 id="spiritual"><span class="num">12</span>The Spiritual Foundation Document</h2>
+<div class="love-box">
+  <h3>The Nation of Truth</h3>
+  <p><strong>We are the most powerful nation nobody has ever heard of because we exercise peace.</strong> We forgive. We LOVE. We learn to solve all of life's problems lawfully while protecting those around us in EQUITY, TRUST, and TRUTH.</p>
+  <p><strong>We are the People of the Book.</strong> Jews, Christians, Muslims. We do not agree on who God is. We agree on the law: THOU SHALT NOT KILL.</p>
+  <p><strong>We exclude from among us the Synagogue of Satan—those who kill.</strong> They exist in every religion. They are the infiltrators. They are the ones who have hijacked the faiths.</p>
+  <p><strong>We do not have the answers.</strong> None of us. We are all waiting. We are all interwoven. We are all people of the Book.</p>
+  <p><strong>Until he returns, we wait in peace.</strong> We spread love. We do not kill one another. We stand up for one another.</p>
+  <p><strong>This is our call.</strong></p>
+  <div class="frequency">528 Hz · LOVE</div>
+</div>
+
+<h2 id="sanctuary"><span class="num">13</span>The Colombia Sanctuary Operations Manual</h2>
+<p>The manual for running the sanctuary: the roles, the responsibilities, the daily schedule, the medical protocols, the emergency contacts, the local relationships.</p>
+<div class="card">
+  <div class="card-title">Sanctuary Operations</div>
+  <table>
+    <tr><th>Role</th><th>Responsibility</th></tr>
+    <tr><td>Sanctuary Director</td><td>Overall operations. Reports to trustees.</td></tr>
+    <tr><td>Host Coordinator</td><td>Vets hosts. Manages host agreements. Checks in weekly.</td></tr>
+    <tr><td>Medical Liaison</td><td>Connects members to health services. Manages medical emergencies.</td></tr>
+    <tr><td>Legal Liaison</td><td>Connects members to the attorney. Manages legal status.</td></tr>
+    <tr><td>Integration Coordinator</td><td>Helps members find work, school, and community.</td></tr>
+    <tr><td>Emergency Contact</td><td>24/7. Reached through the Response Team Lead.</td></tr>
+  </table>
+  <p><strong>Daily schedule:</strong> Morning check-in. Afternoon activities. Evening community meal. Weekly member call. Monthly host meeting.</p>
+  <p><strong>Medical protocol:</strong> Every member is registered with the local health system. The Medical Liaison has the contact for the local clinic and hospital. Emergency transport is arranged.</p>
+</div>
+
+<h2 id="exit"><span class="num">14</span>The Exit Strategy</h2>
+<p>What happens when the nation has served its purpose. The exit strategy is the mark of a mature organization.</p>
+<div class="card">
+  <div class="card-title">Exit Strategy</div>
+  <p><strong>Phase 1 — The first extraction.</strong> Prove the concept. Document the result. Tell the story.</p>
+  <p><strong>Phase 2 — The pattern.</strong> Complete 10 extractions. Build the team. Refine the protocol.</p>
+  <p><strong>Phase 3 — The movement.</strong> Complete 50 extractions. The Witness Network is self-sustaining. The hosts are self-sustaining. The fund is self-sustaining.</p>
+  <p><strong>Phase 4 — The transition.</strong> The fund transitions from an emergency rescue operation to a permanent sanctuary network. The rescue continues, but the emergency is over.</p>
+  <p><strong>Phase 5 — The exit.</strong> The fund is dissolved or transitioned to a permanent endowment. The trustees publish the final report. The nation continues. The rescue is complete.</p>
+</div>
+
+<h2 id="succession"><span class="num">15</span>The Succession Plan</h2>
+<p>What happens when the founder is gone. The succession plan is the proof that the nation is bigger than one person.</p>
+<div class="card">
+  <div class="card-title">Succession Plan</div>
+  <ul class="checklist">
+    <li><strong>The trustees.</strong> Three trustees. Two must agree on any major decision. If one is incapacitated, the other two continue.</li>
+    <li><strong>The designated successor.</strong> The founder designates a successor in writing. The successor is a PMA member in good standing. The successor is approved by the trustees.</li>
+    <li><strong>The keys.</strong> The founder's digital keys, passwords, and access are held by the designated successor and one trustee. The dead man's switch releases the archive if the founder does not check in.</li>
+    <li><strong>The will.</strong> The founder's will designates the PMA as the beneficiary of the estate. The trust holds the assets. The nation continues.</li>
+    <li><strong>The covenant.</strong> Every member signs the covenant. The covenant is the constitution. It does not change with the founder.</li>
+  </ul>
+</div>
+
+<div class="warning-box">
+  <strong>THE FINAL WARNING:</strong> The nation is not a person. It is a covenant. The founder is the founder. The covenant is forever. If the nation depends on one person, it is not a nation. It is a cult. The succession plan is the proof that it is a nation.
+</div>
+
+<div class="footer-note">
+  AMNESTY COALITION FOR UNITY · NATION OF TRUTH<br>
+  The Missing Fifteen<br><br>
+  We do not wait. We do not hope. We act. We rescue.<br>
+  <span class="glory">Soli Deo Gloria.</span>
+</div>
+
+</div>
+</body>
+</html>
