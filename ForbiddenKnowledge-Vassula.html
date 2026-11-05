@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>True Life in God — Expanded Prayer Book</title>
+<style>
+  :root {
+    --bg: #0a0a0c; --surface: #121216; --surface-2: #1a1a20; --border: #2a2a32;
+    --text: #e8e6e3; --text-dim: #9a978f; --gold: #c9a227; --gold-dim: #8a6f1a;
+    --green: #3a7d5c; --danger: #b03a2e;
+  }
+  body.light-mode {
+    --bg: #f5f0e6; --surface: #ebe4d3; --surface-2: #e0d7c0;
+    --text: #2a2a3e; --text-dim: #6a6a7e; --border: #8a8a9a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Georgia', serif; background: var(--bg); color: var(--text);
+    margin: 0; padding: 20px; line-height: 1.7; transition: background 0.3s, color 0.3s;
+  }
+  .container { max-width: 900px; margin: 0 auto; }
+  header { text-align: center; margin-bottom: 24px; }
+  h1 {
+    color: var(--gold); font-size: clamp(1.8em, 4vw, 2.5em);
+    letter-spacing: 0.03em; margin-bottom: 8px;
+    border-bottom: 2px solid var(--gold); padding-bottom: 16px;
+  }
+  .subtitle { font-style: italic; color: var(--text-dim); font-size: 1em; }
+  .intro {
+    background: var(--surface); border: 1px solid var(--border);
+    border-left: 4px solid var(--gold); border-radius: 6px;
+    padding: 20px 24px; margin: 20px 0; font-size: 0.95em;
+  }
+  .intro p { margin: 0 0 12px 0; }
+  .intro p:last-child { margin-bottom: 0; }
+  h2 {
+    color: var(--gold); font-size: 1.3em; margin-top: 40px;
+    margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom: 8px;
+  }
+  .top-controls {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    justify-content: center; margin-bottom: 20px;
+  }
+  .btn {
+    background: var(--surface); color: var(--text); border: 1px solid var(--border);
+    padding: 10px 18px; border-radius: 6px; cursor: pointer;
+    font-family: 'Georgia', serif; font-size: 0.9em; transition: all 0.2s;
+  }
+  .btn:hover { border-color: var(--gold); color: var(--gold); }
+  .search-box {
+    width: 100%; padding: 12px 16px; background: var(--surface);
+    color: var(--text); border: 1px solid var(--border); border-radius: 6px;
+    font-family: 'Georgia', serif; font-size: 1em; margin-bottom: 20px;
+  }
+  .search-box:focus { outline: none; border-color: var(--gold); }
+  .prayer-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 24px 28px; margin: 20px 0;
+  }
+  .prayer-card .prayer-title {
+    font-size: 1.2em; font-weight: bold; color: var(--gold); margin-bottom: 4px;
+  }
+  .prayer-card .prayer-source {
+    font-size: 0.8em; font-style: italic; color: var(--text-dim); margin-bottom: 16px;
+  }
+  .prayer-card .prayer-text {
+    font-size: 1em; line-height: 1.85; white-space: pre-line; color: var(--text);
+  }
+  .prayer-actions {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--border);
+  }
+  .prayer-actions button {
+    background: var(--surface-2); color: var(--text-dim); border: 1px solid var(--border);
+    border-radius: 4px; padding: 6px 12px; font-size: 0.8em;
+    cursor: pointer; font-family: 'Georgia', serif; transition: all 0.2s;
+  }
+  .prayer-actions button:hover { border-color: var(--gold); color: var(--gold); }
+  .count-bar {
+    text-align: center; color: var(--gold); font-family: 'Courier New', monospace;
+    font-size: 0.9em; margin-bottom: 20px; letter-spacing: 0.05em;
+  }
+  .toast {
+    position: fixed; bottom: 24px; left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--green); color: white; padding: 12px 24px;
+    border-radius: 6px; font-size: 0.9em; opacity: 0;
+    transition: all 0.3s ease; z-index: 1000;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4); max-width: 90%;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast.error { background: var(--danger); }
+  .footer-note {
+    margin-top: 60px; padding-top: 24px; border-top: 1px solid var(--border);
+    text-align: center; font-size: 0.85em; color: var(--text-dim); font-style: italic;
+  }
+  .footer-note .glory { color: var(--gold); font-weight: bold; font-style: normal; }
+  @media print {
+    .top-controls, .prayer-actions, .toast, .search-box, .count-bar { display: none !important; }
+    body { background: white; color: black; }
+    .prayer-card { border: 1px solid black; background: white; page-break-inside: avoid; }
+    h1, h2, .prayer-title { color: black; border-color: black; }
+  }
+  @media (max-width: 600px) { body { padding: 12px; } .prayer-card { padding: 18px 16px; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>True Life in God</h1>
+  <p class="subtitle">Expanded Prayer Book from the Messages of Vassula Rydén</p>
+</header>
+
+<div class="top-controls">
+  <button class="btn" onclick="toggleTheme()" id="theme-btn">🌙 Light Mode</button>
+  <button class="btn" onclick="window.print()">🖨️ Print / Save PDF</button>
+</div>
+
+<div class="intro">
+  <p><strong>About this prayer book.</strong> These prayers are drawn from the <em>True Life in God</em> messages received by Vassula Rydén, and from the Prayer Meeting Guidelines published by the True Life in God Foundation. The Catholic Church has not issued a final verdict on the supernatural origin of the messages. The Congregation for the Doctrine of the Faith issued a warning in 1995, reiterated in 2007, but Cardinal Ratzinger permitted the promotion of her writings "with discernment," and two bishops granted the <em>nihil obstat</em> and <em>imprimatur</em> in 2005.</p>
+  <p><strong>This app does not ask you to believe in the messages.</strong> It asks you to pray the prayers. They are Catholic in their language. They are addressed to the Triune God. They are the reason this book exists.</p>
+  <p><strong>On the count.</strong> This is not the complete prayer book. The complete prayer book would require the full 12 volumes. This is every prayer I could verify from the record available to me. If you have the full volumes and want to send me the prayers I am missing, I will add them.</p>
+</div>
+
+<h2>Prayers</h2>
+<div class="count-bar" id="count-bar"></div>
+<input type="text" class="search-box" id="search" placeholder="Search prayers by title or text..." oninput="renderPrayers()">
+<div id="prayer-list"></div>
+
+<div class="footer-note">
+  <p>These prayers are reproduced from the <em>True Life in God</em> messages and the Prayer Meeting Guidelines for the purpose of prayer and study.</p>
+  <p>The official website of the messages is <strong>ww3.tlig.org</strong>.</p>
+  <p style="margin-top: 16px;"><span class="glory">Soli Deo Gloria.</span></p>
+</div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const prayers = [
+  {
+    id: 'help-me-father',
+    title: "Help Me, Father",
+    source: "True Life in God, September 27, 1986 [citation:7]",
+    text: `help me Father and lead me
+to Your pastures of repose,
+where everlasting pure water flows,
+be my Light to show me the Way;
+with You by your side will I walk;
+with You illuminating me will I talk;
+Father, Beloved, remain within me to have Peace,
+to feel Your Love;
+I will follow You in Your footsteps;
+with You I will remain;
+enlighten me, love me,
+be with me here and forever after;
+amen.`
+  },
+  {
+    id: 'my-god-i-love-you',
+    title: "My God, I Love You",
+    source: "True Life in God, March 20, 1987 [citation:11]",
+    text: `My God, I love You
+and it is through Your abundant love and mercy
+that You showed me Your Light;
+blessed be Your Name,
+amen.`
+  },
+  {
+    id: 'o-holy-father',
+    title: "O Holy Father, by Thy Power and with Thy Mercy",
+    source: "True Life in God, March 7, 1987 [citation:11]",
+    text: `O Holy Father,
+by Thy Power and with Thy Mercy,
+I implore You,
+gather all your sheep,
+forgive them
+and let them return to Your Beloved Home.`
+  },
+  {
+    id: 'consecration-father',
+    title: "Consecration to the Father",
+    source: "True Life in God, December 17, 1992 [citation:1]",
+    text: `Father,
+I consecrate myself in body and soul to Your service,
+so that Your Eyes and Your Heart
+may never abandon me.
+
+Establish Your Royal Throne within me
+and give me Your orders.
+Make me advance with purity of heart,
+so that I may accomplish
+all that You have entrusted to me.
+Amen.`
+  },
+  {
+    id: 'come-holy-spirit',
+    title: "Come Holy Spirit",
+    source: "True Life in God, October 26, 1989 [citation:6]",
+    text: `Come Holy Spirit,
+come through the
+powerful intercession
+of the Immaculate Heart of Mary
+Your Beloved Bride;
+Amen.`
+  },
+  {
+    id: 'holy-spirit-descend',
+    title: "Holy Spirit, Descend Upon Us",
+    source: "True Life in God, March 26, 1988 [citation:6]",
+    text: `Holy Spirit
+descend upon us, renewing us,
+fill our soul with Your Love,
+rest in our tormented soul,
+giving us Peace,
+envelop us with Your wings
+sheltering us from all evil,
+humble us,
+guide us in Your Light
+to be able to see Your desires
+and thus fulfil them,
+amen.`
+  },
+  {
+    id: 'prayer-of-praise',
+    title: "A Prayer of Praise",
+    source: "True Life in God, November 10, 1995 [citation:6]",
+    text: `Glory be to God in the highest heaven,
+Glory be to Him who lifted my soul
+from the entrails of this earth;
+Glory be to the Light thrice Holy
+in whose power all things came to be;
+Glory be to God, invincible,
+incomparable in His Authority;
+Glory be to the Immortal One
+in whom we find immortality;
+May Your Breath, Most Holy One,
+which is pure emanation of Your Glory,
+enliven us, renewing us
+into one glorious Body.
+Amen.`
+  },
+  {
+    id: 'consecration-sacred-heart',
+    title: "Consecration to the Sacred Heart",
+    source: "True Life in God, from the Consecration to the Sacred Heart [citation:9]",
+    text: `Sacred Heart of Jesus,
+come and invade me completely
+so that my motives will be Your Motives,
+my desires Your Desires,
+my words Your Words,
+my thoughts Your Thoughts,
+then allow me to creep
+in the deepest place of Your Sacred Heart;
+annihilate me altogether;
+
+I, Vassula, shall worship
+Your Sacred Heart from the core of mine,
+I promise to serve Your Sacred Heart
+with a fire inside me,
+I shall, with zeal, serve You
+more fervently than before;
+
+I am weak but I know that
+your Strength shall sustain me;
+do not allow me to lose sight of You,
+nor allow my heart to flutter elsewhere;
+
+I, Vassula, will look for Your Sacred Heart alone
+and desire You alone;
+make me dislike all that is contrary
+to Your Holiness and to Your Will;
+sift me through and through and
+make sure that not one rival remains within me;
+from today, tighten the bonds of Love
+with which you have enlace me,
+and make my soul thirst for You and
+my heart sick with love for You;
+
+do not wait,
+come and consume my whole being
+with the Flames of Your ardent Love;
+whatever I will do from now on,
+will be done merely for Your Interests and
+Your Glory and nothing for me;
+
+I, Vassula, consecrate my life for you
+and from today am willing
+to be the slave of Your Love,
+the victim of Your Burning Desires
+and of Your Passion,
+the benefit of Your Church,
+and the toy of Your Soul;
+
+make my traits resemble those of Your Crucifixion
+through the bitterness I will encounter
+in the deafness of souls, and to see them fall;
+give my soul its fill;
+do not spare me from Your Cross,
+like the Father had not spared You;
+arrest my eyes, my thoughts and my desires
+to be captives of Your Sacred Heart;
+
+unworthy, I am, and I deserve nothing,
+but help me to live my act of consecration
+by being loyal, invoking Your Holy Name untiringly;
+make my spirit repulse all that is not You;
+make my soul bear more than ever before,
+the Marks of Your Body for the conversion of souls;
+
+I, Vassula, voluntarily submit my will to Your Will,
+now and forever; amen.`
+  },
+  {
+    id: 'consecration-two-hearts',
+    title: "Consecration to the Two Hearts",
+    source: "True Life in God, September 21, 1993 [citation:4]",
+    text: `designated in the prophecies of Your Word,
+O Lord, we know, we trust and we believe
+that the Triumph of Your Sacred Heart,
+and the Immaculate Heart of Mary
+is in the near future;
+
+therefore, we humbly come
+to consecrate ourselves, our families
+and our country to Your Two Sacred Hearts;
+
+we believe that
+in consecrating our country to You,
+nation will not lift sword against nation
+and there will be no more training for war;
+
+we believe that in consecrating our country
+to Your Two Loving Hearts,
+all human pride and arrogance,
+all godlessness and hardening of the heart
+be effaced, and that every evil
+will be replaced with love and good things;
+
+we believe that Your Two Holy Hearts
+will not resist our sighs
+now and our needs,
+but in their Loving Flame
+will hear us and come to us
+to heal our deep wounds and bring us peace;
+
+O Sacred Heart of Jesus
+and Immaculate Heart of Mary,
+blow on us a spark from Your Two Hearts
+to flare up our heart, make out of our nation
+the perfect Dwelling-Place of Your Holiness;
+abide in us and we in You so that through
+the Love of Your Two Hearts,
+we may find Peace, Unity and Conversion;
+amen.`
+  },
+  {
+    id: 'conversion-world',
+    title: "Prayer for the Conversion of the World",
+    source: "True Life in God, May 15, 1990; July 8, 1990 [citation:4]",
+    text: `Father all Merciful,
+let those who hear and hear again yet never understand,
+hear Your Voice this time and understand
+that it is You, the Holy of Holies;
+open the eyes of those who see and see,
+yet never perceive,
+to see with their eyes this time
+Your Holy Face and Your Glory,
+place Your Finger on their heart
+so that their heart may open
+and understand Your Faithfulness,
+I pray and ask You all these things,
+Righteous Father,
+so that all the nations be converted and be healed
+through the Wounds of Your Beloved Son,
+Jesus Christ;
+Amen.`
+  },
+  {
+    id: 'orthodox-hope',
+    title: "My Hope Is the Father (Orthodox Prayer)",
+    source: "Orthodox Prayer, included in True Life in God [citation:5]",
+    text: `My hope is the Father:
+my refuge, the Son;
+my protection, the Holy Spirit.
+Holy Trinity, glory to You.
+Amen.`
+  },
+  {
+    id: 'st-michael',
+    title: "Prayer to St. Michael the Archangel",
+    source: "Traditional, included in the True Life in God Prayer Meeting Guidelines [citation:5]",
+    text: `St. Michael, the Archangel,
+defend us in the Day of Battle,
+be our safeguard against
+the wickedness and snares of the devil.
+May God rebuke him, we humbly pray.
+And do thou, O Prince of the heavenly Host,
+by the Power of God, cast into hell Satan,
+and all the other evil spirits
+who prowl through the world
+seeking the ruin of souls.
+Amen.`
+  },
+  {
+    id: 'jesus-only-love',
+    title: "Jesus, My Only Love",
+    source: "True Life in God, from the prayer meeting guidelines [citation:6]",
+    text: `Jesus, my only love,
+I pray for those whom You love,
+but know not how to love You,
+may they be purified and healed
+so that they too be exempt from all evil.
+Amen.`
+  },
+  {
+    id: 'prayer-to-vassula',
+    title: "Prayer to Vassula for Healing",
+    source: "Composed by Fr. J. L. Iannuzzi, included in the Prayer Meeting Guidelines [citation:15]",
+    text: `Vassula of the Sacred Heart,
+your love for God and charity for His children
+obtained for you the rewards of God.
+I beseech you to present before God
+the grace that I now humbly implore
+(present your petition...).
+Flower of the Most High,
+grant me the grace of deliverance
+from all afflictions of mind, body and soul.
+With Jesus' blessing I shall be healed.
+Whisper my cry into the ears of sweet Jesus
+who embraced you in His Arms,
+so that in hearing your plea,
+He may grant me His blessing.
+I am forever grateful to you
+for having heard and answered my petition.
+Amen.`
+  }
+];
+
+let currentTheme = 'dark';
+
+function renderPrayers() {
+  const list = document.getElementById('prayer-list');
+  const countBar = document.getElementById('count-bar');
+  const search = (document.getElementById('search').value || '').toLowerCase().trim();
+  list.innerHTML = '';
+
+  let filtered = prayers;
+  if (search) {
+    filtered = prayers.filter(p =>
+      p.title.toLowerCase().includes(search) ||
+      p.text.toLowerCase().includes(search) ||
+      p.source.toLowerCase().includes(search)
+    );
+  }
+
+  countBar.textContent = `${prayers.length} prayers in this book · ${filtered.length} showing`;
+
+  filtered.forEach(prayer => {
+    const card = document.createElement('div');
+    card.className = 'prayer-card';
+    card.innerHTML = `
+      <div class="prayer-title">${prayer.title}</div>
+      <div class="prayer-source">${prayer.source}</div>
+      <div class="prayer-text">${prayer.text}</div>
+      <div class="prayer-actions">
+        <button onclick="copyPrayer('${prayer.id}')">📋 Copy</button>
+        <button onclick="speakPrayer('${prayer.id}')">🔊 Read Aloud</button>
+      </div>
+    `;
+    list.appendChild(card);
+  });
+
+  if (filtered.length === 0) {
+    list.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-dim);font-style:italic;">No prayers match your search.</div>';
+  }
+}
+
+function copyPrayer(id) {
+  const prayer = prayers.find(p => p.id === id);
+  if (!prayer) return;
+  const text = `${prayer.title}\n${prayer.source}\n\n${prayer.text}`;
+  navigator.clipboard.writeText(text).then(() => {
+    showToast('Prayer copied');
+  }).catch(() => {
+    showToast('Could not copy', true);
+  });
+}
+
+function speakPrayer(id) {
+  if (!('speechSynthesis' in window)) {
+    showToast('Speech is not supported in this browser', true);
+    return;
+  }
+  const prayer = prayers.find(p => p.id === id);
+  if (!prayer) return;
+  window.speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(`${prayer.title}. ${prayer.text}`);
+  utterance.rate = 0.85;
+  utterance.pitch = 1;
+  window.speechSynthesis.speak(utterance);
+  showToast('Reading aloud...');
+}
+
+function toggleTheme() {
+  document.body.classList.toggle('light-mode');
+  currentTheme = document.body.classList.contains('light-mode') ? 'light' : 'dark';
+  document.getElementById('theme-btn').textContent = currentTheme === 'light' ? '☀️ Dark Mode' : '🌙 Light Mode';
+}
+
+function showToast(message, isError = false) {
+  const toast = document.getElementById('toast');
+  toast.textContent = message;
+  toast.className = 'toast show' + (isError ? ' error' : '');
+  clearTimeout(window._toastTimeout);
+  window._toastTimeout = setTimeout(() => {
+    toast.classList.remove('show');
+  }, 2500);
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  renderPrayers();
+});
+</script>
+</body>
+</html>
