@@ -1,116 +1,746 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scutum Fidei - Shield of Faith</title>
-    <style>
-        :root { --color-deep-blue: #1a1a2e; --color-dark-blue: #16213e; --color-parchment: #e6d3a3; --color-border: #4a4a6a; }
-        body { font-family: 'Georgia', serif; background-color: var(--color-deep-blue); color: var(--color-parchment); margin: 0; padding: 20px; line-height: 1.6; }
-        .container { max-width: 800px; margin: 0 auto; border: 1px solid var(--color-border); border-radius: 8px; padding: 20px; background-color: var(--color-dark-blue); }
-        h1, h2 { text-align: center; color: var(--color-parchment); border-bottom: 1px solid var(--color-border); padding-bottom: 10px; }
-        .prayer-button { background: var(--color-deep-blue); color: var(--color-parchment); border: 1px solid var(--color-border); padding: 15px; margin: 10px 0; border-radius: 5px; cursor: pointer; text-align: left; width: 100%; transition: all 0.3s ease; font-size: 1em; }
-        .prayer-button:hover { background: var(--color-dark-blue); border-color: var(--color-parchment); }
-        .prayer-reference { font-size: 0.8em; font-style: italic; color: #aaa; display: block; margin-top: 5px; }
-        #prayer-display { margin-top: 30px; padding: 20px; border: 1px solid var(--color-border); border-radius: 5px; background-color: rgba(0, 0, 0, 0.2); white-space: pre-line; }
-        select, input { width: 100%; padding: 10px; margin: 10px 0; background: var(--color-deep-blue); color: var(--color-parchment); border: 1px solid var(--color-border); border-radius: 5px; font-size: 1em; }
-        label { display: block; margin-top: 15px; }
-        .section { display: none; }
-        .active { display: block; }
-        nav { text-align: center; margin-bottom: 20px; }
-        nav button { margin: 0 5px; padding: 10px 15px; background: var(--color-deep-blue); color: var(--color-parchment); border: 1px solid var(--color-border); border-radius: 5px; cursor: pointer; }
-        nav button.active-nav { background: var(--color-parchment); color: var(--color-deep-blue); font-weight: bold; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scutum Fidei — Shield of Faith</title>
+<style>
+  :root {
+    --color-deep-blue: #1a1a2e;
+    --color-dark-blue: #16213e;
+    --color-parchment: #e6d3a3;
+    --color-border: #4a4a6a;
+    --color-gold: #c9a227;
+    --color-success: #3a7d5c;
+    --color-danger: #b03a2e;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Georgia', serif;
+    background-color: var(--color-deep-blue);
+    color: var(--color-parchment);
+    margin: 0;
+    padding: 20px;
+    line-height: 1.6;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  body.light-mode {
+    --color-deep-blue: #f5f0e6;
+    --color-dark-blue: #ebe4d3;
+    --color-parchment: #2a2a3e;
+    --color-border: #8a8a9a;
+    background-color: var(--color-deep-blue);
+    color: var(--color-parchment);
+  }
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 24px;
+    background-color: var(--color-dark-blue);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  }
+  header { text-align: center; margin-bottom: 20px; }
+  h1 {
+    color: var(--color-parchment);
+    border-bottom: 2px solid var(--color-gold);
+    padding-bottom: 12px;
+    margin-bottom: 8px;
+    font-size: 2em;
+    letter-spacing: 0.05em;
+  }
+  h2 {
+    text-align: center;
+    color: var(--color-gold);
+    border-bottom: 1px solid var(--color-border);
+    padding-bottom: 10px;
+    margin-top: 0;
+  }
+  h3 { color: var(--color-gold); margin-top: 20px; }
+  .subtitle { font-style: italic; opacity: 0.8; }
+  .top-controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  .top-controls button {
+    padding: 8px 14px;
+    background: var(--color-deep-blue);
+    color: var(--color-parchment);
+    border: 1px solid var(--color-border);
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: 'Georgia', serif;
+    font-size: 0.85em;
+    transition: all 0.2s;
+  }
+  .top-controls button:hover {
+    border-color: var(--color-gold);
+    color: var(--color-gold);
+  }
+  nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 6px;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--color-border);
+  }
+  nav button {
+    padding: 10px 18px;
+    background: var(--color-deep-blue);
+    color: var(--color-parchment);
+    border: 1px solid var(--color-border);
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: 'Georgia', serif;
+    font-size: 0.95em;
+    transition: all 0.2s;
+  }
+  nav button:hover { border-color: var(--color-gold); }
+  nav button.active-nav {
+    background: var(--color-parchment);
+    color: var(--color-deep-blue);
+    font-weight: bold;
+    border-color: var(--color-gold);
+  }
+  .prayer-button {
+    background: var(--color-deep-blue);
+    color: var(--color-parchment);
+    border: 1px solid var(--color-border);
+    padding: 14px 18px;
+    margin: 8px 0;
+    border-radius: 5px;
+    cursor: pointer;
+    text-align: left;
+    width: 100%;
+    transition: all 0.25s ease;
+    font-size: 1em;
+    font-family: 'Georgia', serif;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .prayer-button:hover {
+    background: var(--color-dark-blue);
+    border-color: var(--color-gold);
+    transform: translateX(3px);
+  }
+  .prayer-button .prayer-name { font-weight: bold; }
+  .prayer-reference {
+    font-size: 0.75em;
+    font-style: italic;
+    color: var(--color-gold);
+    opacity: 0.8;
+  }
+  #prayer-display {
+    margin-top: 24px;
+    padding: 24px;
+    border: 1px solid var(--color-gold);
+    border-radius: 6px;
+    background-color: rgba(0, 0, 0, 0.15);
+    white-space: pre-line;
+    min-height: 120px;
+    position: relative;
+  }
+  #prayer-display h3 { margin-top: 0; text-align: center; font-size: 1.4em; }
+  #prayer-display .ref { text-align: center; opacity: 0.7; font-style: italic; margin-bottom: 16px; }
+  #prayer-display .text { font-size: 1.05em; line-height: 1.8; }
+  .prayer-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--color-border);
+  }
+  .prayer-actions button {
+    padding: 8px 16px;
+    background: var(--color-deep-blue);
+    color: var(--color-parchment);
+    border: 1px solid var(--color-border);
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: 'Georgia', serif;
+    font-size: 0.85em;
+    transition: all 0.2s;
+  }
+  .prayer-actions button:hover { border-color: var(--color-gold); color: var(--color-gold); }
+  select, input, textarea {
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    background: var(--color-deep-blue);
+    color: var(--color-parchment);
+    border: 1px solid var(--color-border);
+    border-radius: 5px;
+    font-size: 1em;
+    font-family: 'Georgia', serif;
+  }
+  select:focus, input:focus, textarea:focus {
+    outline: none;
+    border-color: var(--color-gold);
+  }
+  label {
+    display: block;
+    margin-top: 16px;
+    margin-bottom: 4px;
+    color: var(--color-gold);
+    font-size: 0.9em;
+  }
+  .section { display: none; }
+  .section.active { display: block; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  .prayer-board { margin-top: 24px; }
+  .prayer-card {
+    background: var(--color-deep-blue);
+    border: 1px solid var(--color-border);
+    border-left: 3px solid var(--color-gold);
+    border-radius: 4px;
+    padding: 16px;
+    margin: 12px 0;
+    position: relative;
+  }
+  .prayer-card .meta {
+    font-size: 0.8em;
+    color: var(--color-gold);
+    opacity: 0.8;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+  }
+  .prayer-card .text { font-size: 1em; }
+  .prayer-card .delete-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: transparent;
+    color: var(--color-danger);
+    border: 1px solid var(--color-danger);
+    border-radius: 3px;
+    padding: 2px 8px;
+    font-size: 0.7em;
+    cursor: pointer;
+    opacity: 0.5;
+    transition: opacity 0.2s;
+  }
+  .prayer-card .delete-btn:hover { opacity: 1; }
+  .community-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .community-count {
+    font-family: 'Georgia', serif;
+    font-size: 0.85em;
+    color: var(--color-gold);
+    opacity: 0.8;
+  }
+  .search-box {
+    width: 100%;
+    padding: 10px 14px;
+    background: var(--color-deep-blue);
+    color: var(--color-parchment);
+    border: 1px solid var(--color-border);
+    border-radius: 5px;
+    font-family: 'Georgia', serif;
+    font-size: 0.9em;
+    margin-bottom: 16px;
+  }
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    opacity: 0.6;
+    font-style: italic;
+  }
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--color-success);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-size: 0.9em;
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 1000;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast.error { background: var(--color-danger); }
+  @media (max-width: 600px) {
+    body { padding: 12px; }
+    .container { padding: 16px; }
+    h1 { font-size: 1.5em; }
+    nav button { padding: 8px 12px; font-size: 0.85em; }
+    .prayer-button { padding: 12px 14px; font-size: 0.9em; }
+  }
+  @media print {
+    nav, .top-controls, .prayer-actions, .prayer-button, .search-box, #community-form { display: none !important; }
+    body { background: white; color: black; }
+    .container { border: none; background: white; }
+    h1, h2, h3 { color: black; border-color: black; }
+    #prayer-display { border-color: black; background: white; }
+  }
+</style>
 </head>
 <body>
-    <div class="container">
-        <h1>Scutum Fidei</h1>
-        <p style="text-align: center; font-style: italic;">A Spiritual Tool for the Laity</p>
-        <nav>
-            <button id="nav-armory" class="active-nav" onclick="showSection('armory')">Daily Armory</button>
-            <button id="nav-tactical" onclick="showSection('tactical')">Tactical Module</button>
-            <button id="nav-community" onclick="showSection('community')">Community Prayers</button>
-        </nav>
+<div class="container">
+  <header>
+    <h1>Scutum Fidei</h1>
+    <p class="subtitle">A Spiritual Tool for the Laity · Shield of Faith</p>
+  </header>
 
-        <section id="armory" class="section active">
-            <h2>Daily Armory</h2>
-            <button class="prayer-button" onclick="displayPrayer(sealingPrayer)">SEALING PRAYER <span class="prayer-reference">(Pg. 14)</span></button>
-            <button class="prayer-button" onclick="displayPrayer(stMichaelPrayer)">ST. MICHAEL PRAYER <span class="prayer-reference">(Pg. 92)</span></button>
-            <button class="prayer-button" onclick="displayPrayer(subTuumPrayer)">SUB TUUM PRAESIDIUM <span class="prayer-reference">(Pg. 86)</span></button>
-            <button class="prayer-button" onclick="displayPrayer(shortDeliverance)">IMMEDIATE DELIVERANCE <span class="prayer-reference">(Pg. 54)</span></button>
-        </section>
+  <div class="top-controls">
+    <button onclick="toggleTheme()" id="theme-btn">🌙 Light Mode</button>
+    <button onclick="randomPrayer()">🎲 Random Prayer</button>
+    <button onclick="window.print()">🖨️ Print / Save PDF</button>
+    <button onclick="clearAllCommunityPrayers()">🗑️ Clear All Community Prayers</button>
+  </div>
 
-        <section id="tactical" class="section">
-            <h2>Tactical Module</h2>
-            <label for="spirit-select">Identify the Spirit:</label>
-            <select id="spirit-select">
-                <option value="">-- Select a spirit to bind --</option>
-                <option value="fear">Spirit of Fear / Timoris</option>
-                <option value="anxiety">Spirit of Anxiety / Anxietatis</option>
-                <option value="lust">Spirit of Lust / Luxuriae</option>
-                <option value="pride">Spirit of Pride / Superbia</option>
-                <option value="confusion">Spirit of Confusion / Confusionis</option>
-            </select>
-            <label for="target-relationship">This prayer is for:</label>
-            <select id="target-relationship">
-                <option value="self">Myself</option>
-                <option value="family">My Child/Spouse</option>
-                <option value="other">Another Person (Friend, etc.)</option>
-            </select>
-            <button class="prayer-button" onclick="generateBindingPrayer()">GENERATE BINDING PRAYER</button>
-        </section>
+  <nav>
+    <button id="nav-armory" class="active-nav" onclick="showSection('armory')">Daily Armory</button>
+    <button id="nav-tactical" onclick="showSection('tactical')">Tactical Module</button>
+    <button id="nav-community" onclick="showSection('community')">Community Prayers</button>
+    <button id="nav-about" onclick="showSection('about')">About</button>
+  </nav>
 
-        <section id="community" class="section">
-            <h2>Community Prayers</h2>
-            <p><em>This is where our Supabase database will connect! We will build this next.</em></p>
-            <label for="prayer-name">Your Name (optional):</label>
-            <input type="text" id="prayer-name" placeholder="Enter your name">
-            <label for="prayer-request">Your Prayer Request:</label>
-            <input type="text" id="prayer-request" placeholder="Enter your prayer request">
-            <button class="prayer-button" onclick="submitPrayer()">SUBMIT PRAYER REQUEST</button>
-            <div id="prayer-board"></div>
-        </section>
+  <!-- ARMORY -->
+  <section id="armory" class="section active">
+    <h2>Daily Armory</h2>
+    <p style="text-align:center; opacity:0.8; font-style:italic; margin-bottom:20px;">Select a prayer to display it. You can copy it, print it, or save it as a PDF.</p>
+    <div id="armory-list"></div>
+  </section>
 
-        <div id="prayer-display">
-            <p style="text-align: center;">Select a prayer from the Daily Armory or use the Tactical Module.</p>
-        </div>
+  <!-- TACTICAL -->
+  <section id="tactical" class="section">
+    <h2>Tactical Module</h2>
+    <p style="text-align:center; opacity:0.8; font-style:italic; margin-bottom:20px;">Identify the spirit and the person. The app generates a binding prayer.</p>
+    <label for="spirit-select">Identify the Spirit:</label>
+    <select id="spirit-select">
+      <option value="">-- Select a spirit to bind --</option>
+      <option value="fear">Spirit of Fear / Timoris</option>
+      <option value="anxiety">Spirit of Anxiety / Anxietatis</option>
+      <option value="lust">Spirit of Lust / Luxuriae</option>
+      <option value="pride">Spirit of Pride / Superbia</option>
+      <option value="confusion">Spirit of Confusion / Confusionis</option>
+      <option value="anger">Spirit of Anger / Irae</option>
+      <option value="depression">Spirit of Depression / Tristitiae</option>
+      <option value="envy">Spirit of Envy / Invidiae</option>
+      <option value="unbelief">Spirit of Unbelief / Infidelitatis</option>
+      <option value="addiction">Spirit of Addiction / Servitutis</option>
+    </select>
+    <label for="target-relationship">This prayer is for:</label>
+    <select id="target-relationship">
+      <option value="self">Myself</option>
+      <option value="family">My Child / Spouse / Family</option>
+      <option value="friend">A Friend</option>
+      <option value="enemy">An Enemy (Luke 6:27-28)</option>
+      <option value="world">The World / The Nation</option>
+    </select>
+    <label for="custom-name">Name (optional, for the prayer):</label>
+    <input type="text" id="custom-name" placeholder="Enter a name or leave blank">
+    <button class="prayer-button" onclick="generateBindingPrayer()" style="margin-top:16px; justify-content:center;">⚔️ GENERATE BINDING PRAYER</button>
+  </section>
+
+  <!-- COMMUNITY -->
+  <section id="community" class="section">
+    <h2>Community Prayers</h2>
+    <p style="text-align:center; opacity:0.8; font-style:italic; margin-bottom:20px;">Your prayers are saved in this browser. They are not sent to a server. They are private to this device.</p>
+
+    <div id="community-form">
+      <label for="prayer-name">Your Name (optional):</label>
+      <input type="text" id="prayer-name" placeholder="Enter your name" maxlength="50">
+      <label for="prayer-request">Your Prayer Request:</label>
+      <textarea id="prayer-request" rows="3" placeholder="Enter your prayer request" maxlength="500"></textarea>
+      <button class="prayer-button" onclick="submitPrayer()" style="justify-content:center;">🙏 SUBMIT PRAYER REQUEST</button>
     </div>
 
-    <script>
-        // PRAYER DATA
-        const sealingPrayer = { title: "SEALING PRAYER OF PROTECTION", reference: "Pg. 14", text: `I ask Jesus to seal me in His most Precious Blood against any and all incursions of the evil one, in particular against any clinging, familial, familiar or retaliating spirits, in the Name of the Father and of the Son and of the Holy Spirit. Amen.` };
-        const stMichaelPrayer = { title: "PRAYER TO ST. MICHAEL THE ARCHANGEL", reference: "Pg. 92", text: `St. Michael the Archangel, defend us in battle. Be our protection against the wickedness and snares of the devil. May God rebuke him, we humbly pray, and do thou, O Prince of the Heavenly Host, by the power of God, thrust into hell Satan, and all the evil spirits, who prowl about the world seeking the ruin of souls. Amen.` };
-        const subTuumPrayer = { title: "SUB TUUM PRAESIDIUM", reference: "Pg. 86", text: `We fly to thy protection, O Holy Mother of God. Despise not our petitions in our necessities, but deliver us always from all dangers, O glorious and blessed Virgin. Amen.` };
-        const shortDeliverance = { title: "SHORT-FORM DELIVERANCE", reference: "Pg. 54", text: `In the name of the Lord Jesus Christ, by the power of His Cross, His Blood and his resurrection, I bind you Satan, the spirits, powers and forces of darkness... I claim the shed blood of Jesus Christ, the Son of the living God, over every aspect of my life for my protection. I pray all these things in the precious name of my Lord and Savior, Jesus Christ.` };
+    <div class="community-header" style="margin-top:32px;">
+      <h3 style="margin:0;">Prayer Board</h3>
+      <span class="community-count" id="community-count">0 prayers</span>
+    </div>
+    <input type="text" class="search-box" id="community-search" placeholder="Search prayers..." oninput="renderCommunityPrayers()">
+    <div class="prayer-board" id="prayer-board"></div>
+  </section>
 
-        function displayPrayer(prayer) {
-            document.getElementById('prayer-display').innerHTML = `<h3>${prayer.title}</h3><p><em>${prayer.reference}</em></p><p>${prayer.text}</p>`;
-        }
-        function showSection(sectionId) {
-            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('nav button').forEach(b => b.classList.remove('active-nav'));
-            document.getElementById(sectionId).classList.add('active');
-            document.getElementById(`nav-${sectionId}`).classList.add('active-nav');
-        }
-        function generateBindingPrayer() {
-            const spirit = document.getElementById('spirit-select').value;
-            const relationship = document.getElementById('target-relationship').value;
-            if (!spirit) { alert("Please select a spirit."); return; }
-            const spiritNames = { fear: "Fear (Timoris)", anxiety: "Anxiety (Anxietatis)", lust: "Lust (Luxuriae)", pride: "Pride (Superbia)", confusion: "Confusion (Confusionis)" };
-            const spiritName = spiritNames[spirit];
-            let prayerText;
-            if (relationship === 'self' || relationship === 'family') {
-                let target = (relationship === 'self') ? 'me' : 'my family member';
-                prayerText = `In the Name of Jesus Christ, and by the power of His Precious Blood, I command the spirit of ${spiritName} to be bound and to leave ${target} now. Go directly to the foot of the Cross. In the Name of Jesus. Amen.`;
-            } else {
-                prayerText = `Lord Jesus Christ, I ask You to bind the spirit of ${spiritName} afflicting this person. Command it to leave and go to the foot of Your Cross. Thy will be done. Amen.`;
-            }
-            document.getElementById('prayer-display').innerHTML = `<h3>BINDING PRAYER</h3><p><em>Generated for: ${spiritName}</em></p><p>${prayerText}</p>`;
-        }
-        function submitPrayer() {
-            alert("This will connect to our Supabase database in the next lesson!");
-        }
-        showSection('armory');
-    </script>
+  <!-- ABOUT -->
+  <section id="about" class="section">
+    <h2>About Scutum Fidei</h2>
+    <p><strong>Scutum Fidei</strong> is Latin for "Shield of Faith." It is a spiritual tool for the laity — a collection of Catholic prayers, a tactical binding module, and a community prayer board.</p>
+    <p><strong>The Daily Armory</strong> contains the foundational prayers of the faith: the Sign of the Cross, the Our Father, the Hail Mary, the Glory Be, the Apostles' Creed, the Act of Contrition, the Anima Christi, the Prayer to St. Michael, the Sub Tuum Praesidium, and the Sealing Prayer.</p>
+    <p><strong>The Tactical Module</strong> generates a binding prayer for a specific spirit and a specific person. It is based on the Catholic deliverance tradition. It is not a replacement for the sacraments or for professional deliverance ministry. It is a tool for the laity.</p>
+    <p><strong>The Community Prayers</strong> board saves your prayer requests in your browser. They are private to this device. Nothing is sent to a server. You can delete any prayer at any time.</p>
+    <p style="margin-top:24px; text-align:center; font-style:italic; color:var(--color-gold);">Soli Deo Gloria.</p>
+  </section>
+
+  <!-- PRAYER DISPLAY -->
+  <div id="prayer-display">
+    <p style="text-align:center; opacity:0.7;">Select a prayer from the Daily Armory or use the Tactical Module.</p>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+// PRAYER DATA
+// ============================================================
+const prayers = {
+  signOfCross: {
+    title: "Sign of the Cross",
+    reference: "Traditional",
+    text: "In the Name of the Father, and of the Son, and of the Holy Spirit. Amen."
+  },
+  ourFather: {
+    title: "The Our Father",
+    reference: "Matthew 6:9-13",
+    text: "Our Father, who art in heaven, hallowed be Thy Name. Thy Kingdom come, Thy Will be done, on earth as it is in Heaven. Give us this day our daily bread, and forgive us our trespasses, as we forgive those who trespass against us. And lead us not into temptation, but deliver us from evil. Amen."
+  },
+  hailMary: {
+    title: "The Hail Mary",
+    reference: "Traditional",
+    text: "Hail Mary, full of grace, the Lord is with thee. Blessed art thou amongst women, and blessed is the fruit of thy womb, Jesus. Holy Mary, Mother of God, pray for us sinners, now and at the hour of our death. Amen."
+  },
+  gloryBe: {
+    title: "The Glory Be",
+    reference: "Traditional",
+    text: "Glory be to the Father, and to the Son, and to the Holy Spirit. As it was in the beginning, is now, and ever shall be, world without end. Amen."
+  },
+  apostlesCreed: {
+    title: "The Apostles' Creed",
+    reference: "Traditional",
+    text: "I believe in God, the Father Almighty, Creator of heaven and earth, and in Jesus Christ, His only Son, our Lord, who was conceived by the Holy Spirit, born of the Virgin Mary, suffered under Pontius Pilate, was crucified, died and was buried; He descended into hell; on the third day He rose again from the dead; He ascended into heaven, and is seated at the right hand of God the Father Almighty; from there He will come to judge the living and the dead. I believe in the Holy Spirit, the holy catholic Church, the communion of saints, the forgiveness of sins, the resurrection of the body, and life everlasting. Amen."
+  },
+  actOfContrition: {
+    title: "The Act of Contrition",
+    reference: "Traditional",
+    text: "O my God, I am heartily sorry for having offended Thee, and I detest all my sins because of Thy just punishments, but most of all because they offend Thee, my God, who art all-good and deserving of all my love. I firmly resolve, with the help of Thy grace, to sin no more and to avoid the near occasions of sin. Amen."
+  },
+  animaChristi: {
+    title: "Anima Christi",
+    reference: "Traditional",
+    text: "Soul of Christ, sanctify me. Body of Christ, save me. Blood of Christ, inebriate me. Water from the side of Christ, wash me. Passion of Christ, strengthen me. O good Jesus, hear me. Within Thy wounds hide me. Separated from Thee let me never be. From the malignant enemy, defend me. At the hour of death, call me. And bid me come to Thee, that with Thy saints I may praise Thee forever and ever. Amen."
+  },
+  holySpirit: {
+    title: "Prayer to the Holy Spirit",
+    reference: "Traditional",
+    text: "Come, Holy Spirit, fill the hearts of Thy faithful and enkindle in them the fire of Thy love. Send forth Thy Spirit and they shall be created. And Thou shalt renew the face of the earth. Amen."
+  },
+  stMichael: {
+    title: "Prayer to St. Michael the Archangel",
+    reference: "Pg. 92",
+    text: "St. Michael the Archangel, defend us in battle. Be our protection against the wickedness and snares of the devil. May God rebuke him, we humbly pray, and do thou, O Prince of the Heavenly Host, by the power of God, thrust into hell Satan, and all the evil spirits, who prowl about the world seeking the ruin of souls. Amen."
+  },
+  subTuum: {
+    title: "Sub Tuum Praesidium",
+    reference: "Pg. 86",
+    text: "We fly to thy protection, O Holy Mother of God. Despise not our petitions in our necessities, but deliver us always from all dangers, O glorious and blessed Virgin. Amen."
+  },
+  sealingPrayer: {
+    title: "Sealing Prayer of Protection",
+    reference: "Pg. 14",
+    text: "I ask Jesus to seal me in His most Precious Blood against any and all incursions of the evil one, in particular against any clinging, familial, familiar or retaliating spirits, in the Name of the Father and of the Son and of the Holy Spirit. Amen."
+  },
+  shortDeliverance: {
+    title: "Short-Form Deliverance",
+    reference: "Pg. 54",
+    text: "In the name of the Lord Jesus Christ, by the power of His Cross, His Blood and His resurrection, I bind you Satan, the spirits, powers and forces of darkness. I claim the shed blood of Jesus Christ, the Son of the living God, over every aspect of my life for my protection. I pray all these things in the precious name of my Lord and Savior, Jesus Christ. Amen."
+  }
+};
+
+// ============================================================
+// ARMORY RENDERING
+// ============================================================
+function renderArmory() {
+  const list = document.getElementById('armory-list');
+  list.innerHTML = '';
+  Object.keys(prayers).forEach(key => {
+    const prayer = prayers[key];
+    const btn = document.createElement('button');
+    btn.className = 'prayer-button';
+    btn.innerHTML = `<span class="prayer-name">${prayer.title}</span><span class="prayer-reference">${prayer.reference}</span>`;
+    btn.onclick = () => displayPrayer(prayer);
+    list.appendChild(btn);
+  });
+}
+
+// ============================================================
+// PRAYER DISPLAY
+// ============================================================
+function displayPrayer(prayer) {
+  document.getElementById('prayer-display').innerHTML = `
+    <h3>${prayer.title}</h3>
+    <p class="ref">${prayer.reference}</p>
+    <p class="text">${prayer.text}</p>
+    <div class="prayer-actions">
+      <button onclick="copyPrayer(this)">📋 Copy Prayer</button>
+      <button onclick="window.print()">🖨️ Print</button>
+      <button onclick="speakPrayer(this)">🔊 Read Aloud</button>
+    </div>
+  `;
+  document.getElementById('prayer-display').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function copyPrayer(btn) {
+  const display = document.getElementById('prayer-display');
+  const title = display.querySelector('h3').innerText;
+  const ref = display.querySelector('.ref').innerText;
+  const text = display.querySelector('.text').innerText;
+  const fullText = `${title}\n${ref}\n\n${text}`;
+  navigator.clipboard.writeText(fullText).then(() => {
+    showToast('Prayer copied to clipboard');
+  }).catch(() => {
+    showToast('Could not copy. Please select and copy manually.', true);
+  });
+}
+
+function speakPrayer(btn) {
+  if (!('speechSynthesis' in window)) {
+    showToast('Speech is not supported in this browser', true);
+    return;
+  }
+  const display = document.getElementById('prayer-display');
+  const title = display.querySelector('h3').innerText;
+  const text = display.querySelector('.text').innerText;
+  window.speechSynthesis.cancel();
+  const utterance = new SpeechSynthesisUtterance(`${title}. ${text}`);
+  utterance.rate = 0.9;
+  utterance.pitch = 1;
+  window.speechSynthesis.speak(utterance);
+  showToast('Reading prayer aloud...');
+}
+
+// ============================================================
+// RANDOM PRAYER
+// ============================================================
+function randomPrayer() {
+  const keys = Object.keys(prayers);
+  const randomKey = keys[Math.floor(Math.random() * keys.length)];
+  displayPrayer(prayers[randomKey]);
+  showSection('armory');
+}
+
+// ============================================================
+// BINDING PRAYER GENERATOR
+// ============================================================
+function generateBindingPrayer() {
+  const spirit = document.getElementById('spirit-select').value;
+  const relationship = document.getElementById('target-relationship').value;
+  const customName = document.getElementById('custom-name').value.trim();
+
+  if (!spirit) {
+    showToast('Please select a spirit to bind.', true);
+    return;
+  }
+
+  const spiritNames = {
+    fear: "Fear (Timoris)",
+    anxiety: "Anxiety (Anxietatis)",
+    lust: "Lust (Luxuriae)",
+    pride: "Pride (Superbia)",
+    confusion: "Confusion (Confusionis)",
+    anger: "Anger (Irae)",
+    depression: "Depression (Tristitiae)",
+    envy: "Envy (Invidiae)",
+    unbelief: "Unbelief (Infidelitatis)",
+    addiction: "Addiction (Servitutis)"
+  };
+  const spiritName = spiritNames[spirit];
+
+  let target = '';
+  if (relationship === 'self') target = 'me';
+  else if (relationship === 'family') target = customName ? `my family member ${customName}` : 'my family member';
+  else if (relationship === 'friend') target = customName ? `my friend ${customName}` : 'my friend';
+  else if (relationship === 'enemy') target = customName ? `${customName}, who has set themselves against me` : 'those who have set themselves against me';
+  else if (relationship === 'world') target = 'the world and the nations';
+
+  let prayerText = '';
+
+  if (relationship === 'self' || relationship === 'family' || relationship === 'friend') {
+    prayerText = `In the Name of Jesus Christ, and by the power of His Precious Blood, I command the spirit of ${spiritName} to be bound and to leave ${target} now. Go directly to the foot of the Cross. In the Name of the Father, and of the Son, and of the Holy Spirit. Amen.`;
+  } else if (relationship === 'enemy') {
+    prayerText = `Lord Jesus Christ, You commanded us to love our enemies and pray for those who persecute us. I ask You to bless ${target}. I bind the spirit of ${spiritName} that is working through them. I command it to leave and go to the foot of Your Cross. Let Your perfect love cast out all fear. In the Name of Jesus. Amen.`;
+  } else if (relationship === 'world') {
+    prayerText = `Lord Jesus Christ, King of Nations, I ask You to bind the spirit of ${spiritName} that is afflicting ${target}. I command it to leave and go to the foot of Your Cross. Raise up Your standard against the enemy. Let Your Kingdom come, Your will be done, on earth as it is in Heaven. In the Name of Jesus. Amen.`;
+  }
+
+  document.getElementById('prayer-display').innerHTML = `
+    <h3>Binding Prayer</h3>
+    <p class="ref">Generated for: ${spiritName}</p>
+    <p class="text">${prayerText}</p>
+    <div class="prayer-actions">
+      <button onclick="copyPrayer(this)">📋 Copy Prayer</button>
+      <button onclick="window.print()">🖨️ Print</button>
+      <button onclick="speakPrayer(this)">🔊 Read Aloud</button>
+    </div>
+  `;
+  document.getElementById('prayer-display').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  showToast('Binding prayer generated');
+}
+
+// ============================================================
+// COMMUNITY PRAYERS (localStorage)
+// ============================================================
+const STORAGE_KEY = 'scutum_fidei_community_prayers';
+
+function getCommunityPrayers() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveCommunityPrayers(prayers) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(prayers));
+  } catch (e) {
+    showToast('Could not save. Browser storage may be full.', true);
+  }
+}
+
+function submitPrayer() {
+  const name = document.getElementById('prayer-name').value.trim() || 'Anonymous';
+  const request = document.getElementById('prayer-request').value.trim();
+
+  if (!request) {
+    showToast('Please enter a prayer request.', true);
+    return;
+  }
+
+  const prayer = {
+    id: Date.now(),
+    name: name,
+    request: request,
+    date: new Date().toISOString()
+  };
+
+  const prayers = getCommunityPrayers();
+  prayers.unshift(prayer);
+  saveCommunityPrayers(prayers);
+
+  document.getElementById('prayer-name').value = '';
+  document.getElementById('prayer-request').value = '';
+
+  renderCommunityPrayers();
+  showToast('Prayer submitted');
+}
+
+function renderCommunityPrayers() {
+  const board = document.getElementById('prayer-board');
+  const count = document.getElementById('community-count');
+  const search = (document.getElementById('community-search').value || '').toLowerCase().trim();
+  const prayers = getCommunityPrayers();
+
+  let filtered = prayers;
+  if (search) {
+    filtered = prayers.filter(p =>
+      p.name.toLowerCase().includes(search) ||
+      p.request.toLowerCase().includes(search)
+    );
+  }
+
+  count.textContent = `${prayers.length} prayer${prayers.length !== 1 ? 's' : ''}${search ? ` (${filtered.length} matching)` : ''}`;
+
+  if (filtered.length === 0) {
+    board.innerHTML = `<div class="empty-state">${prayers.length === 0 ? 'No prayers yet. Be the first to submit.' : 'No prayers match your search.'}</div>`;
+    return;
+  }
+
+  board.innerHTML = '';
+  filtered.forEach(prayer => {
+    const card = document.createElement('div');
+    card.className = 'prayer-card';
+    const date = new Date(prayer.date).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+    card.innerHTML = `
+      <div class="meta">
+        <span><strong>${escapeHtml(prayer.name)}</strong></span>
+        <span>${date}</span>
+      </div>
+      <div class="text">${escapeHtml(prayer.request)}</div>
+      <button class="delete-btn" onclick="deletePrayer(${prayer.id})">Delete</button>
+    `;
+    board.appendChild(card);
+  });
+}
+
+function deletePrayer(id) {
+  if (!confirm('Delete this prayer?')) return;
+  const prayers = getCommunityPrayers().filter(p => p.id !== id);
+  saveCommunityPrayers(prayers);
+  renderCommunityPrayers();
+  showToast('Prayer deleted');
+}
+
+function clearAllCommunityPrayers() {
+  if (!confirm('Are you sure you want to delete ALL community prayers? This cannot be undone.')) return;
+  saveCommunityPrayers([]);
+  renderCommunityPrayers();
+  showToast('All community prayers cleared');
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function showSection(sectionId) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active-nav'));
+  document.getElementById(sectionId).classList.add('active');
+  document.getElementById(`nav-${sectionId}`).classList.add('active-nav');
+  if (sectionId === 'community') renderCommunityPrayers();
+}
+
+// ============================================================
+// THEME TOGGLE
+// ============================================================
+function toggleTheme() {
+  document.body.classList.toggle('light-mode');
+  const btn = document.getElementById('theme-btn');
+  if (document.body.classList.contains('light-mode')) {
+    btn.textContent = '🌙 Dark Mode';
+  } else {
+    btn.textContent = '☀️ Light Mode';
+  }
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+function showToast(message, isError = false) {
+  const toast = document.getElementById('toast');
+  toast.textContent = message;
+  toast.className = 'toast show' + (isError ? ' error' : '');
+  clearTimeout(window._toastTimeout);
+  window._toastTimeout = setTimeout(() => {
+    toast.classList.remove('show');
+  }, 3000);
+}
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded', () => {
+  renderArmory();
+  renderCommunityPrayers();
+  showSection('armory');
+});
+</script>
 </body>
 </html>
