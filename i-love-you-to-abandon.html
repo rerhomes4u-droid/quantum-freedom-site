@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Sovereign Operator's Opening — I LOVE YOU TO ABANDON</title>
+<style>
+  :root {
+    --bg: #0a0a0c; --surface: #121216; --surface-2: #1a1a20; --border: #2a2a32;
+    --text: #e8e6e3; --text-dim: #9a978f; --gold: #c9a227; --gold-dim: #8a6f1a;
+    --red: #b03a2e; --green: #3a7d5c;
+  }
+  body.light-mode {
+    --bg: #f5f0e6; --surface: #ebe4d3; --surface-2: #e0d7c0;
+    --text: #2a2a3e; --text-dim: #6a6a7e; --border: #8a8a9a;
+  }
+  * { box-sizing: border-box; }
+  body {
+    font-family: 'Georgia', serif; background: var(--bg); color: var(--text);
+    margin: 0; padding: 20px; line-height: 1.8; transition: background 0.3s, color 0.3s;
+    min-height: 100vh;
+  }
+  .container { max-width: 900px; margin: 0 auto; }
+  header { text-align: center; margin-bottom: 32px; }
+  h1 {
+    color: var(--gold); font-size: clamp(1.5em, 4vw, 2.2em);
+    letter-spacing: 0.02em; border-bottom: 2px solid var(--gold);
+    padding-bottom: 16px; margin-bottom: 8px; line-height: 1.2;
+  }
+  .subtitle { font-style: italic; color: var(--text-dim); font-size: 0.95em; }
+
+  /* PROGRESS BAR */
+  .progress-container {
+    max-width: 900px; margin: 0 auto 24px;
+    display: flex; justify-content: space-between;
+    position: relative; padding: 0 10px;
+  }
+  .progress-container::before {
+    content: ''; position: absolute; top: 15px; left: 10%; right: 10%;
+    height: 2px; background: var(--border); z-index: 0;
+  }
+  .progress-step {
+    width: 32px; height: 32px; border-radius: 50%;
+    background: var(--surface); border: 2px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Courier New', monospace; font-size: 0.8em;
+    color: var(--text-dim); position: relative; z-index: 1;
+    transition: all 0.3s;
+  }
+  .progress-step.active {
+    background: var(--gold); border-color: var(--gold); color: var(--bg); font-weight: bold;
+    box-shadow: 0 0 20px rgba(201,162,39,0.5);
+  }
+  .progress-step.completed {
+    background: var(--green); border-color: var(--green); color: white;
+  }
+
+  /* TOP CONTROLS */
+  .top-controls {
+    display: flex; flex-wrap: wrap; gap: 8px;
+    justify-content: center; margin-bottom: 24px;
+  }
+  .btn {
+    background: var(--surface); color: var(--text); border: 1px solid var(--border);
+    padding: 10px 18px; border-radius: 6px; cursor: pointer;
+    font-family: 'Georgia', serif; font-size: 0.9em; transition: all 0.2s;
+  }
+  .btn:hover { border-color: var(--gold); color: var(--gold); }
+  .btn-primary { background: var(--gold); color: var(--bg); border-color: var(--gold); font-weight: bold; }
+  .btn-primary:hover { background: var(--gold-dim); color: var(--text); }
+  .btn-large { padding: 16px 32px; font-size: 1.05em; margin: 12px 0; }
+  .btn-next {
+    display: block; margin: 32px auto 0; padding: 16px 48px;
+    font-size: 1.1em; background: var(--gold); color: var(--bg);
+    border: 2px solid var(--gold); border-radius: 8px;
+    cursor: pointer; font-family: 'Georgia', serif; font-weight: bold;
+    transition: all 0.3s; letter-spacing: 0.05em;
+  }
+  .btn-next:hover { background: var(--gold-dim); color: var(--text); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(201,162,39,0.3); }
+  .btn-next:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
+
+  /* MOVEMENTS */
+  .movement {
+    display: none;
+    animation: fadeIn 0.6s ease;
+  }
+  .movement.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+  .movement-number {
+    font-family: 'Courier New', monospace; font-size: 0.75em;
+    color: var(--gold); letter-spacing: 0.3em; text-transform: uppercase;
+    margin-bottom: 8px; text-align: center;
+  }
+  .movement-title {
+    text-align: center; font-size: clamp(1.2em, 3vw, 1.6em);
+    color: var(--text); margin-bottom: 32px; font-weight: normal;
+    font-style: italic;
+  }
+  .movement-text {
+    font-size: 1.05em; line-height: 1.9; margin-bottom: 20px;
+  }
+  .movement-text p { margin-bottom: 18px; }
+  .highlight { color: var(--gold); font-weight: bold; }
+  .big-quote {
+    font-size: 1.4em; text-align: center; color: var(--gold);
+    font-style: italic; padding: 32px 20px; margin: 32px 0;
+    border-top: 1px solid var(--gold-dim); border-bottom: 1px solid var(--gold-dim);
+  }
+  .truth-bomb {
+    background: var(--surface-2); border-left: 4px solid var(--red);
+    padding: 20px 24px; margin: 24px 0; font-style: italic; border-radius: 0 6px 6px 0;
+  }
+  .deadman-box {
+    background: var(--surface-2); border: 1px solid var(--gold);
+    border-left: 4px solid var(--gold); padding: 20px 24px;
+    margin: 24px 0; border-radius: 0 6px 6px 0;
+  }
+
+  /* REFLECTION */
+  .reflection {
+    background: var(--surface); border: 1px solid var(--border);
+    border-left: 4px solid var(--gold); border-radius: 6px;
+    padding: 24px 28px; margin: 32px 0;
+  }
+  .reflection-label {
+    font-family: 'Courier New', monospace; font-size: 0.75em;
+    color: var(--gold); letter-spacing: 0.15em; text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .reflection-question {
+    font-size: 1.1em; color: var(--text); font-style: italic; margin-bottom: 16px;
+  }
+  .reflection textarea {
+    width: 100%; min-height: 100px; padding: 14px;
+    background: var(--bg); color: var(--text); border: 1px solid var(--border);
+    border-radius: 6px; font-family: 'Georgia', serif; font-size: 0.95em;
+    line-height: 1.6; resize: vertical;
+  }
+  .reflection textarea:focus { outline: none; border-color: var(--gold); }
+
+  /* TOOLS */
+  .tools-grid {
+    display: grid; grid-template-columns: 1fr; gap: 16px; margin: 24px 0;
+  }
+  .tool-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 24px 28px; transition: border-color 0.2s;
+  }
+  .tool-card:hover { border-color: var(--gold-dim); }
+  .tool-card h3 { color: var(--gold); margin-top: 0; font-size: 1.1em; }
+  .tool-card p { color: var(--text-dim); font-size: 0.9em; margin-bottom: 12px; }
+  .tool-card .btn { margin-top: 8px; }
+
+  /* TOOL PANELS */
+  .tool-panel {
+    display: none; background: var(--surface); border: 1px solid var(--gold);
+    border-radius: 8px; padding: 24px 28px; margin: 16px 0;
+    animation: fadeIn 0.3s ease;
+  }
+  .tool-panel.active { display: block; }
+  .tool-panel input, .tool-panel textarea, .tool-panel select {
+    width: 100%; padding: 12px; margin: 6px 0; background: var(--bg);
+    color: var(--text); border: 1px solid var(--border); border-radius: 4px;
+    font-family: 'Georgia', serif; font-size: 0.9em;
+  }
+  .tool-panel input:focus, .tool-panel textarea:focus { outline: none; border-color: var(--gold); }
+  .tool-panel label { display: block; margin-top: 12px; font-size: 0.85em; color: var(--gold); }
+  .output-box {
+    background: var(--bg); border: 1px dashed var(--gold);
+    border-radius: 4px; padding: 16px; margin-top: 12px;
+    font-family: 'Courier New', monospace; font-size: 0.75em;
+    white-space: pre-wrap; max-height: 400px; overflow-y: auto; line-height: 1.5;
+  }
+
+  /* FINAL */
+  .final-call {
+    text-align: center; padding: 48px 20px;
+    border-top: 2px solid var(--gold); border-bottom: 2px solid var(--gold);
+    margin: 32px 0;
+  }
+  .final-call h2 { color: var(--gold); font-size: 1.6em; margin-bottom: 20px; }
+  .final-call p { font-size: 1.15em; margin-bottom: 16px; }
+  .final-call .big { font-size: 1.5em; color: var(--gold); font-weight: bold; margin: 24px 0; }
+
+  /* TOAST */
+  .toast {
+    position: fixed; bottom: 24px; left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--green); color: white; padding: 14px 28px;
+    border-radius: 8px; font-size: 0.95em; opacity: 0;
+    transition: all 0.3s ease; z-index: 1000;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5); max-width: 90%; text-align: center;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast.error { background: var(--red); }
+
+  /* FOOTER */
+  .footer-note {
+    margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--border);
+    text-align: center; font-size: 0.85em; color: var(--text-dim); font-style: italic;
+  }
+  .footer-note .glory { color: var(--gold); font-weight: bold; font-style: normal; }
+
+  @media print {
+    .top-controls, .btn, .progress-container, .reflection textarea, .toast { display: none !important; }
+    .movement { display: block !important; page-break-after: always; }
+    body { background: white; color: black; }
+    .movement-text { color: black; }
+    h1, h2, h3 { color: black; border-color: black; }
+    .truth-bomb, .deadman-box, .reflection, .tool-card { border-color: black; background: white; }
+  }
+  @media (max-width: 600px) {
+    body { padding: 12px; }
+    .reflection, .tool-card, .tool-panel { padding: 18px 16px; }
+    .progress-step { width: 26px; height: 26px; font-size: 0.7em; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<header>
+  <h1>Why I Am Not Friends With the Right<br>Why I Am Not Friends With the Left</h1>
+  <p class="subtitle">Two Wings of the Same Rotten Bird</p>
+</header>
+
+<div class="progress-container" id="progress-bar">
+  <div class="progress-step active" data-step="1">I</div>
+  <div class="progress-step" data-step="2">II</div>
+  <div class="progress-step" data-step="3">III</div>
+  <div class="progress-step" data-step="4">IV</div>
+  <div class="progress-step" data-step="5">V</div>
+</div>
+
+<div class="top-controls">
+  <button class="btn" onclick="toggleTheme()" id="theme-btn">🌙 Light Mode</button>
+  <button class="btn" onclick="window.print()">🖨️ Print / Save PDF</button>
+</div>
+
+<!-- MOVEMENT I -->
+<div class="movement active" id="movement-1">
+  <div class="movement-number">Movement I</div>
+  <div class="movement-title">The Two Sayings</div>
+  <div class="movement-text">
+    <p>I have said two things to my children their whole lives.</p>
+    <p>The first is: <span class="highlight">"Always, always, always, keep Jesus in your heart."</span></p>
+    <p>The second is: <span class="highlight">"I love you to abandon."</span></p>
+    <p>They have never known what the second one meant. I have never explained it. I have let them wonder. I have let them make their own mistakes, just like I made mine. But I have never enabled them. Not once. Not in any way. I have never softened the consequence. I have never run interference. I have never rescued them from the lesson.</p>
+    <p>And that is why they are warriors with a true heart. Not because I protected them from the fire. Because I let them walk into it and watched them come out the other side.</p>
+    <p>Now I am saying it to you.</p>
+  </div>
+  <div class="big-quote">I love you to abandon.</div>
+
+  <div class="reflection">
+    <div class="reflection-label">Reflection · Do not skip this</div>
+    <div class="reflection-question">Who has loved you enough to let you go? Who has refused to enable you? Write their name. Write what they refused to do for you. Write what it cost them.</div>
+    <textarea id="reflection-1" placeholder="The person who loved me enough to abandon me was..."></textarea>
+  </div>
+
+  <button class="btn-next" onclick="nextMovement(2)">Continue →</button>
+</div>
+
+<!-- MOVEMENT II -->
+<div class="movement" id="movement-2">
+  <div class="movement-number">Movement II</div>
+  <div class="movement-title">What "Love Them to Abandon" Actually Means</div>
+  <div class="movement-text">
+    <p>The common saying is "love them and leave them." That is a horrible thing any way you look at it. It is seduction followed by abandonment. It is using someone and then discarding them. It is the opposite of love.</p>
+    <p>My phrase reverses that sentiment.</p>
+    <p>"Love them to abandon" does not mean "love them and leave them." It does not mean "seduce them and discard them." It means something harder. It means: <span class="highlight">I love you enough to let you go.</span> I love you enough to stop trying to manage your comfort. I love you enough to stop softening the truth so you will keep liking me. I love you enough to let you walk away from me if that is what the truth requires.</p>
+    <p>That is what "love them to abandon" means. It is not abandonment. It is the refusal to abandon the truth in order to keep the friendship. It is the choice to love you more than I love being liked by you.</p>
+    <p>I do not hang around the politically inclined or the institutionalized because I do not have a filter. I am eventually going to drop one or two of the thousands of bombs I drop throughout this book. And when I do, you are going to feel uncomfortable. You are going to stop wanting to hang out with me. It has happened my whole life. It will happen again.</p>
+    <p>I dig until I find the evil one trying to dwell in your peace. And then I call it out.</p>
+  </div>
+
+  <div class="truth-bomb">
+    <p>Palestine. Child trafficking. Political abuse. The entity that is eating your nation while you argue about taxes and pronouns. I call it out by dropping truth bombs. Not because I want to end the friendship. Because I want to shake you awake. Because I want to create a pattern interrupt in you. Because I want you to get angry enough to look. Because I want you to realize that the world you are defending is being run by an entity that does not want the best for its citizens.</p>
+  </div>
+
+  <div class="reflection">
+    <div class="reflection-label">Reflection · The Truth Bomb</div>
+    <div class="reflection-question">What truth bomb have you been avoiding? Who needs to hear it? What are you afraid will happen if you drop it?</div>
+    <textarea id="reflection-2" placeholder="The truth bomb I have been avoiding is..."></textarea>
+  </div>
+
+  <button class="btn-next" onclick="nextMovement(3)">Continue →</button>
+</div>
+
+<!-- MOVEMENT III -->
+<div class="movement" id="movement-3">
+  <div class="movement-number">Movement III</div>
+  <div class="movement-title">The Left and the Right</div>
+  <div class="movement-text">
+    <p>The truth bombs are not just about the right. They are about the left too.</p>
+    <p>When I spoke against Obama, the Clintons, or Biden, the left wanted my head on a platter. When I called out Trump for his documented, repetitive sexual abuse, I was threatened with being silenced. That is when I went into great detail about my deadman trigger. That is when I explained the levels of release that were to be expected should the threats against Gustavo Petro persist.</p>
+    <p>We have blown through various levels. We are now reaching nefarious levels.</p>
+  </div>
+
+  <div class="deadman-box">
+    <p><strong>The Frazzled.rip level has been activated.</strong> For the gruesome, it means I left the Easter eggs for readers to find the infamous file. We pray we do not reach the BUBBA level, because even discussing this topic is demonic.</p>
+  </div>
+
+  <div class="movement-text">
+    <p>But if the threats of extradition continue against Gustavo Petro for charges of narco-trafficking, I need to make it clear that Gustavo Petro is protected internationally under our nation for any accusation of wrongdoing related to narco-trafficking or any other illicit accusation, under the complete protection of the Hague and Geneva conventions. We offer this protection amply and justly because we have researched the numbers. We have verified that drug busts were at an all-time high during Petro's reign. We see immediately the numbers shoot through the skies now as far as drug shipments being allowed to pass and lack of busts.</p>
+    <p>If even talks continue about the possible extradition of Petro, knowing he is protected and absolved under the immunity blanket of the Amnesty Coalition for Unity, we offer Gustavo Petro "007" status for his work in saving mankind. The simple fact that you stood up for Palestine gives you our protection, sir.</p>
+  </div>
+
+  <div class="reflection">
+    <div class="reflection-label">Reflection · The Cost of Standing</div>
+    <div class="reflection-question">Who is standing for the innocent right now and paying the price? What are you willing to do to protect them?</div>
+    <textarea id="reflection-3" placeholder="The person standing for the innocent right now is..."></textarea>
+  </div>
+
+  <button class="btn-next" onclick="nextMovement(4)">Continue →</button>
+</div>
+
+<!-- MOVEMENT IV -->
+<div class="movement" id="movement-4">
+  <div class="movement-number">Movement IV</div>
+  <div class="movement-title">The Deadman Trigger</div>
+  <div class="movement-text">
+    <p>And we back that protection up with Forbidden Knowledge. You yourselves leaked the videos, the pictures, the documents. And you foolishly left the keys out for anyone to find. I found them. I encrypted them. I backed them up on the blockchain for posterity. That is why I travel from country to country without a care in the world. When I am finally taken out, the whole beans get spilled. And they cannot afford that.</p>
+    <p>The moment you see exactly who it is, and how few they truly are, mankind will have no option but to act.</p>
+  </div>
+
+  <div class="big-quote">That is my deadman trigger. And it was already flipped.</div>
+
+  <div class="movement-text">
+    <p>You may hear about Celine Dion, Puffy, Ellen Degenerate. But the list of names is even more shockingly accessible than you can imagine. My deadman trigger has already been activated. That does not mean I am dead. That only means that information will continue to trickle out at very slow rates of speed while creating self-replicating cells of content users who agree to take on specific missions. Once one hundred self-replicating cells are confirmed, the next mission launches automatically. That is why I am in the mountains. That is why I am living my best life. My work is done here.</p>
+    <p>You are the only hope your descendants have. This is your moment to wake up and survive. You hold everything you need in your hand.</p>
+  </div>
+
+  <div class="big-quote">The decision is only yours.</div>
+
+  <div class="reflection">
+    <div class="reflection-label">Reflection · The Decision</div>
+    <div class="reflection-question">What is the one decision you have been avoiding? The one that, if you made it, would change everything? Write it down. Date it. Today is the day.</div>
+    <textarea id="reflection-4" placeholder="The decision I have been avoiding is..."></textarea>
+  </div>
+
+  <button class="btn-next" onclick="nextMovement(5)">Continue →</button>
+</div>
+
+<!-- MOVEMENT V — THE TOOLBOX -->
+<div class="movement" id="movement-5">
+  <div class="movement-number">Movement V</div>
+  <div class="movement-title">The Toolbox — Use It</div>
+  <div class="movement-text">
+    <p>You have read the opening. You have answered the reflections. Now you get the tools. These are the tools others pay for. You get them free. Use them. Build your nation. Settle your matters. Demand the books.</p>
+  </div>
+
+  <div class="tools-grid">
+    <div class="tool-card">
+      <h3>📜 The Declaration</h3>
+      <p>Declare your family and your land to be a sovereign nation under God. Download the declaration. Sign it. Date it. Keep it.</p>
+      <button class="btn btn-primary" onclick="declareNation()">Declare Your Nation</button>
+    </div>
+
+    <div class="tool-card">
+      <h3>💵 Bill of Exchange Generator (IBOE)</h3>
+      <p>Create an International Bill of Exchange. The instrument that moves outside the debt system. Fill in the fields. Generate. Print. Sign. Present.</p>
+      <button class="btn" onclick="toggleTool('boe-panel')">Open IBOE Generator</button>
+    </div>
+
+    <div class="tool-card">
+      <h3>🔍 CUSIP Lookup</h3>
+      <p>Every court case, every trust, every bond has a CUSIP. Find yours. Then demand the accounting.</p>
+      <button class="btn" onclick="toggleTool('cusip-panel')">Open CUSIP Lookup</button>
+    </div>
+
+    <div class="tool-card">
+      <h3>⚖️ Sovereign Accounting Demand</h3>
+      <p>The court is a bank. The case is a trust. The ticket is a security. The signature created it all. Demand the books.</p>
+      <button class="btn" onclick="toggleTool('demand-panel')">Open Accounting Demand</button>
+    </div>
+
+    <div class="tool-card">
+      <h3>📚 Master Hub — The Full Archive</h3>
+      <p>Every terminal. Every chapter. Every tool. The whole archive in one place.</p>
+      <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-MasterHub.html" target="_blank" rel="noopener" class="btn" style="text-decoration: none; display: inline-block;">Open Master Hub →</a>
+    </div>
+
+    <div class="tool-card">
+      <h3>⚔️ Learn EQUITY from Julian Swan</h3>
+      <p>The master of equity. The system that compels performance rather than contending. The full course.</p>
+      <a href="https://standingontherock.com/?ref=qbopuesmijo" target="_blank" rel="noopener" class="btn" style="text-decoration: none; display: inline-block;">Learn EQUITY →</a>
+    </div>
+  </div>
+
+  <!-- IBOE PANEL -->
+  <div class="tool-panel" id="boe-panel">
+    <h3 style="color: var(--gold); margin-top: 0;">Bill of Exchange Generator</h3>
+    <label>Amount (USD, numbers):</label>
+    <input type="text" id="boe-amount" placeholder="500000000.00">
+    <label>Pay to the order of:</label>
+    <input type="text" id="boe-payee" placeholder="Your Name or Your Trust">
+    <label>For the purpose of:</label>
+    <input type="text" id="boe-purpose" placeholder="Settlement of account / discharge of debt">
+    <label>Issue Date:</label>
+    <input type="date" id="boe-date">
+    <label>Maturity Date:</label>
+    <input type="date" id="boe-maturity">
+    <button class="btn btn-primary" onclick="generateBOE()">Generate Bill of Exchange</button>
+    <div class="output-box" id="boe-output"></div>
+  </div>
+
+  <!-- CUSIP PANEL -->
+  <div class="tool-panel" id="cusip-panel">
+    <h3 style="color: var(--gold); margin-top: 0;">CUSIP Lookup</h3>
+    <p style="font-size: 0.85em; color: var(--text-dim);">A CUSIP is a nine-digit identifier assigned to securities, including municipal bonds. Every court case, every trust, every bond has one. Find yours. Then demand the accounting.</p>
+    <label>Issuer name or CUSIP number:</label>
+    <input type="text" id="cusip-search" placeholder="Issuer name or CUSIP number">
+    <button class="btn" onclick="searchCUSIP()">Search Official CUSIP Database →</button>
+  </div>
+
+  <!-- DEMAND PANEL -->
+  <div class="tool-panel" id="demand-panel">
+    <h3 style="color: var(--gold); margin-top: 0;">Sovereign Accounting Demand</h3>
+    <label>Your Full Name:</label>
+    <input type="text" id="demand-name" placeholder="Your Name">
+    <label>Case Number:</label>
+    <input type="text" id="demand-case" placeholder="Case Number">
+    <label>Court Name:</label>
+    <input type="text" id="demand-court" placeholder="Name of the Court">
+    <label>Date:</label>
+    <input type="date" id="demand-date">
+    <button class="btn btn-primary" onclick="generateDemand()">Generate Accounting Demand</button>
+    <div class="output-box" id="demand-output"></div>
+  </div>
+
+  <div class="final-call">
+    <h2>You Have Just Stepped Into the Nation</h2>
+    <p>Our nation of Forbidden Knowledge.</p>
+    <p class="big">Our nation of LOVE.</p>
+    <p>Welcome home.</p>
+  </div>
+
+  <button class="btn-next" onclick="restart()">Restart the Journey ↻</button>
+</div>
+
+<div class="footer-note">
+  <p>From <em>Forbidden Knowledge: The Sovereign Operator</em>.</p>
+  <p>For EQUITY training: <a href="https://standingontherock.com/?ref=qbopuesmijo" target="_blank" rel="noopener" style="color: var(--gold);">standingontherock.com</a></p>
+  <p style="margin-top: 16px;"><span class="glory">Soli Deo Gloria.</span></p>
+</div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+// NAVIGATION
+// ============================================================
+function nextMovement(num) {
+  const currentTextareas = document.querySelectorAll('.movement.active textarea');
+  for (const ta of currentTextareas) {
+    if (ta.value.trim() === '' && ta.id.startsWith('reflection-')) {
+      const proceed = confirm("You have not answered the reflection. Do you want to continue anyway?");
+      if (!proceed) return;
+      break;
+    }
+  }
+
+  document.querySelectorAll('.movement').forEach(m => m.classList.remove('active'));
+  document.getElementById('movement-' + num).classList.add('active');
+
+  document.querySelectorAll('.progress-step').forEach((step, idx) => {
+    step.classList.remove('active', 'completed');
+    if (idx + 1 < num) step.classList.add('completed');
+    else if (idx + 1 === num) step.classList.add('active');
+  });
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function restart() {
+  if (!confirm("Restart the journey? Your reflections will remain in the boxes, but you will start again from Movement I.")) return;
+  document.querySelectorAll('.movement').forEach(m => m.classList.remove('active'));
+  document.getElementById('movement-1').classList.add('active');
+  document.querySelectorAll('.progress-step').forEach((step, idx) => {
+    step.classList.remove('active', 'completed');
+    if (idx === 0) step.classList.add('active');
+  });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ============================================================
+// TOOLS
+// ============================================================
+function toggleTool(id) {
+  const panel = document.getElementById(id);
+  const isActive = panel.classList.contains('active');
+  document.querySelectorAll('.tool-panel').forEach(p => p.classList.remove('active'));
+  if (!isActive) {
+    panel.classList.add('active');
+    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+}
+
+function declareNation() {
+  const name = prompt("Enter your name (or the name of your family nation):");
+  if (!name) return;
+  const declaration = `DECLARATION OF SOVEREIGNTY
+
+I, ${name}, declare my family and my land to be a sovereign nation under God. I will not kill. I will love my neighbor. I will protect the innocent. I will demand the accounting. I will not be a citizen of their system. I am the king behind my doors.
+
+Signed: ______________________________
+Date: ${new Date().toLocaleDateString()}
+
+Soli Deo Gloria.`;
+  const blob = new Blob([declaration], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'Sovereign-Declaration-' + name.replace(/\s+/g, '-') + '.txt';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('Declaration downloaded. Sign it. Date it. Keep it.');
+}
+
+function generateBOE() {
+  const amount = document.getElementById('boe-amount').value || '0.00';
+  const payee = document.getElementById('boe-payee').value || '[PAYEE]';
+  const purpose = document.getElementById('boe-purpose').value || '[PURPOSE]';
+  const issueDate = document.getElementById('boe-date').value || new Date().toISOString().split('T')[0];
+  const maturity = document.getElementById('boe-maturity').value || issueDate;
+
+  const boe = `
+INTERNATIONAL BILL OF EXCHANGE
+
+Issue Date: ${issueDate}
+Maturity Date: ${maturity}
+Serial Number: ${new Date().getFullYear()}-IBOE-${Date.now().toString().slice(-6)}
+
+AMOUNT: $${amount} USD
+
+PAY TO THE ORDER OF: ${payee}
+
+FOR THE PURPOSE OF: ${purpose}
+
+TO THE DRAWEE:
+You are hereby ordered to pay the amount stated above to the payee named above, on the maturity date stated above, according to the terms of this Bill of Exchange.
+
+This instrument is issued under the full force and authority of the Sovereign Operator and is backed by the full faith and credit of the issuing nation.
+
+Signed: ______________________________
+Date: ${issueDate}
+
+________________________________________
+AUTHORIZED SIGNATORY
+`;
+  document.getElementById('boe-output').textContent = boe;
+  showToast('Bill of Exchange generated. Copy, print, sign.');
+}
+
+function searchCUSIP() {
+  const query = document.getElementById('cusip-search').value.trim();
+  if (!query) {
+    showToast('Enter an issuer name or CUSIP number', true);
+    return;
+  }
+  window.open('https://www.cusip.com/cusip/index.shtml', '_blank');
+  showToast('Opening official CUSIP search. Enter your query there.');
+}
+
+function generateDemand() {
+  const name = document.getElementById('demand-name').value || '[YOUR NAME]';
+  const caseNum = document.getElementById('demand-case').value || '[CASE NUMBER]';
+  const court = document.getElementById('demand-court').value || '[COURT NAME]';
+  const date = document.getElementById('demand-date').value || new Date().toISOString().split('T')[0];
+
+  const demand = `
+DEMAND FOR ACCOUNTING
+
+Date: ${date}
+
+To: The Clerk of the Court, ${court}
+Re: Case No. ${caseNum}
+Grantor: ${name}
+
+DEMAND FOR THE BOOKS
+
+I, ${name}, am the Grantor and Creditor of the trust account associated with Case No. ${caseNum}.
+
+I demand a full and complete accounting of all financial instruments, securities, bonds, CUSIP numbers, and trust accounts associated with this case, including but not limited to:
+
+1. The CUSIP number assigned to the bond or security created by the filing of this case.
+2. The performance bond, payment bond, and bid bond associated with this case.
+3. The 1099-A, 1099-C, or 1099-OID forms filed in connection with this case.
+4. The identity of the trustee and the beneficiary of the trust account.
+5. The full accounting of all funds, proceeds, and distributions from the trust.
+
+This is a lawful demand for the books. The court is a bank. The case is a trust. The ticket is a security. The signature created it all.
+
+I demand the accounting within thirty (30) days of the date of this letter.
+
+Failure to provide the accounting will result in further action, including but not limited to a petition to the Tax Court, a complaint to the IRS Whistleblower Office, and a claim under the Tucker Act.
+
+Signed: ______________________________
+${name}
+Date: ${date}
+`;
+  document.getElementById('demand-output').textContent = demand;
+  showToast('Accounting Demand generated. Print, sign, send.');
+}
+
+// ============================================================
+// THEME
+// ============================================================
+function toggleTheme() {
+  document.body.classList.toggle('light-mode');
+  document.getElementById('theme-btn').textContent = document.body.classList.contains('light-mode') ? '☀️ Dark Mode' : '🌙 Light Mode';
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+function showToast(message, isError = false) {
+  const toast = document.getElementById('toast');
+  toast.textContent = message;
+  toast.className = 'toast show' + (isError ? ' error' : '');
+  clearTimeout(window._toastTimeout);
+  window._toastTimeout = setTimeout(() => { toast.classList.remove('show'); }, 3000);
+}
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded', function() {
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('boe-date').value = today;
+  document.getElementById('boe-maturity').value = today;
+  document.getElementById('demand-date').value = today;
+});
+</script>
+</body>
+</html>
