@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Algorithm of Self — The Committee Room</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600;700&display=swap');
+  :root {
+    --bg: #0a0a0c; --surface: #121216; --surface-2: #1a1a20; --border: #2a2a32;
+    --text: #e8e6e3; --text-dim: #9a978f; --gold: #c9a227; --gold-dim: #8a6f1a;
+    --part: #7a5c9e; --witness: #3a7d5c; --red: #b03a2e;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg); color: var(--text); font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    line-height: 1.7; font-weight: 300; min-height: 100vh; -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 0 24px 120px; }
+
+  header { padding: 64px 0 32px; border-bottom: 1px solid var(--border); margin-bottom: 40px; text-align: center; }
+  .kicker { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold); margin-bottom: 20px; }
+  h1 { font-size: clamp(28px, 6vw, 48px); font-weight: 700; line-height: 1.05; letter-spacing: -0.02em; margin-bottom: 16px; }
+  .subtitle { font-size: 18px; color: var(--text-dim); max-width: 640px; margin: 0 auto; }
+
+  /* NAV */
+  .nav {
+    display: flex; flex-wrap: wrap; gap: 6px; justify-content: center;
+    margin: 24px 0 40px; padding: 12px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 8px;
+  }
+  .nav button {
+    background: transparent; border: 1px solid var(--border); color: var(--text-dim);
+    padding: 8px 14px; border-radius: 4px; cursor: pointer;
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+    letter-spacing: 0.08em; text-transform: uppercase; transition: all 0.2s;
+  }
+  .nav button:hover { border-color: var(--gold); color: var(--gold); }
+  .nav button.active { background: var(--gold); color: var(--bg); border-color: var(--gold); font-weight: 600; }
+
+  /* SECTION */
+  .section { display: none; animation: fadeIn 0.4s ease; }
+  .section.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+  h2 { font-size: 24px; font-weight: 600; margin: 40px 0 16px; padding-top: 24px; border-top: 1px solid var(--border); }
+  h2:first-of-type { border-top: none; margin-top: 0; padding-top: 0; }
+  h3 { font-size: 17px; font-weight: 600; margin: 24px 0 12px; color: var(--gold); }
+  p { margin-bottom: 16px; font-size: 15px; color: var(--text-dim); }
+  .lead { font-size: 18px; color: var(--text); border-left: 2px solid var(--gold); padding-left: 20px; margin: 24px 0 32px; }
+  .highlight { color: var(--gold); font-weight: 600; }
+
+  /* CARDS */
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 24px; margin: 16px 0; }
+  .card-title { font-weight: 600; font-size: 16px; color: var(--text); margin-bottom: 8px; }
+
+  /* BUTTONS */
+  .btn {
+    background: var(--gold); color: var(--bg); border: none;
+    padding: 12px 24px; border-radius: 6px; cursor: pointer;
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px;
+    font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+    transition: all 0.2s; display: inline-block; text-decoration: none;
+  }
+  .btn:hover { background: var(--gold-dim); color: var(--text); }
+  .btn-secondary { background: transparent; color: var(--gold); border: 1px solid var(--gold); }
+  .btn-secondary:hover { background: var(--gold); color: var(--bg); }
+  .btn-danger { background: var(--red); color: white; }
+  .btn-danger:hover { background: #8a2a20; }
+  .btn-small { padding: 6px 12px; font-size: 10px; }
+  .btn-full { display: block; width: 100%; text-align: center; }
+
+  /* INPUTS */
+  input[type="text"], textarea, select {
+    width: 100%; padding: 12px 16px; background: var(--surface-2);
+    color: var(--text); border: 1px solid var(--border); border-radius: 6px;
+    font-family: 'IBM Plex Sans', sans-serif; font-size: 14px; margin: 6px 0;
+  }
+  input:focus, textarea:focus, select:focus { outline: none; border-color: var(--gold); }
+  label { display: block; margin-top: 12px; margin-bottom: 4px; font-size: 13px; color: var(--gold); font-weight: 600; }
+  textarea { min-height: 100px; resize: vertical; line-height: 1.6; }
+
+  /* COMMITTEE GRID */
+  .committee-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin: 16px 0; }
+  .part-card {
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-left: 4px solid var(--part); border-radius: 6px;
+    padding: 14px 16px; cursor: pointer; transition: all 0.2s;
+    position: relative;
+  }
+  .part-card:hover { border-color: var(--gold); transform: translateY(-2px); }
+  .part-card .part-name { font-weight: 600; font-size: 14px; color: var(--text); margin-bottom: 4px; }
+  .part-card .part-role { font-size: 12px; color: var(--gold); margin-bottom: 6px; font-family: 'IBM Plex Mono', monospace; letter-spacing: 0.05em; }
+  .part-card .part-voice { font-size: 12px; color: var(--text-dim); font-style: italic; line-height: 1.5; }
+  .part-card .delete-part {
+    position: absolute; top: 8px; right: 8px; background: transparent;
+    color: var(--red); border: none; font-size: 16px; cursor: pointer;
+    opacity: 0.4; transition: opacity 0.2s;
+  }
+  .part-card .delete-part:hover { opacity: 1; }
+
+  .add-part-form { background: var(--surface-2); border: 1px dashed var(--gold-dim); border-radius: 6px; padding: 16px; margin: 16px 0; }
+
+  /* WITNESS PRACTICE */
+  .witness-practice { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 24px; margin: 16px 0; }
+  .witness-step { margin-bottom: 20px; }
+  .witness-step-label { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--witness); margin-bottom: 8px; }
+  .witness-result { background: var(--surface-2); border-left: 3px solid var(--witness); padding: 16px; margin-top: 16px; font-size: 14px; border-radius: 0 6px 6px 0; }
+
+  /* MERGER DETECTOR */
+  .detector-q { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 20px; margin: 12px 0; }
+  .detector-q .q-text { font-weight: 600; font-size: 15px; margin-bottom: 12px; }
+  .detector-q .q-options { display: flex; flex-direction: column; gap: 8px; }
+  .detector-q .q-option {
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: 4px; padding: 10px 14px; cursor: pointer;
+    font-size: 13px; color: var(--text-dim); transition: all 0.2s;
+  }
+  .detector-q .q-option:hover { border-color: var(--gold); color: var(--text); }
+  .detector-q .q-option.selected { border-color: var(--gold); background: var(--surface); color: var(--gold); }
+
+  /* MAP */
+  .map-canvas {
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: 8px; height: 500px; position: relative; overflow: hidden;
+    margin: 16px 0;
+  }
+  .map-node {
+    position: absolute; width: 100px; padding: 8px 12px;
+    background: var(--surface); border: 2px solid var(--part); border-radius: 6px;
+    text-align: center; font-size: 12px; font-weight: 600; cursor: move;
+    user-select: none; transition: border-color 0.2s;
+  }
+  .map-node:hover { border-color: var(--gold); }
+  .map-node .node-role { font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: var(--gold); letter-spacing: 0.05em; display: block; margin-top: 2px; }
+
+  /* MANIFESTO */
+  .manifesto-preview { background: var(--surface-2); border: 1px solid var(--gold-dim); border-radius: 8px; padding: 24px; margin: 16px 0; font-family: 'IBM Plex Mono', monospace; font-size: 12px; line-height: 1.8; white-space: pre-wrap; color: var(--text-dim); max-height: 400px; overflow-y: auto; }
+
+  /* TOAST */
+  .toast {
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px);
+    background: var(--witness); color: white; padding: 12px 24px; border-radius: 6px;
+    font-size: 14px; opacity: 0; transition: all 0.3s ease; z-index: 1000;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.5); max-width: 90%; text-align: center;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast.error { background: var(--red); }
+
+  /* CHAPTER TEXT */
+  .chapter-text { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 32px; margin: 24px 0; font-size: 15px; line-height: 1.9; }
+  .chapter-text p { color: var(--text); }
+  .chapter-text p:last-child { margin-bottom: 0; }
+
+  .footer-note {
+    margin-top: 64px; padding-top: 32px; border-top: 1px solid var(--border);
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--text-dim);
+    letter-spacing: 0.08em; text-align: center; line-height: 2;
+  }
+  .footer-note .glory { color: var(--gold); font-weight: 600; }
+
+  @media (max-width: 600px) {
+    .wrap { padding: 0 16px 80px; }
+    header { padding: 40px 0 24px; }
+    .chapter-text { padding: 20px; font-size: 14px; }
+    .map-canvas { height: 400px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="kicker">Forbidden Knowledge · Chapter 14 · The Algorithm of Self</div>
+  <h1>The Committee Room</h1>
+  <p class="subtitle">You are not one mind. You are a committee of sub-personalities. This app helps you meet them, name them, map them, and watch them from the witness state.</p>
+</header>
+
+<nav class="nav">
+  <button class="active" onclick="showSection('chapter', this)">The Chapter</button>
+  <button onclick="showSection('committee', this)">The Committee</button>
+  <button onclick="showSection('witness', this)">The Witness</button>
+  <button onclick="showSection('detector', this)">The Merger Detector</button>
+  <button onclick="showSection('map', this)">The Constellation</button>
+  <button onclick="showSection('manifesto', this)">My Manifesto</button>
+</nav>
+
+<!-- THE CHAPTER -->
+<div class="section active" id="chapter">
+  <h2>The Algorithm of Self (You Are Not One Mind)</h2>
+
+  <div class="chapter-text">
+    <p>The voice you call "I" is not the captain of the ship. It is the PR department, the spin doctor who narrates decisions made by a collection of sub-personalities, trauma-holders, and autonomous survival programs that never voted you into power. The "inner critic" is not a flaw. It is the installed manager of a prison where your exiled parts are held without trial.</p>
+    <p>Who is really in control when you make a decision? No one. And everyone. Your mind is a marketplace of competing interests—the pleaser, the avoider, the perfectionist, the rebel—and the one that shouts loudest gets the microphone. Most people live their entire lives as the puppet of whichever sub-personality was last triggered.</p>
+    <p>You do not "become" the true self. You dissolve. You stop identifying with any single voice and learn to witness the entire committee with detached curiosity. The moment you can watch your anger arise without saying "I am angry," you have stepped out of the puppet theater and into the control booth.</p>
+    <p>For one day, do not say "I feel X." Say instead, "A part of me is presenting the experience of X." Watch how quickly the intensity drops when you stop claiming ownership of every passing storm.</p>
+    <p><strong>The weather is not you. You are the sky.</strong></p>
+  </div>
+
+  <h3>How to use this app</h3>
+  <p>This app is a practice, not a theory. It has five tools:</p>
+  <p><strong>1. The Committee</strong> — Add the parts of yourself that you can identify. Name them. Give them a role. Write down what they say. This is the first step: seeing that you are not one voice.</p>
+  <p><strong>2. The Witness</strong> — The practice from the chapter. Take a moment when a part was activated. Write the "I feel" version. Then rewrite it in the witness voice. Watch the intensity drop.</p>
+  <p><strong>3. The Merger Detector</strong> — A quiz to help you tell the difference between being merged with a part (you think you ARE the part) and being in the witness state (you can watch the part).</p>
+  <p><strong>4. The Constellation</strong> — A visual map of your committee. Drag the parts around. See which parts cluster, which parts protect which, which parts are in conflict.</p>
+  <p><strong>5. My Manifesto</strong> — Save your committee, your witness practice, and your merger diagnosis as a personal manifesto. Download it. Keep it. Return to it.</p>
+</div>
+
+<!-- THE COMMITTEE -->
+<div class="section" id="committee">
+  <h2>The Committee</h2>
+  <p>Add the parts of yourself that you can identify. Start with the ones the chapter names: the Pleaser, the Avoider, the Perfectionist, the Rebel, the Inner Critic. Then add your own.</p>
+
+  <div class="committee-grid" id="committeeGrid"></div>
+
+  <div class="add-part-form">
+    <h3>Add a Part</h3>
+    <label for="part-name">Name of the part:</label>
+    <input type="text" id="part-name" placeholder="e.g., The Pleaser, The Avoider, The Inner Critic">
+    <label for="part-role">Its role (what is it trying to do?):</label>
+    <input type="text" id="part-role" placeholder="e.g., Keep everyone happy, Avoid conflict">
+    <label for="part-voice">What does it say? (the actual voice):</label>
+    <textarea id="part-voice" placeholder="e.g., 'You can't say no. They'll be upset with you.'"></textarea>
+    <button class="btn btn-full" onclick="addPart()" style="margin-top: 12px;">+ Add to Committee</button>
+  </div>
+
+  <h3>The Five Named Parts</h3>
+  <p>If you are not sure where to start, here are the five parts the chapter names. Click one to add it to your committee.</p>
+  <div class="committee-grid" id="templateParts"></div>
+</div>
+
+<!-- THE WITNESS -->
+<div class="section" id="witness">
+  <h2>The Witness Practice</h2>
+  <p>This is the core exercise from the chapter. When a part is activated, you usually say: "I am angry." That is the merger. You are claiming ownership of the part. The practice is to step back and say: "A part of me is presenting the experience of anger." That is the witness.</p>
+  <p>Do this practice with a real moment. Not a hypothetical. A moment when a part was activated. Write the "I feel" version first. Then rewrite it in the witness voice. Then notice the difference.</p>
+
+  <div class="witness-practice">
+    <div class="witness-step">
+      <div class="witness-step-label">Step 1 · The Moment</div>
+      <textarea id="witness-moment" placeholder="Describe the moment. Where were you? What was happening? Who was there?"></textarea>
+    </div>
+
+    <div class="witness-step">
+      <div class="witness-step-label">Step 2 · The "I Feel" Version</div>
+      <textarea id="witness-merged" placeholder="Write it the way you normally would: 'I feel angry because...' / 'I feel anxious...' / 'I feel like a failure...'"></textarea>
+    </div>
+
+    <div class="witness-step">
+      <div class="witness-step-label">Step 3 · The Witness Version</div>
+      <textarea id="witness-witnessed" placeholder="Rewrite it: 'A part of me is presenting the experience of anger because...' / 'A part of me is presenting the experience of anxiety...'"></textarea>
+    </div>
+
+    <button class="btn btn-full" onclick="saveWitnessPractice()">Save the Practice</button>
+
+    <div class="witness-result" id="witness-result" style="display: none;"></div>
+  </div>
+
+  <h3>Saved Practices</h3>
+  <div id="witness-saved"></div>
+</div>
+
+<!-- THE MERGER DETECTOR -->
+<div class="section" id="detector">
+  <h2>The Merger Detector</h2>
+  <p>This is a diagnostic. It helps you tell the difference between being merged with a part and being in the witness state. Answer the questions honestly. The diagnosis is not a judgment. It is information.</p>
+
+  <div id="detector-questions"></div>
+
+  <button class="btn btn-full" onclick="calculateMerger()" style="margin-top: 20px;">Calculate My Merger Score</button>
+
+  <div class="witness-result" id="merger-result" style="display: none;"></div>
+</div>
+
+<!-- THE CONSTELLATION -->
+<div class="section" id="map">
+  <h2>The Constellation</h2>
+  <p>This is a visual map of your committee. The parts are placed on the canvas. You can drag them around. Place the parts that cluster together near each other. Place the parts in conflict on opposite sides. Place the protector parts near the parts they are protecting. There is no right way to do it. The map is for you.</p>
+
+  <div class="map-canvas" id="mapCanvas"></div>
+
+  <div class="card">
+    <div class="card-title">How to read your constellation</div>
+    <p><strong>Clusters</strong> — parts that sit close together often fire together. When one is activated, the others follow.</p>
+    <p><strong>Opposites</strong> — parts on opposite sides often represent the "internal conflict." The Pleaser on one side, the Rebel on the other.</p>
+    <p><strong>Protectors and exiles</strong> — the Inner Critic often sits near the part it is trying to protect. The part it is trying to protect is often the most vulnerable part.</p>
+    <p><strong>The center</strong> — the witness. The part of you that can see the whole committee. It is not a part. It is the space where the parts appear.</p>
+  </div>
+</div>
+
+<!-- MANIFESTO -->
+<div class="section" id="manifesto">
+  <h2>My Manifesto</h2>
+  <p>This is your personal record. It has your committee, your witness practice, and your merger diagnosis. Download it. Keep it. Return to it.</p>
+
+  <button class="btn btn-full" onclick="generateManifesto()">Generate My Manifesto</button>
+  <button class="btn btn-full btn-secondary" onclick="downloadManifesto()" style="margin-top: 8px;">Download as Text File</button>
+
+  <div class="manifesto-preview" id="manifestoPreview">Click "Generate My Manifesto" to see it here.</div>
+
+  <h3>Resources</h3>
+  <div class="card">
+    <div class="card-title">Go deeper</div>
+    <p><strong>The full chapter:</strong> <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-Chapter13.html" target="_blank" rel="noopener">Two Meanings of Within — Chapter 13</a> (the chapter that contains the algorithm of self)</p>
+    <p><strong>The Master Hub:</strong> <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-MasterHub.html" target="_blank" rel="noopener">Every terminal, every tool, every door</a></p>
+    <p><strong>The Soul Recognition Engine:</strong> <a href="https://quantum-freedom-site.vercel.app/SoulRecognitionEngine.html" target="_blank" rel="noopener">The engine that helps you recognize your true self</a></p>
+    <p><strong>Triune Consciousness Bridge:</strong> <a href="https://quantum-freedom-site.vercel.app/TriuneConsciousnessBridge.html" target="_blank" rel="noopener">The bridge between the human, the divine, and the witness</a></p>
+    <p><strong>I AM:</strong> <a href="https://quantum-freedom-site.vercel.app/I.html" target="_blank" rel="noopener">The I AM page — who you are beyond the committee</a></p>
+  </div>
+</div>
+
+<div class="footer-note">
+  FORBIDDEN KNOWLEDGE · THE SOVEREIGN OPERATOR<br>
+  Chapter 14 · The Algorithm of Self<br><br>
+  The weather is not you. You are the sky.<br>
+  <span class="glory">Soli Deo Gloria.</span>
+</div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+// STATE
+// ============================================================
+const STORAGE_KEY = 'committee_room_parts';
+const WITNESS_KEY = 'committee_room_witness';
+const MERGER_KEY = 'committee_room_merger';
+
+let parts = [];
+let witnessPractices = [];
+let mergerScore = null;
+
+// Template parts from the chapter
+const templateParts = [
+  { name: 'The Pleaser', role: 'Keep everyone happy, avoid conflict', voice: '"You can\'t say no. They\'ll be upset with you."' },
+  { name: 'The Avoider', role: 'Avoid pain, discomfort, and confrontation', voice: '"Just don\'t think about it. Distract yourself."' },
+  { name: 'The Perfectionist', role: 'Ensure you never fail, never disappoint', voice: '"That\'s not good enough. Try harder. You\'re going to fail."' },
+  { name: 'The Rebel', role: 'Refuse control, refuse authority, refuse to comply', voice: '"You can\'t tell me what to do. I\'ll do the opposite."' },
+  { name: 'The Inner Critic', role: 'Protect you by criticizing you before anyone else can', voice: '"You\'re stupid. You\'re worthless. They\'re all laughing at you."' }
+];
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded', function() {
+  loadState();
+  renderCommittee();
+  renderTemplates();
+  renderWitnessSaved();
+  renderDetectorQuestions();
+  renderMapNodes();
+});
+
+function loadState() {
+  try {
+    const storedParts = localStorage.getItem(STORAGE_KEY);
+    if (storedParts) parts = JSON.parse(storedParts);
+    const storedWitness = localStorage.getItem(WITNESS_KEY);
+    if (storedWitness) witnessPractices = JSON.parse(storedWitness);
+    const storedMerger = localStorage.getItem(MERGER_KEY);
+    if (storedMerger) mergerScore = JSON.parse(storedMerger);
+  } catch(e) {}
+}
+
+function saveState() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(parts));
+    localStorage.setItem(WITNESS_KEY, JSON.stringify(witnessPractices));
+    if (mergerScore !== null) localStorage.setItem(MERGER_KEY, JSON.stringify(mergerScore));
+  } catch(e) {}
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function showSection(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ============================================================
+// COMMITTEE
+// ============================================================
+function addPart() {
+  const name = document.getElementById('part-name').value.trim();
+  const role = document.getElementById('part-role').value.trim();
+  const voice = document.getElementById('part-voice').value.trim();
+
+  if (!name) { showToast('Please give the part a name.', true); return; }
+
+  parts.push({
+    id: Date.now(),
+    name: name,
+    role: role || 'Not yet named',
+    voice: voice || 'Not yet heard',
+    x: 50 + Math.random() * 200,
+    y: 50 + Math.random() * 300
+  });
+
+  document.getElementById('part-name').value = '';
+  document.getElementById('part-role').value = '';
+  document.getElementById('part-voice').value = '';
+
+  saveState();
+  renderCommittee();
+  renderMapNodes();
+  showToast('Part added to the committee.');
+}
+
+function addTemplatePart(index) {
+  const t = templateParts[index];
+  if (parts.some(p => p.name === t.name)) {
+    showToast('That part is already in your committee.', true);
+    return;
+  }
+  parts.push({
+    id: Date.now(),
+    name: t.name,
+    role: t.role,
+    voice: t.voice,
+    x: 50 + Math.random() * 200,
+    y: 50 + Math.random() * 300
+  });
+  saveState();
+  renderCommittee();
+  renderMapNodes();
+  showToast(t.name + ' added to the committee.');
+}
+
+function deletePart(id) {
+  if (!confirm('Remove this part from your committee?')) return;
+  parts = parts.filter(p => p.id !== id);
+  saveState();
+  renderCommittee();
+  renderMapNodes();
+  showToast('Part removed.');
+}
+
+function renderCommittee() {
+  const grid = document.getElementById('committeeGrid');
+  grid.innerHTML = '';
+  if (parts.length === 0) {
+    grid.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 32px; color: var(--text-dim); font-style: italic;">No parts yet. Add one below, or start with one of the five named parts.</div>';
+    return;
+  }
+  parts.forEach(p => {
+    const card = document.createElement('div');
+    card.className = 'part-card';
+    card.innerHTML = `
+      <button class="delete-part" onclick="deletePart(${p.id})">×</button>
+      <div class="part-name">${escapeHtml(p.name)}</div>
+      <div class="part-role">${escapeHtml(p.role)}</div>
+      <div class="part-voice">${escapeHtml(p.voice)}</div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function renderTemplates() {
+  const grid = document.getElementById('templateParts');
+  grid.innerHTML = '';
+  templateParts.forEach((t, i) => {
+    const card = document.createElement('div');
+    card.className = 'part-card';
+    card.style.cursor = 'pointer';
+    card.onclick = () => addTemplatePart(i);
+    card.innerHTML = `
+      <div class="part-name">${t.name}</div>
+      <div class="part-role">${t.role}</div>
+      <div class="part-voice">${t.voice}</div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+// ============================================================
+// WITNESS
+// ============================================================
+function saveWitnessPractice() {
+  const moment = document.getElementById('witness-moment').value.trim();
+  const merged = document.getElementById('witness-merged').value.trim();
+  const witnessed = document.getElementById('witness-witnessed').value.trim();
+
+  if (!moment || !merged || !witnessed) {
+    showToast('Please fill in all three steps.', true);
+    return;
+  }
+
+  witnessPractices.push({
+    id: Date.now(),
+    moment: moment,
+    merged: merged,
+    witnessed: witnessed,
+    date: new Date().toISOString()
+  });
+
+  saveState();
+  renderWitnessSaved();
+
+  document.getElementById('witness-moment').value = '';
+  document.getElementById('witness-merged').value = '';
+  document.getElementById('witness-witnessed').value = '';
+
+  const result = document.getElementById('witness-result');
+  result.style.display = 'block';
+  result.innerHTML = `
+    <strong>Practice saved.</strong><br><br>
+    <em>Merged:</em> "${escapeHtml(merged)}"<br><br>
+    <em>Witnessed:</em> "${escapeHtml(witnessed)}"<br><br>
+    Notice the difference. The first version is heavy. The second version has space. That space is the witness. That space is you.
+  `;
+
+  showToast('Witness practice saved.');
+}
+
+function renderWitnessSaved() {
+  const container = document.getElementById('witness-saved');
+  if (witnessPractices.length === 0) {
+    container.innerHTML = '<p style="color: var(--text-dim); font-style: italic;">No saved practices yet.</p>';
+    return;
+  }
+  container.innerHTML = '';
+  witnessPractices.slice().reverse().forEach(w => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    const date = new Date(w.date).toLocaleDateString();
+    card.innerHTML = `
+      <div class="card-title">${date}</div>
+      <p><strong>The moment:</strong> ${escapeHtml(w.moment)}</p>
+      <p><strong>The "I feel" version:</strong> <em>${escapeHtml(w.merged)}</em></p>
+      <p><strong>The witness version:</strong> <em style="color: var(--witness);">${escapeHtml(w.witnessed)}</em></p>
+      <button class="btn btn-small btn-danger" onclick="deleteWitness(${w.id})">Delete</button>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function deleteWitness(id) {
+  if (!confirm('Delete this practice?')) return;
+  witnessPractices = witnessPractices.filter(w => w.id !== id);
+  saveState();
+  renderWitnessSaved();
+  showToast('Practice deleted.');
+}
+
+// ============================================================
+// MERGER DETECTOR
+// ============================================================
+const detectorQuestions = [
+  {
+    text: 'When you feel a strong emotion, what usually happens?',
+    options: [
+      { text: 'I become the emotion. "I am angry."', value: 4 },
+      { text: 'I try to push the emotion away.', value: 3 },
+      { text: 'I notice the emotion and can name it as "anger."', value: 1 },
+      { text: 'I can watch the emotion with curiosity, and it moves through me.', value: 0 }
+    ]
+  },
+  {
+    text: 'When someone criticizes you, what happens?',
+    options: [
+      { text: 'I believe the criticism. It confirms I am a failure.', value: 4 },
+      { text: 'I defend myself immediately.', value: 3 },
+      { text: 'I feel the sting, then I can step back and ask if it is true.', value: 1 },
+      { text: 'I can hear the criticism without it becoming my identity.', value: 0 }
+    ]
+  },
+  {
+    text: 'When you are triggered, how would you describe the experience?',
+    options: [
+      { text: 'I am overwhelmed. I lose myself.', value: 4 },
+      { text: 'I know it is a reaction, but I cannot stop it.', value: 3 },
+      { text: 'I can name the part that is triggered: "The Avoider is here."', value: 1 },
+      { text: 'I can hold space for the part while staying in the witness.', value: 0 }
+    ]
+  },
+  {
+    text: 'What is your relationship with the inner critic?',
+    options: [
+      { text: 'The inner critic is me. It is my voice.', value: 4 },
+      { text: 'I hate the inner critic. I try to silence it.', value: 3 },
+      { text: 'I can hear the inner critic and know it is a part, not me.', value: 1 },
+      { text: 'I understand the inner critic is protecting me. I can thank it and let it rest.', value: 0 }
+    ]
+  },
+  {
+    text: 'When you make a decision, what is the process?',
+    options: [
+      { text: 'Whoever shouts loudest gets the microphone. I am the microphone.', value: 4 },
+      { text: 'I struggle between two parts. I am exhausted by the conflict.', value: 3 },
+      { text: 'I can see the parts that are in conflict, and I can hear each one.', value: 1 },
+      { text: 'I can listen to all the parts, then choose from the witness.', value: 0 }
+    ]
+  }
+];
+
+let detectorSelections = new Array(detectorQuestions.length).fill(null);
+
+function renderDetectorQuestions() {
+  const container = document.getElementById('detector-questions');
+  container.innerHTML = '';
+  detectorQuestions.forEach((q, qi) => {
+    const qDiv = document.createElement('div');
+    qDiv.className = 'detector-q';
+    qDiv.innerHTML = `<div class="q-text">${qi + 1}. ${q.text}</div>`;
+    const optDiv = document.createElement('div');
+    optDiv.className = 'q-options';
+    q.options.forEach((o, oi) => {
+      const btn = document.createElement('div');
+      btn.className = 'q-option' + (detectorSelections[qi] === oi ? ' selected' : '');
+      btn.textContent = o.text;
+      btn.onclick = () => {
+        detectorSelections[qi] = oi;
+        renderDetectorQuestions();
+      };
+      optDiv.appendChild(btn);
+    });
+    qDiv.appendChild(optDiv);
+    container.appendChild(qDiv);
+  });
+}
+
+function calculateMerger() {
+  if (detectorSelections.some(s => s === null)) {
+    showToast('Please answer all questions.', true);
+    return;
+  }
+
+  let total = 0;
+  detectorSelections.forEach((sel, qi) => {
+    total += detectorQuestions[qi].options[sel].value;
+  });
+
+  const max = detectorQuestions.length * 4;
+  const percentage = Math.round((total / max) * 100);
+
+  let diagnosis, body;
+
+  if (percentage < 25) {
+    diagnosis = 'Witness State — Strong';
+    body = 'You are living in the witness state more than most people. You can see the parts, name them, and stay in the space. This is the goal of the chapter. It does not mean you are perfect. It means you have done the work. Keep practicing. The parts will still fire. The difference is that you are not them.';
+  } else if (percentage < 50) {
+    diagnosis = 'Witness State — Developing';
+    body = 'You have moments of witness, but you also have moments of merger. This is the normal path. The witness is not a state you achieve once and keep forever. It is a muscle you build. Every time you say "a part of me is presenting the experience of X," you build the muscle. Keep going.';
+  } else if (percentage < 75) {
+    diagnosis = 'Merger — Frequent';
+    body = 'You are merged with the parts more often than not. The parts are still running the show. This is not a failure. It is a starting point. Most people are here. The first step is to see the parts. The second step is to name them. The third step is to learn to step back. The chapter gives you the map. The practice gives you the muscle.';
+  } else {
+    diagnosis = 'Merger — Heavy';
+    body = 'You are merged with the parts almost all the time. The voice you call "I" is the PR department of the committee. This is not a judgment. It is a diagnosis. The good news is that the moment you can see this, the witness is already present. The part of you that recognizes "I am merged" is not the merger. It is the witness, starting to wake up. Begin with the smallest part. Name it. Watch it. Do not try to fix it. Just see it.';
+  }
+
+  mergerScore = { total, max, percentage, diagnosis };
+
+  const result = document.getElementById('merger-result');
+  result.style.display = 'block';
+  result.innerHTML = `
+    <h3 style="color: var(--gold); margin-top: 0;">Your Merger Score</h3>
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 48px; color: var(--gold); line-height: 1; margin: 16px 0;">${percentage}%</div>
+    <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 16px;">Merger Score</div>
+    <p><strong style="color: var(--text); font-size: 18px;">${diagnosis}</strong></p>
+    <p>${body}</p>
+  `;
+
+  saveState();
+  showToast('Merger diagnosis calculated.');
+}
+
+// ============================================================
+// MAP
+// ============================================================
+function renderMapNodes() {
+  const canvas = document.getElementById('mapCanvas');
+  if (!canvas) return;
+  canvas.innerHTML = '';
+  if (parts.length === 0) {
+    canvas.innerHTML = '<div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; color: var(--text-dim); font-style: italic;">Add parts to the committee to see them here.</div>';
+    return;
+  }
+  parts.forEach(p => {
+    const node = document.createElement('div');
+    node.className = 'map-node';
+    node.style.left = (p.x || 50) + 'px';
+    node.style.top = (p.y || 50) + 'px';
+    node.innerHTML = `
+      <div>${escapeHtml(p.name)}</div>
+      <span class="node-role">${escapeHtml(p.role).substring(0, 30)}</span>
+    `;
+    makeDraggable(node, p);
+    canvas.appendChild(node);
+  });
+}
+
+function makeDraggable(node, part) {
+  let isDragging = false;
+  let startX, startY, startLeft, startTop;
+
+  node.addEventListener('mousedown', (e) => {
+    isDragging = true;
+    startX = e.clientX;
+    startY = e.clientY;
+    startLeft = parseInt(node.style.left) || 0;
+    startTop = parseInt(node.style.top) || 0;
+    node.style.zIndex = 100;
+  });
+
+  document.addEventListener('mousemove', (e) => {
+    if (!isDragging) return;
+    const dx = e.clientX - startX;
+    const dy = e.clientY - startY;
+    node.style.left = (startLeft + dx) + 'px';
+    node.style.top = (startTop + dy) + 'px';
+  });
+
+  document.addEventListener('mouseup', () => {
+    if (!isDragging) return;
+    isDragging = false;
+    node.style.zIndex = '';
+    part.x = parseInt(node.style.left);
+    part.y = parseInt(node.style.top);
+    saveState();
+  });
+
+  // Touch support
+  node.addEventListener('touchstart', (e) => {
+    isDragging = true;
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+    startLeft = parseInt(node.style.left) || 0;
+    startTop = parseInt(node.style.top) || 0;
+  });
+
+  document.addEventListener('touchmove', (e) => {
+    if (!isDragging) return;
+    e.preventDefault();
+    const dx = e.touches[0].clientX - startX;
+    const dy = e.touches[0].clientY - startY;
+    node.style.left = (startLeft + dx) + 'px';
+    node.style.top = (startTop + dy) + 'px';
+  }, { passive: false });
+
+  document.addEventListener('touchend', () => {
+    if (!isDragging) return;
+    isDragging = false;
+    part.x = parseInt(node.style.left);
+    part.y = parseInt(node.style.top);
+    saveState();
+  });
+}
+
+// ============================================================
+// MANIFESTO
+// ============================================================
+function generateManifesto() {
+  const date = new Date().toLocaleDateString();
+  let manifesto = `PERSONAL MANIFESTO — THE ALGORITHM OF SELF\n`;
+  manifesto += `Date: ${date}\n`;
+  manifesto += `\n========================================\n\n`;
+
+  manifesto += `MY COMMITTEE (${parts.length} parts)\n`;
+  manifesto += `----------------------------------------\n`;
+  if (parts.length === 0) {
+    manifesto += `No parts named yet.\n`;
+  } else {
+    parts.forEach(p => {
+      manifesto += `- ${p.name}\n`;
+      manifesto += `  Role: ${p.role}\n`;
+      manifesto += `  Voice: ${p.voice}\n\n`;
+    });
+  }
+
+  manifesto += `\nTHE WITNESS PRACTICE (${witnessPractices.length} saved)\n`;
+  manifesto += `----------------------------------------\n`;
+  if (witnessPractices.length === 0) {
+    manifesto += `No practices saved yet.\n`;
+  } else {
+    witnessPractices.forEach(w => {
+      manifesto += `Date: ${new Date(w.date).toLocaleDateString()}\n`;
+      manifesto += `Moment: ${w.moment}\n`;
+      manifesto += `Merged: "${w.merged}"\n`;
+      manifesto += `Witnessed: "${w.witnessed}"\n\n`;
+    });
+  }
+
+  manifesto += `\nMERGER DIAGNOSIS\n`;
+  manifesto += `----------------------------------------\n`;
+  if (mergerScore) {
+    manifesto += `Score: ${mergerScore.percentage}%\n`;
+    manifesto += `Diagnosis: ${mergerScore.diagnosis}\n`;
+  } else {
+    manifesto += `Not yet calculated.\n`;
+  }
+
+  manifesto += `\n========================================\n\n`;
+  manifesto += `The weather is not you. You are the sky.\n\n`;
+  manifesto += `Soli Deo Gloria.\n`;
+
+  document.getElementById('manifestoPreview').textContent = manifesto;
+  showToast('Manifesto generated.');
+}
+
+function downloadManifesto() {
+  if (!document.getElementById('manifestoPreview').textContent.includes('PERSONAL MANIFESTO')) {
+    generateManifesto();
+  }
+  const text = document.getElementById('manifestoPreview').textContent;
+  const blob = new Blob([text], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'Committee-Manifesto-' + new Date().toISOString().split('T')[0] + '.txt';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('Manifesto downloaded.');
+}
+
+// ============================================================
+// UTILS
+// ============================================================
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function showToast(message, isError = false) {
+  const toast = document.getElementById('toast');
+  toast.textContent = message;
+  toast.className = 'toast show' + (isError ? ' error' : '');
+  clearTimeout(window._toastTimeout);
+  window._toastTimeout = setTimeout(() => { toast.classList.remove('show'); }, 3000);
+}
+</script>
+</body>
+</html>
