@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TripsToColombia — The Complete Dossier</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600;700&display=swap');
+  :root {
+    --bg: #0a0a0c; --surface: #121216; --surface-2: #1a1a20; --border: #2a2a32;
+    --text: #e8e6e3; --text-dim: #9a978f; --gold: #c9a227; --gold-dim: #8a6f1a;
+    --green: #3a7d5c; --red: #b03a2e;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'IBM Plex Sans', system-ui, sans-serif; background: var(--bg);
+    color: var(--text); line-height: 1.7; font-weight: 300; -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 0 24px 120px; }
+
+  /* HEADER */
+  header { padding: 64px 0 32px; border-bottom: 1px solid var(--border); margin-bottom: 48px; text-align: center; }
+  .kicker { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold); margin-bottom: 20px; }
+  h1 { font-size: clamp(28px, 6vw, 52px); font-weight: 700; line-height: 1.05; letter-spacing: -0.02em; margin-bottom: 16px; }
+  .subtitle { font-size: 18px; color: var(--text-dim); max-width: 640px; margin: 0 auto; }
+
+  /* SECTION */
+  h2 { font-size: 24px; font-weight: 600; margin: 64px 0 16px; padding-top: 32px; border-top: 1px solid var(--border); }
+  h2 .num { font-family: 'IBM Plex Mono', monospace; color: var(--gold); font-size: 14px; margin-right: 12px; }
+  h3 { font-size: 17px; font-weight: 600; margin: 24px 0 8px; color: var(--gold); }
+  p { margin-bottom: 16px; font-size: 15px; color: var(--text-dim); }
+  .lead { font-size: 18px; color: var(--text); border-left: 2px solid var(--gold); padding-left: 20px; margin: 28px 0 32px; }
+
+  /* HERO IMAGE */
+  .hero {
+    background: linear-gradient(135deg, var(--surface-2) 0%, var(--surface) 100%);
+    border: 1px solid var(--border); border-radius: 12px; padding: 64px 32px;
+    text-align: center; margin: 32px 0; position: relative; overflow: hidden;
+  }
+  .hero::before {
+    content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+    background: radial-gradient(circle, rgba(201,162,39,0.05) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero h2 { border: none; margin: 0 0 16px; padding: 0; font-size: 32px; }
+  .hero p { font-size: 17px; max-width: 600px; margin: 0 auto 24px; }
+  .hero .location {
+    font-family: 'IBM Plex Mono', monospace; font-size: 13px;
+    color: var(--gold); letter-spacing: 0.15em; text-transform: uppercase;
+  }
+
+  /* TIERS */
+  .tiers { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; margin: 24px 0; }
+  .tier {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+    padding: 28px 24px; display: flex; flex-direction: column; transition: all 0.2s;
+  }
+  .tier:hover { border-color: var(--gold); transform: translateY(-3px); }
+  .tier.featured { border-color: var(--gold); border-width: 2px; background: var(--surface-2); }
+  .tier-name { font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold); margin-bottom: 12px; }
+  .tier-price { font-family: 'IBM Plex Mono', monospace; font-size: 32px; font-weight: 700; color: var(--text); margin-bottom: 8px; line-height: 1; }
+  .tier-price .small { font-size: 14px; color: var(--text-dim); font-weight: 400; }
+  .tier-desc { font-size: 14px; color: var(--text-dim); margin-bottom: 20px; flex: 1; }
+  .tier-features { list-style: none; margin-bottom: 20px; }
+  .tier-features li { font-size: 13px; color: var(--text-dim); padding: 6px 0 6px 20px; position: relative; }
+  .tier-features li::before { content: '✓'; position: absolute; left: 0; color: var(--gold); font-weight: bold; }
+  .tier-cta {
+    background: var(--gold); color: var(--bg); border: none; padding: 12px 20px;
+    border-radius: 6px; font-family: 'IBM Plex Mono', monospace; font-size: 12px;
+    font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase;
+    cursor: pointer; text-decoration: none; display: block; text-align: center; transition: all 0.2s;
+  }
+  .tier-cta:hover { background: var(--gold-dim); color: var(--text); }
+  .tier:not(.featured) .tier-cta { background: transparent; color: var(--gold); border: 1px solid var(--gold); }
+  .tier:not(.featured) .tier-cta:hover { background: var(--gold); color: var(--bg); }
+
+  /* SERVICES */
+  .services { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin: 24px 0; }
+  .service {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 8px;
+    padding: 22px 24px; transition: all 0.2s;
+  }
+  .service:hover { border-color: var(--gold-dim); }
+  .service-icon { font-size: 28px; margin-bottom: 12px; }
+  .service h3 { margin: 0 0 8px; font-size: 16px; }
+  .service p { font-size: 14px; margin-bottom: 12px; }
+  .service a { color: var(--gold); font-size: 13px; text-decoration: none; font-weight: 600; }
+  .service a:hover { text-decoration: underline; }
+
+  /* DIRECTORY */
+  .directory { margin: 24px 0; }
+  .category { margin: 24px 0; }
+  .category-title { font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold); margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+  .app-list { display: flex; flex-wrap: wrap; gap: 8px; }
+  .app-chip {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 4px;
+    padding: 6px 12px; font-size: 12px; color: var(--text-dim); text-decoration: none;
+    font-family: 'IBM Plex Mono', monospace; transition: all 0.2s;
+  }
+  .app-chip:hover { border-color: var(--gold); color: var(--gold); }
+
+  /* CONSULTATION */
+  .consult {
+    background: var(--surface-2); border: 2px solid var(--gold); border-radius: 12px;
+    padding: 48px 32px; margin: 48px 0; text-align: center;
+  }
+  .consult h2 { border: none; margin: 0 0 16px; padding: 0; color: var(--gold); }
+  .consult p { font-size: 17px; color: var(--text); max-width: 600px; margin: 0 auto 24px; }
+  .consult-options { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin-top: 24px; }
+  .consult-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--gold); color: var(--bg); padding: 14px 28px; border-radius: 6px;
+    text-decoration: none; font-family: 'IBM Plex Mono', monospace; font-size: 13px;
+    font-weight: 600; letter-spacing: 0.05em; transition: all 0.2s;
+  }
+  .consult-btn:hover { background: var(--gold-dim); color: var(--text); }
+  .consult-btn.secondary { background: transparent; color: var(--gold); border: 1px solid var(--gold); }
+  .consult-btn.secondary:hover { background: var(--gold); color: var(--bg); }
+
+  /* TESTIMONIALS */
+  .testimonials { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin: 24px 0; }
+  .testimonial {
+    background: var(--surface); border-left: 3px solid var(--gold); border-radius: 4px;
+    padding: 24px; font-size: 14px; color: var(--text-dim); font-style: italic;
+  }
+  .testimonial .author { margin-top: 12px; font-style: normal; color: var(--gold); font-size: 13px; font-weight: 600; }
+
+  /* FINAL */
+  .final {
+    text-align: center; padding: 64px 24px; border-top: 2px solid var(--gold);
+    border-bottom: 2px solid var(--gold); margin: 64px 0;
+  }
+  .final h2 { border: none; margin: 0 0 20px; padding: 0; font-size: 32px; }
+  .final p { font-size: 17px; color: var(--text); max-width: 600px; margin: 0 auto 16px; }
+  .final .konami {
+    font-family: 'IBM Plex Mono', monospace; font-size: 24px; color: var(--gold);
+    letter-spacing: 0.3em; margin: 24px 0;
+  }
+
+  .footer-note {
+    margin-top: 64px; padding-top: 32px; border-top: 1px solid var(--border);
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--text-dim);
+    letter-spacing: 0.08em; text-align: center; line-height: 2;
+  }
+  .footer-note .glory { color: var(--gold); font-weight: 600; }
+
+  /* NAV */
+  .sticky-nav {
+    position: sticky; top: 0; background: rgba(10,10,12,0.95); backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border); padding: 12px 24px; z-index: 100;
+    margin: 0 -24px 32px; display: flex; flex-wrap: wrap; gap: 6px; justify-content: center;
+  }
+  .sticky-nav a {
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px; padding: 6px 10px;
+    border: 1px solid var(--border); border-radius: 3px; color: var(--text-dim);
+    text-decoration: none; letter-spacing: 0.04em; transition: all 0.2s;
+  }
+  .sticky-nav a:hover { border-color: var(--gold); color: var(--gold); }
+
+  a { color: var(--gold); }
+  @media (max-width: 600px) {
+    .wrap { padding: 0 16px 80px; }
+    header { padding: 40px 0 24px; }
+    h2 { margin-top: 48px; }
+    .hero { padding: 40px 20px; }
+    .hero h2 { font-size: 24px; }
+    .consult { padding: 32px 20px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<nav class="sticky-nav">
+  <a href="#invitation">Invitation</a>
+  <a href="#tiers">Tiers</a>
+  <a href="#services">Services</a>
+  <a href="#tools">Tools</a>
+  <a href="#directory">Directory</a>
+  <a href="#consultation">Consultation</a>
+  <a href="#testimonials">Stories</a>
+</nav>
+
+<header>
+  <div class="kicker">TripsToColombia.com · The Complete Dossier</div>
+  <h1>Colombia Is Not a Vacation. It Is a Door.</h1>
+  <p class="subtitle">The sanctuary in the mountains. The nation of love. The place where you can breathe, build, and become sovereign. This is the complete dossier. Every service. Every tool. Every door.</p>
+</header>
+
+<div class="hero">
+  <div class="location">Quindío · Salento · Calarcá · The Andes Mountains</div>
+  <h2>The Sanctuary Is Real</h2>
+  <p>Clean air. Pure water. Real food. A community of Sovereign Operators who have already made the move. A legal structure that protects your family. A network of hosts, attorneys, and builders who are waiting to welcome you.</p>
+  <p>You have read the book. You have seen the evidence. Now you have a choice. You can close the book and go back to your life. Or you can step through the door.</p>
+  <a href="#consultation" class="consult-btn">Book a Consultation →</a>
+</div>
+
+<!-- INVITATION -->
+<h2 id="invitation"><span class="num">01</span>The Invitation</h2>
+
+<p class="lead">I am not here to sell you a vacation. I am here to offer you a life. The life you were meant to live. The life that the system has stolen from you. The life that is still available in the mountains of Colombia.</p>
+
+<p>Colombia is not perfect. It has problems. It has a history of violence. It has a government that is not always on your side. But it also has something that the United States and Europe have lost: <strong>the possibility of freedom</strong>. Land that is affordable. Food that is real. Water that is clean. A community that is building something new. A legal system that still respects the rights of the individual. A sanctuary that is outside the densest part of the frequency grid.</p>
+
+<p>The sanctuary is in the Quindío department, in the Andes mountains. It is a network of farms, fincas, and small communities that have agreed to host Sovereign Operators who are making the move. It is not a commune. It is not a cult. It is not a political project. It is a <strong>private membership association</strong> of people who have decided to live differently.</p>
+
+<p>We have spent decades building relationships with the people of the region. The farmers who grow the organic coffee. The hosts who open their fincas. The attorneys who know the immigration law. The builders who know how to construct off-grid. The doctors who know how to heal without the pharmaceutical protocol. The teachers who know how to educate children without the state curriculum.</p>
+
+<p>This is the network. This is the nation. This is the door.</p>
+
+<!-- TIERS -->
+<h2 id="tiers"><span class="num">02</span>The Tiers — Five Ways to Engage</h2>
+
+<p>The consultation is the first step. But the first step looks different for everyone. Some people are just curious. Some people are ready to visit. Some people are ready to move. Some people are ready to build. Some people are ready to join the nation. Here are the five tiers. Choose the one that fits where you are right now.</p>
+
+<div class="tiers">
+
+  <div class="tier">
+    <div class="tier-name">The Reader</div>
+    <div class="tier-price">Free</div>
+    <div class="tier-desc">You have read the book. You are curious. You are not ready to move yet. This tier gives you access to the Colombia Complete Dossier, the Master Hub, and the newsletter.</div>
+    <ul class="tier-features">
+      <li>Colombia Complete Dossier</li>
+      <li>Forbidden Knowledge Master Hub</li>
+      <li>Monthly newsletter</li>
+      <li>No consultation call</li>
+    </ul>
+    <a href="https://quantum-freedom-site.vercel.app/Colombia2026.html" class="tier-cta" target="_blank" rel="noopener">Access the Dossier</a>
+  </div>
+
+  <div class="tier">
+    <div class="tier-name">The Tourist</div>
+    <div class="tier-price">$99</div>
+    <div class="tier-desc">You want to visit. You want to see the sanctuary with your own eyes. You want to meet the community. This tier gives you a one-hour consultation and a custom itinerary.</div>
+    <ul class="tier-features">
+      <li>One-hour consultation call</li>
+      <li>Custom 7-day itinerary</li>
+      <li>Host introductions</li>
+      <li>Airport pickup</li>
+      <li>Sanctuary tour</li>
+    </ul>
+    <a href="#consultation" class="tier-cta">Book the Call</a>
+  </div>
+
+  <div class="tier featured">
+    <div class="tier-name">The Resident · Most Popular</div>
+    <div class="tier-price">$999</div>
+    <div class="tier-desc">You are ready to move. You need the full relocation package. This tier gives you the attorney, the visa, the housing, the bank account, and the community integration.</div>
+    <ul class="tier-features">
+      <li>Three-hour consultation call</li>
+      <li>Colombian attorney on retainer</li>
+      <li>Visa application support</li>
+      <li>Housing search and lease review</li>
+      <li>Bank account setup</li>
+      <li>Fideicomiso / trust setup</li>
+      <li>Community introduction</li>
+      <li>90-day follow-up support</li>
+    </ul>
+    <a href="#consultation" class="tier-cta">Begin the Relocation</a>
+  </div>
+
+  <div class="tier">
+    <div class="tier-name">The Sovereign</div>
+    <div class="tier-price">$9,999</div>
+    <div class="tier-desc">You are ready to build. You need the full infrastructure. This tier gives you the land, the trust, the business setup, the legal fortress, and the sanctuary network.</div>
+    <ul class="tier-features">
+      <li>Everything in The Resident</li>
+      <li>Land search and purchase support</li>
+      <li>Wyoming LLC + South Dakota Trust</li>
+      <li>Colombian SAS business setup</li>
+      <li>Fideicomiso and asset protection</li>
+      <li>Off-grid infrastructure consultation</li>
+      <li>Sanctuary network membership</li>
+      <li>One-year follow-up support</li>
+    </ul>
+    <a href="#consultation" class="tier-cta">Build the Fortress</a>
+  </div>
+
+  <div class="tier">
+    <div class="tier-name">The Nation</div>
+    <div class="tier-price">Custom</div>
+    <div class="tier-desc">You are ready to join the nation. You want the full protection of the Amnesty Coalition for Unity. You want the 007 status. You want the inheritance. This tier is custom.</div>
+    <ul class="tier-features">
+      <li>Everything in The Sovereign</li>
+      <li>Amnesty Coalition for Unity membership</li>
+      <li>PMA membership</li>
+      <li>007 status classification</li>
+      <li>Geneva and Hague convention protection</li>
+      <li>Nation inheritance structure</li>
+      <li>Legacy planning</li>
+    </ul>
+    <a href="#consultation" class="tier-cta">Request Custom Proposal</a>
+  </div>
+
+</div>
+
+<!-- SERVICES -->
+<h2 id="services"><span class="num">03</span>The Services</h2>
+
+<p>Every service we offer. Each one is a door. Each one has an app. Each one is ready.</p>
+
+<div class="services">
+
+  <div class="service">
+    <div class="service-icon">✈️</div>
+    <h3>Travel Companion</h3>
+    <p>The complete Colombia travel companion. Itineraries, transportation, translation, and local guides who know the sanctuary.</p>
+    <a href="https://quantum-freedom-site.vercel.app/ColombiaTravelCompanion.html" target="_blank" rel="noopener">Open the Companion →</a>
+  </div>
+
+  <div class="service">
+    <div class="service-icon">🏡</div>
+    <h3>Real Estate & Land</h3>
+    <p>Fincas, farms, and land in the Quindío mountains. Legal title review. Water rights. Sanctuary network properties.</p>
+    <a href="https://quantum-freedom-site.vercel.app/MountainLandNetwork.html" target="_blank" rel="noopener">Open the Network →</a>
+  </div>
+
+  <div class="service">
+    <div class="service-icon">⚖️</div>
+    <h3>Legal & Immigration</h3>
+    <p>The Colombian attorney on retainer. Visas. Residency. Fideicomiso. Asset protection. The legal fortress.</p>
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-LegalFortress.html" target="_blank" rel="noopener">Open the Fortress →</a>
+  </div>
+
+  <div class="service">
+    <div class="service-icon">🏦</div>
+    <h3>Financial & Trust</h3>
+    <p>Banca offshore. Fideicomiso internacional. The Wyoming LLC. The South Dakota Dynasty Trust. The $55 billion trust structure.</p>
+    <a href="https://quantum-freedom-site.vercel.app/FideicomisoInternacionalProteccionPatrimonial.html" target="_blank" rel="noopener">Open the Trust →</a>
+  </div>
+
+  <div class="service">
+    <div class="service-icon">💼</div>
+    <h3>Business Setup</h3>
+    <p>Colombian SAS. RUT. Cámara de Comercio. The business blueprint. The income builder. The tourism boom.</p>
+    <a href="https://quantum-freedom-site.vercel.app/ColombiaBusinessSuccessBlueprint.html" target="_blank" rel="noopener">Open the Blueprint →</a>
+  </div>
+
+  <div class="service">
+    <div class="service-icon">🌱</div>
+    <h3>Sanctuary & Seeds</h3>
+    <p>The living seed ecosystem. The organic farms. The fish ponds. The eco-cultura Andina. The sanctuary network.</p>
+    <a href="https://quantum-freedom-site.vercel.app/EcoCultura.html" target="_blank" rel="noopener">Open the Sanctuary →</a>
+  </div>
+
+  <div class="service">
+    <div class="service-icon">🛡️</div>
+    <h3>Security & Sovereignty</h3>
+    <p>Personal security assessment. Encryption setup. Digital sovereignty. The Graphene OS. The secure mountain network.</p>
+    <a href="https://quantum-freedom-site.vercel.app/SecureMountainNetworkContact.html" target="_blank" rel="noopener">Open the Network →</a>
+  </div>
+
+  <div class="service">
+    <div class="service-icon">🏥</div>
+    <h3>Health & Healing</h3>
+    <p>The forbidden healing protocols. Detox. The Hugo Protocol. The frequency healing. The local doctors who know.</p>
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenHealingProtocols.html" target="_blank" rel="noopener">Open the Healing →</a>
+  </div>
+
+  <div class="service">
+    <div class="service-icon">👨‍👩‍👧‍👦</div>
+    <h3>Family & Education</h3>
+    <p>Schools outside the state curriculum. Family nation structure. The Sovereign Family Compact. The children's protection.</p>
+    <a href="https://quantum-freedom-site.vercel.app/SovereignFamilyCompact.html" target="_blank" rel="noopener">Open the Compact →</a>
+  </div>
+
+  <div class="service">
+    <div class="service-icon">🌎</div>
+    <h3>The Nation</h3>
+    <p>The Amnesty Coalition for Unity. The PMA. The 25 pillars. The 007 status. The nation that is forming.</p>
+    <a href="https://quantum-freedom-site.vercel.app/theNation.html" target="_blank" rel="noopener">Join the Nation →</a>
+  </div>
+
+</div>
+
+<!-- TOOLS -->
+<h2 id="tools"><span class="num">04</span>The Tools — Free, Ready, Yours</h2>
+
+<p>These are the tools that make the move possible. They are free. They are ready. They are yours. Use them before you contact us. Use them after. Use them whether you come to Colombia or not.</p>
+
+<div class="services">
+
+  <div class="service">
+    <div class="service-icon">🚗</div>
+    <h3>The Free Car Path</h3>
+    <p>Acquire your own car without exchanging your hours for Federal Reserve notes. The knowledge I gave my children.</p>
+    <a href="https://quantum-freedom-site.vercel.app/Jax-Slaters-Free-Car-Path.html" target="_blank" rel="noopener">Learn the Path →</a>
+  </div>
+
+  <div class="service">
+    <div class="service-icon">💵</div>
+    <h3>The Bill of Exchange Generator</h3>
+    <p>Create an IBOE. The instrument that moves outside the debt system. Print. Sign. Present.</p>
+    <a href="https://quantum-freedom-site.vercel.app/SovereignOpening.html" target="_blank" rel="noopener">Generate the IBOE →</a>
+  </div>
+
+  <div class="service">
+    <div class="service-icon">📜</div>
+    <h3>The Sovereign Declaration</h3>
+    <p>Declare your family and your land to be a sovereign nation under God. Download. Sign. Date. Keep.</p>
+    <a href="https://quantum-freedom-site.vercel.app/Sovereign-Declaration.html" target="_blank" rel="noopener">Declare Sovereignty →</a>
+  </div>
+
+  <div class="service">
+    <div class="service-icon">🏥</div>
+    <h3>The Hugo Protocol</h3>
+    <p>The hospital protocol that killed Hugo. The record. The proof. The protocol that protects your family before the hospital calls.</p>
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-HugoProtocol.html" target="_blank" rel="noopener">Open the Protocol →</a>
+  </div>
+
+  <div class="service">
+    <div class="service-icon">⚔️</div>
+    <h3>True Equity — Julian Swan</h3>
+    <p>The master of equity. The system that compels performance rather than contending. The complete exit.</p>
+    <a href="https://standingontherock.com/?ref=qbopuesmijo" target="_blank" rel="noopener">Learn Equity →</a>
+  </div>
+
+  <div class="service">
+    <div class="service-icon">📚</div>
+    <h3>The Master Hub</h3>
+    <p>Every terminal. Every chapter. Every tool. The whole Forbidden Knowledge archive in one place.</p>
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-MasterHub.html" target="_blank" rel="noopener">Open the Hub →</a>
+  </div>
+
+  <div class="service">
+    <div class="service-icon">🕊️</div>
+    <h3>Palestine Rescue</h3>
+    <p>One person. One extraction. One life moved to safety. The rescue fund. The public ledger.</p>
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-PalestineRescue.html" target="_blank" rel="noopener">Open the Rescue →</a>
+  </div>
+
+  <div class="service">
+    <div class="service-icon">🔍</div>
+    <h3>CUSIP Lookup</h3>
+    <p>Every court case, every trust, every bond has a CUSIP. Find yours. Then demand the accounting.</p>
+    <a href="https://www.cusip.com/cusip/index.shtml" target="_blank" rel="noopener">Search CUSIP →</a>
+  </div>
+
+</div>
+
+<!-- DIRECTORY -->
+<h2 id="directory"><span class="num">05</span>The Directory — Every Colombia App</h2>
+
+<p>Every Colombia app in the archive, organized by category. Click any chip to open the app.</p>
+
+<div class="directory">
+
+  <div class="category">
+    <div class="category-title">Travel & Tourism</div>
+    <div class="app-list">
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/ColombiaTravelCompanion.html" target="_blank" rel="noopener">Travel Companion</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/DiscoverMagicColombia.html" target="_blank" rel="noopener">Discover the Magic</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/TripsToColombia-APP.html" target="_blank" rel="noopener">TripsToColombia APP</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/AndeanConnectionAPP.html" target="_blank" rel="noopener">Andean Connection</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/ColombianSoulmate.html" target="_blank" rel="noopener">Colombian Soulmate</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/Colombia-Amor-Verdadero.html" target="_blank" rel="noopener">Amor Verdadero</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/Travel.html" target="_blank" rel="noopener">Travel Mate</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/YOLO-ADVENTURE.html" target="_blank" rel="noopener">YOLO Adventure</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/MotoColombia.html" target="_blank" rel="noopener">Moto Colombia</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/MotoSalento.html" target="_blank" rel="noopener">Moto Salento</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/Marroko.html" target="_blank" rel="noopener">Marroko</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/Origen.ViveLaExperiencia.html" target="_blank" rel="noopener">Origen</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/OrigenParapente.html" target="_blank" rel="noopener">Origen Parapente</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/OrigenSalento.html" target="_blank" rel="noopener">Origen Salento</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/Pijao.html" target="_blank" rel="noopener">Pijao — Rotary</a>
+    </div>
+  </div>
+
+  <div class="category">
+    <div class="category-title">Real Estate & Land</div>
+    <div class="app-list">
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/MountainLandNetwork.html" target="_blank" rel="noopener">Mountain Land Network</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/SecureMountainNetworkContact.html" target="_blank" rel="noopener">Secure Mountain Network</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/Land.html" target="_blank" rel="noopener">Land</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/LandStewardshipAgreementHelper.html" target="_blank" rel="noopener">Land Stewardship</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/the-Hearth.html" target="_blank" rel="noopener">The Hearth</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/MultiDimensionalSanctuary.html" target="_blank" rel="noopener">Ark of the Unseen</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/LiberationLibrary.html" target="_blank" rel="noopener">The Sanctuary</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/TheLionsDen.html" target="_blank" rel="noopener">The Lion's Den</a>
+    </div>
+  </div>
+
+  <div class="category">
+    <div class="category-title">Legal & Immigration</div>
+    <div class="app-list">
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-LegalFortress.html" target="_blank" rel="noopener">Legal Fortress</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/PassportWithoutSSN.html" target="_blank" rel="noopener">Passport Without SSN</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/PassportFreedom.html" target="_blank" rel="noopener">Passport Freedom</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/PasaporteSinNumeroSeguroSocial.html" target="_blank" rel="noopener">Pasaporte Sin SSN</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/AlvaroMolina.html" target="_blank" rel="noopener">Attorney — Alvaro Molina</a>
+    </div>
+  </div>
+
+  <div class="category">
+    <div class="category-title">Financial & Trust</div>
+    <div class="app-list">
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/FideicomisoInternacionalProteccionPatrimonial.html" target="_blank" rel="noopener">Fideicomiso Internacional</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/DashboardColombia.html" target="_blank" rel="noopener">Fideicomiso y Banco</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/BancaOffshore.html" target="_blank" rel="noopener">Banca Offshore</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/SociedadesOffshore.html" target="_blank" rel="noopener">Sociedades Offshore</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/TRUST.html" target="_blank" rel="noopener">Sovereignty Forge</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/TrustFreedomEngine.html" target="_blank" rel="noopener">Trust Freedom Engine</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/TrustPlanning.html" target="_blank" rel="noopener">Trust Planning</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/TrustAssetRecovery.html" target="_blank" rel="noopener">Trust Asset Recovery</a>
+    </div>
+  </div>
+
+  <div class="category">
+    <div class="category-title">Business & Income</div>
+    <div class="app-list">
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/ColombiaBusinessSuccessBlueprint.html" target="_blank" rel="noopener">Business Blueprint</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/ConviertePasionEnNegocio.html" target="_blank" rel="noopener">10% Sign Up Business</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/Medellin-Incubator.html" target="_blank" rel="noopener">Medellín Incubator</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/zona-informal.html" target="_blank" rel="noopener">Zona Informal</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/InformalWork2026.html" target="_blank" rel="noopener">Informal Work 2026</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/BoomTuristico.html" target="_blank" rel="noopener">Boom Turístico</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/NuevoBoomTuristico.html" target="_blank" rel="noopener">Nuevo Boom Turístico</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/PetroColombia.html" target="_blank" rel="noopener">Petro Boom</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/ColombianArtisanFreedom.html" target="_blank" rel="noopener">Artisan Freedom</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/ColombianArtisanGlobalConnect.html" target="_blank" rel="noopener">Artisan Global</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/ColombianCulinaryFreedomAPP.html" target="_blank" rel="noopener">Culinary Freedom</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/ColombianRhythmRevolution.html" target="_blank" rel="noopener">Rhythm Revolution</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/UniRed.html" target="_blank" rel="noopener">Red de Redistribución</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/RevolucionandoElComercioGlobal.html" target="_blank" rel="noopener">Connect Global</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/RevolucionDeLiberacion2.html" target="_blank" rel="noopener">Revolución de Liberación</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/RevolucionDigitalHispana.html" target="_blank" rel="noopener">Revolución Digital</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/PatiosRevolucion.html" target="_blank" rel="noopener">Revolución de los Patios</a>
+    </div>
+  </div>
+
+  <div class="category">
+    <div class="category-title">Community & Sanctuary</div>
+    <div class="app-list">
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/EcoCultura.html" target="_blank" rel="noopener">Eco Cultura Andina</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/EcoCulturaAndina-EmergencyAPP.html" target="_blank" rel="noopener">Eco Cultura Emergency</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/EcoCulturaAndina=Cosmic.html" target="_blank" rel="noopener">Eco Cultura Cosmic</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/ARK-ColombianSolutionsNexus.html" target="_blank" rel="noopener">ARK — Solutions Nexus</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/ARK.html" target="_blank" rel="noopener">ARK</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/ArkHost.html" target="_blank" rel="noopener">Host del Arca</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/Camino-Libertad.html" target="_blank" rel="noopener">Camino a la Libertad</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/Ayni.html" target="_blank" rel="noopener">Ayni Santuario</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/DamafreOrigen.html" target="_blank" rel="noopener">Damafre Origen</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/Aura_Serena.html" target="_blank" rel="noopener">Aura Serena Spa</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/AuraSerenaRomance.html" target="_blank" rel="noopener">Aura Serena Romance</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/Cristian.html" target="_blank" rel="noopener">Cristian</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/Aguacate.html" target="_blank" rel="noopener">Niño Aguacate</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/Sabores-Saberes.html" target="_blank" rel="noopener">Sabores Saberes</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/LaVacaAlegre.html" target="_blank" rel="noopener">La Vaca Alegre</a>
+    </div>
+  </div>
+
+  <div class="category">
+    <div class="category-title">Security & Sovereignty</div>
+    <div class="app-list">
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/SecureMountainNetworkContact.html" target="_blank" rel="noopener">Secure Mountain Network</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/SovereignFamilyCompact.html" target="_blank" rel="noopener">Sovereign Family Compact</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/CompleteSovereignEcosystem.html" target="_blank" rel="noopener">Complete Sovereign Ecosystem</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/GrapheneOS.html" target="_blank" rel="noopener">Graphene OS</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/Graphene.html" target="_blank" rel="noopener">Graphene Protection</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/GestionesSegurosMoncada.html" target="_blank" rel="noopener">Seguros Moncada</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/servicios-integrales-COL.html" target="_blank" rel="noopener">Servicios Integrales</a>
+    </div>
+  </div>
+
+  <div class="category">
+    <div class="category-title">Health & Environment</div>
+    <div class="app-list">
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/ForbiddenHealingProtocols.html" target="_blank" rel="noopener">Forbidden Healing</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/CieloLimpioSalento.html" target="_blank" rel="noopener">Cielo Limpio Salento</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/SalentoSkies.html" target="_blank" rel="noopener">Salento Skies</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/SalentoChemtrail.html" target="_blank" rel="noopener">Salento Chemtrail</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/SignalCannon.html" target="_blank" rel="noopener">Signal Cannon</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/SilentKiller.html" target="_blank" rel="noopener">Silent Killer</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/Equilibrio.html" target="_blank" rel="noopener">Equilibrio</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/Equilibrio2.html" target="_blank" rel="noopener">Equilibrio 2</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/Equilibrio4.html" target="_blank" rel="noopener">Equilibrio 4</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/Equilibrio5.html" target="_blank" rel="noopener">Equilibrio 5</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/Equilibrio6.html" target="_blank" rel="noopener">Equilibrio 6</a>
+    </div>
+  </div>
+
+  <div class="category">
+    <div class="category-title">The Nation</div>
+    <div class="app-list">
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/theNation.html" target="_blank" rel="noopener">The Nation</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/theNation2.html" target="_blank" rel="noopener">The Nation 2</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/theNationOperator.html" target="_blank" rel="noopener">The Nation Operator</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/AmnestyApplication.html" target="_blank" rel="noopener">Amnesty Application</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-AmnestyGateway.html" target="_blank" rel="noopener">Amnesty Gateway</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/TheNationOfTheAmnestyCoalitionForUnity.html" target="_blank" rel="noopener">Nation of Amnesty</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/AmnestyCoalitionCentral.html" target="_blank" rel="noopener">Court of Public Opinion</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/AmnestyCoalitionForUnity3.0.html" target="_blank" rel="noopener">Amnesty Coalition 3.0</a>
+    </div>
+  </div>
+
+  <div class="category">
+    <div class="category-title">The Political Fight</div>
+    <div class="app-list">
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/7Enero.html" target="_blank" rel="noopener">Colombia v Trump</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/Colombia-Bases.html" target="_blank" rel="noopener">Colombia Bases</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/GustavoPetro.html" target="_blank" rel="noopener">Gustavo Petro</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/PRESIDENT-PETRO-10-PERCENT-TOURISM-ECONOMIC-BOOM-PROGRAM-IS-ACTIVE.html" target="_blank" rel="noopener">Petro 10% Program</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/OperationOrange.html" target="_blank" rel="noopener">Operation Orange</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/SAVE-COLOMBIA-Expose-ORANGEman-Phase1.html" target="_blank" rel="noopener">SAVE COLOMBIA</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/Trump.html" target="_blank" rel="noopener">Trump</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/VerifiedTrump.html" target="_blank" rel="noopener">Verified Trump</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/VictorMendoza.html" target="_blank" rel="noopener">Victor Mendoza</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/Duck.html" target="_blank" rel="noopener">Duck</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/DuckHunter.html" target="_blank" rel="noopener">Duck Hunter</a>
+    </div>
+  </div>
+
+  <div class="category">
+    <div class="category-title">The Rescue</div>
+    <div class="app-list">
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-PalestineRescue.html" target="_blank" rel="noopener">Palestine Rescue</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-RescueHostAgreement.html" target="_blank" rel="noopener">Rescue Host Agreement</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-SALchecklist.html" target="_blank" rel="noopener">SAL Checklist</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-Missing15.html" target="_blank" rel="noopener">Missing 15 Steps</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-RescueFieldManual.html" target="_blank" rel="noopener">Rescue Field Manual</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-FirstExtraction.html" target="_blank" rel="noopener">First Extraction</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-Palestine.html" target="_blank" rel="noopener">Palestine</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/GAZA-emergencyResponse.html" target="_blank" rel="noopener">GAZA Emergency</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/UrgentHumanitarianCrisis.html" target="_blank" rel="noopener">Urgent Crisis</a>
+      <a class="app-chip" href="https://quantum-freedom-site.vercel.app/HumanTrafficking.html" target="_blank" rel="noopener">Human Trafficking</a>
+    </div>
+  </div>
+
+</div>
+
+<!-- CONSULTATION -->
+<div class="consult" id="consultation">
+  <h2>Book a Consultation</h2>
+  <p>The first step is a conversation. Not a sales pitch. Not a pressure call. A conversation. We will ask you where you are. We will ask you where you want to be. We will tell you what is possible. We will tell you what is not. And then you will decide.</p>
+  <div class="consult-options">
+    <a href="https://wa.me/573233235532" target="_blank" rel="noopener" class="consult-btn">💬 WhatsApp</a>
+    <a href="mailto:qbopuesmijo@proton.me" class="consult-btn secondary">📧 Email</a>
+    <a href="https://tripstocolombia.com" target="_blank" rel="noopener" class="consult-btn secondary">🌎 TripsToColombia.com</a>
+  </div>
+  <p style="margin-top: 24px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--gold); letter-spacing: 0.1em;">
+    +57 323 323 5532 · qbopuesmijo@proton.me
+  </p>
+</div>
+
+<!-- TESTIMONIALS -->
+<h2 id="testimonials"><span class="num">06</span>The Stories</h2>
+
+<p>The people who have already come. The people who have already built. The people who have already found the sanctuary.</p>
+
+<div class="testimonials">
+
+  <div class="testimonial">
+    "I came to Colombia for a week. I stayed for a year. The mountains changed me. The community changed me. The food changed me. I am healthier, happier, and freer than I have ever been."
+    <div class="author">— Michael, from Texas</div>
+  </div>
+
+  <div class="testimonial">
+    "I was scared. I had read the book. I had seen the evidence. But I was scared to leave. Ramiro and the community walked me through every step. The visa. The housing. The bank account. The trust. I am now a resident. My children are in a school that does not teach them to hate themselves."
+    <div class="author">— Sarah, from California</div>
+  </div>
+
+  <div class="testimonial">
+    "The sanctuary is real. The people are real. The food is real. The water is real. The air is real. I have not had a headache since I arrived. I have not had a panic attack. I have not felt the frequency grid pressing on my skull. I am home."
+    <div class="author">— David, from New York</div>
+  </div>
+
+  <div class="testimonial">
+    "I built my own finca. I grow my own food. I have my own water. I have my own energy. I am not dependent on the system. I am not afraid of the system. I am sovereign. This is what Ramiro promised. This is what he delivered."
+    <div class="author">— Carlos, from Florida</div>
+  </div>
+
+</div>
+
+<!-- FINAL -->
+<div class="final">
+  <h2>The Konami Code</h2>
+  <p>If you cannot come to Colombia right now, there is another way. Go to TripsToColombia.com. Enter the Konami Code. Unlock Mission Control.</p>
+  <div class="konami">↑ ↑ ↓ ↓ ← → ← → B A</div>
+  <p>The Konami Code is not a joke. It is the initiation rite. It separates the tourists from the warriors. When you unlock Mission Control, you will find real, actionable missions that you can participate in right now.</p>
+  <a href="https://tripstocolombia.com" target="_blank" rel="noopener" class="consult-btn" style="margin-top: 24px;">Enter Mission Control →</a>
+</div>
+
+<div class="footer-note">
+  TRIPS TO COLOMBIA · THE COMPLETE DOSSIER<br>
+  The sanctuary in the mountains. The nation of love. The door is open.<br><br>
+  <span class="glory">Soli Deo Gloria.</span><br><br>
+  And always, always, always keep Jesus in your heart.<br>
+  He is the frequency that cannot be jammed.<br>
+  The name that cannot be banned.<br>
+  The King who has already won.
+</div>
+
+</div>
+</body>
+</html>
