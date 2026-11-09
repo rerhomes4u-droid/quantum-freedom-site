@@ -1,81 +1,675 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Forbidden Knowledge Quiz</title>
-    <style>
-        body { font-family: Arial, sans-serif; background: #0a0a0a; color: #fff; text-align: center; padding: 20px; }
-        .question { display: none; margin: 20px auto; max-width: 600px; }
-        .active { display: block; }
-        button { background: #cc0000; color: white; border: none; padding: 15px 30px; margin: 10px; cursor: pointer; border-radius: 5px; }
-        button:hover { background: #ff0000; }
-        #result { display: none; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>How Awake Are You? — The Forbidden Knowledge Quiz</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600;700&display=swap');
+  :root {
+    --bg: #0a0a0c; --surface: #121216; --surface-2: #1a1a20; --border: #2a2a32;
+    --text: #e8e6e3; --text-dim: #9a978f; --gold: #c9a227; --gold-dim: #8a6f1a;
+    --red: #b03a2e; --green: #3a7d5c;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg); color: var(--text);
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    line-height: 1.7; font-weight: 300; min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 32px 20px 80px; }
+
+  header { text-align: center; margin-bottom: 32px; }
+  .kicker {
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+    letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold);
+    margin-bottom: 16px;
+  }
+  h1 {
+    font-size: clamp(28px, 6vw, 44px); font-weight: 700;
+    line-height: 1.1; letter-spacing: -0.02em; margin-bottom: 12px;
+  }
+  .subtitle { font-size: 17px; color: var(--text-dim); max-width: 560px; margin: 0 auto; }
+
+  .progress-wrap { margin: 32px 0 24px; }
+  .progress-meta {
+    display: flex; justify-content: space-between;
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+    color: var(--text-dim); letter-spacing: 0.08em; margin-bottom: 8px;
+  }
+  .progress-track {
+    height: 6px; background: var(--surface-2); border-radius: 3px;
+    overflow: hidden; border: 1px solid var(--border);
+  }
+  .progress-fill {
+    height: 100%; background: linear-gradient(90deg, var(--gold-dim), var(--gold));
+    width: 0%; transition: width 0.4s ease; border-radius: 3px;
+  }
+
+  .question-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 28px 24px; margin-bottom: 20px;
+    display: none; animation: fadeIn 0.4s ease;
+  }
+  .question-card.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+  .q-num {
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+    color: var(--gold); letter-spacing: 0.18em; text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .q-text {
+    font-size: 20px; font-weight: 600; line-height: 1.35;
+    margin-bottom: 24px; color: var(--text);
+  }
+  .answers { display: grid; gap: 10px; }
+  .answer-btn {
+    background: var(--surface-2); border: 1px solid var(--border);
+    border-radius: 6px; padding: 16px 18px; text-align: left;
+    cursor: pointer; color: var(--text); font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 15px; line-height: 1.5; transition: all 0.2s;
+    display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  }
+  .answer-btn:hover {
+    border-color: var(--gold-dim); background: var(--surface);
+    transform: translateX(3px);
+  }
+  .answer-btn .arrow {
+    color: var(--gold); font-family: 'IBM Plex Mono', monospace;
+    font-size: 14px; opacity: 0.6; flex-shrink: 0;
+  }
+  .answer-btn:hover .arrow { opacity: 1; }
+
+  .why-box {
+    margin-top: 16px; padding: 14px 16px; background: var(--surface-2);
+    border-left: 3px solid var(--gold-dim); border-radius: 0 4px 4px 0;
+    font-size: 13px; color: var(--text-dim); display: none;
+  }
+  .why-box.active { display: block; animation: fadeIn 0.3s ease; }
+  .why-box strong { color: var(--gold); }
+
+  .why-toggle {
+    background: transparent; border: none; color: var(--gold);
+    font-family: 'IBM Plex Mono', monospace; font-size: 11px;
+    letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer;
+    padding: 8px 0; margin-top: 8px; opacity: 0.8;
+  }
+  .why-toggle:hover { opacity: 1; text-decoration: underline; }
+
+  /* RESULT */
+  .result-screen { display: none; animation: fadeIn 0.6s ease; }
+  .result-screen.active { display: block; }
+
+  .score-display {
+    text-align: center; padding: 40px 20px; background: var(--surface);
+    border: 2px solid var(--gold); border-radius: 12px; margin-bottom: 24px;
+  }
+  .score-num {
+    font-family: 'IBM Plex Mono', monospace; font-size: clamp(64px, 16vw, 96px);
+    font-weight: 700; color: var(--gold); line-height: 1;
+  }
+  .score-label {
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px;
+    letter-spacing: 0.2em; text-transform: uppercase;
+    color: var(--text-dim); margin-top: 8px;
+  }
+  .diagnosis {
+    font-size: 24px; font-weight: 700; color: var(--gold);
+    margin-top: 20px; line-height: 1.2;
+  }
+  .diagnosis-sub {
+    font-size: 15px; color: var(--text-dim); margin-top: 8px;
+    font-style: italic;
+  }
+
+  .result-body {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 24px; margin-bottom: 20px;
+    font-size: 15px; line-height: 1.75;
+  }
+  .result-body p { margin-bottom: 14px; }
+  .result-body p:last-child { margin-bottom: 0; }
+  .result-body strong { color: var(--gold); }
+
+  .next-steps { margin: 28px 0; }
+  .next-steps h2 {
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px;
+    letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold);
+    margin-bottom: 16px; text-align: center;
+  }
+  .mission-list { display: grid; gap: 10px; }
+  .mission-link {
+    display: block; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 6px; padding: 16px 20px; text-decoration: none;
+    color: var(--text); transition: all 0.2s;
+  }
+  .mission-link:hover {
+    border-color: var(--gold); background: var(--surface-2);
+    transform: translateY(-2px);
+  }
+  .mission-link .mission-title {
+    font-weight: 600; font-size: 15px; margin-bottom: 4px;
+    display: flex; justify-content: space-between; align-items: center; gap: 8px;
+  }
+  .mission-link .mission-title .arrow {
+    color: var(--gold); font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+  }
+  .mission-link .mission-desc {
+    font-size: 13px; color: var(--text-dim); line-height: 1.5;
+  }
+
+  .share-section {
+    background: var(--surface); border: 1px solid var(--gold-dim);
+    border-radius: 8px; padding: 24px; margin: 24px 0;
+  }
+  .share-section h3 {
+    font-family: 'IBM Plex Mono', monospace; font-size: 12px;
+    letter-spacing: 0.15em; text-transform: uppercase; color: var(--gold);
+    margin-bottom: 12px; text-align: center;
+  }
+  .share-section p {
+    font-size: 14px; color: var(--text-dim); text-align: center;
+    margin-bottom: 16px;
+  }
+  .share-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 8px;
+  }
+  .share-btn {
+    background: var(--surface-2); border: 1px solid var(--border);
+    color: var(--text); padding: 12px 8px; border-radius: 6px;
+    cursor: pointer; font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 13px; transition: all 0.2s; text-align: center;
+  }
+  .share-btn:hover { border-color: var(--gold); color: var(--gold); }
+
+  .restart-wrap { text-align: center; margin: 32px 0; }
+  .btn-restart {
+    background: transparent; border: 1px solid var(--border);
+    color: var(--text-dim); padding: 12px 28px; border-radius: 6px;
+    cursor: pointer; font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase;
+    transition: all 0.2s;
+  }
+  .btn-restart:hover { border-color: var(--gold); color: var(--gold); }
+
+  .footer-note {
+    margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--border);
+    text-align: center; font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; color: var(--text-dim); letter-spacing: 0.1em; line-height: 2;
+  }
+  .footer-note .glory { color: var(--gold); font-weight: 600; }
+
+  .toast {
+    position: fixed; bottom: 24px; left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--green); color: white; padding: 12px 24px;
+    border-radius: 6px; font-size: 14px; opacity: 0;
+    transition: all 0.3s ease; z-index: 1000;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.5); max-width: 90%;
+    text-align: center;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast.error { background: var(--red); }
+
+  @media (max-width: 600px) {
+    .wrap { padding: 20px 14px 60px; }
+    .question-card { padding: 22px 18px; }
+    .q-text { font-size: 17px; }
+    .answer-btn { font-size: 14px; padding: 14px 16px; }
+    .result-body { padding: 20px; font-size: 14px; }
+  }
+</style>
 </head>
 <body>
-    <h1>How Awake Are You?</h1>
-    <div id="quiz-container">
-        <div class="question active" id="q1">
-            <h2>Question 1: How much do you trust the information from mainstream media (CNN, Fox, BBC, etc.)?</h2>
-            <button onclick="nextQuestion(1, 1)">Completely</button>
-            <button onclick="nextQuestion(1, 3)">Somewhat</button>
-            <button onclick="nextQuestion(1, 5)">Not at all</button>
-        </div>
-        <div class="question" id="q2">
-            <h2>Question 2: Do you believe pharmaceutical companies prioritize profits over patient safety?</h2>
-            <button onclick="nextQuestion(2, 1)">No</button>
-            <button onclick="nextQuestion(2, 3)">Unsure</button>
-            <button onclick="nextQuestion(2, 5)">Yes</button>
-        </div>
-        <!-- ADD 8-10 MORE SIMILAR QUESTIONS ESCALATING TO VAX, 5G, ETC. -->
+<div class="wrap">
+
+<header>
+  <div class="kicker">Forbidden Knowledge · The Awakening Diagnostic</div>
+  <h1>How Awake Are You?</h1>
+  <p class="subtitle">Twelve questions. One diagnosis. No wrong answers — only honest ones. The quiz does not tell you what to believe. It shows you where you are.</p>
+</header>
+
+<div class="progress-wrap">
+  <div class="progress-meta">
+    <span>QUESTION <span id="current-q">1</span> OF 12</span>
+    <span>SCORE: <span id="live-score">0</span></span>
+  </div>
+  <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+</div>
+
+<div id="quiz-container"></div>
+
+<div id="result-screen" class="result-screen">
+  <div class="score-display">
+    <div class="score-num" id="final-score">0</div>
+    <div class="score-label">Awakening Score</div>
+    <div class="diagnosis" id="diagnosis-title"></div>
+    <div class="diagnosis-sub" id="diagnosis-sub"></div>
+  </div>
+
+  <div class="result-body" id="result-body"></div>
+
+  <div class="next-steps">
+    <h2>Your Next Step</h2>
+    <div class="mission-list">
+      <a href="https://quantum-freedom-site.vercel.app/SovereignOpening.html" target="_blank" rel="noopener" class="mission-link">
+        <div class="mission-title"><span>The Sovereign Operator's Opening</span><span class="arrow">→</span></div>
+        <div class="mission-desc">The opening chapter. The two sayings. "I love you to abandon." The deadman trigger. The 007 status. The toolbox.</div>
+      </a>
+      <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-MasterHub.html" target="_blank" rel="noopener" class="mission-link">
+        <div class="mission-title"><span>The Master Hub — Every Terminal, Every Tool</span><span class="arrow">→</span></div>
+        <div class="mission-desc">The full archive. 250+ apps. Every disclosure terminal. Every legal tool. Every financial tool. Every sanctuary door.</div>
+      </a>
+      <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-HugoProtocol.html" target="_blank" rel="noopener" class="mission-link">
+        <div class="mission-title"><span>The Hugo Protocol — Protect Your Family</span><span class="arrow">→</span></div>
+        <div class="mission-desc">The hospital protocol that killed my uncle Hugo. The record. The proof. The protocol that protects your family before the hospital calls.</div>
+      </a>
+      <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-HarvesterTerminal.html" target="_blank" rel="noopener" class="mission-link">
+        <div class="mission-title"><span>The Fear Audit — 7-Day Protocol</span><span class="arrow">→</span></div>
+        <div class="mission-desc">The attention economy runs on fear. The seven-day protocol is the test. Stop consuming. Watch the fear. Withhold the reaction. See your own pattern.</div>
+      </a>
+      <a href="https://quantum-freedom-site.vercel.app/Jax-Slaters-Free-Car-Path.html" target="_blank" rel="noopener" class="mission-link">
+        <div class="mission-title"><span>The Free Car Path — Exit the Debt System</span><span class="arrow">→</span></div>
+        <div class="mission-desc">The knowledge I gave my children. How to acquire a car without exchanging your hours for Federal Reserve notes.</div>
+      </a>
+      <a href="https://standingontherock.com/?ref=qbopuesmijo" target="_blank" rel="noopener" class="mission-link">
+        <div class="mission-title"><span>Learn EQUITY from Julian Swan</span><span class="arrow">→</span></div>
+        <div class="mission-desc">The master of equity. The system that compels performance rather than contending. The most complete exit.</div>
+      </a>
     </div>
+  </div>
 
-    <div id="result">
-        <h2>Your Awakening Score: <span id="score"></span>/100</h2>
-        <p id="result-text"></p>
-        <p><strong>You are not crazy. You are awake.</strong></p>
-        <p>The world is not what you were told. What you called 'conspiracy' is a documented, pre-meditated genocide.</p>
-        <br>
-        <h3>Your Mission Starts Now:</h3>
-        <a href="bioweapon_simulator.html"><button>SEE THE PROOF (The Bioweapon Simulator)</button></a>
-        <a href="legal_strike.html"><button>FIGHT BACK (The Legal First Strike)</button></a>
-        <br>
-        <p>Find Sanctuary. Find Community. Find Truth.</p>
-        <a href="https://TripsToColombia.com" target="_blank"><button style="background: #006600;">STRATEGIC RELOCATION & DEFENSE</button></a>
+  <div class="share-section">
+    <h3>Share Your Diagnosis</h3>
+    <p>Your network needs to take this quiz too. Share your score.</p>
+    <div class="share-grid">
+      <button class="share-btn" onclick="copyShare()">📋 Copy</button>
+      <button class="share-btn" onclick="shareTo('whatsapp')">💬 WhatsApp</button>
+      <button class="share-btn" onclick="shareTo('telegram')">✈️ Telegram</button>
+      <button class="share-btn" onclick="shareTo('twitter')">𝕏 Twitter</button>
+      <button class="share-btn" onclick="shareTo('email')">📧 Email</button>
     </div>
+  </div>
 
-    <script>
-        let userScore = 0;
-        const totalQuestions = 10; // Set this to the actual number
+  <div class="restart-wrap">
+    <button class="btn-restart" onclick="restartQuiz()">↻ Retake the Quiz</button>
+  </div>
+</div>
 
-        function nextQuestion(currentQ, points) {
-            userScore += points;
-            document.getElementById('q'+currentQ).classList.remove('active');
-            if (currentQ < totalQuestions) {
-                document.getElementById('q'+(currentQ+1)).classList.add('active');
-            } else {
-                showResult();
-            }
-        }
+<div class="footer-note">
+  FORBIDDEN KNOWLEDGE · THE SOVEREIGN OPERATOR<br>
+  You are not crazy. You are awake.<br><br>
+  <span class="glory">Soli Deo Gloria.</span>
+</div>
 
-        function showResult() {
-            document.getElementById('quiz-container').style.display = 'none';
-            const resultElement = document.getElementById('result');
-            const scoreElement = document.getElementById('score');
-            const textElement = document.getElementById('result-text');
+</div>
 
-            scoreElement.textContent = userScore;
+<div class="toast" id="toast"></div>
 
-            if (userScore < 30) {
-                textElement.textContent = "You are still largely asleep. Question everything.";
-            } else if (userScore < 60) {
-                textElement.textContent = "You are questioning. You are on the path. Keep going.";
-            } else {
-                textElement.textContent = "You are AWAKE. You see the lies. Now it's time to act.";
-            }
-            resultElement.style.display = 'block';
-        }
-    </script>
+<script>
+// ============================================================
+// QUESTION DATA
+// ============================================================
+const questions = [
+  {
+    text: "How much do you trust the information from mainstream media — CNN, Fox, BBC, MSNBC, the evening news?",
+    answers: [
+      { text: "Completely. If it's on the news, it's true.", points: 1 },
+      { text: "Somewhat. I check multiple sources, but I still trust the major outlets.", points: 3 },
+      { text: "I watch the news to see what they want me to think. I don't trust it.", points: 6 },
+      { text: "I do not consume mainstream media at all. I go to the primary sources.", points: 9 }
+    ],
+    why: "The mainstream media is not a neutral observer. It is owned by six corporations. It is funded by pharmaceutical advertising. It is fed by intelligence agencies. It is not lying to you every time — but it is filtering every time. The question is not whether the media lies. The question is whether you know what it is filtering out."
+  },
+  {
+    text: "Do you believe pharmaceutical companies prioritize profits over patient safety?",
+    answers: [
+      { text: "No. The FDA and the clinical trials protect us.", points: 1 },
+      { text: "Maybe sometimes, but the system is basically sound.", points: 3 },
+      { text: "Yes. The opioid crisis proved it. The vaccine injuries proved it.", points: 7 },
+      { text: "Yes, and the PREP Act gave them legal immunity before they released the product.", points: 9 }
+    ],
+    why: "The PREP Act of 2005 gave drug companies complete immunity from liability for 'covered countermeasures' during a public health emergency. They gave themselves immunity before the product was released. The NVICP has paid over $4 billion in vaccine injury compensation. Pfizer and Moderna have paid $0. That is not a conspiracy theory. That is the record."
+  },
+  {
+    text: "What do you think about the COVID-19 lockdowns and mandates?",
+    answers: [
+      { text: "They saved lives. They were necessary.", points: 1 },
+      { text: "They went too far, but the intentions were good.", points: 3 },
+      { text: "They destroyed the economy, the children's education, and the middle class.", points: 7 },
+      { text: "They were a dry run for the next crisis. The playbook is still on the table.", points: 9 }
+    ],
+    why: "The lockdowns destroyed millions of businesses. They closed schools for over a year. They increased childhood obesity, depression, and suicide attempts. They transferred trillions of dollars from the middle class to the billionaire class. The question is not whether the intentions were good. The question is who benefited."
+  },
+  {
+    text: "Do you believe the COVID-19 vaccines are safe and effective?",
+    answers: [
+      { text: "Yes. The science is settled. The vaccines saved millions of lives.", points: 1 },
+      { text: "They are mostly safe, but the myocarditis risk in young men is real.", points: 3 },
+      { text: "They are experimental gene therapies. The spike protein is pathogenic.", points: 8 },
+      { text: "They are a bioweapon. The spike protein attacks the cardiovascular system, crosses the blood-brain barrier, and causes the immune system to attack itself.", points: 9 }
+    ],
+    why: "The spike protein is not a harmless antigen. It crosses the blood-brain barrier. It attacks the cardiovascular system. It attaches to ACE2 receptors on the surface of sperm and ovaries. It causes the body's own immune system to attack itself. The BMJ published a Pulitzer-prize-winning investigation revealing that FDA scientists who raised safety concerns were ordered to 'cease and desist.' They knew about the myocarditis. They knew about the blood clots. And they hid it."
+  },
+  {
+    text: "What do you think about 5G and the wireless grid?",
+    answers: [
+      { text: "It is just faster internet. There is nothing to worry about.", points: 1 },
+      { text: "I have heard the concerns, but I think they are overblown.", points: 3 },
+      { text: "Electromagnetic hypersensitivity is a real, documented condition. The blood-brain barrier is affected.", points: 7 },
+      { text: "The grid is a weapon. The frequencies interact with heavy metals in the body. The children are the experiment.", points: 9 }
+    ],
+    why: "Electromagnetic hypersensitivity is in the peer-reviewed literature. Lennart Hardell and colleagues published case reports of 16 people aged 4 to 83 who developed headaches, tinnitus, dizziness, anxiety, and heart arrhythmias after 5G base stations were installed near their homes. The symptoms resolved when they moved away. The human blood-brain barrier studies have never been done. The children have never been tracked. The gap is the question no one is asking."
+  },
+  {
+    text: "Do you believe the world is run by a small group of bloodline families who have been in power for centuries?",
+    answers: [
+      { text: "No. That is a conspiracy theory.", points: 1 },
+      { text: "Maybe there are powerful families, but not a coordinated bloodline.", points: 3 },
+      { text: "The Rothschilds, the Rockefellers, the British Royal Family — yes, they have disproportionate power.", points: 7 },
+      { text: "Yes, and the bloodlines trace back to the Watchers. The Rh-negative marker. The Merovingian line. The 13 families.", points: 9 }
+    ],
+    why: "The Rothschilds are a real banking dynasty. The Rockefellers are a real industrial dynasty. The British Royal Family is a real institution. The question is not whether they exist. The question is whether they coordinate. The record shows intermarriage, shared institutions, and shared interests. The record does not prove a single coordinated bloodline. The reader decides."
+  },
+  {
+    text: "Do you believe child trafficking is a real, widespread problem that reaches the highest levels of power?",
+    answers: [
+      { text: "It is a terrible problem, but it does not reach the highest levels.", points: 1 },
+      { text: "It reaches some powerful people — Epstein, NXIVM — but it is not systemic.", points: 4 },
+      { text: "It is systemic. The Franklin case. The Finders. The Epstein network. The orphanages. The foster system.", points: 8 },
+      { text: "It is systemic, it is ritual, and it is funded by the same institutions that run the world. The children are the fuel.", points: 9 }
+    ],
+    why: "The Franklin case. The Finders case. The Epstein network. The Dutroux X-Dossiers. The Hampstead hoax. The McMartin trial. Some are real. Some are hoaxes. The hoaxes are the shield. Every time a real case surfaces, the hoaxes are cited. The question is not whether all the claims are true. The question is which ones are, and how the hoaxes prevent you from asking."
+  },
+  {
+    text: "What do you think about the conflict in Palestine?",
+    answers: [
+      { text: "Israel has a right to defend itself. The casualties are unfortunate but unavoidable.", points: 1 },
+      { text: "Both sides have done wrong. It is complicated.", points: 3 },
+      { text: "It is a genocide. The UN has said so. The children are dying.", points: 7 },
+      { text: "It is a genocide, and the entity that is doing it is the same entity that is killing us. We are all in the same boat.", points: 9 }
+    ],
+    why: "The UN Independent International Commission of Inquiry concluded that Israeli authorities have deliberately targeted Palestinian children. UNICEF documented more than 340 children killed since the ceasefire. The true death toll is unknown because thousands remain under the rubble. The genocide is not a conspiracy theory. It is the official finding of the United Nations. The question is not whether it is real. The question is why the world is watching and doing nothing."
+  },
+  {
+    text: "Do you believe the government is capable of lying to you about something as big as a pandemic?",
+    answers: [
+      { text: "No. The government has our best interests at heart.", points: 1 },
+      { text: "They exaggerate sometimes, but they do not lie about something that big.", points: 3 },
+      { text: "They have lied about wars, about surveillance, about torture. They can lie about a pandemic.", points: 7 },
+      { text: "They lied about the PCR test. They lied about the masks. They lied about the vaccine. They lied about the lab leak. The lie is the pattern.", points: 9 }
+    ],
+    why: "The Pentagon Papers. The Gulf of Tonkin. The Weapons of Mass Destruction. The MKULTRA files. The Tuskegee experiment. The Iran-Contra affair. The NSA surveillance. The lab leak cover-up. The pattern is not a conspiracy theory. It is the historical record. The question is not whether the government lies. The question is why you still believe it."
+  },
+  {
+    text: "Do you believe that the bankers and the politicians are the ones who are actually in charge?",
+    answers: [
+      { text: "Yes. They are the ones with the money and the power.", points: 2 },
+      { text: "The bankers and the politicians are the visible face. The intelligence agencies are the real power.", points: 4 },
+      { text: "The intelligence agencies are the enforcers. The bankers are the treasury. The bloodlines are the lineage.", points: 7 },
+      { text: "The visible power is a mask. The real power is the entity behind them all. They are the hands. The entity is the mind.", points: 9 }
+    ],
+    why: "The Federal Reserve is not a government agency. It is a private bank. The CIA is not a government agency. It is a covert action arm. The banks create money out of nothing. The politicians take orders from the banks. The intelligence agencies take orders from the banks. The bloodlines take orders from the entity. The entity takes orders from no one. The entity is the one who kills."
+  },
+  {
+    text: "Have you ever experienced a moment when you realized that the world is not what you were told it is?",
+    answers: [
+      { text: "No. I have always seen the world the way it is.", points: 1 },
+      { text: "Once or twice. But I have moved on.", points: 3 },
+      { text: "Yes. It was terrifying. But it was the beginning of my real life.", points: 7 },
+      { text: "Yes. It happened when I stopped watching the news. When I stopped scrolling. When I sat in silence and heard the hum of my own nervous system.", points: 9 }
+    ],
+    why: "The moment of awakening is not a single event. It is a series of small moments. It is the moment you stop believing the headline. It is the moment you start asking the question. It is the moment you realize that the fear you feel is being farmed. It is the moment you decide to stop being a crop. That moment is the beginning. Not the end."
+  },
+  {
+    text: "Are you willing to give up your comfort to protect the innocent?",
+    answers: [
+      { text: "No. I have a family to take care of. I cannot afford to fight.", points: 1 },
+      { text: "I want to help, but I don't know what to do.", points: 3 },
+      { text: "Yes. I am willing to give up my comfort. I just need to know where to start.", points: 7 },
+      { text: "Yes. I have already started. I am building my nation. I am teaching my children. I am sharing the truth. I am a node.", points: 9 }
+    ],
+    why: "The people who built the world you live in did not ask for permission. They did not wait for the perfect moment. They did not wait until they had all the answers. They built. They sacrificed. They acted. The question is not whether you are ready. The question is whether you are willing. The rest is a matter of tools and time."
+  }
+];
+
+// ============================================================
+// STATE
+// ============================================================
+let currentQuestion = 0;
+let score = 0;
+let answers = [];
+let totalPoints = 0;
+
+// Calculate maximum possible score
+const MAX_SCORE = questions.reduce((sum, q) => sum + Math.max(...q.answers.map(a => a.points)), 0);
+
+// ============================================================
+// RENDER QUIZ
+// ============================================================
+function renderQuestion() {
+  const container = document.getElementById('quiz-container');
+  const q = questions[currentQuestion];
+
+  container.innerHTML = `
+    <div class="question-card active">
+      <div class="q-num">Question ${currentQuestion + 1} of ${questions.length}</div>
+      <div class="q-text">${q.text}</div>
+      <div class="answers">
+        ${q.answers.map((a, i) => `
+          <button class="answer-btn" onclick="answerQuestion(${i})">
+            <span>${a.text}</span>
+            <span class="arrow">→</span>
+          </button>
+        `).join('')}
+      </div>
+      <button class="why-toggle" onclick="toggleWhy()">+ Why this question matters</button>
+      <div class="why-box" id="why-box">
+        <strong>Why this matters:</strong> ${q.why}
+      </div>
+    </div>
+  `;
+
+  document.getElementById('current-q').textContent = currentQuestion + 1;
+  const progress = ((currentQuestion) / questions.length) * 100;
+  document.getElementById('progress-fill').style.width = progress + '%';
+}
+
+function toggleWhy() {
+  const box = document.getElementById('why-box');
+  const toggle = document.querySelector('.why-toggle');
+  box.classList.toggle('active');
+  if (box.classList.contains('active')) {
+    toggle.textContent = '− Hide';
+  } else {
+    toggle.textContent = '+ Why this question matters';
+  }
+}
+
+function answerQuestion(index) {
+  const q = questions[currentQuestion];
+  const answer = q.answers[index];
+
+  score += answer.points;
+  answers.push({
+    question: q.text,
+    answer: answer.text,
+    points: answer.points
+  });
+
+  document.getElementById('live-score').textContent = score;
+
+  // Check if there are more questions
+  if (currentQuestion < questions.length - 1) {
+    currentQuestion++;
+    renderQuestion();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  } else {
+    showResult();
+  }
+}
+
+// ============================================================
+// SHOW RESULT
+// ============================================================
+function showResult() {
+  // Scale to 100
+  const percentage = Math.round((score / MAX_SCORE) * 100);
+
+  document.getElementById('progress-fill').style.width = '100%';
+  document.getElementById('current-q').textContent = questions.length;
+  document.getElementById('quiz-container').innerHTML = '';
+  document.getElementById('result-screen').classList.add('active');
+
+  // Animate score
+  const scoreEl = document.getElementById('final-score');
+  let display = 0;
+  const interval = setInterval(() => {
+    display += Math.ceil(percentage / 30);
+    if (display >= percentage) {
+      display = percentage;
+      clearInterval(interval);
+    }
+    scoreEl.textContent = display;
+  }, 30);
+
+  // Diagnosis
+  let diagnosis, sub, body;
+  if (percentage < 30) {
+    diagnosis = "Asleep";
+    sub = "The world is what they told you it is. For now.";
+    body = `
+      <p>You are still in the cave. You are watching the shadows on the wall and believing they are real. That is not a judgment. That is a diagnosis. Most people are here. Most people never leave.</p>
+      <p>But you took the quiz. You asked the questions. You read the answers. That means something in you is starting to stir. The fact that you are here, reading this, means the seed has been planted.</p>
+      <p><strong>The question is not whether you are asleep. The question is whether you are ready to wake up.</strong> The tools are below. The door is open. The first step is to stop watching the news. The second step is to start asking the questions. The third step is to do something with the answers.</p>
+      <p>You are not crazy. You are just not awake yet. That can change today.</p>
+    `;
+  } else if (percentage < 50) {
+    diagnosis = "Waking";
+    sub = "Something is wrong. You can feel it. You just don't know what it is yet.";
+    body = `
+      <p>You are in the in-between. You know the official story is not the whole story. You know the media lies. You know the politicians lie. You know something is wrong with the world. But you have not yet connected the dots.</p>
+      <p>That is the most uncomfortable place to be. You are too awake to be comfortable in the lie, but not awake enough to see the truth. You are in the wilderness. You are wandering.</p>
+      <p><strong>The good news is that the wilderness is where the awakening happens.</strong> The people who are asleep do not know they are asleep. The people who are awake went through the wilderness. You are in the middle. That is not a failure. That is the journey.</p>
+      <p>The tools below will help you connect the dots. The Master Hub has every terminal. The Hugo Protocol will teach you how the hospital kills. The Fear Audit will teach you how the attention economy farms you. The Free Car Path will teach you how to exit the debt system. Start with one. Then another. The dots will connect.</p>
+    `;
+  } else if (percentage < 70) {
+    diagnosis = "Questioning";
+    sub = "You are asking the right questions. You are on the path. Keep going.";
+    body = `
+      <p>You are awake enough to see the machinery. You know the pharmaceutical companies put profits over patients. You know the lockdowns were a dry run. You know the vaccines are not as safe as they told you. You know the media is a filter, not a window.</p>
+      <p>You are asking the right questions. You are on the path. But you are still alone on the path. That is the danger. The system is designed to isolate you. It wants you to think that you are the only one who sees. It wants you to think that everyone else is asleep.</p>
+      <p><strong>The truth is that millions of people are asking the same questions you are asking.</strong> They are just not connected. The nation is the connection. The PMA is the connection. The Master Hub is the connection. The nodes are the connection. You are not alone. You have never been alone. You just have not found your people yet.</p>
+      <p>The tools below are your people. The Sovereign Opening will show you the way. The Master Hub will give you the full archive. The Palestine Rescue will show you how to act. The Julian Swan course will teach you the complete equity system. Start connecting.</p>
+    `;
+  } else if (percentage < 90) {
+    diagnosis = "Awake";
+    sub = "You see the lies. You know the truth. Now it is time to act.";
+    body = `
+      <p>You are awake. You see the machinery. You know the names. You know the bloodlines. You know the vaccines. You know the media. You know the politicians. You know the banks. You know the entity.</p>
+      <p>But knowing is not enough. The awake person who does nothing is no better than the asleep person who does nothing. The difference between the awake and the sovereign is action. The awake person knows the truth. The sovereign person builds the alternative.</p>
+      <p><strong>You are not here to argue on the internet. You are not here to win debates. You are here to build.</strong> Build your nation. Declare your sovereignty. Teach your children. Protect the innocent. Fund the rescue. Be a node. Share the truth. Save the children. Save your descendants.</p>
+      <p>The tools below are the tools for building. The Sovereign Opening is the door. The Master Hub is the library. The Free Car Path is the exit from the debt system. The Julian Swan course is the complete equity system. The Palestine Rescue is the mission. Start building.</p>
+    `;
+  } else {
+    diagnosis = "Sovereign Operator";
+    sub = "You are not just awake. You are ready. You are the hope your descendants have.";
+    body = `
+      <p>You have crossed the threshold. You are not just awake. You are sovereign. You know the truth. You know the entity. You know the mission. You are already building. You are already a node. You are already a light in the darkness.</p>
+      <p>The people who built the world you live in did not ask for permission. They did not wait for the perfect moment. They built. They sacrificed. They acted. You are one of those people now.</p>
+      <p><strong>Your mission is not to wake up. Your mission is to wake up others.</strong> You are a node. You are a light. You are a seed. The information you carry will spread. The nation you build will grow. The children you protect will live. The descendants you save will remember you.</p>
+      <p>The tools below are your tools. The Sovereign Opening is the door for the people you will bring in. The Master Hub is the library for the people you will teach. The Palestine Rescue is the mission for the people you will save. The Julian Swan course is the system for the people you will teach to compel performance. The Free Car Path is the exit for the people you will free from the debt system.</p>
+      <p><strong>You are the Sovereign Operator. Go build the nation.</strong></p>
+    `;
+  }
+
+  document.getElementById('diagnosis-title').textContent = diagnosis;
+  document.getElementById('diagnosis-sub').textContent = sub;
+  document.getElementById('result-body').innerHTML = body;
+
+  // Scroll to top
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ============================================================
+// SHARE
+// ============================================================
+function getShareText() {
+  const percentage = Math.round((score / MAX_SCORE) * 100);
+  const diagnosis = document.getElementById('diagnosis-title').textContent;
+  return `I took the Forbidden Knowledge Awakening Quiz.
+
+My score: ${percentage}/100
+My diagnosis: ${diagnosis}
+
+"${document.getElementById('diagnosis-sub').textContent}"
+
+Twelve questions. One diagnosis. No wrong answers — only honest ones.
+
+How awake are you?
+
+https://quantum-freedom-site.vercel.app/HowAwake.html
+
+Soli Deo Gloria.`;
+}
+
+function copyShare() {
+  const text = getShareText();
+  navigator.clipboard.writeText(text).then(() => {
+    showToast('Share text copied. Paste it anywhere.');
+  }).catch(() => {
+    showToast('Could not copy. Please select and copy manually.', true);
+  });
+}
+
+function shareTo(platform) {
+  const text = encodeURIComponent(getShareText());
+  const url = encodeURIComponent('https://quantum-freedom-site.vercel.app/HowAwake.html');
+  let shareUrl = '';
+  switch(platform) {
+    case 'whatsapp': shareUrl = `https://wa.me/?text=${text}`; break;
+    case 'telegram': shareUrl = `https://t.me/share/url?url=${url}&text=${text}`; break;
+    case 'twitter': shareUrl = `https://twitter.com/intent/tweet?text=${text}&url=${url}`; break;
+    case 'email': shareUrl = `mailto:?subject=Forbidden%20Knowledge%20Awakening%20Quiz&body=${text}`; break;
+  }
+  if (shareUrl) window.open(shareUrl, '_blank');
+}
+
+// ============================================================
+// RESTART
+// ============================================================
+function restartQuiz() {
+  currentQuestion = 0;
+  score = 0;
+  answers = [];
+  document.getElementById('result-screen').classList.remove('active');
+  document.getElementById('live-score').textContent = '0';
+  document.getElementById('progress-fill').style.width = '0%';
+  renderQuestion();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ============================================================
+// TOAST
+// ============================================================
+function showToast(message, isError = false) {
+  const toast = document.getElementById('toast');
+  toast.textContent = message;
+  toast.className = 'toast show' + (isError ? ' error' : '');
+  clearTimeout(window._toastTimeout);
+  window._toastTimeout = setTimeout(() => { toast.classList.remove('show'); }, 3000);
+}
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded', function() {
+  renderQuestion();
+});
+</script>
 </body>
 </html>
