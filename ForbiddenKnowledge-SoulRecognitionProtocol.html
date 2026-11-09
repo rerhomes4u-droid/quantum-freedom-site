@@ -1,0 +1,1058 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Soul Recognition Protocol — The Server Transfer</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600;700&display=swap');
+  :root {
+    --bg: #05070d;
+    --surface: #0a0f1a;
+    --surface-2: #0f1626;
+    --border: #1a2538;
+    --text: #c8d8e8;
+    --text-dim: #6a7a8e;
+    --cyan: #00d2ff;
+    --cyan-dim: #0088aa;
+    --magenta: #ff2d95;
+    --gold: #ffd966;
+    --green: #00ff88;
+    --red: #ff4444;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+    font-weight: 300;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+
+  /* BOOT SCREEN */
+  #boot-screen {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: var(--bg);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    transition: opacity 0.8s ease;
+  }
+  #boot-screen.hidden { opacity: 0; pointer-events: none; }
+  .code-bg {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    overflow: hidden;
+    opacity: 0.15;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    line-height: 1.4;
+    color: var(--cyan);
+    pointer-events: none;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .boot-content {
+    position: relative;
+    z-index: 2;
+    max-width: 700px;
+    width: 100%;
+    text-align: center;
+  }
+  .boot-logo {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: clamp(18px, 4vw, 28px);
+    font-weight: 700;
+    letter-spacing: 0.2em;
+    color: var(--cyan);
+    margin-bottom: 8px;
+    text-shadow: 0 0 20px var(--cyan);
+  }
+  .boot-sub {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--magenta);
+    margin-bottom: 40px;
+  }
+  .boot-terminal {
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid var(--cyan-dim);
+    border-radius: 8px;
+    padding: 20px 24px;
+    text-align: left;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    line-height: 2;
+    min-height: 220px;
+    margin-bottom: 24px;
+    box-shadow: 0 0 40px rgba(0, 210, 255, 0.1);
+  }
+  .boot-line { color: var(--cyan); opacity: 0; animation: fadeIn 0.4s forwards; }
+  .boot-line.warn { color: var(--gold); }
+  .boot-line.danger { color: var(--red); }
+  .boot-line.success { color: var(--green); }
+  .boot-line.dim { color: var(--text-dim); }
+  @keyframes fadeIn { to { opacity: 1; } }
+  .boot-progress {
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-bottom: 16px;
+  }
+  .boot-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--cyan), var(--magenta));
+    width: 0%;
+    transition: width 0.3s ease;
+    box-shadow: 0 0 10px var(--cyan);
+  }
+  .boot-skip {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    color: var(--text-dim);
+    background: transparent;
+    border: 1px solid var(--border);
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .boot-skip:hover { border-color: var(--cyan); color: var(--cyan); }
+
+  /* MAIN APP */
+  #main-app {
+    opacity: 0;
+    transition: opacity 0.8s ease;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 24px 120px;
+  }
+  #main-app.visible { opacity: 1; }
+
+  /* HEADER */
+  header {
+    padding: 48px 0 32px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 32px;
+    text-align: center;
+  }
+  .kicker {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--magenta);
+    margin-bottom: 16px;
+  }
+  h1 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: clamp(22px, 5vw, 36px);
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--cyan);
+    margin-bottom: 12px;
+    text-shadow: 0 0 30px rgba(0, 210, 255, 0.4);
+  }
+  .subtitle {
+    font-size: 15px;
+    color: var(--text-dim);
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  /* NAV */
+  .nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+    margin-bottom: 40px;
+    padding: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+  .nav button {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 8px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: all 0.2s;
+  }
+  .nav button:hover { border-color: var(--cyan); color: var(--cyan); }
+  .nav button.active {
+    background: var(--cyan);
+    color: var(--bg);
+    border-color: var(--cyan);
+    font-weight: 600;
+  }
+
+  /* SECTION */
+  .section { display: none; animation: fadeIn 0.4s ease; }
+  .section.active { display: block; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  h2 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    color: var(--cyan);
+    margin: 32px 0 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  h2:first-of-type { margin-top: 0; }
+  h3 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gold);
+    margin: 24px 0 12px;
+    letter-spacing: 0.05em;
+  }
+  p { margin-bottom: 16px; font-size: 15px; color: var(--text); }
+  p.dim { color: var(--text-dim); }
+  .lead {
+    font-size: 17px;
+    color: var(--text);
+    border-left: 2px solid var(--cyan);
+    padding-left: 20px;
+    margin: 24px 0 32px;
+  }
+  .highlight { color: var(--gold); font-weight: 600; }
+  .metaphor-tag {
+    display: inline-block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    padding: 2px 8px;
+    border-radius: 3px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .tag-metaphor { background: rgba(255, 45, 149, 0.15); color: var(--magenta); border: 1px solid var(--magenta); }
+  .tag-record { background: rgba(0, 255, 136, 0.1); color: var(--green); border: 1px solid var(--green); }
+  .tag-tool { background: rgba(255, 217, 102, 0.1); color: var(--gold); border: 1px solid var(--gold); }
+  .tag-gap { background: rgba(255, 68, 68, 0.1); color: var(--red); border: 1px solid var(--red); }
+
+  /* CARDS */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px;
+    margin: 16px 0;
+    transition: all 0.2s;
+  }
+  .card:hover { border-color: var(--cyan-dim); }
+  .card-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: 0.05em;
+    margin-bottom: 12px;
+  }
+
+  /* BUTTONS */
+  .btn {
+    background: var(--cyan);
+    color: var(--bg);
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: all 0.2s;
+    display: inline-block;
+    text-decoration: none;
+  }
+  .btn:hover { background: var(--cyan-dim); color: var(--text); }
+  .btn-secondary {
+    background: transparent;
+    color: var(--cyan);
+    border: 1px solid var(--cyan);
+  }
+  .btn-secondary:hover { background: var(--cyan); color: var(--bg); }
+  .btn-full { display: block; width: 100%; text-align: center; }
+
+  /* INPUTS */
+  input[type="text"], textarea, select {
+    width: 100%;
+    padding: 12px 16px;
+    background: var(--surface-2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 14px;
+    margin: 6px 0;
+  }
+  input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: var(--cyan);
+    box-shadow: 0 0 10px rgba(0, 210, 255, 0.2);
+  }
+  label {
+    display: block;
+    margin-top: 12px;
+    margin-bottom: 4px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--cyan);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+  textarea { min-height: 100px; resize: vertical; line-height: 1.6; }
+
+  /* FREQUENCY SCANNER */
+  .freq-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 12px;
+    margin: 16px 0;
+  }
+  .freq-item {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+  }
+  .freq-item .freq-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+  }
+  .freq-item .freq-options {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .freq-item .freq-option {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 12px;
+    color: var(--text-dim);
+    transition: all 0.2s;
+  }
+  .freq-item .freq-option:hover { border-color: var(--cyan); color: var(--text); }
+  .freq-item .freq-option.selected { border-color: var(--cyan); background: rgba(0, 210, 255, 0.1); color: var(--cyan); }
+
+  /* RESULT */
+  .result-box {
+    background: var(--surface-2);
+    border: 1px solid var(--cyan);
+    border-radius: 8px;
+    padding: 24px;
+    margin: 20px 0;
+    display: none;
+  }
+  .result-box.visible { display: block; animation: fadeIn 0.4s ease; }
+  .result-box h3 { color: var(--cyan); margin-top: 0; }
+  .score-bar {
+    height: 24px;
+    background: var(--surface);
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 12px 0;
+    border: 1px solid var(--border);
+  }
+  .score-bar-fill {
+    height: 100%;
+    transition: width 1s ease;
+    display: flex;
+    align-items: center;
+    padding-left: 8px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--bg);
+  }
+
+  /* SERVER TRANSFER */
+  .transfer-list { list-style: none; margin: 16px 0; }
+  .transfer-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    background: var(--surface-2);
+    border-radius: 4px;
+    margin-bottom: 6px;
+    font-size: 13px;
+  }
+  .transfer-item input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--cyan);
+    cursor: pointer;
+  }
+  .transfer-item label { margin: 0; font-family: 'IBM Plex Sans', sans-serif; font-size: 13px; color: var(--text); text-transform: none; letter-spacing: 0; cursor: pointer; }
+
+  /* SOUL SIGNATURE */
+  .signature-field {
+    margin: 16px 0;
+  }
+  .signature-field label {
+    color: var(--gold);
+  }
+
+  /* EXTRACTION POINT */
+  .extraction-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+    margin: 16px 0;
+  }
+  .extraction-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px;
+    text-decoration: none;
+    color: var(--text);
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+  }
+  .extraction-card:hover { border-color: var(--cyan); transform: translateY(-2px); }
+  .extraction-card .ec-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--cyan);
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+  }
+  .extraction-card .ec-desc {
+    font-size: 12px;
+    color: var(--text-dim);
+    line-height: 1.5;
+  }
+
+  /* TOAST */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--green);
+    color: var(--bg);
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 10000;
+    box-shadow: 0 4px 20px rgba(0, 255, 136, 0.3);
+    max-width: 90%;
+    text-align: center;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast.error { background: var(--red); box-shadow: 0 4px 20px rgba(255, 68, 68, 0.3); }
+
+  .footer-note {
+    margin-top: 64px;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+    text-align: center;
+    line-height: 2;
+  }
+  .footer-note .glory { color: var(--gold); font-weight: 600; }
+
+  @media (max-width: 600px) {
+    #main-app { padding: 0 16px 80px; }
+    header { padding: 32px 0 24px; }
+    .freq-grid { grid-template-columns: 1fr; }
+    .extraction-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- BOOT SCREEN -->
+<div id="boot-screen">
+  <div class="code-bg" id="codeBg"></div>
+  <div class="boot-content">
+    <div class="boot-logo">SOUL RECOGNITION PROTOCOL</div>
+    <div class="boot-sub">TripsToColombia.com · The Server Transfer</div>
+    <div class="boot-terminal" id="bootTerminal"></div>
+    <div class="boot-progress"><div class="boot-progress-fill" id="bootProgress"></div></div>
+    <button class="boot-skip" onclick="skipBoot()">Skip Boot Sequence →</button>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="main-app">
+
+<header>
+  <div class="kicker">TripsToColombia.com · The Server Transfer</div>
+  <h1>SOUL RECOGNITION PROTOCOL</h1>
+  <p class="subtitle">You have been running on a server you did not choose. This is not a metaphor. It is a description of your attention. This app will not tell you what to believe. It will give you the tools to check.</p>
+</header>
+
+<nav class="nav">
+  <button class="active" onclick="showSection('reveal', this)">The Reveal</button>
+  <button onclick="showSection('metaphors', this)">The Four Metaphors</button>
+  <button onclick="showSection('scanner', this)">Frequency Scanner</button>
+  <button onclick="showSection('transfer', this)">Server Transfer</button>
+  <button onclick="showSection('signature', this)">Soul Signature</button>
+  <button onclick="showSection('extraction', this)">Extraction Point</button>
+</nav>
+
+<!-- THE REVEAL -->
+<div class="section active" id="reveal">
+  <h2>The Reveal</h2>
+
+  <p class="lead">You have been running on a server you did not choose. This is not a metaphor. It is a description of your attention. The algorithms chose what you saw. The system chose what you feared. The feed chose what you believed. You did not choose. You were chosen.</p>
+
+  <p>But here is the good news. The server is not the only server. There are other servers. There is the server of fear and outrage and division. There is the server of love and sovereignty and truth. You are not stuck on the first server. You can transfer. Not literally. Practically. By choosing what you consume. By choosing what you believe. By choosing what you build.</p>
+
+  <p>This app is not going to tell you what to believe. It is going to give you the tools to check. It is going to show you the four metaphors that the book uses to describe the system. It is going to give you the tools to test the metaphors against your own experience. It is going to give you the tools to transfer.</p>
+
+  <h3>What this app is not</h3>
+  <p class="dim">This app is not a literal claim. It is not saying that the earth is a farm or that Colombia is a computer server or that Jesus is a computer hack. Those are metaphors. They are ways of seeing. They are useful if they help you see clearly, and they are dangerous if you mistake them for facts. The book's method is: name the specific, find the corroboration, mark the gap, refuse to overclaim. This app uses the same method.</p>
+
+  <div class="card">
+    <div class="card-title">The Method — How to use this app</div>
+    <p><strong>1. The Four Metaphors</strong> — Read the four metaphors. For each one, decide whether it helps you see clearly or whether it distorts. The app does not decide for you.</p>
+    <p><strong>2. Frequency Scanner</strong> — Log what you consumed today. The app shows you the frequency of what you consumed. It is a mirror, not a judgment.</p>
+    <p><strong>3. Server Transfer</strong> — Choose what you want to unsubscribe from and what you want to subscribe to. The app generates a personal transfer plan.</p>
+    <p><strong>4. Soul Signature</strong> — Identify your own values, loves, gifts, and callings. The app generates your signature.</p>
+    <p><strong>5. Extraction Point</strong> — The real doors. The real tools. The real nation. The real sanctuary.</p>
+  </div>
+</div>
+
+<!-- THE FOUR METAPHORS -->
+<div class="section" id="metaphors">
+  <h2>The Four Metaphors</h2>
+  <p>These are the four metaphors that the book uses to describe the system. Each one is labeled as what it is: a metaphor. Each one is tested against the record. Each one has a gap. The reader decides whether the metaphor helps them see clearly.</p>
+
+  <div class="card">
+    <span class="metaphor-tag tag-metaphor">Metaphor 01</span>
+    <div class="card-title">The Earth Is a Farm</div>
+    <p><strong>The metaphor:</strong> The earth is not a home. It is a farm. The crop is human emotional energy: fear, anger, suffering, conflict. The system harvests this energy. Your outrage is the crop. Your despair is the crop. Your division is the crop.</p>
+    <p><span class="metaphor-tag tag-record">Record</span> <strong>What the record shows:</strong> The attention economy is real. Fear and outrage generate more engagement than calm analysis. The algorithms amplify what generates engagement. The result is a feedback loop that leaves the user exhausted, anxious, and divided. This is documented by behavioral science, by former tech insiders, and by the platforms' own internal research.</p>
+    <p><span class="metaphor-tag tag-gap">Gap</span> <strong>The gap:</strong> The record does not prove that the harvest is intentional. It proves that the harvest is profitable. Whether the harvesters are human corporations or non-physical entities is a question the record cannot answer. The metaphor of the farm is useful. The literal claim that the earth is a farm is not in the record.</p>
+  </div>
+
+  <div class="card">
+    <span class="metaphor-tag tag-metaphor">Metaphor 02</span>
+    <div class="card-title">The System Is a Server</div>
+    <p><strong>The metaphor:</strong> The system is not a political structure. It is a server. It runs a set of rules. It decides what you see. It decides what you fear. It decides what you believe. You are running on the server. You did not choose the server. You can change servers.</p>
+    <p><span class="metaphor-tag tag-record">Record</span> <strong>What the record shows:</strong> The attention economy is a set of algorithms that decide what appears in your feed. The algorithms are designed to maximize engagement. They are not neutral. They are not a public utility. They are a private business. The algorithms have been documented by former engineers, by journalists, and by the platforms themselves.</p>
+    <p><span class="metaphor-tag tag-gap">Gap</span> <strong>The gap:</strong> The record does not prove that the server is conscious or intentional. It proves that the server is profitable. The metaphor of the server is useful. The literal claim that the system is a computer server is not in the record.</p>
+  </div>
+
+  <div class="card">
+    <span class="metaphor-tag tag-metaphor">Metaphor 03</span>
+    <div class="card-title">Jesus Is the Hack</div>
+    <p><strong>The metaphor:</strong> Jesus is not a religion. He is an access code. The name of Jesus is the backdoor to the system. The system censors the name because the name is the code that breaks the system.</p>
+    <p><span class="metaphor-tag tag-record">Record</span> <strong>What the record shows:</strong> The name of Jesus is systematically censored, blocked, and removed. Heinz blocked "Jesus" on personalized ketchup bottles while allowing "Allah" and "Satan." Coca-Cola blocked "Jesus is Lord" while allowing "God is Dead" and "Atheist Pride." Military chaplains have been ordered not to pray in the name of Jesus. The pattern is documented.</p>
+    <p><span class="metaphor-tag tag-gap">Gap</span> <strong>The gap:</strong> The record does not prove that the name of Jesus is a computer code. It proves that the name is treated differently from other names. The metaphor of the hack is useful. The literal claim that the name is a hack is not in the record.</p>
+  </div>
+
+  <div class="card">
+    <span class="metaphor-tag tag-metaphor">Metaphor 04</span>
+    <div class="card-title">Colombia Is the Extraction Point</div>
+    <p><strong>The metaphor:</strong> Colombia is not a country. It is a server. It runs different rules. It is a place where you can breathe, build, and become sovereign. It is the extraction point.</p>
+    <p><span class="metaphor-tag tag-record">Record</span> <strong>What the record shows:</strong> Colombia is a real country. It has real problems. It has a real history of violence. It has a real government that is not always on your side. It also has real mountains. Real clean air. Real pure water. Real food. Real communities that are building something new. Real legal structures that can protect your family. Real sanctuaries that are outside the densest part of the frequency grid.</p>
+    <p><span class="metaphor-tag tag-gap">Gap</span> <strong>The gap:</strong> The record does not prove that Colombia is a computer server. It proves that Colombia is a real place with real advantages and real problems. The metaphor of the extraction point is useful. The literal claim that Colombia is a server is not in the record.</p>
+  </div>
+</div>
+
+<!-- FREQUENCY SCANNER -->
+<div class="section" id="scanner">
+  <h2>Frequency Scanner</h2>
+  <p>Log what you consumed today. The app shows you the frequency of what you consumed. It is a mirror, not a judgment. There are no wrong answers. Only honest ones.</p>
+
+  <div class="freq-grid" id="freqGrid"></div>
+
+  <button class="btn btn-full" onclick="scanFrequency()" style="margin-top: 20px;">Scan My Frequency</button>
+
+  <div class="result-box" id="freqResult"></div>
+</div>
+
+<!-- SERVER TRANSFER -->
+<div class="section" id="transfer">
+  <h2>Server Transfer</h2>
+  <p>This is a practice, not a literal server. Choose what you want to unsubscribe from. Choose what you want to subscribe to. The app generates a personal transfer plan.</p>
+
+  <h3>What to unsubscribe from</h3>
+  <ul class="transfer-list" id="unsubList"></ul>
+
+  <h3>What to subscribe to</h3>
+  <ul class="transfer-list" id="subList"></ul>
+
+  <button class="btn btn-full" onclick="generateTransfer()" style="margin-top: 20px;">Generate My Transfer Plan</button>
+
+  <div class="result-box" id="transferResult"></div>
+</div>
+
+<!-- SOUL SIGNATURE -->
+<div class="section" id="signature">
+  <h2>Soul Signature</h2>
+  <p>This is not a mystical reading. It is a self-inventory. The questions help you identify the values, loves, gifts, and callings that are yours and no one else's. There are no wrong answers. Write what is true for you.</p>
+
+  <div class="signature-field">
+    <label>Three values you will not compromise:</label>
+    <textarea id="sig-values" placeholder="e.g., Truth. Freedom. Love."></textarea>
+  </div>
+  <div class="signature-field">
+    <label>Three things you love doing so much that you lose track of time:</label>
+    <textarea id="sig-loves" placeholder="e.g., Building things. Teaching. Writing."></textarea>
+  </div>
+  <div class="signature-field">
+    <label>Three gifts you have that others have recognized in you:</label>
+    <textarea id="sig-gifts" placeholder="e.g., Seeing patterns. Explaining complex things. Making people feel seen."></textarea>
+  </div>
+  <div class="signature-field">
+    <label>Three callings you feel you cannot ignore:</label>
+    <textarea id="sig-callings" placeholder="e.g., Protect the innocent. Build the nation. Teach the children."></textarea>
+  </div>
+
+  <button class="btn btn-full" onclick="generateSignature()">Generate My Soul Signature</button>
+
+  <div class="result-box" id="signatureResult"></div>
+</div>
+
+<!-- EXTRACTION POINT -->
+<div class="section" id="extraction">
+  <h2>The Extraction Point</h2>
+  <p>The extraction point is not a metaphysical place. It is a list of real doors. The real tools. The real nation. The real sanctuary. The real book. The real app. The real community. Click any door. Walk through.</p>
+
+  <div class="extraction-grid">
+    <a class="extraction-card" href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-MasterHub.html" target="_blank" rel="noopener">
+      <div class="ec-title">The Master Hub</div>
+      <div class="ec-desc">Every terminal. Every chapter. Every tool. The whole archive in one place.</div>
+    </a>
+    <a class="extraction-card" href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-Chapter6.html" target="_blank" rel="noopener">
+      <div class="ec-title">The Harvest — Chapter 6</div>
+      <div class="ec-desc">The fear economy. The harvest. The record. The claim. The gap.</div>
+    </a>
+    <a class="extraction-card" href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-Chapter13.html" target="_blank" rel="noopener">
+      <div class="ec-title">The God Program — Chapter 13</div>
+      <div class="ec-desc">The kingdom. The within. The two readings. The institution and the internal.</div>
+    </a>
+    <a class="extraction-card" href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-HugoProtocol.html" target="_blank" rel="noopener">
+      <div class="ec-title">The Hugo Protocol</div>
+      <div class="ec-desc">The hospital protocol that killed Hugo. The record. The proof. The protocol that protects your family.</div>
+    </a>
+    <a class="extraction-card" href="https://quantum-freedom-site.vercel.app/AlgorithmOfSelf.html" target="_blank" rel="noopener">
+      <div class="ec-title">The Algorithm of Self</div>
+      <div class="ec-desc">The committee of sub-personalities. The witness practice. The merger detector.</div>
+    </a>
+    <a class="extraction-card" href="https://quantum-freedom-site.vercel.app/Jax-Slaters-Free-Car-Path.html" target="_blank" rel="noopener">
+      <div class="ec-title">The Free Car Path</div>
+      <div class="ec-desc">Acquire your own car without exchanging your hours for Federal Reserve notes.</div>
+    </a>
+    <a class="extraction-card" href="https://standingontherock.com/?ref=qbopuesmijo" target="_blank" rel="noopener">
+      <div class="ec-title">True Equity — Julian Swan</div>
+      <div class="ec-desc">The master of equity. The system that compels performance rather than contending.</div>
+    </a>
+    <a class="extraction-card" href="https://quantum-freedom-site.vercel.app/Colombia2026.html" target="_blank" rel="noopener">
+      <div class="ec-title">Colombia Complete Dossier</div>
+      <div class="ec-desc">The sanctuary in the mountains. The complete dossier. The real door.</div>
+    </a>
+    <a class="extraction-card" href="https://quantum-freedom-site.vercel.app/theNation.html" target="_blank" rel="noopener">
+      <div class="ec-title">The Nation</div>
+      <div class="ec-desc">The Amnesty Coalition for Unity. The PMA. The 007 status. The nation that is forming.</div>
+    </a>
+    <a class="extraction-card" href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-PalestineRescue.html" target="_blank" rel="noopener">
+      <div class="ec-title">Palestine Rescue</div>
+      <div class="ec-desc">One person. One extraction. One life moved to safety. The rescue fund. The public ledger.</div>
+    </a>
+    <a class="extraction-card" href="https://quantum-freedom-site.vercel.app/SoulRecognitionEngine.html" target="_blank" rel="noopener">
+      <div class="ec-title">Soul Recognition Engine</div>
+      <div class="ec-desc">You are already here. The app you did not know you needed.</div>
+    </a>
+    <a class="extraction-card" href="https://quantum-freedom-site.vercel.app/SovereignOpening.html" target="_blank" rel="noopener">
+      <div class="ec-title">The Sovereign Opening</div>
+      <div class="ec-desc">The opening chapter. The two sayings. The deadman trigger. The toolbox.</div>
+    </a>
+  </div>
+</div>
+
+<div class="footer-note">
+  SOUL RECOGNITION PROTOCOL · TRIPS TO COLOMBIA<br>
+  The server transfer. The four metaphors. The tools to check.<br><br>
+  <span class="glory">Soli Deo Gloria.</span>
+</div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+// BOOT SEQUENCE
+// ============================================================
+const bootLines = [
+  { text: '[SYSTEM] Initializing Soul Recognition Protocol...', class: 'dim' },
+  { text: '[SYSTEM] Loading metaphor engine...', class: 'dim' },
+  { text: '[SYSTEM] Loading frequency scanner...', class: 'dim' },
+  { text: '[SYSTEM] Loading server transfer module...', class: 'dim' },
+  { text: '[WARN] This app will not tell you what to believe.', class: 'warn' },
+  { text: '[WARN] It will give you the tools to check.', class: 'warn' },
+  { text: '[SYSTEM] Four metaphors detected:', class: 'dim' },
+  { text: '  → The Earth Is a Farm', class: 'dim' },
+  { text: '  → The System Is a Server', class: 'dim' },
+  { text: '  → Jesus Is the Hack', class: 'dim' },
+  { text: '  → Colombia Is the Extraction Point', class: 'dim' },
+  { text: '[SYSTEM] Each metaphor is labeled. Each one is tested against the record.', class: 'success' },
+  { text: '[SYSTEM] Each one has a gap. The reader decides.', class: 'success' },
+  { text: '[SYSTEM] The method is: name the specific, find the corroboration, mark the gap, refuse to overclaim.', class: 'success' },
+  { text: '[SYSTEM] You have been running on a server you did not choose.', class: 'warn' },
+  { text: '[SYSTEM] The server is not the only server.', class: 'success' },
+  { text: '[SYSTEM] You can transfer. Not literally. Practically.', class: 'success' },
+  { text: '[SYSTEM] Soul Recognition Protocol ready.', class: 'success' },
+  { text: '[SYSTEM] Welcome, Sovereign Operator.', class: 'success' }
+];
+
+function generateCodeBg() {
+  const chars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+  const bg = document.getElementById('codeBg');
+  let html = '';
+  for (let i = 0; i < 200; i++) {
+    const line = Array.from({ length: 80 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+    html += line + '\n';
+  }
+  bg.textContent = html;
+}
+
+function runBoot() {
+  generateCodeBg();
+  const terminal = document.getElementById('bootTerminal');
+  const progress = document.getElementById('bootProgress');
+  let i = 0;
+  const interval = setInterval(() => {
+    if (i >= bootLines.length) {
+      clearInterval(interval);
+      setTimeout(() => {
+        document.getElementById('boot-screen').classList.add('hidden');
+        document.getElementById('main-app').classList.add('visible');
+      }, 600);
+      return;
+    }
+    const line = document.createElement('div');
+    line.className = 'boot-line ' + bootLines[i].class;
+    line.textContent = bootLines[i].text;
+    line.style.animationDelay = '0s';
+    terminal.appendChild(line);
+    terminal.scrollTop = terminal.scrollHeight;
+    progress.style.width = ((i + 1) / bootLines.length * 100) + '%';
+    i++;
+  }, 180);
+}
+
+function skipBoot() {
+  document.getElementById('boot-screen').classList.add('hidden');
+  document.getElementById('main-app').classList.add('visible');
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function showSection(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ============================================================
+// FREQUENCY SCANNER
+// ============================================================
+const freqQuestions = [
+  { id: 'news', label: 'News consumption today', options: ['None', 'Less than 30 min', '30 min – 2 hours', 'More than 2 hours'] },
+  { id: 'social', label: 'Social media today', options: ['None', 'Less than 30 min', '30 min – 2 hours', 'More than 2 hours'] },
+  { id: 'outrage', label: 'Outrage content today', options: ['None', 'A little', 'A moderate amount', 'A lot'] },
+  { id: 'fear', label: 'Fear content today', options: ['None', 'A little', 'A moderate amount', 'A lot'] },
+  { id: 'love', label: 'Love content today', options: ['None', 'A little', 'A moderate amount', 'A lot'] },
+  { id: 'silence', label: 'Silence today', options: ['None', 'Less than 10 min', '10–30 min', 'More than 30 min'] },
+  { id: 'prayer', label: 'Prayer or meditation today', options: ['None', 'Less than 10 min', '10–30 min', 'More than 30 min'] }
+];
+
+let freqSelections = {};
+
+function renderFreqQuestions() {
+  const grid = document.getElementById('freqGrid');
+  grid.innerHTML = '';
+  freqQuestions.forEach(q => {
+    const item = document.createElement('div');
+    item.className = 'freq-item';
+    const label = document.createElement('div');
+    label.className = 'freq-label';
+    label.textContent = q.label;
+    item.appendChild(label);
+    const opts = document.createElement('div');
+    opts.className = 'freq-options';
+    q.options.forEach((opt, oi) => {
+      const optDiv = document.createElement('div');
+      optDiv.className = 'freq-option' + (freqSelections[q.id] === oi ? ' selected' : '');
+      optDiv.textContent = opt;
+      optDiv.onclick = () => {
+        freqSelections[q.id] = oi;
+        renderFreqQuestions();
+      };
+      opts.appendChild(optDiv);
+    });
+    item.appendChild(opts);
+    grid.appendChild(item);
+  });
+}
+
+function scanFrequency() {
+  if (Object.keys(freqSelections).length < freqQuestions.length) {
+    showToast('Please answer all questions.', true);
+    return;
+  }
+
+  let fearScore = 0;
+  let loveScore = 0;
+
+  const fearWeights = { news: 1, social: 1, outrage: 2, fear: 2 };
+  const loveWeights = { love: 2, silence: 1, prayer: 1 };
+
+  fearWeights && Object.entries(fearWeights).forEach(([id, w]) => {
+    fearScore += (freqSelections[id] || 0) * w;
+  });
+
+  Object.entries(loveWeights).forEach(([id, w]) => {
+    const val = freqSelections[id] || 0;
+    loveScore += (3 - val) * w;
+  });
+
+  const fearPct = Math.min(100, Math.round((fearScore / 18) * 100));
+  const lovePct = Math.min(100, Math.round((loveScore / 12) * 100));
+
+  let diagnosis, body;
+
+  if (fearPct > lovePct + 20) {
+    diagnosis = 'Fear Server — Dominant';
+    body = 'You are consuming more fear than love. The feed is winning. This is not a judgment. It is a reading. The good news is that the reading can change. Start with one day. One day of less news. One day of more silence. One day of more prayer. The server can change.';
+  } else if (lovePct > fearPct + 20) {
+    diagnosis = 'Love Server — Dominant';
+    body = 'You are consuming more love than fear. The feed is losing. This is not a badge of honor. It is a practice. Keep practicing. The feed will try to pull you back. Do not let it.';
+  } else {
+    diagnosis = 'Mixed Server';
+    body = 'You are consuming roughly equal parts fear and love. The feed is balanced. This is the most common reading. The question is: which way do you want to tip? The choice is yours. The next choice is yours.';
+  }
+
+  const result = document.getElementById('freqResult');
+  result.classList.add('visible');
+  result.innerHTML = `
+    <h3>Frequency Scan Complete</h3>
+    <div style="margin: 16px 0;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--text-dim); margin-bottom: 4px;">FEAR FREQUENCY</div>
+      <div class="score-bar"><div class="score-bar-fill" style="width: ${fearPct}%; background: var(--red);">${fearPct}%</div></div>
+    </div>
+    <div style="margin: 16px 0;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--text-dim); margin-bottom: 4px;">LOVE FREQUENCY</div>
+      <div class="score-bar"><div class="score-bar-fill" style="width: ${lovePct}%; background: var(--green);">${lovePct}%</div></div>
+    </div>
+    <p><strong style="color: var(--cyan); font-size: 18px;">${diagnosis}</strong></p>
+    <p>${body}</p>
+  `;
+
+  showToast('Frequency scan complete.');
+}
+
+// ============================================================
+// SERVER TRANSFER
+// ============================================================
+const unsubOptions = [
+  'Mainstream news (CNN, Fox, MSNBC, BBC)',
+  'Social media algorithms (TikTok, Instagram, Facebook)',
+  'Outrage content (political arguments, culture wars)',
+  'Fear-based content (doomscrolling, crisis news)',
+  'YouTube recommendations (algorithmic)',
+  'Twitter/X feed (algorithmic)',
+  'Group chats that drain you',
+  'People who only take energy',
+  'Late-night scrolling',
+  'Morning phone check before getting out of bed'
+];
+
+const subOptions = [
+  'The Bible (start with the Gospels)',
+  'Silence (10 minutes a day)',
+  'Prayer (talk to Jesus like a friend)',
+  'The Forbidden Knowledge Master Hub',
+  'The Sovereign Opening',
+  'The Algorithm of Self app',
+  'The Hugo Protocol',
+  'The Free Car Path',
+  'True Equity (Julian Swan)',
+  'The Colombia Complete Dossier',
+  'The Nation (Amnesty Coalition)',
+  'The Palestine Rescue',
+  'A daily walk outside',
+  'Real food, real water, real sleep',
+  'A community of Sovereign Operators',
+  'The name of Jesus'
+];
+
+function renderTransferLists() {
+  const unsubList = document.getElementById('unsubList');
+  unsubList.innerHTML = '';
+  unsubOptions.forEach((opt, i) => {
+    const li = document.createElement('li');
+    li.className = 'transfer-item';
+    li.innerHTML = `<input type="checkbox" id="unsub-${i}" value="${escapeHtml(opt)}"><label for="unsub-${i}">${escapeHtml(opt)}</label>`;
+    unsubList.appendChild(li);
+  });
+
+  const subList = document.getElementById('subList');
+  subList.innerHTML = '';
+  subOptions.forEach((opt, i) => {
+    const li = document.createElement('li');
+    li.className = 'transfer-item';
+    li.innerHTML = `<input type="checkbox" id="sub-${i}" value="${escapeHtml(opt)}"><label for="sub-${i}">${escapeHtml(opt)}</label>`;
+    subList.appendChild(li);
+  });
+}
+
+function generateTransfer() {
+  const unsubs = Array.from(document.querySelectorAll('#unsubList input:checked')).map(c => c.value);
+  const subs = Array.from(document.querySelectorAll('#subList input:checked')).map(c => c.value);
+
+  if (unsubs.length === 0 && subs.length === 0) {
+    showToast('Choose at least one thing to unsubscribe from or subscribe to.', true);
+    return;
+  }
+
+  const result = document.getElementById('transferResult');
+  result.classList.add('visible');
+  result.innerHTML = `
+    <h3>Your Server Transfer Plan</h3>
+    ${unsubs.length > 0 ? `
+      <div style="margin: 16px 0;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--red); letter-spacing: 0.1em; margin-bottom: 8px;">UNSUBSCRIBE FROM</div>
+        <ul style="list-style: none; padding: 0;">
+          ${unsubs.map(u => `<li style="padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 14px;">- ${escapeHtml(u)}</li>`).join('')}
+        </ul>
+      </div>
+    ` : ''}
+    ${subs.length > 0 ? `
+      <div style="margin: 16px 0;">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--green); letter-spacing: 0.1em; margin-bottom: 8px;">SUBSCRIBE TO</div>
+        <ul style="list-style: none; padding: 0;">
+          ${subs.map(s => `<li style="padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 14px;">+ ${escapeHtml(s)}</li>`).join('')}
+        </ul>
+      </div>
+    ` : ''}
+    <p style="margin-top: 20px; color: var(--text-dim); font-size: 13px;">This is a practice, not a literal server. The transfer happens one choice at a time. Start with one unsubscribe. Start with one subscribe. Do it today. Do it tomorrow. The server changes.</p>
+  `;
+
+  showToast('Transfer plan generated.');
+}
+
+// ============================================================
+// SOUL SIGNATURE
+// ============================================================
+function generateSignature() {
+  const values = document.getElementById('sig-values').value.trim();
+  const loves = document.getElementById('sig-loves').value.trim();
+  const gifts = document.getElementById('sig-gifts').value.trim();
+  const callings = document.getElementById('sig-callings').value.trim();
+
+  if (!values || !loves || !gifts || !callings) {
+    showToast('Please answer all four questions.', true);
+    return;
+  }
+
+  const result = document.getElementById('signatureResult');
+  result.classList.add('visible');
+  result.innerHTML = `
+    <h3>Your Soul Signature</h3>
+    <div style="margin: 16px 0;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--cyan); letter-spacing: 0.1em; margin-bottom: 6px;">YOUR VALUES</div>
+      <p style="white-space: pre-line; font-size: 14px;">${escapeHtml(values)}</p>
+    </div>
+    <div style="margin: 16px 0;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--gold); letter-spacing: 0.1em; margin-bottom: 6px;">YOUR LOVES</div>
+      <p style="white-space: pre-line; font-size: 14px;">${escapeHtml(loves)}</p>
+    </div>
+    <div style="margin: 16px 0;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--green); letter-spacing: 0.1em; margin-bottom: 6px;">YOUR GIFTS</div>
+      <p style="white-space: pre-line; font-size: 14px;">${escapeHtml(gifts)}</p>
+    </div>
+    <div style="margin: 16px 0;">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--magenta); letter-spacing: 0.1em; margin-bottom: 6px;">YOUR CALLINGS</div>
+      <p style="white-space: pre-line; font-size: 14px;">${escapeHtml(callings)}</p>
+    </div>
+    <p style="margin-top: 20px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--cyan); letter-spacing: 0.05em;">This is your signature. No one else has it. The system cannot counterfeit it. The feed cannot replace it. Live from it.</p>
+  `;
+
+  showToast('Soul signature generated.');
+}
+
+// ============================================================
+// UTILS
+// ============================================================
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function showToast(message, isError = false) {
+  const toast = document.getElementById('toast');
+  toast.textContent = message;
+  toast.className = 'toast show' + (isError ? ' error' : '');
+  clearTimeout(window._toastTimeout);
+  window._toastTimeout = setTimeout(() => { toast.classList.remove('show'); }, 3000);
+}
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded', function() {
+  runBoot();
+  renderFreqQuestions();
+  renderTransferLists();
+});
+</script>
+</body>
+</html>
