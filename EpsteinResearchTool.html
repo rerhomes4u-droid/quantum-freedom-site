@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Forbidden Knowledge — The Epstein Research Terminal</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600;700&display=swap');
+  :root { --bg: #0a0a0c; --surface: #121216; --surface-2: #1a1a20; --border: #2a2a32; --text: #e8e6e3; --text-dim: #9a978f; --accent: #c9a227; --accent-dim: #8a6f1a; --record: #3a7d5c; --suppressed: #b03a2e; --gap: #8a6f1a; --action: #00d2ff; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'IBM Plex Sans', system-ui, sans-serif; line-height: 1.65; font-weight: 300; -webkit-font-smoothing: antialiased; }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 0 24px 120px; }
+  header { padding: 64px 0 32px; border-bottom: 1px solid var(--border); margin-bottom: 48px; }
+  .kicker { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--accent); margin-bottom: 20px; }
+  h1 { font-size: clamp(28px, 5vw, 44px); font-weight: 700; line-height: 1.1; letter-spacing: -0.02em; margin-bottom: 16px; }
+  .subtitle { font-size: 17px; color: var(--text-dim); max-width: 720px; font-weight: 300; }
+  .operator-note { background: var(--surface-2); border: 1px solid var(--accent-dim); border-left: 3px solid var(--accent); border-radius: 4px; padding: 20px 24px; margin: 28px 0; font-size: 14px; color: var(--text-dim); }
+  .operator-note strong { color: var(--accent); }
+  .legend { display: flex; flex-wrap: wrap; gap: 16px; margin: 20px 0; font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.05em; }
+  .legend span { display: flex; align-items: center; gap: 6px; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+  .dot-record { background: var(--record); } .dot-suppressed { background: var(--suppressed); } .dot-gap { background: var(--gap); }
+  h2 { font-size: 22px; font-weight: 600; letter-spacing: -0.01em; margin: 56px 0 16px; padding-top: 32px; border-top: 1px solid var(--border); }
+  h2 .num { font-family: 'IBM Plex Mono', monospace; color: var(--accent); font-size: 14px; margin-right: 12px; }
+  .claim-header { font-size: 16px; font-weight: 600; margin-bottom: 8px; color: var(--text); }
+  .claim-sub { font-size: 14px; color: var(--text-dim); margin-bottom: 20px; font-style: italic; }
+  .dual { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin: 24px 0; }
+  @media (max-width: 800px) { .dual { grid-template-columns: 1fr; } }
+  .col { background: var(--surface); border: 1px solid var(--border); border-radius: 4px; padding: 20px 22px; }
+  .col-record { border-top: 3px solid var(--record); } .col-suppressed { border-top: 3px solid var(--suppressed); }
+  .col-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase; margin-bottom: 12px; font-weight: 600; }
+  .col-record .col-label { color: var(--record); } .col-suppressed .col-label { color: var(--suppressed); }
+  .col p { font-size: 14px; margin-bottom: 12px; color: var(--text-dim); } .col p:last-child { margin-bottom: 0; } .col strong { color: var(--text); }
+  .suppressed-links { list-style: none; margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border); }
+  .suppressed-links li { margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
+  .suppressed-links li:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+  .suppressed-links a { color: var(--accent); font-weight: 600; font-size: 13px; text-decoration: none; display: block; margin-bottom: 4px; }
+  .suppressed-links a:hover { text-decoration: underline; }
+  .suppressed-links .url { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--text-dim); word-break: break-all; display: block; margin-bottom: 4px; }
+  .suppressed-links .note { font-size: 12px; color: var(--text-dim); line-height: 1.5; }
+  .gap-note { background: var(--surface-2); border: 1px solid var(--gap); border-left: 3px solid var(--gap); border-radius: 4px; padding: 18px 22px; margin: 20px 0; font-size: 13px; color: var(--text-dim); }
+  .gap-note strong { color: var(--gap); }
+  .disclaimer { background: var(--surface-2); border: 1px solid var(--suppressed); border-radius: 4px; padding: 20px 24px; margin: 32px 0; font-size: 13px; color: var(--text-dim); }
+  .disclaimer strong { color: var(--suppressed); }
+  .footer-note { margin-top: 64px; padding-top: 32px; border-top: 1px solid var(--border); font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--text-dim); letter-spacing: 0.08em; text-align: center; line-height: 2; }
+  .footer-note .glory { color: var(--accent); font-weight: 600; }
+  a { color: var(--accent); }
+  .action-box { background: var(--surface-2); border: 2px solid var(--action); border-radius: 6px; padding: 28px 26px; margin: 40px 0; }
+  .action-box h3 { color: var(--action); margin-bottom: 16px; font-size: 20px; }
+  .action-box p { font-size: 15px; color: var(--text); margin-bottom: 14px; }
+  .action-box strong { color: var(--action); }
+  .action-box .step { display: flex; gap: 16px; margin-bottom: 16px; align-items: flex-start; }
+  .action-box .step-num { font-family: 'IBM Plex Mono', monospace; font-size: 24px; color: var(--action); font-weight: 600; line-height: 1; min-width: 32px; }
+  .action-box .step-body { flex: 1; }
+  .action-box .step-body p { margin-bottom: 6px; }
+  .action-box .step-body a { color: var(--action); font-weight: 600; }
+  @media (max-width: 600px) { .wrap { padding: 0 16px 80px; } header { padding: 40px 0 24px; } h2 { margin-top: 40px; } .action-box .step { flex-direction: column; gap: 8px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="kicker">Forbidden Knowledge · The Epstein Research Terminal</div>
+  <h1>The Archive Is Live. The Tools Are Free. Here Is How to Use Them.</h1>
+  <p class="subtitle">The GitHub repository is for developers. You are not a developer. You are a reader. This terminal gives you the live site, the search protocol, the verification chain, the gaps, and the node mission. No database. No command line. Just the tools.</p>
+  <div class="operator-note">
+    <strong>OPERATOR NOTE:</strong> This is not a tutorial for the GitHub repo. It is a guided walkthrough for the reader. The live archive is at epstein.academy. The search protocol is below. The verification chain is below. The gaps are below. The reader decides what to do.
+  </div>
+  <div class="legend">
+    <span><span class="dot dot-record"></span> The Record</span>
+    <span><span class="dot dot-suppressed"></span> The Suppressed</span>
+    <span><span class="dot dot-gap"></span> Gap</span>
+  </div>
+</header>
+
+<h2><span class="num">01</span>The Live Archive: epstein.academy</h2>
+
+<div class="claim-header">The Tool</div>
+<p class="claim-sub">The GitHub repository points to a live public site. It has 86,000+ entities, 51,000+ documents, 500+ media files, flight logs, timelines, and relationship mapping. It is free. It works in a browser. You do not need to install anything.</p>
+
+<div class="action-box">
+  <h3>🔍 Open the Live Archive</h3>
+  <p>The live site is <a href="https://epstein.academy" target="_blank" rel="noopener">epstein.academy</a>. It is the public-facing interface of the Epstein Archive [citation:3][citation:15].</p>
+  <p>What you will find there:</p>
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-body">
+      <p><strong>People Index.</strong> Search by name. Every entity has a profile with linked documents, flights, and relationships [citation:3].</p>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-body">
+      <p><strong>Document Search.</strong> Full-text search across 51,000+ documents. Integrated PDF viewing [citation:1][citation:4].</p>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-body">
+      <p><strong>Flight Logs.</strong> The private jet movements. Search by date, by passenger, by destination [citation:3].</p>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num">4</div>
+    <div class="step-body">
+      <p><strong>Media Archive.</strong> 500+ verified photos, videos, and audio files [citation:1].</p>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num">5</div>
+    <div class="step-body">
+      <p><strong>Timeline.</strong> A chronological view of the events, the flights, and the documents [citation:3].</p>
+    </div>
+  </div>
+</div>
+
+<h2><span class="num">02</span>The Search Protocol: How to Find What You Are Looking For</h2>
+
+<div class="claim-header">The Method</div>
+<p class="claim-sub">The archive is only useful if you know how to search it. Here is the protocol. Name the specific. Find the corroboration. Mark the gap. Refuse to overclaim.</p>
+
+<div class="dual">
+  <div class="col col-record">
+    <div class="col-label">The Protocol</div>
+    <p><strong>Search by name.</strong> Start with the people who are already in the public record. Search for the name. Look at the documents linked to that entity. Look at the flights. Look at the dates. Do not assume guilt. Look for corroboration.</p>
+    <p><strong>Search by document.</strong> If you have a document number or a file name, search for it. The archive has full-text search. It will show you the document, the entities mentioned, and the other documents linked to it.</p>
+    <p><strong>Search by flight.</strong> The flight logs are the strongest corroboration. They place people in specific places at specific times. Search the flight logs. Cross-reference the dates with the documents.</p>
+    <p><strong>Search by media.</strong> The media archive has 500+ verified files. Search for the people you are investigating. Look at the photos. Look at the dates.</p>
+    <p><strong>Trace to the source.</strong> Every document in the archive is linked to its original DOJ filing. Click the source link. Verify the document yourself. Do not take the archive's word for it.</p>
+  </div>
+  <div class="col col-suppressed">
+    <div class="col-label">The Warning</div>
+    <p><strong>A name in the files is not a conviction.</strong> The DOJ list includes people who were "simply referenced in the documents, or in news articles included in the files." A name is a starting point, not a verdict.</p>
+    <p><strong>The redactions are the gap.</strong> Six men identified as "possibly involved in wrongdoing" remain redacted. The archive cannot show you what the DOJ has not released.</p>
+    <p><strong>The archive is not complete.</strong> The DOJ has removed and retroactively redacted documents. Independent researchers are building parallel archives because the official release is incomplete [citation:14].</p>
+  </div>
+</div>
+
+<div class="gap-note">
+  <strong>GAP:</strong> The archive is a tool. It is not the truth. It is a map. The map is not the territory. The reader must verify every claim against the original source.
+</div>
+
+<h2><span class="num">03</span>The Verification Chain: Trace It Back</h2>
+
+<div class="claim-header">The Tool</div>
+<p class="claim-sub">The archive links to the original DOJ filing. But the DOJ has removed documents. The verification chain requires a second source. Here are the tools.</p>
+
+<div class="action-box">
+  <h3>🔗 Verify the Document</h3>
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-body">
+      <p><strong>The DOJ Epstein Library.</strong> The official source. The 12 data sets. The original PDFs [citation:13]. <a href="https://www.justice.gov/epstein" target="_blank" rel="noopener">justice.gov/epstein</a></p>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-body">
+      <p><strong>The Zenodo Collection Index.</strong> A catalogue of the official releases, mirrors, torrents, and checksums. If you download a file, verify it against the SHA-256 checksum. <a href="https://zenodo.org/records/22865746" target="_blank" rel="noopener">zenodo.org/records/22865746</a> [citation:7]</p>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-body">
+      <p><strong>The Jmail Portal.</strong> A Gmail-style interface built by independent developers. It organizes the emails, photos, and documents into a searchable inbox. <a href="https://jmail.world" target="_blank" rel="noopener">jmail.world</a> [citation:11]</p>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num">4</div>
+    <div class="step-body">
+      <p><strong>The Guardian's reporting on the data sleuths.</strong> Independent researchers are building parallel archives because the DOJ's releases are incomplete. Read the report. <a href="https://www.theguardian.com/us-news/2026/may/19/jeffrey-epstein-files-data-sleuths-archives" target="_blank" rel="noopener">theguardian.com</a> [citation:14]</p>
+    </div>
+  </div>
+</div>
+
+<h2><span class="num">04</span>The Gaps: What the Archive Does Not Contain</h2>
+
+<div class="claim-header">The Gap</div>
+<p class="claim-sub">The archive is not complete. The DOJ has removed documents. The redactions are still in place. The cases that were never filed are not in the archive. The reader needs to know what is missing.</p>
+
+<div class="dual">
+  <div class="col col-record">
+    <div class="col-label">The Record</div>
+    <p><strong>The DOJ released 3.5 million pages.</strong> It is organized into 12 data sets. Sets 1-8 are FBI interviews. Set 9 is emails and DOJ pacts. Set 10 is redacted media. Set 11 is financials and island manifests. Set 12 is extras [citation:13].</p>
+    <p><strong>The redactions are documented.</strong> Victim advocates slammed Set 10 for blackouts hiding perpetrators while exposing some survivors .</p>
+    <p><strong>Six men remain redacted.</strong> Massie and Khanna reviewed the unredacted files. They said at least six men were identified as "possibly involved in wrongdoing." Their names are still blacked out.</p>
+  </div>
+  <div class="col col-suppressed">
+    <div class="col-label">The Suppressed</div>
+    <p><strong>The suppressed stream says the DOJ removed documents after publication.</strong> Independent researchers are building parallel archives because the official release is incomplete [citation:14].</p>
+    <p><strong>The suppressed stream says the archive is a distraction.</strong> The names are public. The system has done nothing. The archive is a release valve.</p>
+  </div>
+</div>
+
+<div class="gap-note">
+  <strong>GAP:</strong> The archive is the record. The redactions are the gap. The removed documents are the gap. The cases that were never filed are the gap. The reader must look at what is missing, not just what is present.
+</div>
+
+<h2><span class="num">05</span>The Node Mission: What to Do With What You Find</h2>
+
+<div class="action-box">
+  <h3>⚡ The Node Mission</h3>
+  <p>You have the archive. You have the search protocol. You have the verification chain. Now what?</p>
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-body">
+      <p><strong>Document what you find.</strong> Take screenshots. Save the URLs. Note the dates and times. Do not alter the evidence. Do not share it publicly if it contains victim information.</p>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-body">
+      <p><strong>Report it.</strong> NCMEC CyberTipline: <a href="https://report.cybertip.org" target="_blank" rel="noopener">report.cybertip.org</a> or 1-800-843-5678. FBI Tips: <a href="https://tips.fbi.gov" target="_blank" rel="noopener">tips.fbi.gov</a>.</p>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-body">
+      <p><strong>Share what is already public.</strong> The names are in the files. The flights are in the files. The documents are in the files. Share the archive. Share the search protocol. Make it travel.</p>
+    </div>
+  </div>
+  <div class="step">
+    <div class="step-num">4</div>
+    <div class="step-body">
+      <p><strong>Connect with other nodes.</strong> Follow the data sleuths. Follow the independent researchers. Amplify their findings. Add your eyes to the search.</p>
+    </div>
+  </div>
+</div>
+
+<h2><span class="num">06</span>What the Record Does Not Support</h2>
+
+<div class="disclaimer">
+  <strong>OVERCLAIMS, NAMED PLAINLY:</strong><br><br>
+  1. <strong>"The archive proves everyone is guilty."</strong> A name in the files is not a conviction. The DOJ list includes people who were "simply referenced." Label: <strong>listed, not convicted</strong>.<br><br>
+  2. <strong>"The archive is complete."</strong> The DOJ removed documents. Six men remain redacted. Independent researchers are building parallel archives. Label: <strong>incomplete</strong>.<br><br>
+  3. <strong>"The archive is a distraction."</strong> The suppressed stream says this. The record shows the archive is a tool for verification. Label: <strong>contested</strong>.
+</div>
+
+<h2><span class="num">07</span>The Invitation</h2>
+
+<div class="disclaimer" style="border-color: var(--accent-dim);">
+  <strong style="color: var(--accent);">WHAT THIS TERMINAL ASKS:</strong><br><br>
+  The archive is live. The search protocol is here. The verification chain is here. The gaps are named. The node mission is clear.<br><br>
+  The question is not "does the archive have all the answers?" It does not. The question is: what are you going to do with what it does have? Search it. Verify it. Report what you find. Share what is already public. Be a node. The children are waiting.
+</div>
+
+<div class="footer-note">
+  FORBIDDEN KNOWLEDGE · THE SOVEREIGN OPERATOR<br>
+  The Epstein Research Terminal<br><br>
+  Test all things. Hold fast to what is good.<br>
+  <span class="glory">Soli Deo Gloria.</span>
+</div>
+
+</div>
+</body>
+</html>
