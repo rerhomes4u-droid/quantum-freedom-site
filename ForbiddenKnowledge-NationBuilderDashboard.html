@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Nation Builder's Dashboard</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600;700&display=swap');
+  :root {
+    --bg: #0a0a0c; --surface: #121216; --surface-2: #1a1a20; --border: #2a2a32;
+    --text: #e8e6e3; --text-dim: #9a978f; --gold: #c9a227; --gold-dim: #8a6f1a;
+    --record: #3a7d5c; --suppressed: #b03a2e; --gap: #8a6f1a; --action: #00d2ff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'IBM Plex Sans', system-ui, sans-serif; background: var(--bg);
+    color: var(--text); line-height: 1.7; font-weight: 300; -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 0 24px 120px; }
+
+  header { padding: 56px 0 32px; border-bottom: 1px solid var(--border); margin-bottom: 40px; text-align: center; }
+  .kicker { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold); margin-bottom: 20px; }
+  h1 { font-size: clamp(26px, 6vw, 44px); font-weight: 700; line-height: 1.05; letter-spacing: -0.02em; margin-bottom: 16px; }
+  .subtitle { font-size: 17px; color: var(--text-dim); max-width: 680px; margin: 0 auto; }
+
+  .nav {
+    display: flex; flex-wrap: wrap; gap: 6px; justify-content: center;
+    margin-bottom: 40px; padding: 12px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 8px;
+  }
+  .nav button {
+    background: transparent; border: 1px solid var(--border); color: var(--text-dim);
+    padding: 8px 14px; border-radius: 4px; cursor: pointer;
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+    letter-spacing: 0.08em; text-transform: uppercase; transition: all 0.2s;
+  }
+  .nav button:hover { border-color: var(--gold); color: var(--gold); }
+  .nav button.active { background: var(--gold); color: var(--bg); border-color: var(--gold); font-weight: 600; }
+
+  .section { display: none; animation: fadeIn 0.4s ease; }
+  .section.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+  h2 { font-size: 24px; font-weight: 600; margin: 40px 0 16px; padding-top: 24px; border-top: 1px solid var(--border); }
+  h2:first-of-type { border-top: none; margin-top: 0; padding-top: 0; }
+  h3 { font-size: 17px; font-weight: 600; margin: 24px 0 12px; color: var(--gold); }
+  p { margin-bottom: 16px; font-size: 15px; color: var(--text-dim); }
+  .lead { font-size: 18px; color: var(--text); border-left: 2px solid var(--gold); padding-left: 20px; margin: 24px 0 32px; }
+  .highlight { color: var(--gold); font-weight: 600; }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 24px; margin: 16px 0; }
+  .card-title { font-weight: 600; font-size: 16px; color: var(--text); margin-bottom: 8px; }
+
+  .score-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin: 20px 0; }
+  .score-item { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 20px; }
+  .score-item h4 { font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); margin-bottom: 12px; }
+  .score-item .score-slider { width: 100%; margin: 10px 0; accent-color: var(--gold); }
+  .score-item .score-value { font-family: 'IBM Plex Mono', monospace; font-size: 24px; color: var(--gold); font-weight: 600; }
+  .score-item .score-desc { font-size: 12px; color: var(--text-dim); margin-top: 8px; }
+
+  .btn { background: var(--gold); color: var(--bg); border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; transition: all 0.2s; display: inline-block; text-decoration: none; }
+  .btn:hover { background: var(--gold-dim); color: var(--text); }
+  .btn-secondary { background: transparent; color: var(--gold); border: 1px solid var(--gold); }
+  .btn-secondary:hover { background: var(--gold); color: var(--bg); }
+  .btn-full { display: block; width: 100%; text-align: center; }
+
+  .result-box { background: var(--surface-2); border: 1px solid var(--gold); border-radius: 8px; padding: 24px; margin: 20px 0; display: none; }
+  .result-box.visible { display: block; animation: fadeIn 0.4s ease; }
+  .result-box h3 { color: var(--gold); margin-top: 0; }
+
+  .step-list { list-style: none; margin: 16px 0; }
+  .step-list li { display: flex; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--border); align-items: flex-start; }
+  .step-list li:last-child { border-bottom: none; }
+  .step-num { font-family: 'IBM Plex Mono', monospace; font-size: 20px; color: var(--gold); font-weight: 600; line-height: 1; min-width: 28px; }
+  .step-body { flex: 1; }
+  .step-body h4 { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .step-body p { font-size: 13px; color: var(--text-dim); margin-bottom: 6px; }
+  .step-body a { color: var(--gold); font-weight: 600; font-size: 13px; }
+
+  .compact-input { width: 100%; padding: 10px 14px; background: var(--surface-2); color: var(--text); border: 1px solid var(--border); border-radius: 4px; font-family: 'IBM Plex Sans', sans-serif; font-size: 13px; margin: 6px 0; }
+  .compact-input:focus { outline: none; border-color: var(--gold); }
+  label { display: block; margin-top: 12px; margin-bottom: 4px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); }
+
+  .network-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; margin: 20px 0; }
+  .network-card { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 16px; text-decoration: none; color: var(--text); transition: all 0.2s; display: block; }
+  .network-card:hover { border-color: var(--gold); transform: translateY(-2px); }
+  .network-card .nc-title { font-weight: 600; font-size: 14px; color: var(--gold); margin-bottom: 4px; }
+  .network-card .nc-desc { font-size: 12px; color: var(--text-dim); line-height: 1.5; }
+
+  .footer-note { margin-top: 64px; padding-top: 32px; border-top: 1px solid var(--border); font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--text-dim); letter-spacing: 0.08em; text-align: center; line-height: 2; }
+  .footer-note .glory { color: var(--gold); font-weight: 600; }
+
+  @media (max-width: 600px) {
+    .wrap { padding: 0 16px 80px; }
+    header { padding: 32px 0 24px; }
+    .step-list li { flex-direction: column; gap: 8px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="kicker">Forbidden Knowledge · The Nation Builder's Dashboard</div>
+  <h1>From Understanding to Building. In Seven Steps.</h1>
+  <p class="subtitle">You have the method. You have the tools. You have the record. Now you need the operating system for a sovereign life: the score, the trust, the income, the sanctuary, the node, the family compact, and the legacy plan.</p>
+</header>
+
+<nav class="nav">
+  <button class="active" onclick="showSection('score', this)">Sovereign Score</button>
+  <button onclick="showSection('trust', this)">Trust Builder</button>
+  <button onclick="showSection('income', this)">Income Engine</button>
+  <button onclick="showSection('sanctuary', this)">Sanctuary Map</button>
+  <button onclick="showSection('node', this)">Node Builder</button>
+  <button onclick="showSection('family', this)">Family Compact</button>
+  <button onclick="showSection('legacy', this)">Legacy Plan</button>
+  <button onclick="showSection('network', this)">The Network</button>
+</nav>
+
+<!-- SOVEREIGN SCORE -->
+<div class="section active" id="score">
+  <h2>Your Sovereign Score</h2>
+
+  <p class="lead">Sovereignty is not a feeling. It is a measurable condition. This audit measures your actual sovereignty across six dimensions. Answer honestly. The score is not a judgment. It is a map.</p>
+
+  <div class="score-grid" id="scoreGrid"></div>
+
+  <button class="btn btn-full" onclick="calculateSovereignScore()" style="margin-top: 20px;">Calculate My Sovereign Score</button>
+
+  <div class="result-box" id="scoreResult"></div>
+</div>
+
+<!-- TRUST BUILDER -->
+<div class="section" id="trust">
+  <h2>The Trust Builder</h2>
+
+  <p>You do not have to hold your assets in your own name. You can hold them in a trust. The trust is a legal structure that separates legal title from beneficial ownership. The trustee holds the legal title. The beneficiary holds the equity. You can be both. The trust is not a fiction. It is a contract. Here is how to build it.</p>
+
+  <ul class="step-list">
+    <li>
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h4>Choose Your Jurisdiction</h4>
+        <p>Wyoming and South Dakota are the two most favorable U.S. states for trusts. South Dakota has no rule against perpetuities, no state income tax, and strong privacy protections. Wyoming has strong asset protection and no state income tax.</p>
+        <p><a href="https://quantum-freedom-site.vercel.app/TrustPlanning.html" target="_blank" rel="noopener">Open the Trust Planning App →</a></p>
+      </div>
+    </li>
+    <li>
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h4>Form the LLC</h4>
+        <p>The Wyoming LLC is the holding company. It is the legal entity that owns the assets. It is managed by the trustee. It is not owned by you personally. It is owned by the trust.</p>
+        <p><a href="https://quantum-freedom-site.vercel.app/TRUST.html" target="_blank" rel="noopener">Open the Sovereignty Forge →</a></p>
+      </div>
+    </li>
+    <li>
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h4>Establish the Dynasty Trust</h4>
+        <p>The South Dakota Dynasty Trust is the beneficial owner. It holds the equity. It is irrevocable. It is designed to last for generations. It protects the assets from creditors, from lawsuits, and from the government.</p>
+        <p><a href="https://quantum-freedom-site.vercel.app/TrustFreedomEngine.html" target="_blank" rel="noopener">Open the Trust Freedom Engine →</a></p>
+      </div>
+    </li>
+    <li>
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <h4>Create the Private Membership Association</h4>
+        <p>The PMA is the private domain. It is a voluntary association of individuals who share a common purpose. It operates in the private domain, outside the reach of public regulatory bodies that govern public charities. The Amnesty Coalition for Unity is a PMA.</p>
+        <p><a href="https://quantum-freedom-site.vercel.app/theNation.html" target="_blank" rel="noopener">Join the Nation →</a></p>
+      </div>
+    </li>
+    <li>
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <h4>Establish the 508(c)(1)(a) Ministry Trust</h4>
+        <p>The 508(c)(1)(a) ministry trust is a tax-exempt religious organization. It is not required to file for 501(c)(3) status. It is not required to file annual returns. It is not required to disclose its donors. It is the structure that protects the spiritual mission.</p>
+        <p><a href="https://quantum-freedom-site.vercel.app/ACU-OSINT.html" target="_blank" rel="noopener">Open the Trust Writer →</a></p>
+      </div>
+    </li>
+    <li>
+      <div class="step-num">6</div>
+      <div class="step-body">
+        <h4>Retain the Attorney</h4>
+        <p>You cannot do this alone. You need an attorney who understands trust law, asset protection, and the jurisdiction you have chosen. The attorney is the one who drafts the documents. The attorney is the one who files them. The attorney is the one who defends them.</p>
+        <p><a href="https://quantum-freedom-site.vercel.app/AlvaroMolina.html" target="_blank" rel="noopener">Attorney Referral — Alvaro Molina →</a></p>
+      </div>
+    </li>
+  </ul>
+</div>
+
+<!-- INCOME ENGINE -->
+<div class="section" id="income">
+  <h2>The Income Engine</h2>
+
+  <p>You cannot fight the system if you are broke. You need multiple pillars of income. Here is how to build them. Each pillar is a stream. Each stream is a source of sovereignty.</p>
+
+  <ul class="step-list">
+    <li>
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h4>The AI Wealth Engine</h4>
+        <p>Use AI to generate content, products, and services. You do not need a marketing agency. You do not need a team. You need a laptop, an internet connection, and the willingness to follow the steps.</p>
+        <p><a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-ai-wealth-engine.html" target="_blank" rel="noopener">Open the AI Wealth Engine →</a></p>
+      </div>
+    </li>
+    <li>
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h4>The Affiliate Program</h4>
+        <p>Every product you sell can be sold by someone else. Every person who sells it gets a commission. The affiliate program is the network. The network is the growth.</p>
+        <p><a href="https://quantum-freedom-site.vercel.app/incomeBuilder.html" target="_blank" rel="noopener">Open the Income Builder →</a></p>
+      </div>
+    </li>
+    <li>
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h4>The Consulting Practice</h4>
+        <p>You have knowledge. Someone needs it. The consulting practice is the simplest income stream. You sell your time and your expertise. The app gives you the scripts.</p>
+        <p><a href="https://quantum-freedom-site.vercel.app/ConsultativeClose.html" target="_blank" rel="noopener">Open the Consultative Close →</a></p>
+      </div>
+    </li>
+    <li>
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <h4>The Digital Product</h4>
+        <p>You have a book. You have an app. You have a course. You can sell it. The digital product is the leverage. It sells while you sleep. It scales infinitely.</p>
+        <p><a href="https://quantum-freedom-site.vercel.app/3-GAME-ForbiddenKnowledge.html" target="_blank" rel="noopener">Open the Digital Book →</a></p>
+      </div>
+    </li>
+    <li>
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <h4>The Real Estate Investment</h4>
+        <p>The real estate is the foundation. It is the tangible asset. It is the income stream that survives inflation. The Free Car Path is the start. The finca is the next step.</p>
+        <p><a href="https://quantum-freedom-site.vercel.app/Jax-Slaters-Free-Car-Path.html" target="_blank" rel="noopener">Open the Free Car Path →</a></p>
+      </div>
+    </li>
+  </ul>
+</div>
+
+<!-- SANCTUARY MAP -->
+<div class="section" id="sanctuary">
+  <h2>The Sanctuary Map</h2>
+
+  <p>You do not have to live in the jurisdiction that is trying to kill you. You can move. Here are the jurisdictions that respect sovereignty. The app generates a personalized plan.</p>
+
+  <div class="card">
+    <div class="card-title">Personalized Relocation Plan</div>
+    <label for="sanctuary-budget">Your Monthly Budget (USD)</label>
+    <input type="text" class="compact-input" id="sanctuary-budget" placeholder="e.g., 2000">
+    <label for="sanctuary-family">Family Size</label>
+    <input type="text" class="compact-input" id="sanctuary-family" placeholder="e.g., 4">
+    <label for="sanctuary-priority">Your Priority</label>
+    <select class="compact-input" id="sanctuary-priority">
+      <option value="cost">Lowest Cost</option>
+      <option value="freedom">Maximum Freedom</option>
+      <option value="health">Best Healthcare</option>
+      <option value="community">Strongest Community</option>
+      <option value="business">Best Business Environment</option>
+    </select>
+    <button class="btn btn-full" onclick="generateSanctuaryPlan()" style="margin-top: 12px;">Generate My Relocation Plan</button>
+    <div class="result-box" id="sanctuaryResult"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">The Top Jurisdictions</div>
+    <p><strong>Colombia</strong> — Low cost, real food, clean water, the sanctuary network, the Quindío mountains. The TripsToColombia.com infrastructure is live.</p>
+    <p><strong>Panama</strong> — The Pensionado visa. Territorial tax system. Strong banking privacy. The dollar economy.</p>
+    <p><strong>Paraguay</strong> — The easiest residency in South America. Low cost. Territorial tax. The Ciudad del Este free trade zone.</p>
+    <p><strong>Uruguay</strong> — The most stable democracy in South America. Strong property rights. The 10-year tax holiday for new residents.</p>
+    <p><strong>Portugal</strong> — The D7 visa. The NHR tax regime. The European access. The safety.</p>
+    <p><strong>Georgia</strong> — The 1-year visa-free stay. The territorial tax. The low cost. The Caucasus mountains.</p>
+    <p><strong>Malaysia</strong> — The MM2H visa. The low cost. The tropical climate. The Muslim-friendly environment.</p>
+  </div>
+</div>
+
+<!-- NODE BUILDER -->
+<div class="section" id="node">
+  <h2>The Node Builder</h2>
+
+  <p>You do not need to be an investigator. You need to be a node. A node is a person who documents, reports, and shares. Here is how to become one.</p>
+
+  <ul class="step-list">
+    <li>
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h4>Choose Your Platform</h4>
+        <p>TikTok. YouTube. X. Instagram. Substack. A newsletter. A Discord. Any platform where you can post and share. The platform does not matter. The consistency does.</p>
+      </div>
+    </li>
+    <li>
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h4>Document What You Find</h4>
+        <p>Search for the suspicious listings. The code words. The patterns. Take screenshots. Save URLs. Note the dates and times. Do not alter the evidence.</p>
+      </div>
+    </li>
+    <li>
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h4>Report It</h4>
+        <p>NCMEC CyberTipline. The FBI. The platform. The authorities. Keep a record of what you reported and when.</p>
+        <p><a href="https://report.cybertip.org" target="_blank" rel="noopener">report.cybertip.org</a> · <a href="https://tips.fbi.gov" target="_blank" rel="noopener">tips.fbi.gov</a></p>
+      </div>
+    </li>
+    <li>
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <h4>Share It</h4>
+        <p>Post what you found. Link to the original sources. Credit the researchers who found it first. Use the hashtags. Make it travel.</p>
+      </div>
+    </li>
+    <li>
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <h4>Connect with Other Nodes</h4>
+        <p>Follow Diego Saul Reynosa. Follow John Swann. Follow Thorn. Follow Safe House Project. Share their work. Amplify their findings. Add your eyes to the search.</p>
+        <p><a href="https://quantum-freedom-site.vercel.app/DiegoSaulReynosa.html" target="_blank" rel="noopener">Diego Saul Reynosa →</a> · <a href="https://x.com/johnswann304" target="_blank" rel="noopener">John Swann →</a></p>
+      </div>
+    </li>
+  </ul>
+</div>
+
+<!-- FAMILY COMPACT -->
+<div class="section" id="family">
+  <h2>The Family Compact</h2>
+
+  <p>Your family is your first government. The Family Compact is a document that establishes your family as a sovereign entity. It is not a legal fiction. It is a covenant. Fill in the fields. The app generates the document. Print it. Sign it. Date it. Keep it.</p>
+
+  <div class="card">
+    <div class="card-title">Generate Your Family Compact</div>
+    <label for="family-name">Family Name</label>
+    <input type="text" class="compact-input" id="family-name" placeholder="e.g., The Ramirez Family">
+    <label for="family-head">Head of Household</label>
+    <input type="text" class="compact-input" id="family-head" placeholder="Your Full Name">
+    <label for="family-members">Family Members (comma separated)</label>
+    <input type="text" class="compact-input" id="family-members" placeholder="e.g., Maria, Jose, Sofia">
+    <label for="family-location">Family Seat (City, Country)</label>
+    <input type="text" class="compact-input" id="family-location" placeholder="e.g., Salento, Colombia">
+    <button class="btn btn-full" onclick="generateFamilyCompact()" style="margin-top: 12px;">Generate My Family Compact</button>
+    <div class="result-box" id="familyResult"></div>
+  </div>
+</div>
+
+<!-- LEGACY PLAN -->
+<div class="section" id="legacy">
+  <h2>The Legacy Plan</h2>
+
+  <p>You have built something. You need to make sure it survives you. The Legacy Plan has four components: the will, the trust, the digital archive, and the deadman trigger.</p>
+
+  <ul class="step-list">
+    <li>
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h4>The Will</h4>
+        <p>The will is the legal document that disposes of your property after your death. It names the executor. It names the beneficiaries. It names the guardian for your minor children. You need one. Even if you think you do not.</p>
+      </div>
+    </li>
+    <li>
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h4>The Trust</h4>
+        <p>The trust is the structure that holds the assets. It is separate from the will. It is separate from probate. The trust is the one that survives. The trust is the one that protects the family.</p>
+        <p><a href="https://quantum-freedom-site.vercel.app/TrustPlanning.html" target="_blank" rel="noopener">Open the Trust Planning App →</a></p>
+      </div>
+    </li>
+    <li>
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h4>The Digital Archive</h4>
+        <p>The digital archive is the record. The documents. The videos. The books. The apps. The archive is the legacy. It needs to be preserved, mirrored, and released. The blockchain is the mirror. The deadman trigger is the release.</p>
+        <p><a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-MasterHub.html" target="_blank" rel="noopener">Open the Master Hub →</a></p>
+      </div>
+    </li>
+    <li>
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <h4>The Deadman Trigger</h4>
+        <p>The deadman trigger is the mechanism that releases the archive if you do not check in. It can be a timed release. It can be a trusted person. It can be both. The trigger is the promise that the truth survives you.</p>
+        <p><a href="https://quantum-freedom-site.vercel.app/RamiroRamirezApp.html" target="_blank" rel="noopener">Open the Deadman Dossier →</a></p>
+      </div>
+    </li>
+  </ul>
+</div>
+
+<!-- THE NETWORK -->
+<div class="section" id="network">
+  <h2>The Network — Real Organizations, Real People, Real Work</h2>
+
+  <p>You are not alone. These are the organizations and individuals who are already doing the work. Support them. Join them. Learn from them. Every link is live.</p>
+
+  <div class="network-grid">
+    <a class="network-card" href="https://thorn.org" target="_blank" rel="noopener">
+      <div class="nc-title">Thorn</div>
+      <div class="nc-desc">Founded by Ashton Kutcher and Demi Moore. Builds technology to identify trafficked children. Partners with Google, Facebook, Twitter, and Instagram.</div>
+    </a>
+    <a class="network-card" href="https://safehouseproject.org" target="_blank" rel="noopener">
+      <div class="nc-title">Safe House Project</div>
+      <div class="nc-desc">The organization behind Simply Report. Fights child sex trafficking. Connects survivors to safe houses and certified care providers.</div>
+    </a>
+    <a class="network-card" href="https://shadowdragon.io" target="_blank" rel="noopener">
+      <div class="nc-title">ShadowDragon</div>
+      <div class="nc-desc">OSINT tools used by law enforcement to correlate digital identities across platforms. Real cases, real arrests.</div>
+    </a>
+    <a class="network-card" href="https://www.missingkids.org" target="_blank" rel="noopener">
+      <div class="nc-title">NCMEC</div>
+      <div class="nc-desc">The National Center for Missing & Exploited Children. The official reporting channel. CyberTipline: 1-800-843-5678.</div>
+    </a>
+    <a class="network-card" href="https://www.courtlistener.com" target="_blank" rel="noopener">
+      <div class="nc-title">CourtListener</div>
+      <div class="nc-desc">Free database of legal opinions and the RECAP Archive of PACER documents. No fee to search.</div>
+    </a>
+    <a class="network-card" href="https://pacer.uscourts.gov" target="_blank" rel="noopener">
+      <div class="nc-title">PACER</div>
+      <div class="nc-desc">The official federal court records database. Fees waived at public terminals in federal courthouses.</div>
+    </a>
+    <a class="network-card" href="https://epstein.academy" target="_blank" rel="noopener">
+      <div class="nc-title">Epstein Archive</div>
+      <div class="nc-desc">86,000+ entities, 51,000+ documents. The live public research platform.</div>
+    </a>
+    <a class="network-card" href="https://www.justice.gov/epstein" target="_blank" rel="noopener">
+      <div class="nc-title">DOJ Epstein Library</div>
+      <div class="nc-desc">The official source. The 12 data sets. The original PDFs.</div>
+    </a>
+    <a class="network-card" href="https://zenodo.org/records/22865746" target="_blank" rel="noopener">
+      <div class="nc-title">Zenodo Collection Index</div>
+      <div class="nc-desc">The catalogue of official releases, mirrors, torrents, and SHA-256 checksums.</div>
+    </a>
+    <a class="network-card" href="https://jmail.world" target="_blank" rel="noopener">
+      <div class="nc-title">Jmail</div>
+      <div class="nc-desc">A Gmail-style interface for the Epstein emails, built by independent developers.</div>
+    </a>
+    <a class="network-card" href="https://standingontherock.com/?ref=qbopuesmijo" target="_blank" rel="noopener">
+      <div class="nc-title">True Equity — Julian Swan</div>
+      <div class="nc-desc">The complete equity system. The system that compels performance rather than contending.</div>
+    </a>
+    <a class="network-card" href="https://quantum-freedom-site.vercel.app/Colombia2026.html" target="_blank" rel="noopener">
+      <div class="nc-title">Colombia Complete Dossier</div>
+      <div class="nc-desc">The sanctuary in the mountains. The complete dossier. The real door.</div>
+    </a>
+    <a class="network-card" href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-HugoProtocol.html" target="_blank" rel="noopener">
+      <div class="nc-title">The Hugo Protocol</div>
+      <div class="nc-desc">The hospital protocol that killed Hugo. The record. The proof. The protocol that protects your family.</div>
+    </a>
+    <a class="network-card" href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-PalestineRescue.html" target="_blank" rel="noopener">
+      <div class="nc-title">Palestine Rescue</div>
+      <div class="nc-desc">One person. One extraction. One life moved to safety. The rescue fund. The public ledger.</div>
+    </a>
+  </div>
+</div>
+
+<div class="footer-note">
+  FORBIDDEN KNOWLEDGE · THE SOVEREIGN OPERATOR<br>
+  The Nation Builder's Dashboard<br><br>
+  The method. The tools. The score. The trust. The income. The sanctuary. The node. The family. The legacy. The network.<br>
+  <span class="glory">Soli Deo Gloria.</span>
+</div>
+
+</div>
+
+<script>
+// ============================================================
+// NAVIGATION
+// ============================================================
+function showSection(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ============================================================
+// SOVEREIGN SCORE
+// ============================================================
+const scoreDimensions = [
+  { id: 'legal', label: 'Legal', desc: 'Do you have a will? A trust? A POA? A private membership association? Do you know your rights?' },
+  { id: 'financial', label: 'Financial', desc: 'Do you have multiple income streams? Assets in trust? A bank account outside the system? No debt to the banks?' },
+  { id: 'medical', label: 'Medical', desc: 'Do you have a Hugo Protocol? A healing protocol? A doctor who will not kill you? A family medical POA?' },
+  { id: 'spiritual', label: 'Spiritual', desc: 'Do you have a daily practice? A relationship with Jesus? A community of faith? A witness practice?' },
+  { id: 'relational', label: 'Relational', desc: 'Do you have a node network? A sanctuary host? A community of Sovereign Operators? A family compact?' },
+  { id: 'physical', label: 'Physical', desc: 'Do you have a sanctuary location? Food and water security? A bug-out plan? A deadman trigger?' }
+];
+
+let scoreValues = {};
+
+function renderScoreGrid() {
+  const grid = document.getElementById('scoreGrid');
+  grid.innerHTML = '';
+  scoreDimensions.forEach(d => {
+    const item = document.createElement('div');
+    item.className = 'score-item';
+    item.innerHTML = `
+      <h4>${d.label}</h4>
+      <div class="score-value" id="score-val-${d.id}">5</div>
+      <input type="range" class="score-slider" id="score-slider-${d.id}" min="0" max="10" value="5" oninput="updateScoreVal('${d.id}')">
+      <div class="score-desc">${d.desc}</div>
+    `;
+    grid.appendChild(item);
+  });
+}
+
+function updateScoreVal(id) {
+  const val = document.getElementById('score-slider-' + id).value;
+  document.getElementById('score-val-' + id).textContent = val;
+  scoreValues[id] = parseInt(val);
+}
+
+function calculateSovereignScore() {
+  scoreDimensions.forEach(d => {
+    const slider = document.getElementById('score-slider-' + d.id);
+    scoreValues[d.id] = parseInt(slider.value);
+  });
+
+  const total = Object.values(scoreValues).reduce((a, b) => a + b, 0);
+  const max = scoreDimensions.length * 10;
+  const pct = Math.round((total / max) * 100);
+
+  const weakest = scoreDimensions.reduce((a, b) => (scoreValues[a.id] < scoreValues[b.id] ? a : b));
+  const strongest = scoreDimensions.reduce((a, b) => (scoreValues[a.id] > scoreValues[b.id] ? a : b));
+
+  let diagnosis, body;
+  if (pct >= 80) {
+    diagnosis = 'Sovereign';
+    body = 'You are sovereign in most dimensions. Your weakest dimension is <strong>' + weakest.label + '</strong>. Focus there. The rest is strong. Keep building.';
+  } else if (pct >= 50) {
+    diagnosis = 'Building';
+    body = 'You are building. Your strongest dimension is <strong>' + strongest.label + '</strong>. Your weakest is <strong>' + weakest.label + '</strong>. Start with the weakest. The trust builder, the income engine, and the sanctuary map are below.';
+  } else {
+    diagnosis = 'Vulnerable';
+    body = 'You are vulnerable. Your weakest dimension is <strong>' + weakest.label + '</strong>. That is where you start. Not with the whole system. With one step. The family compact is the first. The trust builder is the second. The income engine is the third. Do not try to do it all at once.';
+  }
+
+  const result = document.getElementById('scoreResult');
+  result.classList.add('visible');
+  result.innerHTML = '<h3>Your Sovereign Score: ' + total + ' / ' + max + ' (' + pct + '%)</h3><p style="font-size: 20px; color: var(--gold); font-weight: 600;">' + diagnosis + '</p><p>' + body + '</p>';
+}
+
+// ============================================================
+// SANCTUARY PLAN
+// ============================================================
+function generateSanctuaryPlan() {
+  const budget = document.getElementById('sanctuary-budget').value.trim();
+  const family = document.getElementById('sanctuary-family').value.trim();
+  const priority = document.getElementById('sanctuary-priority').value;
+
+  if (!budget || !family) {
+    alert('Please enter your budget and family size.');
+    return;
+  }
+
+  let recommendation, body;
+  if (priority === 'cost') {
+    recommendation = 'Paraguay or Colombia';
+    body = 'Paraguay has the lowest cost of living in South America. Colombia has the sanctuary network and the Quindío mountains. With a budget of $' + budget + ' per month for a family of ' + family + ', both are viable. Paraguay is the cheapest. Colombia has the community.';
+  } else if (priority === 'freedom') {
+    recommendation = 'Paraguay or Georgia';
+    body = 'Paraguay has territorial tax and easy residency. Georgia has a 1-year visa-free stay and territorial tax. Both are outside the Western regulatory apparatus. For a family of ' + family + ' with $' + budget + ' per month, both are affordable.';
+  } else if (priority === 'health') {
+    recommendation = 'Colombia or Uruguay';
+    body = 'Colombia has the sanctuary network and the healing protocols. Uruguay has the most stable healthcare system in South America. For a family of ' + family + ' with $' + budget + ' per month, Colombia is the better fit for the natural healing protocols.';
+  } else if (priority === 'community') {
+    recommendation = 'Colombia';
+    body = 'The Amnesty Coalition for Unity has a sanctuary network in the Quindío mountains. The community is already there. The hosts are already there. The infrastructure is already built. For a family of ' + family + ' with $' + budget + ' per month, this is the strongest option.';
+  } else {
+    recommendation = 'Panama or Uruguay';
+    body = 'Panama has the Pensionado visa, territorial tax, and the dollar economy. Uruguay has strong property rights and the 10-year tax holiday. For a family of ' + family + ' with $' + budget + ' per month, both are viable for business.';
+  }
+
+  const result = document.getElementById('sanctuaryResult');
+  result.classList.add('visible');
+  result.innerHTML = '<h3>Your Sanctuary Recommendation</h3><p style="font-size: 20px; color: var(--gold); font-weight: 600;">' + recommendation + '</p><p>' + body + '</p><p style="margin-top: 16px;"><a href="https://quantum-freedom-site.vercel.app/Colombia2026.html" target="_blank" rel="noopener" style="color: var(--gold); font-weight: 600;">Open the Colombia Complete Dossier →</a></p>';
+}
+
+// ============================================================
+// FAMILY COMPACT
+// ============================================================
+function generateFamilyCompact() {
+  const name = document.getElementById('family-name').value.trim();
+  const head = document.getElementById('family-head').value.trim();
+  const members = document.getElementById('family-members').value.trim();
+  const location = document.getElementById('family-location').value.trim();
+
+  if (!name || !head || !members || !location) {
+    alert('Please fill in all fields.');
+    return;
+  }
+
+  const compact = 'FAMILY COMPACT\n\n' +
+    'We, the ' + name + ', establish this compact as the governing document of our family nation.\n\n' +
+    'HEAD OF HOUSEHOLD: ' + head + '\n' +
+    'FAMILY MEMBERS: ' + members + '\n' +
+    'FAMILY SEAT: ' + location + '\n\n' +
+    'ARTICLE I — SOVEREIGNTY\n' +
+    'We declare our family to be a sovereign entity under God. We are not a corporation. We are not a legal fiction. We are a people.\n\n' +
+    'ARTICLE II — LAW\n' +
+    'The law of this family is the law of love. We do not kill. We love one another. We protect the innocent.\n\n' +
+    'ARTICLE III — AUTHORITY\n' +
+    'The head of household is the final authority in all family matters. The family council advises. The family assembly consents.\n\n' +
+    'ARTICLE IV — PROPERTY\n' +
+    'All property held by the family is held in trust. The trust is the legal structure. The family is the beneficiary. The trust survives the individual.\n\n' +
+    'ARTICLE V — EDUCATION\n' +
+    'The children of this family will be educated in truth, in love, and in sovereignty. They will not be educated by the state. They will be educated by the family, by the community, and by the Word of God.\n\n' +
+    'ARTICLE VI — DEFENSE\n' +
+    'The family will defend itself, its members, and its property. The defense is lawful. The defense is proportional. The defense is the last resort.\n\n' +
+    'ARTICLE VII — SUCCESSION\n' +
+    'The head of household will designate a successor. The successor will be approved by the family council. The succession plan will be documented and kept.\n\n' +
+    'Signed this day, ' + new Date().toLocaleDateString() + '\n\n' +
+    '_________________________\n' +
+    head + '\n\n' +
+    'Soli Deo Gloria.';
+
+  const result = document.getElementById('familyResult');
+  result.classList.add('visible');
+  result.innerHTML = '<h3>Your Family Compact</h3><pre style="white-space: pre-wrap; font-family: \'IBM Plex Mono\', monospace; font-size: 11px; line-height: 1.6; color: var(--text); max-height: 400px; overflow-y: auto;">' + escapeHtml(compact) + '</pre><button class="btn btn-full" onclick="downloadFamilyCompact()" style="margin-top: 12px;">Download Family Compact</button>';
+
+  window._familyCompact = compact;
+}
+
+function downloadFamilyCompact() {
+  if (!window._familyCompact) return;
+  const blob = new Blob([window._familyCompact], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'Family-Compact-' + new Date().toISOString().split('T')[0] + '.txt';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ============================================================
+// UTILS
+// ============================================================
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded', function() {
+  renderScoreGrid();
+});
+</script>
+</body>
+</html>
