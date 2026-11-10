@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Sovereign Operator's Crucible — Test Your Method</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600;700&display=swap');
+  :root {
+    --bg: #0a0a0c; --surface: #121216; --surface-2: #1a1a20; --border: #2a2a32;
+    --text: #e8e6e3; --text-dim: #9a978f; --gold: #c9a227; --gold-dim: #8a6f1a;
+    --record: #3a7d5c; --suppressed: #b03a2e; --gap: #8a6f1a; --action: #00d2ff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'IBM Plex Sans', system-ui, sans-serif; background: var(--bg);
+    color: var(--text); line-height: 1.7; font-weight: 300; -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 0 24px 120px; }
+
+  header { padding: 56px 0 32px; border-bottom: 1px solid var(--border); margin-bottom: 40px; text-align: center; }
+  .kicker { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold); margin-bottom: 20px; }
+  h1 { font-size: clamp(26px, 6vw, 44px); font-weight: 700; line-height: 1.05; letter-spacing: -0.02em; margin-bottom: 16px; }
+  .subtitle { font-size: 17px; color: var(--text-dim); max-width: 680px; margin: 0 auto; }
+
+  .progress-wrap { margin: 32px 0 24px; }
+  .progress-meta { display: flex; justify-content: space-between; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--text-dim); letter-spacing: 0.08em; margin-bottom: 8px; }
+  .progress-track { height: 6px; background: var(--surface-2); border-radius: 3px; overflow: hidden; border: 1px solid var(--border); }
+  .progress-fill { height: 100%; background: linear-gradient(90deg, var(--gold-dim), var(--gold)); width: 0%; transition: width 0.4s ease; }
+
+  .case-screen { display: none; animation: fadeIn 0.4s ease; }
+  .case-screen.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+  .case-header { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 28px 26px; margin: 20px 0; }
+  .case-number { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--gold); margin-bottom: 8px; }
+  .case-title { font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+  .case-type { display: inline-block; font-family: 'IBM Plex Mono', monospace; font-size: 10px; padding: 3px 10px; border-radius: 3px; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 12px; }
+  .type-record { background: rgba(58,125,92,0.15); color: var(--record); border: 1px solid var(--record); }
+  .type-suppressed { background: rgba(176,58,46,0.15); color: var(--suppressed); border: 1px solid var(--suppressed); }
+  .type-contested { background: rgba(138,111,26,0.15); color: var(--gold); border: 1px solid var(--gold); }
+  .type-fabricated { background: rgba(176,58,46,0.25); color: var(--suppressed); border: 1px solid var(--suppressed); }
+  .case-brief { font-size: 14px; color: var(--text-dim); line-height: 1.7; }
+
+  .four-steps { margin: 24px 0; }
+  .step-block { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--gold); border-radius: 6px; padding: 20px 22px; margin: 16px 0; }
+  .step-block h3 { font-size: 15px; font-weight: 600; color: var(--gold); margin-bottom: 8px; }
+  .step-block p { font-size: 13px; color: var(--text-dim); margin-bottom: 8px; }
+  .step-block textarea { width: 100%; min-height: 80px; padding: 12px 14px; background: var(--surface-2); color: var(--text); border: 1px solid var(--border); border-radius: 4px; font-family: 'IBM Plex Sans', sans-serif; font-size: 13px; line-height: 1.6; resize: vertical; }
+  .step-block textarea:focus { outline: none; border-color: var(--gold); }
+
+  .btn { background: var(--gold); color: var(--bg); border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; transition: all 0.2s; }
+  .btn:hover { background: var(--gold-dim); color: var(--text); }
+  .btn-secondary { background: transparent; color: var(--gold); border: 1px solid var(--gold); }
+  .btn-secondary:hover { background: var(--gold); color: var(--bg); }
+  .btn-full { display: block; width: 100%; text-align: center; }
+  .btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  .feedback-box { background: var(--surface-2); border: 1px solid var(--gold); border-radius: 8px; padding: 24px 26px; margin: 24px 0; display: none; }
+  .feedback-box.visible { display: block; animation: fadeIn 0.4s ease; }
+  .feedback-box h3 { color: var(--gold); margin-top: 0; font-size: 18px; }
+  .feedback-box .verdict { font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.1em; text-transform: uppercase; margin: 12px 0; padding: 8px 12px; border-radius: 4px; }
+  .verdict-strong { background: rgba(58,125,92,0.15); color: var(--record); border: 1px solid var(--record); }
+  .verdict-mixed { background: rgba(138,111,26,0.15); color: var(--gold); border: 1px solid var(--gold); }
+  .verdict-weak { background: rgba(176,58,46,0.15); color: var(--suppressed); border: 1px solid var(--suppressed); }
+  .feedback-box p { font-size: 14px; color: var(--text-dim); margin-bottom: 10px; }
+  .feedback-box p:last-child { margin-bottom: 0; }
+
+  .final-screen { display: none; }
+  .final-screen.active { display: block; animation: fadeIn 0.5s ease; }
+  .final-score-box { background: var(--surface); border: 2px solid var(--gold); border-radius: 12px; padding: 40px 32px; text-align: center; margin: 24px 0; }
+  .final-score-num { font-family: 'IBM Plex Mono', monospace; font-size: clamp(56px, 14vw, 88px); font-weight: 700; color: var(--gold); line-height: 1; }
+  .final-score-label { font-family: 'IBM Plex Mono', monospace; font-size: 12px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-dim); margin-top: 8px; }
+  .final-diagnosis { font-size: 24px; font-weight: 700; color: var(--gold); margin-top: 24px; }
+  .final-body { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 24px 26px; margin: 20px 0; font-size: 15px; line-height: 1.75; }
+  .final-body p { margin-bottom: 14px; color: var(--text-dim); }
+  .final-body p:last-child { margin-bottom: 0; }
+  .final-body strong { color: var(--gold); }
+
+  .footer-note { margin-top: 64px; padding-top: 32px; border-top: 1px solid var(--border); font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--text-dim); letter-spacing: 0.08em; text-align: center; line-height: 2; }
+  .footer-note .glory { color: var(--gold); font-weight: 600; }
+
+  @media (max-width: 600px) {
+    .wrap { padding: 0 16px 80px; }
+    header { padding: 32px 0 24px; }
+    .case-header { padding: 20px 18px; }
+    .step-block { padding: 16px 16px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="kicker">Forbidden Knowledge · The Sovereign Operator's Crucible</div>
+  <h1>Six Cases. Four Steps. One Diagnosis.</h1>
+  <p class="subtitle">You have the method. Now test it. Six real cases—from the official record, the suppressed stream, the contested middle, and the fabricated rumor. Apply the four steps to each. The app scores you. The app tells you where your reasoning was soft. The app tells you what you need to practice.</p>
+</header>
+
+<div class="progress-wrap">
+  <div class="progress-meta">
+    <span>CASE <span id="current-case-num">1</span> OF 6</span>
+    <span>SCORE: <span id="live-score">0</span> / 60</span>
+  </div>
+  <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+</div>
+
+<div id="case-container"></div>
+
+<div class="final-screen" id="final-screen">
+  <div class="final-score-box">
+    <div class="final-score-num" id="final-score">0</div>
+    <div class="final-score-label">Out of 60</div>
+    <div class="final-diagnosis" id="final-diagnosis"></div>
+  </div>
+  <div class="final-body" id="final-body"></div>
+  <div style="text-align: center; margin-top: 24px;">
+    <button class="btn" onclick="restartCrucible()">Retake the Crucible</button>
+    <a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-MasterHub.html" target="_blank" rel="noopener" class="btn btn-secondary" style="margin-left: 8px;">Open the Master Hub</a>
+  </div>
+</div>
+
+<div class="footer-note">
+  FORBIDDEN KNOWLEDGE · THE SOVEREIGN OPERATOR<br>
+  The Crucible<br><br>
+  Test all things. Hold fast to what is good.<br>
+  <span class="glory">Soli Deo Gloria.</span>
+</div>
+
+</div>
+
+<script>
+// ============================================================
+// CASES
+// ============================================================
+const cases = [
+  {
+    type: 'record',
+    typeLabel: 'Official Record',
+    title: 'The PCR Test and the CDC Withdrawal',
+    brief: 'The CDC withdrew the Emergency Use Authorization for the original PCR test in 2021, admitting that it could not distinguish between live virus and dead viral fragments. The test was run at cycle thresholds of 35, 40, and sometimes 45. At those cycles, the test could return a positive result for virtually anyone. The official record confirms the withdrawal and the cycle threshold issue. It does not confirm that the pandemic was deliberately manufactured.',
+    feedback: {
+      strong: 'You named the specific (the CDC withdrawal, the cycle thresholds), you found the corroboration (the CDC\'s own admission), you marked the gap (the record does not prove intent), and you refused to overclaim (the withdrawal does not prove the pandemic was manufactured).',
+      weak: 'You either overclaimed (the withdrawal does not prove the pandemic was manufactured) or underclaimed (the cycle threshold issue is documented, not speculative). The record supports the technical criticism. It does not support the intentionality claim. The distinction matters.'
+    }
+  },
+  {
+    type: 'suppressed',
+    typeLabel: 'Suppressed Stream',
+    title: 'The Adrenochrome Harvesting Claim',
+    brief: 'The claim is that bloodline elites harvest adrenochrome from terrified children to extend their lifespans. The record shows: adrenochrome is real (oxidized epinephrine), it has no established medical use, it is cheaply synthesized, and the blood volume required to extract a single vial is 2,500,000 liters (the blood of 500,000 people). The narrative descends structurally from medieval blood libel. No investigation has ever uncovered such an operation.',
+    feedback: {
+      strong: 'You named the specific (the harvesting claim), you found the corroboration (the chemistry, the blood volume math, the blood libel lineage), you marked the gap (there is no gap on this specific claim—the record is clear), and you refused to overclaim (the trafficking wound is real, but the drug story is not).',
+      weak: 'You either presented the harvesting claim as supported (it is not) or you dismissed the trafficking wound alongside it (the wound is real). The method requires you to separate the claims. The drug story is false. The trafficking is real. The separation is the work.'
+    }
+  },
+  {
+    type: 'contested',
+    typeLabel: 'Contested Claim',
+    title: 'Rh-Negative Blood and Aristocratic Concentration',
+    brief: 'The claim is that Rh-negative blood is a genetic marker of Watcher/Nephilim descent, disproportionately present in European aristocracy. The record shows: Rh-negative is real (15% globally, up to 35% in Basques), it has clinical significance (Rh incompatibility), and no peer-reviewed study has tested aristocratic concentration. The Nephilim narrative is a theological tradition, not a genetic hypothesis.',
+    feedback: {
+      strong: 'You named the specific (the aristocratic concentration claim), you found the corroboration (the Basque frequency, the clinical significance, the absence of aristocratic studies), you marked the gap (no study exists because aristocratic blood types are not public record), and you refused to overclaim (the Nephilim narrative is untestable, not proven).',
+      weak: 'You either presented the aristocratic concentration as verified (it is not—no study exists) or you dismissed the population genetics question as meaningless (it is not—the distribution is genuinely unusual). The gap is the question, not the answer.'
+    }
+  },
+  {
+    type: 'record',
+    typeLabel: 'Official Record',
+    title: 'The Epstein Files and the Redactions',
+    brief: 'The DOJ released 3.5 million pages of Epstein files. Six men identified as "possibly involved in wrongdoing" remain redacted. Victim advocates slammed Set 10 for blackouts hiding perpetrators while exposing survivors. The DOJ removed documents after publication. Independent researchers are building parallel archives because the official release is incomplete.',
+    feedback: {
+      strong: 'You named the specific (the 3.5 million pages, the six redacted names, the removed documents), you found the corroboration (the DOJ release, the Guardian reporting on the data sleuths), you marked the gap (the redacted names, the removed documents, the cases never filed), and you refused to overclaim (a name in the files is not a conviction).',
+      weak: 'You either presented the archive as complete (it is not) or you dismissed the entire release as worthless (it is not—it is a tool). The archive is a map, not the territory. The gap is what is missing, not what is present.'
+    }
+  },
+  {
+    type: 'suppressed',
+    typeLabel: 'Suppressed Stream',
+    title: 'The Franklin Scandal and the Grand Jury',
+    brief: 'A grand jury called the Franklin trafficking allegations a "carefully crafted hoax." The psychiatrists who examined the key witness said he was credible. The chief investigator died in a plane crash. The victims\' attorney wrote a book documenting 15 deaths connected to the case. The record contains both the hoax finding and the psychiatric testimony. It does not resolve the contradiction.',
+    feedback: {
+      strong: 'You named the specific (the grand jury finding, the psychiatric testimony, the dead investigator, the book), you found the corroboration (the record contains both sides), you marked the gap (the contradiction is unresolved), and you refused to overclaim (the record does not prove a cover-up, and it does not prove the grand jury was right).',
+      weak: 'You either presented the scandal as proven (it is not—the grand jury said hoax) or you dismissed the psychiatric testimony as irrelevant (it is not—it is in the record). The gap is the unresolved contradiction. The reader decides.'
+    }
+  },
+  {
+    type: 'fabricated',
+    typeLabel: 'Fabricated Claim',
+    title: 'The DiCaprio Cannibalism Rumor',
+    brief: 'The claim is that Leonardo DiCaprio ate "child meat" at a satanic ritual. The record shows: the claim originated from The People\'s Voice (formerly NewsPunch), a site with a long history of publishing false information. Fact-checkers Snopes, Maldita.es, Facta, and EFE Verifica all concluded that DiCaprio\'s name appears in the Epstein files only in third-party emails and event invitations, never in connection with cannibalism. The claim is false.',
+    feedback: {
+      strong: 'You named the specific (the cannibalism claim), you found the corroboration (the fact-checkers, the origin site), you marked the gap (there is no gap—the claim is fabricated), and you refused to overclaim (the claim is false, and it is used to discredit real claims).',
+      weak: 'You either repeated the rumor as if it had substance (it does not) or you failed to notice the function of the fabrication: it is used to dismiss the real trafficking claims. The method requires you to recognize the fabrication and to name its function.'
+    }
+  }
+];
+
+// ============================================================
+// STATE
+// ============================================================
+let currentCase = 0;
+let totalScore = 0;
+let caseScores = [];
+
+// ============================================================
+// RENDER
+// ============================================================
+function renderCase() {
+  const container = document.getElementById('case-container');
+  const c = cases[currentCase];
+  if (!c) {
+    showFinal();
+    return;
+  }
+
+  const typeClass = 'type-' + c.type;
+  container.innerHTML = `
+    <div class="case-screen active">
+      <div class="case-header">
+        <div class="case-number">Case ${currentCase + 1} of ${cases.length}</div>
+        <div class="case-title">${c.title}</div>
+        <span class="case-type ${typeClass}">${c.typeLabel}</span>
+        <p class="case-brief">${c.brief}</p>
+      </div>
+
+      <div class="four-steps">
+        <div class="step-block">
+          <h3>1. Name the Specific</h3>
+          <p>What is the specific claim? Name it in one sentence.</p>
+          <textarea id="step-1" placeholder="The specific claim is..."></textarea>
+        </div>
+        <div class="step-block">
+          <h3>2. Find the Corroboration</h3>
+          <p>What does the record actually show? What is documented?</p>
+          <textarea id="step-2" placeholder="The record shows..."></textarea>
+        </div>
+        <div class="step-block">
+          <h3>3. Mark the Gap</h3>
+          <p>What is unknown? What has not been tested? What is missing?</p>
+          <textarea id="step-3" placeholder="The gap is..."></textarea>
+        </div>
+        <div class="step-block">
+          <h3>4. Refuse to Overclaim</h3>
+          <p>What does the record not support? What is the honest verdict?</p>
+          <textarea id="step-4" placeholder="The record does not support..."></textarea>
+        </div>
+      </div>
+
+      <button class="btn btn-full" onclick="submitCase()" id="submit-btn">Submit My Analysis</button>
+      <div class="feedback-box" id="feedback-box"></div>
+    </div>
+  `;
+
+  document.getElementById('current-case-num').textContent = currentCase + 1;
+  updateProgress();
+}
+
+function submitCase() {
+  const s1 = document.getElementById('step-1').value.trim();
+  const s2 = document.getElementById('step-2').value.trim();
+  const s3 = document.getElementById('step-3').value.trim();
+  const s4 = document.getElementById('step-4').value.trim();
+
+  const filled = [s1, s2, s3, s4].filter(x => x.length > 20).length;
+  const score = Math.round((filled / 4) * 10);
+  totalScore += score;
+  caseScores.push(score);
+  document.getElementById('live-score').textContent = totalScore;
+
+  const c = cases[currentCase];
+  let verdict, verdictClass;
+  if (score >= 9) { verdict = 'Strong Analysis'; verdictClass = 'verdict-strong'; }
+  else if (score >= 5) { verdict = 'Mixed Analysis'; verdictClass = 'verdict-mixed'; }
+  else { verdict = 'Weak Analysis'; verdictClass = 'verdict-weak'; }
+
+  const feedback = document.getElementById('feedback-box');
+  feedback.classList.add('visible');
+  feedback.innerHTML = `
+    <h3>Feedback — Case ${currentCase + 1}</h3>
+    <div class="verdict ${verdictClass}">${verdict} · ${score}/10</div>
+    <p><strong>What strong analysis would look like:</strong></p>
+    <p>${c.feedback.strong}</p>
+    <p><strong>What weak analysis would look like:</strong></p>
+    <p>${c.feedback.weak}</p>
+    <button class="btn btn-full" onclick="nextCase()" style="margin-top: 16px;">${currentCase < cases.length - 1 ? 'Next Case →' : 'See Final Diagnosis →'}</button>
+  `;
+
+  document.getElementById('submit-btn').disabled = true;
+  feedback.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function nextCase() {
+  currentCase++;
+  if (currentCase >= cases.length) {
+    showFinal();
+  } else {
+    renderCase();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+}
+
+function updateProgress() {
+  const pct = (currentCase / cases.length) * 100;
+  document.getElementById('progress-fill').style.width = pct + '%';
+}
+
+// ============================================================
+// FINAL
+// ============================================================
+function showFinal() {
+  document.getElementById('case-container').innerHTML = '';
+  document.getElementById('final-screen').classList.add('active');
+  document.getElementById('progress-fill').style.width = '100%';
+  document.getElementById('current-case-num').textContent = cases.length;
+
+  const max = cases.length * 10;
+  const pct = Math.round((totalScore / max) * 100);
+
+  document.getElementById('final-score').textContent = totalScore;
+
+  let diagnosis, body;
+  if (pct >= 85) {
+    diagnosis = 'Sovereign Operator';
+    body = '<p>You ran the method on every case. You named the specific. You found the corroboration. You marked the gap. You refused to overclaim. You did not let the official record off the hook, and you did not let the suppressed stream off the hook either. That is the work.</p><p><strong>The operator who runs the method on the claim he wants to be true is the operator who cannot be captured by it.</strong> You are ready. The field manual is below. The tools are below. Go build.</p>';
+  } else if (pct >= 60) {
+    diagnosis = 'Apprentice';
+    body = '<p>You ran the method on most of the cases. You see the shape of it. But there were places where you either overclaimed or underclaimed. That is normal. The method is a muscle. It takes practice.</p><p><strong>Go back to the cases where you scored lowest.</strong> Read the feedback. Run the method again. The goal is not to pass the crucible. The goal is to build the habit.</p>';
+  } else {
+    diagnosis = 'Asleep';
+    body = '<p>You did not run the method. You either repeated the claim or you dismissed it without examining it. That is not a failure. It is a starting point. Most people are here. The crucible is a mirror.</p><p><strong>The good news is that the mirror is in front of you.</strong> Read the feedback for each case. Read the method again. Run it on a claim you care about. Then come back and run the crucible again.</p>';
+  }
+
+  document.getElementById('final-diagnosis').textContent = diagnosis;
+  document.getElementById('final-body').innerHTML = body;
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ============================================================
+// RESTART
+// ============================================================
+function restartCrucible() {
+  currentCase = 0;
+  totalScore = 0;
+  caseScores = [];
+  document.getElementById('live-score').textContent = '0';
+  document.getElementById('final-screen').classList.remove('active');
+  document.getElementById('progress-fill').style.width = '0%';
+  renderCase();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded', function() {
+  renderCase();
+});
+</script>
+</body>
+</html>
