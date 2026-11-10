@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Sovereign Operator's Field Manual</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600;700&display=swap');
+  :root {
+    --bg: #0a0a0c; --surface: #121216; --surface-2: #1a1a20; --border: #2a2a32;
+    --text: #e8e6e3; --text-dim: #9a978f; --gold: #c9a227; --gold-dim: #8a6f1a;
+    --record: #3a7d5c; --suppressed: #b03a2e; --gap: #8a6f1a; --action: #00d2ff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'IBM Plex Sans', system-ui, sans-serif; background: var(--bg);
+    color: var(--text); line-height: 1.7; font-weight: 300; -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 0 24px 120px; }
+
+  header { padding: 64px 0 32px; border-bottom: 1px solid var(--border); margin-bottom: 40px; text-align: center; }
+  .kicker { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold); margin-bottom: 20px; }
+  h1 { font-size: clamp(28px, 6vw, 48px); font-weight: 700; line-height: 1.05; letter-spacing: -0.02em; margin-bottom: 16px; }
+  .subtitle { font-size: 18px; color: var(--text-dim); max-width: 680px; margin: 0 auto; }
+
+  .nav {
+    display: flex; flex-wrap: wrap; gap: 6px; justify-content: center;
+    margin-bottom: 40px; padding: 12px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 8px;
+  }
+  .nav button {
+    background: transparent; border: 1px solid var(--border); color: var(--text-dim);
+    padding: 8px 14px; border-radius: 4px; cursor: pointer;
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+    letter-spacing: 0.08em; text-transform: uppercase; transition: all 0.2s;
+  }
+  .nav button:hover { border-color: var(--gold); color: var(--gold); }
+  .nav button.active { background: var(--gold); color: var(--bg); border-color: var(--gold); font-weight: 600; }
+
+  .section { display: none; animation: fadeIn 0.4s ease; }
+  .section.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+  h2 { font-size: 24px; font-weight: 600; margin: 40px 0 16px; padding-top: 24px; border-top: 1px solid var(--border); }
+  h2:first-of-type { border-top: none; margin-top: 0; padding-top: 0; }
+  h3 { font-size: 17px; font-weight: 600; margin: 24px 0 12px; color: var(--gold); }
+  p { margin-bottom: 16px; font-size: 15px; color: var(--text-dim); }
+  .lead { font-size: 18px; color: var(--text); border-left: 2px solid var(--gold); padding-left: 20px; margin: 24px 0 32px; }
+  .highlight { color: var(--gold); font-weight: 600; }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 24px; margin: 16px 0; }
+  .card-title { font-weight: 600; font-size: 16px; color: var(--text); margin-bottom: 8px; }
+
+  .step-box { background: var(--surface); border: 1px solid var(--border); border-left: 4px solid var(--gold); border-radius: 6px; padding: 20px 24px; margin: 16px 0; }
+  .step-box h3 { margin-top: 0; }
+  .step-box p { margin-bottom: 12px; }
+  .step-box p:last-child { margin-bottom: 0; }
+  .step-box a { color: var(--gold); font-weight: 600; }
+
+  .action-box { background: var(--surface-2); border: 2px solid var(--action); border-radius: 8px; padding: 28px 26px; margin: 32px 0; }
+  .action-box h3 { color: var(--action); margin-top: 0; font-size: 20px; }
+  .action-box p { color: var(--text); }
+  .action-box strong { color: var(--action); }
+  .action-box .step { display: flex; gap: 16px; margin-bottom: 16px; align-items: flex-start; }
+  .action-box .step-num { font-family: 'IBM Plex Mono', monospace; font-size: 24px; color: var(--action); font-weight: 600; line-height: 1; min-width: 32px; }
+  .action-box .step-body { flex: 1; }
+  .action-box .step-body p { margin-bottom: 6px; }
+  .action-box .step-body a { color: var(--action); font-weight: 600; }
+
+  .tracker { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 24px; margin: 20px 0; }
+  .tracker-day { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); }
+  .tracker-day:last-child { border-bottom: none; }
+  .tracker-day label { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--text-dim); min-width: 60px; }
+  .tracker-day input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--gold); cursor: pointer; }
+  .tracker-day span { font-size: 13px; color: var(--text); }
+
+  .text-input { width: 100%; padding: 12px 16px; background: var(--surface-2); color: var(--text); border: 1px solid var(--border); border-radius: 6px; font-family: 'IBM Plex Sans', sans-serif; font-size: 14px; margin: 6px 0; }
+  .text-input:focus { outline: none; border-color: var(--gold); }
+  label { display: block; margin-top: 12px; margin-bottom: 4px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); }
+  textarea { min-height: 100px; resize: vertical; line-height: 1.6; }
+
+  .btn { background: var(--gold); color: var(--bg); border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; transition: all 0.2s; display: inline-block; text-decoration: none; }
+  .btn:hover { background: var(--gold-dim); color: var(--text); }
+  .btn-secondary { background: transparent; color: var(--gold); border: 1px solid var(--gold); }
+  .btn-secondary:hover { background: var(--gold); color: var(--bg); }
+  .btn-full { display: block; width: 100%; text-align: center; }
+
+  .result-box { background: var(--surface-2); border: 1px solid var(--gold); border-radius: 8px; padding: 24px; margin: 20px 0; display: none; }
+  .result-box.visible { display: block; animation: fadeIn 0.4s ease; }
+  .result-box h3 { color: var(--gold); margin-top: 0; }
+
+  .prayer-box { background: var(--surface-2); border: 1px solid var(--gold-dim); border-radius: 8px; padding: 32px 28px; margin: 32px 0; font-style: italic; color: var(--text); line-height: 2; text-align: center; }
+
+  .footer-note { margin-top: 64px; padding-top: 32px; border-top: 1px solid var(--border); font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--text-dim); letter-spacing: 0.08em; text-align: center; line-height: 2; }
+  .footer-note .glory { color: var(--gold); font-weight: 600; }
+
+  @media (max-width: 600px) {
+    .wrap { padding: 0 16px 80px; }
+    header { padding: 40px 0 24px; }
+    .action-box .step { flex-direction: column; gap: 8px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="kicker">Forbidden Knowledge · The Sovereign Operator's Field Manual</div>
+  <h1>Everything You Need. In One Place. In Your Hands.</h1>
+  <p class="subtitle">This is not a library. This is a field manual. It contains the method, the verification protocol, the reporting protocol, the fear audit, the committee room, the zero point, the declaration, the node mission, the nation, the sanctuary, and the prayer. The reader carries it into the field.</p>
+</header>
+
+<nav class="nav">
+  <button class="active" onclick="showSection('method', this)">The Method</button>
+  <button onclick="showSection('verify', this)">Verify</button>
+  <button onclick="showSection('report', this)">Report</button>
+  <button onclick="showSection('fear', this)">Fear Audit</button>
+  <button onclick="showSection('committee', this)">Committee</button>
+  <button onclick="showSection('zero', this)">Zero Point</button>
+  <button onclick="showSection('declare', this)">Declare</button>
+  <button onclick="showSection('node', this)">Node</button>
+  <button onclick="showSection('nation', this)">Nation</button>
+  <button onclick="showSection('prayer', this)">Prayer</button>
+</nav>
+
+<!-- THE METHOD -->
+<div class="section active" id="method">
+  <h2>The Method — Four Steps</h2>
+
+  <p class="lead">Every claim you encounter—from any source, in any situation—you handle in four steps. This is the method. It is the whole manual. Everything else is an application of it.</p>
+
+  <div class="step-box">
+    <h3>1. Name the Specific</h3>
+    <p>Not "the system is corrupt." The specific: the specific document, the specific court case, the specific date, the specific person, the specific dollar amount. If you cannot name the specific, you do not have a claim. You have a feeling.</p>
+  </div>
+
+  <div class="step-box">
+    <h3>2. Find the Corroboration</h3>
+    <p>What does the record actually show? Cite the source. If the source is contested, say so. If the source is anonymous, say so. If the source is a screenshot with no origin, say so. The record is the standard. Not the vibe. Not the algorithm. Not the influencer.</p>
+  </div>
+
+  <div class="step-box">
+    <h3>3. Mark the Gap</h3>
+    <p>What is unknown? What has not been tested in court? What has not been independently verified? Say it plainly. The gap is not a weakness. The gap is the truth. Every honest claim has a gap. The dishonest claim pretends it does not.</p>
+  </div>
+
+  <div class="step-box">
+    <h3>4. Refuse to Overclaim</h3>
+    <p>If the record does not support a claim, say so. Do not soften it. Do not hedge it into meaninglessness. Say: "The record I can find does not support this. Here is what it does support." That is the method. That is the work.</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Why this matters</div>
+    <p>The method is not a weapon against the other side. It is a weapon against your own certainty. The person who runs the method on the claim he wants to be true is the person who cannot be captured by it. The person who only runs it on the enemy is a mirror image of the enemy.</p>
+  </div>
+</div>
+
+<!-- VERIFY -->
+<div class="section" id="verify">
+  <h2>Verify — The Tools</h2>
+
+  <p>You have the method. Now you need the tools to run it. These are the tools. They are free. They are live. They are the ones the researchers and the journalists use.</p>
+
+  <div class="action-box">
+    <h3>🔍 The Verification Chain</h3>
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <p><strong>PACER.</strong> The official federal court records database. Search federal court dockets and case documents. Fees are waived at public terminals in federal courthouses.</p>
+        <p><a href="https://pacer.uscourts.gov" target="_blank" rel="noopener">pacer.uscourts.gov</a></p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <p><strong>CourtListener.</strong> A free database of legal opinions and the RECAP Archive of PACER documents. No fee to search.</p>
+        <p><a href="https://www.courtlistener.com" target="_blank" rel="noopener">courtlistener.com</a></p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <p><strong>The DOJ Epstein Library.</strong> The official source. The 12 data sets. The original PDFs.</p>
+        <p><a href="https://www.justice.gov/epstein" target="_blank" rel="noopener">justice.gov/epstein</a></p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <p><strong>The Zenodo Collection Index.</strong> A catalogue of the official releases, mirrors, torrents, and SHA-256 checksums. Verify what you download.</p>
+        <p><a href="https://zenodo.org/records/22865746" target="_blank" rel="noopener">zenodo.org/records/22865746</a></p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <p><strong>The CISA Deepfake Guide.</strong> How to spot AI-generated video and audio. The record is being flooded with fakes. Verify before you share.</p>
+        <p><a href="https://www.cisa.gov/news-events/news/spotting-deepfakes" target="_blank" rel="noopener">cisa.gov</a></p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">6</div>
+      <div class="step-body">
+        <p><strong>EpsteinExposed.com.</strong> 1,400 connections mapped from co-flights, co-documents, and black book entries. The methodology is public.</p>
+        <p><a href="https://epsteinexposed.com" target="_blank" rel="noopener">epsteinexposed.com</a></p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">7</div>
+      <div class="step-body">
+        <p><strong>The Epstein Archive.</strong> 86,000+ entities, 51,000+ documents. The live public site.</p>
+        <p><a href="https://epstein.academy" target="_blank" rel="noopener">epstein.academy</a></p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">8</div>
+      <div class="step-body">
+        <p><strong>NCMEC CyberTipline.</strong> The reporting channel for child exploitation. Available 24/7.</p>
+        <p><a href="https://report.cybertip.org" target="_blank" rel="noopener">report.cybertip.org</a> · 1-800-843-5678</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- REPORT -->
+<div class="section" id="report">
+  <h2>Report — The Protocol</h2>
+
+  <p>If you find evidence of trafficking, abuse, or exploitation, here is the protocol. Do not investigate alone. Do not confront. Do not share it publicly if it contains victim information. Report it.</p>
+
+  <div class="action-box">
+    <h3>📢 The Reporting Protocol</h3>
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <p><strong>Document everything.</strong> Take screenshots. Save URLs. Note the dates and times. Do not alter the evidence.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <p><strong>Report to NCMEC.</strong> The National Center for Missing & Exploited Children. Report online or call 1-800-843-5678. Available 24/7.</p>
+        <p><a href="https://report.cybertip.org" target="_blank" rel="noopener">report.cybertip.org</a></p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <p><strong>Report to the FBI.</strong> Submit a tip online or call 1-800-CALL-FBI. For emergencies, call 911.</p>
+        <p><a href="https://tips.fbi.gov" target="_blank" rel="noopener">tips.fbi.gov</a></p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <p><strong>Report to the platform.</strong> Every platform has a reporting mechanism. Use it. Keep a record of what you reported and when.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <p><strong>Do not investigate alone.</strong> If you find something, report it. Do not confront the person. Do not try to rescue the victim yourself. The authorities are the ones with the training and the legal authority. Your job is to document and report.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">The Simply Report app</div>
+    <p>A free mobile app launched in 2025. Anonymous real-time reporting. Connects survivors to Safe House Project's network of safe houses and certified care providers.</p>
+    <p><a href="https://safehouseproject.org" target="_blank" rel="noopener">safehouseproject.org</a></p>
+  </div>
+</div>
+
+<!-- FEAR AUDIT -->
+<div class="section" id="fear">
+  <h2>The Fear Audit — Seven Days</h2>
+
+  <p>The attention economy runs on fear and outrage. The seven-day protocol is the test. Stop consuming. Watch the fear. Withhold the reaction. At the end, the app shows you your own pattern.</p>
+
+  <div class="tracker">
+    <h3>Check the box each day you completed the protocol.</h3>
+    <div class="tracker-day">
+      <label>Day 1</label>
+      <input type="checkbox" class="fear-check" id="fear-day1">
+      <span>No news, no social media. Watched the fear. Did not react.</span>
+    </div>
+    <div class="tracker-day">
+      <label>Day 2</label>
+      <input type="checkbox" class="fear-check" id="fear-day2">
+      <span>No news, no social media. Watched the fear. Did not react.</span>
+    </div>
+    <div class="tracker-day">
+      <label>Day 3</label>
+      <input type="checkbox" class="fear-check" id="fear-day3">
+      <span>No news, no social media. Watched the fear. Did not react.</span>
+    </div>
+    <div class="tracker-day">
+      <label>Day 4</label>
+      <input type="checkbox" class="fear-check" id="fear-day4">
+      <span>No news, no social media. Watched the fear. Did not react.</span>
+    </div>
+    <div class="tracker-day">
+      <label>Day 5</label>
+      <input type="checkbox" class="fear-check" id="fear-day5">
+      <span>No news, no social media. Watched the fear. Did not react.</span>
+    </div>
+    <div class="tracker-day">
+      <label>Day 6</label>
+      <input type="checkbox" class="fear-check" id="fear-day6">
+      <span>No news, no social media. Watched the fear. Did not react.</span>
+    </div>
+    <div class="tracker-day">
+      <label>Day 7</label>
+      <input type="checkbox" class="fear-check" id="fear-day7">
+      <span>No news, no social media. Watched the fear. Did not react.</span>
+    </div>
+    <button class="btn btn-full" onclick="calculateFearAudit()" style="margin-top: 16px;">Calculate My Pattern</button>
+    <div class="result-box" id="fearResult"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">What the audit reveals</div>
+    <p>If you completed all seven days, the question is not whether the archons are real. The question is whether you feel different. If you do, the protocol worked. If you do not, the protocol did not work. Either way, you have data.</p>
+    <p>If you missed days, the missed days are the data. What happened on those days? Was it fear? Outrage? Boredom? The gap is where the harvest lives.</p>
+  </div>
+</div>
+
+<!-- COMMITTEE -->
+<div class="section" id="committee">
+  <h2>The Committee Room</h2>
+
+  <p>You are not one mind. You are a committee of sub-personalities. This is the witness practice. Name the parts. Watch the parts. Do not identify with the parts.</p>
+
+  <div class="card">
+    <div class="card-title">The Five Named Parts</div>
+    <p><strong>The Pleaser</strong> — "You can't say no. They'll be upset with you."</p>
+    <p><strong>The Avoider</strong> — "Just don't think about it. Distract yourself."</p>
+    <p><strong>The Perfectionist</strong> — "That's not good enough. Try harder. You're going to fail."</p>
+    <p><strong>The Rebel</strong> — "You can't tell me what to do. I'll do the opposite."</p>
+    <p><strong>The Inner Critic</strong> — "You're stupid. You're worthless. They're all laughing at you."</p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">The Witness Practice</div>
+    <p>When a part is activated, you usually say: "I am angry." That is the merger. You are claiming ownership of the part. The practice is to step back and say: "A part of me is presenting the experience of anger." That is the witness.</p>
+    <p><strong>Do this today.</strong> Take a moment when a part was activated. Write the "I feel" version. Then rewrite it in the witness voice. Notice the difference.</p>
+    <label>Step 1 — The "I feel" version</label>
+    <textarea class="text-input" id="committee-merged" placeholder="I feel angry because..."></textarea>
+    <label>Step 2 — The witness version</label>
+    <textarea class="text-input" id="committee-witnessed" placeholder="A part of me is presenting the experience of anger because..."></textarea>
+    <button class="btn btn-full" onclick="saveCommitteePractice()" style="margin-top: 8px;">Save the Practice</button>
+    <div class="result-box" id="committeeResult"></div>
+  </div>
+</div>
+
+<!-- ZERO POINT -->
+<div class="section" id="zero">
+  <h2>The Zero Point</h2>
+
+  <p>The nothing is the most fertile soil there is. The silence between thoughts. The space between heartbeats. The pause between exhale and inhale. That is the zero point. It has been with you always.</p>
+
+  <div class="card">
+    <div class="card-title">The Breath Practice</div>
+    <p>Take a single breath. Hold it. Release it. In the pause between exhale and inhale, notice that there is no "you" noticing. There is just the pause. That pause is the zero point.</p>
+    <button class="btn btn-full" onclick="startBreathTimer()" id="breathStartBtn" style="margin-top: 8px;">Begin the Breath — 1 Minute</button>
+    <div class="result-box" id="breathResult"></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">The Silence Practice</div>
+    <p>Sit in silence. Not the silence of a quiet room. The silence of the mind. The silence that is underneath the thoughts. The silence that is always there, even when the thoughts are loud.</p>
+    <button class="btn btn-full" onclick="startSilenceTimer()" id="silenceStartBtn" style="margin-top: 8px;">Begin the Silence — 5 Minutes</button>
+    <div class="result-box" id="silenceResult"></div>
+  </div>
+</div>
+
+<!-- DECLARE -->
+<div class="section" id="declare">
+  <h2>Declare Your Sovereignty</h2>
+
+  <p>You do not have to be a citizen of their system. You can create your very own nation. Your family nation should be a completely sovereign entity so that you are the king behind your doors, on your land.</p>
+
+  <div class="card">
+    <div class="card-title">The Declaration</div>
+    <label for="declare-name">Your Full Name</label>
+    <input type="text" class="text-input" id="declare-name" placeholder="Your Name">
+    <button class="btn btn-full" onclick="generateDeclaration()" style="margin-top: 12px;">Generate My Declaration</button>
+    <div class="result-box" id="declareResult"></div>
+  </div>
+</div>
+
+<!-- NODE -->
+<div class="section" id="node">
+  <h2>The Node Mission</h2>
+
+  <p>You do not need to be an investigator. You do not need to be a journalist. You need to be a node. Here is what a node does.</p>
+
+  <div class="action-box">
+    <h3>⚡ What a Node Does</h3>
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <p><strong>Choose your platform.</strong> TikTok. YouTube. X. Instagram. Substack. A newsletter. A Discord. Any platform where you can post and share.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <p><strong>Document what you find.</strong> Search for the suspicious listings. The code words. The patterns. Take screenshots. Save URLs. Note the dates and times.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <p><strong>Report it.</strong> NCMEC. The FBI. The platform. The authorities. Keep a record of what you reported and when.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <p><strong>Share it.</strong> Post what you found. Link to the original sources. Credit the researchers who found it first. Use the hashtags. Make it travel.</p>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <p><strong>Connect with other nodes.</strong> Follow Diego Saul Reynosa. Follow John Swann. Follow Thorn. Follow Safe House Project. Share their work. Amplify their findings. Add your eyes to the search.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NATION -->
+<div class="section" id="nation">
+  <h2>The Nation and the Sanctuary</h2>
+
+  <p>You do not have to join his nation. You can create your own. But if you want to join, the door is open. If you want to come to Colombia, the door is open. The links are below.</p>
+
+  <div class="card">
+    <div class="card-title">The Nation</div>
+    <p>The Amnesty Coalition for Unity. The PMA. The 007 status. The application.</p>
+    <p><a href="https://quantum-freedom-site.vercel.app/theNation.html" target="_blank" rel="noopener">quantum-freedom-site.vercel.app/theNation.html</a></p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">The Sanctuary</div>
+    <p>TripsToColombia. The Colombia Complete Dossier. The real door.</p>
+    <p><a href="https://quantum-freedom-site.vercel.app/Colombia2026.html" target="_blank" rel="noopener">quantum-freedom-site.vercel.app/Colombia2026.html</a></p>
+  </div>
+
+  <div class="card">
+    <div class="card-title">The Master Hub</div>
+    <p>Every terminal. Every chapter. Every tool.</p>
+    <p><a href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-MasterHub.html" target="_blank" rel="noopener">quantum-freedom-site.vercel.app/ForbiddenKnowledge-MasterHub.html</a></p>
+  </div>
+</div>
+
+<!-- PRAYER -->
+<div class="section" id="prayer">
+  <h2>A Prayer</h2>
+
+  <div class="prayer-box">
+    <p>Father, we lift up the reader of this manual to You.</p>
+    <p>They have the method. They have the tools. They have the protocol.</p>
+    <p>Give them the courage to use them. Give them the wisdom to know when to speak and when to be silent. Give them the love that refuses to abandon the truth.</p>
+    <p>Protect the innocent. Expose the guilty. Confuse the plans of the evil one.</p>
+    <p>And when the work is done—and only You know when—let them hear:</p>
+    <p style="color: var(--gold); font-style: normal; font-size: 18px; margin-top: 16px;">"Well done, good and faithful servant. Enter into the joy of your Lord."</p>
+    <p>In the name of Jesus Christ, Amen.</p>
+  </div>
+
+  <p style="text-align: center; margin-top: 32px;">The manual is in your hands. Now go. Do something with it.</p>
+</div>
+
+<div class="footer-note">
+  FORBIDDEN KNOWLEDGE · THE SOVEREIGN OPERATOR<br>
+  The Field Manual<br><br>
+  Test all things. Hold fast to what is good.<br>
+  <span class="glory">Soli Deo Gloria.</span>
+</div>
+
+</div>
+
+<script>
+// ============================================================
+// NAVIGATION
+// ============================================================
+function showSection(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ============================================================
+// FEAR AUDIT
+// ============================================================
+function calculateFearAudit() {
+  const checks = document.querySelectorAll('.fear-check');
+  let count = 0;
+  checks.forEach(c => { if (c.checked) count++; });
+  const result = document.getElementById('fearResult');
+  result.classList.add('visible');
+  if (count === 7) {
+    result.innerHTML = '<h3>Seven Out of Seven</h3><p>You completed the protocol. The question is not whether the archons are real. The question is whether you feel different. If you do, the protocol worked. If you do not, the protocol did not work. Either way, you have data.</p>';
+  } else if (count >= 4) {
+    result.innerHTML = '<h3>' + count + ' Out of Seven</h3><p>You did most of the protocol. The days you missed are the data. What happened on those days? Was it fear? Outrage? Boredom? The gap is where the harvest lives.</p>';
+  } else if (count >= 1) {
+    result.innerHTML = '<h3>' + count + ' Out of Seven</h3><p>You started. That is enough to know something. The protocol is not a test you pass or fail. It is a mirror. What did you see?</p>';
+  } else {
+    result.innerHTML = '<h3>Zero Out of Seven</h3><p>You did not do the protocol. The claim cannot be tested from here. The manual asks you to do one thing: stop. If you cannot stop, that is the data.</p>';
+  }
+}
+
+// ============================================================
+// COMMITTEE PRACTICE
+// ============================================================
+function saveCommitteePractice() {
+  const merged = document.getElementById('committee-merged').value.trim();
+  const witnessed = document.getElementById('committee-witnessed').value.trim();
+  if (!merged || !witnessed) {
+    alert('Please fill in both steps.');
+    return;
+  }
+  const result = document.getElementById('committeeResult');
+  result.classList.add('visible');
+  result.innerHTML = '<h3>Practice Saved</h3><p><em>Merged:</em> "' + escapeHtml(merged) + '"</p><p><em>Witnessed:</em> "' + escapeHtml(witnessed) + '"</p><p>Notice the difference. The first version is heavy. The second version has space. That space is the witness. That space is you.</p>';
+}
+
+// ============================================================
+// BREATH TIMER
+// ============================================================
+let breathTimer = null;
+let breathSeconds = 0;
+
+function startBreathTimer() {
+  if (breathTimer) return;
+  breathSeconds = 0;
+  const btn = document.getElementById('breathStartBtn');
+  const result = document.getElementById('breathResult');
+  result.classList.add('visible');
+  result.innerHTML = '<h3>The Breath</h3><p id="breathCountdown">01:00</p><p>Inhale for 4. Hold for 4. Exhale for 4. Hold for 4. Follow the breath.</p>';
+  btn.disabled = true;
+  breathTimer = setInterval(() => {
+    breathSeconds++;
+    const remaining = 60 - breathSeconds;
+    const el = document.getElementById('breathCountdown');
+    if (el) el.textContent = '00:' + remaining.toString().padStart(2, '0');
+    if (remaining <= 0) {
+      clearInterval(breathTimer);
+      breathTimer = null;
+      btn.disabled = false;
+      result.innerHTML = '<h3>The Breath Is Complete</h3><p>Sit for a moment. Ask yourself: Who was breathing? The answer is not "me." The answer is not "the body." The answer is not "the mind." The answer is the space in which the breath appeared. That space is the zero point.</p>';
+    }
+  }, 1000);
+}
+
+// ============================================================
+// SILENCE TIMER
+// ============================================================
+let silenceTimer = null;
+let silenceSeconds = 0;
+
+function startSilenceTimer() {
+  if (silenceTimer) return;
+  silenceSeconds = 0;
+  const btn = document.getElementById('silenceStartBtn');
+  const result = document.getElementById('silenceResult');
+  result.classList.add('visible');
+  result.innerHTML = '<h3>The Silence</h3><p id="silenceCountdown">05:00</p><p>Sit. Do not try to stop the thoughts. Do not try to empty the mind. Just sit. The silence is not the absence of thoughts. The silence is the space in which the thoughts appear.</p>';
+  btn.disabled = true;
+  silenceTimer = setInterval(() => {
+    silenceSeconds++;
+    const remaining = 300 - silenceSeconds;
+    const el = document.getElementById('silenceCountdown');
+    if (el) el.textContent = Math.floor(remaining / 60).toString().padStart(2, '0') + ':' + (remaining % 60).toString().padStart(2, '0');
+    if (remaining <= 0) {
+      clearInterval(silenceTimer);
+      silenceTimer = null;
+      btn.disabled = false;
+      result.innerHTML = '<h3>The Silence Is Complete</h3><p>Sit for a moment. Ask yourself: What was there before the first thought? The answer is the zero point. It was there before the thought. It was there during the thought. It was there after the thought. It is here now.</p>';
+    }
+  }, 1000);
+}
+
+// ============================================================
+// DECLARATION
+// ============================================================
+function generateDeclaration() {
+  const name = document.getElementById('declare-name').value.trim();
+  if (!name) {
+    alert('Please enter your name.');
+    return;
+  }
+  const declaration = 'DECLARATION OF SOVEREIGNTY\n\nI, ' + name + ', declare my family and my land to be a sovereign nation under God. I will not kill. I will love my neighbor. I will protect the innocent. I will demand the accounting. I will not be a citizen of their system. I am the king behind my doors.\n\nSigned: ______________________________\nDate: ' + new Date().toLocaleDateString() + '\n\nSoli Deo Gloria.';
+  const result = document.getElementById('declareResult');
+  result.classList.add('visible');
+  result.innerHTML = '<h3>Your Declaration</h3><pre style="white-space: pre-wrap; font-family: \'IBM Plex Mono\', monospace; font-size: 12px; line-height: 1.6; color: var(--text);">' + escapeHtml(declaration) + '</pre><button class="btn btn-full" onclick="downloadDeclaration()" style="margin-top: 12px;">Download Declaration</button>';
+}
+
+function downloadDeclaration() {
+  const name = document.getElementById('declare-name').value.trim();
+  const declaration = 'DECLARATION OF SOVEREIGNTY\n\nI, ' + name + ', declare my family and my land to be a sovereign nation under God. I will not kill. I will love my neighbor. I will protect the innocent. I will demand the accounting. I will not be a citizen of their system. I am the king behind my doors.\n\nSigned: ______________________________\nDate: ' + new Date().toLocaleDateString() + '\n\nSoli Deo Gloria.';
+  const blob = new Blob([declaration], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'Sovereign-Declaration-' + name.replace(/\s+/g, '-') + '.txt';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ============================================================
+// UTILS
+// ============================================================
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+</script>
+</body>
+</html>
