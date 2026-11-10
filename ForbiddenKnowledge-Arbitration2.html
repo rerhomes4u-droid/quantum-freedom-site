@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Arbitration Shield v2 | Forbidden Knowledge</title>
+<style>
+:root {
+  --bg: #0a0a0a;
+  --surface: #141414;
+  --surface2: #1c1c1c;
+  --border: #2a2a2a;
+  --gold: #c9a84c;
+  --gold-dim: #8a7333;
+  --text: #e8e4dc;
+  --text-dim: #9a958c;
+  --danger: #8b3a3a;
+  --success: #3a6b4a;
+  --font: 'Georgia', 'Times New Roman', serif;
+  --mono: 'Courier New', monospace;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  line-height: 1.7;
+  min-height: 100vh;
+}
+.container { max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem; }
+header {
+  text-align: center;
+  padding: 3rem 1rem 2rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 2rem;
+}
+header h1 {
+  font-size: 1.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-weight: normal;
+}
+header p {
+  color: var(--text-dim);
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+  font-style: italic;
+}
+.step-indicator {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 2rem 0;
+  flex-wrap: wrap;
+}
+.step-dot {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  font-family: var(--mono);
+}
+.step-dot.active {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: rgba(201,168,76,0.1);
+}
+.step-dot.done {
+  border-color: var(--success);
+  color: var(--success);
+}
+.panel { display: none; animation: fadeIn 0.4s ease; }
+.panel.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+h2 {
+  font-size: 1.2rem;
+  color: var(--gold);
+  margin-bottom: 1rem;
+  font-weight: normal;
+  letter-spacing: 0.05em;
+}
+h3 {
+  font-size: 0.85rem;
+  color: var(--text);
+  margin: 1.5rem 0 0.75rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+p { margin-bottom: 1rem; color: var(--text-dim); }
+.highlight { color: var(--text); }
+.gold { color: var(--gold); }
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.card-title {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--gold);
+  margin-bottom: 0.75rem;
+  font-family: var(--mono);
+}
+.btn {
+  display: inline-block;
+  padding: 0.8rem 2rem;
+  background: transparent;
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s;
+  margin: 0.5rem 0.5rem 0.5rem 0;
+}
+.btn:hover { background: var(--gold); color: var(--bg); }
+.btn-secondary {
+  border-color: var(--border);
+  color: var(--text-dim);
+}
+.btn-secondary:hover { border-color: var(--text); color: var(--text); background: transparent; }
+.btn-small { padding: 0.5rem 1rem; font-size: 0.75rem; }
+input, textarea, select {
+  width: 100%;
+  padding: 0.8rem;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+}
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--gold-dim);
+}
+label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.4rem;
+  font-family: var(--mono);
+}
+.output-box {
+  background: var(--surface2);
+  border-left: 3px solid var(--gold);
+  padding: 1.25rem;
+  margin: 1rem 0;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  max-height: 600px;
+  overflow-y: auto;
+}
+.warning {
+  border-left: 3px solid var(--danger);
+  padding: 1rem 1.25rem;
+  background: rgba(139,58,58,0.1);
+  margin: 1rem 0;
+  font-size: 0.85rem;
+}
+.warning strong { color: var(--danger); }
+.success-box {
+  border-left: 3px solid var(--success);
+  padding: 1rem 1.25rem;
+  background: rgba(58,107,74,0.1);
+  margin: 1rem 0;
+}
+.cost-compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+.cost-box {
+  background: var(--surface2);
+  padding: 1.25rem;
+  border: 1px solid var(--border);
+}
+.cost-box h4 { color: var(--gold); font-size: 0.9rem; margin-bottom: 0.5rem; }
+.cost-box .number { font-size: 1.8rem; font-family: var(--mono); color: var(--text); }
+.cost-box .detail { font-size: 0.75rem; color: var(--text-dim); margin-top: 0.5rem; }
+.footer {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-dim);
+  font-size: 0.8rem;
+  border-top: 1px solid var(--border);
+  margin-top: 3rem;
+}
+.footer .gold { font-style: italic; }
+.script-block {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  padding: 1rem;
+  margin: 0.75rem 0;
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+.script-block .label {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  color: var(--gold-dim);
+  letter-spacing: 0.1em;
+  margin-bottom: 0.4rem;
+}
+.checklist {
+  list-style: none;
+  padding: 0;
+}
+.checklist li {
+  padding: 0.5rem 0;
+  padding-left: 1.5rem;
+  position: relative;
+  font-size: 0.9rem;
+  color: var(--text-dim);
+}
+.checklist li:before {
+  content: "□";
+  position: absolute;
+  left: 0;
+  color: var(--gold-dim);
+  font-family: var(--mono);
+}
+.tab-nav {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 1.5rem;
+  overflow-x: auto;
+}
+.tab-btn {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-dim);
+  padding: 0.75rem 1.25rem;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.tab-btn.active {
+  color: var(--gold);
+  border-bottom-color: var(--gold);
+}
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+</style>
+</head>
+<body>
+
+<div class="container">
+<header>
+  <h1>The Arbitration Shield v2</h1>
+  <p>Forbidden Knowledge: The Sovereign Operator — Companion Tool</p>
+  <p style="font-size:0.75rem; margin-top:0.75rem;">Based on the verified method of compelling private arbitration against junk debt buyers. Fixed and expanded.</p>
+</header>
+
+<div class="step-indicator" id="stepIndicator">
+  <div class="step-dot active" data-step="1">1</div>
+  <div class="step-dot" data-step="2">2</div>
+  <div class="step-dot" data-step="3">3</div>
+  <div class="step-dot" data-step="4">4</div>
+  <div class="step-dot" data-step="5">5</div>
+  <div class="step-dot" data-step="6">6</div>
+</div>
+
+<!-- STEP 1: UNDERSTAND -->
+<div class="panel active" id="panel1">
+  <h2>Step One: Understand What You Are Doing</h2>
+  <p>You are being sued by a junk debt buyer. They bought your old credit card debt for pennies on the dollar. They are counting on you to do nothing. They are counting on a default judgment.</p>
+  <p>But the original credit card agreement had a clause. It said disputes can go to private arbitration. That clause was written to protect the creditor. You are going to use it against them.</p>
+
+  <div class="card">
+    <div class="card-title">Why This Works (The Economics)</div>
+    <p>Debt buyers operate on volume. Court filing fees are low. Most people don't show up. The system is built for speed.</p>
+    <p><span class="gold">Arbitration breaks the system.</span></p>
+    <p>When you compel arbitration, the debt buyer has to pay:</p>
+    <ul class="checklist">
+      <li><strong>AAA:</strong> $375 filing fee (business side), $1,400 case management, plus arbitrator compensation at $300/hour [citation:22]</li>
+      <li><strong>JAMS:</strong> $2,500 filing fee, plus 13% case management fee on professional fees [citation:4]</li>
+    </ul>
+    <p>For a $2,000 debt, the math stops working. Many debt buyers dismiss rather than pay.</p>
+  </div>
+
+  <div class="warning">
+    <strong>Honest boundary:</strong> Arbitration is a forum change, not an automatic win. You still have to prepare your case. The debt buyer may still pursue. But the economics shift in your favor [citation:5].
+  </div>
+
+  <div class="card">
+    <div class="card-title">What You Need Before You Start</div>
+    <ul class="checklist">
+      <li>Your original credit card agreement (or the one the debt buyer attached to the complaint)</li>
+      <li>The arbitration clause language</li>
+      <li>The case number and court name from the summons</li>
+      <li>The plaintiff's attorney name and address</li>
+    </ul>
+  </div>
+
+  <button class="btn" onclick="goToStep(2)">I Have What I Need →</button>
+</div>
+
+<!-- STEP 2: INTAKE -->
+<div class="panel" id="panel2">
+  <h2>Step Two: Your Case Details</h2>
+  <p>Enter the information from your summons and complaint. This will generate your motion.</p>
+
+  <label>Your Full Legal Name *</label>
+  <input type="text" id="defName" placeholder="e.g., John Michael Smith">
+
+  <label>Your Street Address *</label>
+  <input type="text" id="defAddress" placeholder="e.g., 123 Main St, Phoenix, AZ 85001">
+
+  <label>Plaintiff (the debt buyer suing you) *</label>
+  <input type="text" id="plaintiff" placeholder="e.g., Midland Funding LLC">
+
+  <label>Plaintiff's Attorney (from the complaint)</label>
+  <input type="text" id="plAttorney" placeholder="e.g., XYZ Law Firm, 456 Oak Ave, Phoenix, AZ 85002">
+
+  <label>Court Name *</label>
+  <input type="text" id="courtName" placeholder="e.g., Maricopa County Justice Court">
+
+  <label>Case Number *</label>
+  <input type="text" id="caseNo" placeholder="e.g., CV2024-001234">
+
+  <label>Original Creditor (the credit card company)</label>
+  <input type="text" id="origCreditor" placeholder="e.g., Capital One, Synchrony Bank, etc.">
+
+  <label>Arbitration Forum Named in the Agreement (if known)</label>
+  <select id="forum">
+    <option value="AAA">American Arbitration Association (AAA)</option>
+    <option value="JAMS">JAMS</option>
+    <option value="either">Either / Not Sure</option>
+  </select>
+
+  <button class="btn" onclick="validateAndGenerate()">Generate My Motion →</button>
+  <button class="btn btn-secondary" onclick="goToStep(1)">← Back</button>
+</div>
+
+<!-- STEP 3: THE MATH -->
+<div class="panel" id="panel3">
+  <h2>Step Three: The Cost Comparison</h2>
+  <p>This is why the debt buyer does not want to go to arbitration. Show them the math.</p>
+
+  <div class="cost-compare">
+    <div class="cost-box">
+      <h4>What You Pay (AAA)</h4>
+      <div class="number">$225</div>
+      <div class="detail">Maximum consumer filing fee. Capped by AAA rules [citation:22].</div>
+    </div>
+    <div class="cost-box">
+      <h4>What They Pay (AAA)</h4>
+      <div class="number">$1,775+</div>
+      <div class="detail">$375 filing + $1,400 case management. Plus arbitrator at $300/hour [citation:22].</div>
+    </div>
+  </div>
+
+  <div class="cost-compare">
+    <div class="cost-box">
+      <h4>What You Pay (JAMS)</h4>
+      <div class="number">$250</div>
+      <div class="detail">Consumer filing fee. All other costs borne by the company [citation:15].</div>
+    </div>
+    <div class="cost-box">
+      <h4>What They Pay (JAMS)</h4>
+      <div class="number">$2,500+</div>
+      <div class="detail">Filing fee plus 13% case management on professional fees [citation:4].</div>
+    </div>
+  </div>
+
+  <div class="success-box">
+    <strong class="gold">The leverage:</strong> If your debt is under $3,000, the debt buyer is losing money by pursuing arbitration. Many dismiss. Some settle for far less. The math is on your side.
+  </div>
+
+  <div class="warning">
+    <strong>When this does NOT work:</strong> If the debt is large (e.g., $15,000+), the debt buyer may absorb the arbitration cost. If they have strong documentation, they may pursue. If you are already in trial, it may be too late [citation:5]. This is a strategic tool, not a guaranteed win.
+  </div>
+
+  <button class="btn" onclick="goToStep(4)">View My Motion →</button>
+  <button class="btn btn-secondary" onclick="goToStep(2)">← Back</button>
+</div>
+
+<!-- STEP 4: THE MOTION -->
+<div class="panel" id="panel4">
+  <h2>Step Four: Your Motion to Compel Arbitration</h2>
+  <p>Copy this. Fill in any remaining bracketed sections. File it with the court clerk. Send a copy to the plaintiff's attorney by certified mail.</p>
+
+  <div id="motionContainer">
+    <div class="output-box" id="motionOutput">Your motion will appear here after you complete Step Two.</div>
+  </div>
+
+  <button class="btn" onclick="copyMotion()">Copy Motion to Clipboard</button>
+
+  <div class="card" style="margin-top:1.5rem;">
+    <div class="card-title">Filing Instructions</div>
+    <ol style="color:var(--text-dim); padding-left:1.5rem; font-size:0.9rem;">
+      <li>Print three copies of the motion.</li>
+      <li>File one copy with the court clerk. Ask for a stamped copy for your records.</li>
+      <li>Mail one copy to the plaintiff's attorney by certified mail, return receipt requested.</li>
+      <li>Keep the third copy for yourself.</li>
+      <li>Attach a copy of the credit card agreement with the arbitration clause highlighted.</li>
+    </ol>
+  </div>
+
+  <button class="btn" onclick="goToStep(5)">What Happens Next →</button>
+  <button class="btn btn-secondary" onclick="goToStep(3)">← Back</button>
+</div>
+
+<!-- STEP 5: WHAT NEXT -->
+<div class="panel" id="panel5">
+  <h2>Step Five: What Happens After You File</h2>
+
+  <div class="tab-nav">
+    <button class="tab-btn active" onclick="switchTab('panel5', 'timeline', this)">The Timeline</button>
+    <button class="tab-btn" onclick="switchTab('panel5', 'objections', this)">If They Object</button>
+    <button class="tab-btn" onclick="switchTab('panel5', 'arbitration', this)">Starting Arbitration</button>
+    <button class="tab-btn" onclick="switchTab('panel5', 'settlement', this)">Settlement Script</button>
+  </div>
+
+  <div id="timeline" class="tab-content active">
+    <div class="card">
+      <div class="card-title">The Timeline</div>
+      <div class="script-block">
+        <div class="label">Week 1-2: Filing</div>
+The clerk stamps your motion. You mail the certified copy to the attorney. The clock starts.
+      </div>
+      <div class="script-block">
+        <div class="label">Week 2-4: Response</div>
+The plaintiff's attorney may file an objection. This is normal. They will argue you waited too long, or that the clause does not apply. The court decides.
+      </div>
+      <div class="script-block">
+        <div class="label">Week 4-8: Ruling</div>
+The judge grants or denies the motion. If granted, the court case is stayed (paused) or dismissed. You then initiate arbitration with AAA or JAMS.
+      </div>
+    </div>
+  </div>
+
+  <div id="objections" class="tab-content">
+    <div class="card">
+      <div class="card-title">Common Objections and Your Responses</div>
+      <div class="script-block">
+        <div class="label">"You waited too long."</div>
+The agreement says arbitration can be elected "as long as a judgment has not been entered" or "as long as trial has not started." Check your agreement. If neither has happened, you are within your rights. Most courts enforce the clause as written [citation:5].
+      </div>
+      <div class="script-block">
+        <div class="label">"The clause doesn't apply to assignees."</div>
+Most credit card agreements explicitly state that the arbitration clause applies to successors and assigns. Courts have held that debt buyers who purchase accounts step into the shoes of the original creditor and are bound by the arbitration clause [citation:14][citation:20]. The debt buyer is an assignee. They are bound.
+      </div>
+      <div class="script-block">
+        <div class="label">"This is a small claims case."</div>
+If there is an attorney involved, it is not small claims court. Debt buyers always use attorneys. Check your local rules. If the case was filed in a court where attorneys are not allowed, the arbitration clause may not apply [citation:5].
+      </div>
+      <div class="script-block">
+        <div class="label">"The clause doesn't cover this dispute."</div>
+Most arbitration clauses are broad: "all disputes arising from or relating to the account." A debt collection lawsuit arises from the account. The clause covers it.
+      </div>
+    </div>
+  </div>
+
+  <div id="arbitration" class="tab-content">
+    <div class="card">
+      <div class="card-title">After the Motion is Granted: Starting Arbitration</div>
+      <div class="script-block">
+        <div class="label">Step 1: Choose Your Forum</div>
+If the agreement names AAA or JAMS, use that forum. If it says "either," choose the one that is more convenient for you.
+      </div>
+      <div class="script-block">
+        <div class="label">Step 2: File Your Demand</div>
+Go to the forum's website. Download the consumer demand form. Fill it out. Attach a copy of the arbitration clause and the court order granting your motion. Pay your filing fee ($225 for AAA, $250 for JAMS).
+      </div>
+      <div class="script-block">
+        <div class="label">Step 3: Serve the Debt Buyer</div>
+The forum will send a copy to the debt buyer. They now have to pay their share. This is the moment the math hits them.
+      </div>
+      <div class="script-block">
+        <div class="label">Step 4: Wait</div>
+Many debt buyers dismiss at this point. The cost of arbitration exceeds the value of the debt. If they pursue, you prepare your case. You present your evidence to the arbitrator. The same rules of evidence apply, but the process is faster and more informal than court.
+      </div>
+    </div>
+  </div>
+
+  <div id="settlement" class="tab-content">
+    <div class="card">
+      <div class="card-title">If They Want to Settle (They Probably Will)</div>
+      <p>Once you file the motion, the debt buyer's attorney may reach out to settle. Here is a script:</p>
+      <div class="script-block">
+        <div class="label">The Settlement Script</div>
+"I am not interested in a payment plan. I am interested in resolving this matter. I have filed a motion to compel arbitration. If the court grants it, you will have to pay thousands of dollars in arbitration fees for a debt you bought for pennies. I am willing to settle for [amount, e.g., 10-20% of the alleged debt] as a full and final resolution. If you agree, I will dismiss the motion and we can be done. If not, I will see you in arbitration."
+      </div>
+      <div class="warning" style="margin-top:1rem;">
+        <strong>Honest boundary:</strong> Only make an offer you can afford. Get any settlement in writing before you pay anything. Do not pay until you have a signed agreement that says the matter is resolved and no further collection will occur.
+      </div>
+    </div>
+  </div>
+
+  <button class="btn" onclick="goToStep(6)">The Final Word →</button>
+  <button class="btn btn-secondary" onclick="goToStep(4)">← Back</button>
+</div>
+
+<!-- STEP 6: FINAL -->
+<div class="panel" id="panel6">
+  <h2>Step Six: The Final Word</h2>
+
+  <div class="success-box">
+    <strong class="gold">You are not helpless.</strong>
+  </div>
+
+  <p>The system was built for volume. You are introducing friction. Friction costs money. Money changes the math. The math changes the outcome.</p>
+
+  <p>This app is a tool. It is not a lawyer. It is not a guarantee. It is a strategy that has worked for others and may work for you.</p>
+
+  <div class="card">
+    <div class="card-title">What This App Does NOT Do</div>
+    <ul class="checklist">
+      <li>Guarantee that the court will grant your motion. The judge decides.</li>
+      <li>Guarantee that the debt buyer will dismiss. They might pursue.</li>
+      <li>Replace legal advice. If you can afford an attorney, hire one.</li>
+      <li>Work if you have already lost. If a judgment has been entered, this motion is too late.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <div class="card-title">What This App DOES Do</div>
+    <ul class="checklist">
+      <li>Explain the strategy in plain language.</li>
+      <li>Generate a motion you can file.</li>
+      <li>Show you the math that changes the debt buyer's calculus.</li>
+      <li>Give you the language to respond to objections.</li>
+      <li>Walk you through the next steps if the motion is granted.</li>
+    </ul>
+  </div>
+
+  <button class="btn" onclick="goToStep(1)">Start Over</button>
+  <button class="btn btn-secondary" onclick="window.print()">Print This Page</button>
+</div>
+
+<div class="footer">
+  <p>The Arbitration Shield v2 — Built for <em>Forbidden Knowledge: The Sovereign Operator</em></p>
+  <p style="margin-top:0.5rem;">Based on verified consumer arbitration rules and procedures. No legal advice. No guarantees. The gaps are marked.</p>
+  <p class="gold" style="margin-top:1rem;">Soli Deo Gloria.</p>
+</div>
+
+</div>
+
+<script>
+function goToStep(step) {
+  // Hide all panels
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  // Show target panel
+  const target = document.getElementById('panel' + step);
+  if (target) target.classList.add('active');
+  
+  // Update step indicators
+  document.querySelectorAll('.step-dot').forEach(d => {
+    const s = parseInt(d.dataset.step);
+    d.classList.remove('active', 'done');
+    if (s === step) d.classList.add('active');
+    else if (s < step) d.classList.add('done');
+  });
+  
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function validateAndGenerate() {
+  const required = ['defName', 'courtName', 'caseNo'];
+  const missing = [];
+  
+  for (const id of required) {
+    const el = document.getElementById(id);
+    if (el && !el.value.trim()) {
+      missing.push(el.previousElementSibling ? el.previousElementSibling.textContent.replace(' *', '') : id);
+    }
+  }
+  
+  if (missing.length > 0) {
+    alert('Please fill in the required fields: ' + missing.join(', '));
+    return;
+  }
+  
+  generateMotion();
+  goToStep(3);
+}
+
+function generateMotion() {
+  const defName = document.getElementById('defName').value || '[YOUR NAME]';
+  const defAddress = document.getElementById('defAddress').value || '[YOUR ADDRESS]';
+  const plaintiff = document.getElementById('plaintiff').value || '[PLAINTIFF NAME]';
+  const plAttorney = document.getElementById('plAttorney').value || '[PLAINTIFF ATTORNEY]';
+  const courtName = document.getElementById('courtName').value || '[COURT NAME]';
+  const caseNo = document.getElementById('caseNo').value || '[CASE NUMBER]';
+  const origCreditor = document.getElementById('origCreditor').value || '[ORIGINAL CREDITOR]';
+  const forum = document.getElementById('forum').value;
+
+  let forumName = '';
+  let forumDetail = '';
+  if (forum === 'AAA') {
+    forumName = 'American Arbitration Association (AAA)';
+    forumDetail = 'Pursuant to the AAA Consumer Arbitration Rules, Defendant has paid or will pay the consumer filing fee of $225, and Plaintiff shall be responsible for the business filing fee of $375, case management fees, and arbitrator compensation.';
+  } else if (forum === 'JAMS') {
+    forumName = 'JAMS';
+    forumDetail = 'Pursuant to the JAMS Consumer Minimum Standards, Defendant has paid or will pay the consumer filing fee of $250, and Plaintiff shall be responsible for all remaining JAMS fees and costs, including the $2,500 filing fee, case management fees, and arbitrator compensation.';
+  } else {
+    forumName = 'American Arbitration Association (AAA) or JAMS';
+    forumDetail = 'Defendant will initiate arbitration before the forum designated in the agreement. If the agreement permits either forum, Defendant will select the forum that is most convenient.';
+  }
+
+  const motion = `IN THE ${courtName.toUpperCase()}
+
+${defName},
+Defendant
+
+v.
+
+${plaintiff},
+Plaintiff
+
+Case No: ${caseNo}
+
+MOTION TO COMPEL PRIVATE ARBITRATION AND STAY PROCEEDINGS
+
+Defendant ${defName}, appearing pro se, respectfully moves this Court to compel arbitration pursuant to the Federal Arbitration Act (9 U.S.C. § 1 et seq.) and the arbitration provision contained in the governing credit card agreement between the Defendant and ${origCreditor}, and to stay or dismiss these proceedings.
+
+1. EXISTENCE OF ARBITRATION AGREEMENT
+
+The underlying credit card agreement between the Defendant and ${origCreditor} contains a binding arbitration clause. A true and correct copy of the relevant agreement and arbitration provision is attached hereto as Exhibit A. The clause states that either party may elect to resolve disputes through binding arbitration.
+
+2. APPLICABILITY TO PLAINTIFF
+
+The arbitration agreement expressly applies to successors and assigns. Plaintiff ${plaintiff} is an alleged assignee of the original creditor and is therefore bound by the same arbitration provision. Plaintiff cannot enforce the terms of the contract while ignoring the arbitration clause. See, e.g., Clemons v. Midland Credit Management, Inc., No. 1-18-CV-16883-NLH-AMD (D.N.J. July 25, 2019) (holding that debt buyer stepped into the shoes of the original creditor and was bound by the arbitration agreement).
+
+3. SCOPE OF THE CLAUSE
+
+The present dispute arises from the credit account and falls within the scope of the arbitration agreement. The agreement covers all disputes arising from or relating to the account.
+
+4. ELECTION OF ARBITRATION
+
+Pursuant to the terms of the agreement, Defendant hereby elects to resolve this dispute through binding arbitration before ${forumName}. ${forumDetail}
+
+5. RELIEF REQUESTED
+
+Defendant respectfully requests that this Court:
+
+a. Compel the parties to proceed to binding arbitration before ${forumName};
+b. Stay or dismiss these proceedings pending arbitration;
+c. Grant such other relief as the Court deems just and proper.
+
+Respectfully submitted,
+
+_________________________
+${defName}
+${defAddress}
+Defendant, Pro Se
+
+Dated: _________________
+
+CERTIFICATE OF SERVICE
+
+I hereby certify that a true and correct copy of the foregoing Motion was served upon the Plaintiff's attorney, ${plAttorney || '[PLAINTIFF ATTORNEY]'}, by certified mail, return receipt requested, on this ____ day of ____________, 20__.
+
+_________________________
+${defName}`;
+
+  document.getElementById('motionOutput').textContent = motion;
+}
+
+function copyMotion() {
+  const text = document.getElementById('motionOutput').textContent;
+  if (!text || text.includes('Your motion will appear here')) {
+    alert('Please generate your motion first by completing Step Two.');
+    return;
+  }
+  navigator.clipboard.writeText(text).then(() => {
+    alert('Motion copied to clipboard.');
+  }).catch(() => {
+    // Fallback for older browsers
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
+    alert('Motion copied to clipboard.');
+  });
+}
+
+function switchTab(parentId, tabId, btn) {
+  const parent = document.getElementById(parentId);
+  if (!parent) return;
+  
+  parent.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  parent.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  
+  const target = document.getElementById(tabId);
+  if (target) target.classList.add('active');
+  if (btn) btn.classList.add('active');
+}
+</script>
+</body>
+</html>
