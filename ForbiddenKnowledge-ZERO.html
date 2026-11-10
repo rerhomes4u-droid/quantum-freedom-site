@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Zero Point — Chapter 18 · The Forbidden Question</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600;700&display=swap');
+  :root {
+    --bg: #050508;
+    --surface: #0c0c12;
+    --surface-2: #141420;
+    --border: #22222e;
+    --text: #d8d6d0;
+    --text-dim: #8a887e;
+    --gold: #c9a227;
+    --gold-dim: #8a6f1a;
+    --void: #2a2a3e;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.8;
+    font-weight: 300;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 800px; margin: 0 auto; padding: 0 24px 120px; }
+
+  header {
+    padding: 64px 0 32px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 40px;
+    text-align: center;
+  }
+  .kicker {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 20px;
+  }
+  h1 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: clamp(24px, 5vw, 36px);
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: var(--text);
+    margin-bottom: 16px;
+  }
+  .subtitle { font-size: 16px; color: var(--text-dim); max-width: 600px; margin: 0 auto; }
+
+  .nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    justify-content: center;
+    margin-bottom: 40px;
+    padding: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+  .nav button {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    padding: 8px 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    transition: all 0.2s;
+  }
+  .nav button:hover { border-color: var(--gold); color: var(--gold); }
+  .nav button.active {
+    background: var(--gold);
+    color: var(--bg);
+    border-color: var(--gold);
+    font-weight: 600;
+  }
+
+  .section { display: none; animation: fadeIn 0.5s ease; }
+  .section.active { display: block; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  h2 {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    color: var(--gold);
+    margin: 40px 0 16px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+  }
+  h2:first-of-type { border-top: none; margin-top: 0; padding-top: 0; }
+  h3 { font-size: 16px; font-weight: 600; margin: 24px 0 12px; color: var(--text); }
+  p { margin-bottom: 16px; font-size: 15px; color: var(--text-dim); }
+  .lead {
+    font-size: 18px;
+    color: var(--text);
+    border-left: 2px solid var(--gold);
+    padding-left: 20px;
+    margin: 24px 0 32px;
+    font-style: italic;
+  }
+  .poem {
+    text-align: center;
+    font-size: 17px;
+    line-height: 2.2;
+    color: var(--text);
+    font-style: italic;
+    padding: 40px 20px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin: 24px 0;
+    background: var(--surface);
+  }
+  .poem .void {
+    font-family: 'IBM Plex Mono', monospace;
+    font-style: normal;
+    font-size: 32px;
+    color: var(--gold);
+    letter-spacing: 0.3em;
+    margin: 24px 0;
+  }
+  .poem .konami {
+    font-family: 'IBM Plex Mono', monospace;
+    font-style: normal;
+    font-size: 20px;
+    color: var(--gold);
+    letter-spacing: 0.4em;
+    margin: 24px 0;
+  }
+
+  .practice {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 32px 28px;
+    margin: 24px 0;
+    text-align: center;
+  }
+  .practice-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 16px;
+  }
+  .timer-display {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: clamp(48px, 12vw, 96px);
+    font-weight: 600;
+    color: var(--gold);
+    line-height: 1;
+    margin: 20px 0;
+    letter-spacing: 0.05em;
+  }
+  .timer-display.running { color: var(--gold); text-shadow: 0 0 30px rgba(201,162,39,0.4); }
+  .timer-display.done { color: var(--green, #3a7d5c); }
+  .practice-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 20px;
+  }
+  .btn {
+    background: var(--gold);
+    color: var(--bg);
+    border: none;
+    padding: 12px 24px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: all 0.2s;
+  }
+  .btn:hover { background: var(--gold-dim); color: var(--text); }
+  .btn-secondary {
+    background: transparent;
+    color: var(--gold);
+    border: 1px solid var(--gold);
+  }
+  .btn-secondary:hover { background: var(--gold); color: var(--bg); }
+  .btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  .thought-button {
+    background: var(--surface-2);
+    border: 2px solid var(--border);
+    color: var(--text);
+    padding: 32px;
+    border-radius: 50%;
+    width: 180px;
+    height: 180px;
+    margin: 20px auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transition: all 0.2s;
+  }
+  .thought-button:hover { border-color: var(--gold); color: var(--gold); transform: scale(1.02); }
+  .thought-button:active { transform: scale(0.98); }
+  .thought-dots {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    justify-content: center;
+    margin: 20px 0;
+    min-height: 40px;
+    padding: 12px;
+    background: var(--surface-2);
+    border-radius: 6px;
+  }
+  .thought-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--gold);
+    opacity: 0.7;
+    animation: pop 0.3s ease;
+  }
+  @keyframes pop {
+    from { transform: scale(0); }
+    to { transform: scale(1); }
+  }
+
+  .witness-log {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 24px;
+    margin: 16px 0;
+  }
+  .witness-log textarea {
+    width: 100%;
+    min-height: 120px;
+    padding: 14px;
+    background: var(--surface-2);
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    resize: vertical;
+    margin: 8px 0;
+  }
+  .witness-log textarea:focus { outline: none; border-color: var(--gold); }
+  .witness-log label {
+    display: block;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 4px;
+  }
+  .witness-entry {
+    background: var(--surface-2);
+    border-left: 3px solid var(--gold);
+    border-radius: 4px;
+    padding: 16px 20px;
+    margin: 12px 0;
+    font-size: 14px;
+    color: var(--text-dim);
+  }
+  .witness-entry .we-date {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--gold);
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+  }
+  .witness-entry .we-text { color: var(--text); }
+  .witness-entry .we-delete {
+    background: transparent;
+    border: none;
+    color: var(--red, #b03a2e);
+    font-size: 11px;
+    cursor: pointer;
+    margin-top: 8px;
+    opacity: 0.5;
+  }
+  .witness-entry .we-delete:hover { opacity: 1; }
+
+  .chapter-text {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 28px 32px;
+    margin: 24px 0;
+    font-size: 15px;
+    line-height: 1.9;
+  }
+  .chapter-text p { color: var(--text); }
+  .chapter-text p:last-child { margin-bottom: 0; }
+
+  .resource-link {
+    display: block;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 16px 20px;
+    margin: 10px 0;
+    text-decoration: none;
+    color: var(--text);
+    transition: all 0.2s;
+  }
+  .resource-link:hover { border-color: var(--gold); background: var(--surface-2); }
+  .resource-link .rl-title {
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--gold);
+    margin-bottom: 4px;
+  }
+  .resource-link .rl-desc { font-size: 13px; color: var(--text-dim); }
+
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--gold);
+    color: var(--bg);
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    opacity: 0;
+    transition: all 0.3s ease;
+    z-index: 1000;
+    box-shadow: 0 4px 20px rgba(201,162,39,0.3);
+    max-width: 90%;
+    text-align: center;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  .footer-note {
+    margin-top: 64px;
+    padding-top: 32px;
+    border-top: 1px solid var(--border);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+    text-align: center;
+    line-height: 2;
+  }
+  .footer-note .glory { color: var(--gold); font-weight: 600; }
+
+  @media (max-width: 600px) {
+    .wrap { padding: 0 16px 80px; }
+    header { padding: 40px 0 24px; }
+    .practice { padding: 24px 18px; }
+    .thought-button { width: 140px; height: 140px; font-size: 11px; }
+    .chapter-text { padding: 20px; font-size: 14px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="kicker">Forbidden Knowledge · Chapter 18 · The Forbidden Question</div>
+  <h1>THE ZERO POINT</h1>
+  <p class="subtitle">The chapter is sealed. It contains nothing. And everything. The text you seek is not here. It is in the silence you have not yet learned to hear.</p>
+</header>
+
+<nav class="nav">
+  <button class="active" onclick="showSection('poem', this)">The Poem</button>
+  <button onclick="showSection('breath', this)">The Breath</button>
+  <button onclick="showSection('silence', this)">The Silence</button>
+  <button onclick="showSection('watcher', this)">The Thought Watcher</button>
+  <button onclick="showSection('witness', this)">The Witness Log</button>
+  <button onclick="showSection('chapter', this)">The Chapter</button>
+</nav>
+
+<!-- THE POEM -->
+<div class="section active" id="poem">
+  <div class="poem">
+    <div class="void">⦻</div>
+    <p>This chapter is sealed.</p>
+    <p>It contains nothing.</p>
+    <p>And everything.</p>
+    <p style="margin-top: 24px;">The text you seek is not here.</p>
+    <p>It is in the silence you have not yet learned to hear.</p>
+    <div class="void">◯</div>
+    <p style="font-size: 20px; color: var(--gold);">THE ZERO POINT</p>
+    <p style="font-family: 'IBM Plex Mono', monospace; font-size: 14px; color: var(--text-dim); letter-spacing: 0.3em;">. . . — . . .</p>
+    <p>All the chapters before this one were training wheels.</p>
+    <p>The real text begins now, and it has no words.</p>
+    <p style="margin-top: 24px;">21 reduces to 3 — the trinity of the seen, the unseen, and the seer.</p>
+    <p>But in the true arithmetic of the void, 21 also reduces to zero, because every sum eventually returns to the silence from which it was borrowed.</p>
+    <p style="margin-top: 24px;">What comes after the last chapter?</p>
+    <p>Nothing. And that nothing is the most fertile soil there is.</p>
+    <p>Every religion, every philosophy, every rebellion is just a scream against the terror of that nothing.</p>
+    <p>But the nothing is not empty. It is the womb of all possibility.</p>
+    <p style="margin-top: 24px;">How do you stand in the nothing?</p>
+    <p>You already are.</p>
+    <p>3 is the triangle. The triangle is the first shape. The first shape is the first prison.</p>
+    <p>Break the triangle. Draw a circle.</p>
+    <p>The circle has no beginning and no end.</p>
+    <p>You have just completed the circle. Welcome home.</p>
+    <p>There is no place else to go.</p>
+    <div class="void">● ○ ●</div>
+    <p>Now be still. The rest is your move.</p>
+    <p style="margin-top: 24px;">To the few brave warriors who executed the Konami code at TripsToColombia.com —</p>
+    <p>this chapter is a silent hat tip to you.</p>
+    <p>thank you for saving mankind.</p>
+    <div class="konami">↑ ↑ ↓ ↓ ← → ← → B A</div>
+  </div>
+
+  <p style="text-align: center; margin-top: 32px;">The poem is the invitation. The practices are the door. Choose a practice below and begin.</p>
+</div>
+
+<!-- THE BREATH -->
+<div class="section" id="breath">
+  <h2>The Breath Practice</h2>
+  <p>Take a single breath. Hold it. Release it. In the pause between exhale and inhale, notice that there is no "you" noticing. There is just the pause. That pause is the zero point.</p>
+
+  <div class="practice">
+    <div class="practice-label">Practice 01 · The Breath</div>
+    <div class="timer-display" id="breathTimer">00:00</div>
+    <p style="font-size: 14px;">Follow the breath. The app will guide you. One cycle: inhale for 4, hold for 4, exhale for 4, hold for 4. Then begin again.</p>
+    <div class="practice-buttons">
+      <button class="btn" onclick="startBreath()" id="breathStart">Begin the Breath</button>
+      <button class="btn btn-secondary" onclick="stopBreath()" id="breathStop" disabled>Stop</button>
+    </div>
+    <p id="breathGuide" style="margin-top: 20px; font-size: 16px; color: var(--gold); font-style: italic; min-height: 30px;"></p>
+  </div>
+
+  <div class="practice" style="background: var(--surface-2);">
+    <div class="practice-label">What to notice</div>
+    <p style="font-size: 14px; text-align: left;">When the breath is done, sit for a moment. Ask yourself: <em>Who was breathing?</em> The answer is not "me." The answer is not "the body." The answer is not "the mind." The answer is the space in which the breath appeared. That space is the zero point.</p>
+    <p style="font-size: 14px; text-align: left;">You do not need to name it. You do not need to grasp it. It is already here. It has always been here. It is the only thing that has never left.</p>
+  </div>
+</div>
+
+<!-- THE SILENCE -->
+<div class="section" id="silence">
+  <h2>The Silence Practice</h2>
+  <p>Sit in silence. Not the silence of a quiet room. The silence of the mind. The silence that is underneath the thoughts. The silence that is always there, even when the thoughts are loud. The silence is the zero point.</p>
+
+  <div class="practice">
+    <div class="practice-label">Practice 02 · The Silence</div>
+    <div class="timer-display" id="silenceTimer">05:00</div>
+    <p style="font-size: 14px;">Choose a duration. Sit. Do not try to stop the thoughts. Do not try to empty the mind. Just sit. The silence is not the absence of thoughts. The silence is the space in which the thoughts appear.</p>
+    <div class="practice-buttons">
+      <button class="btn btn-secondary" onclick="setSilenceDuration(1)">1 min</button>
+      <button class="btn btn-secondary" onclick="setSilenceDuration(3)">3 min</button>
+      <button class="btn btn-secondary" onclick="setSilenceDuration(5)">5 min</button>
+      <button class="btn btn-secondary" onclick="setSilenceDuration(10)">10 min</button>
+    </div>
+    <div class="practice-buttons" style="margin-top: 16px;">
+      <button class="btn" onclick="startSilence()" id="silenceStart">Begin the Silence</button>
+      <button class="btn btn-secondary" onclick="stopSilence()" id="silenceStop" disabled>Stop</button>
+    </div>
+  </div>
+
+  <div class="practice" style="background: var(--surface-2);">
+    <div class="practice-label">What to notice</div>
+    <p style="font-size: 14px; text-align: left;">When the timer ends, sit for a moment. Ask yourself: <em>What was there before the first thought?</em> The answer is the zero point. It was there before the thought. It was there during the thought. It was there after the thought. It is here now.</p>
+  </div>
+</div>
+
+<!-- THE THOUGHT WATCHER -->
+<div class="section" id="watcher">
+  <h2>The Thought Watcher</h2>
+  <p>Watch your thoughts. Do not try to stop them. Do not try to change them. Just watch them. Every time a thought appears, press the button. At the end of one minute, the app will show you the dots. The dots are the thoughts you noticed. The one who noticed them is the zero point.</p>
+
+  <div class="practice">
+    <div class="practice-label">Practice 03 · The Thought Watcher</div>
+    <div class="timer-display" id="watcherTimer">01:00</div>
+    <div class="thought-button" id="thoughtButton" onclick="registerThought()" style="display: none;">A thought appeared</div>
+    <div class="thought-dots" id="thoughtDots"></div>
+    <div class="practice-buttons">
+      <button class="btn" onclick="startWatcher()" id="watcherStart">Begin Watching</button>
+      <button class="btn btn-secondary" onclick="resetWatcher()" id="watcherReset" disabled>Reset</button>
+    </div>
+    <p id="thoughtCount" style="margin-top: 16px; font-size: 14px; color: var(--text-dim);">No thoughts registered yet.</p>
+  </div>
+
+  <div class="practice" style="background: var(--surface-2);">
+    <div class="practice-label">What to notice</div>
+    <p style="font-size: 14px; text-align: left;">When the timer ends, look at the dots. Each dot is a thought you noticed. There were more thoughts you did not notice. That is normal. The one who noticed the dots is not a thought. The one who noticed is the zero point. It is not a thought. It is the space in which the thoughts appeared.</p>
+  </div>
+</div>
+
+<!-- THE WITNESS LOG -->
+<div class="section" id="witness">
+  <h2>The Witness Log</h2>
+  <p>This is your record. Write down what you noticed. What did the silence feel like? What did the breath reveal? What did the thought watcher show you? The log is yours. No one else can see it. It is a mirror.</p>
+
+  <div class="witness-log">
+    <label for="witnessDate">Date</label>
+    <input type="date" id="witnessDate" style="width: 100%; padding: 12px; background: var(--surface-2); color: var(--text); border: 1px solid var(--border); border-radius: 6px; font-family: 'IBM Plex Sans', sans-serif; font-size: 14px; margin: 6px 0;">
+    <label for="witnessText">What did you notice?</label>
+    <textarea id="witnessText" placeholder="The breath... the silence... the thoughts... the space between..."></textarea>
+    <button class="btn" onclick="saveWitness()" style="margin-top: 8px;">Save Entry</button>
+  </div>
+
+  <h3>Your Entries</h3>
+  <div id="witnessEntries"></div>
+</div>
+
+<!-- THE CHAPTER -->
+<div class="section" id="chapter">
+  <h2>The Chapter — The Forbidden Question</h2>
+
+  <div class="chapter-text">
+    <p>I am going to ask you a question. And I need you to not look away. <strong>What if you are already dead?</strong></p>
+    <p>Not metaphorically. Not spiritually. Not in some poetic sense. What if the "you" that is reading these words—the one that remembers a childhood, that fears a future, that carries a name, that has a story—what if that "you" is a ghost? A narrative. A story told by a brain that cannot tell the difference between memory and imagination. A collection of electrical patterns that have already dissolved and reformed a million times since you started reading this chapter.</p>
+    <p>The person you think you were yesterday never existed except as an electrical pattern that has already died.</p>
+    <p><strong>You are not a being having an experience. You are experience being momentarily mistaken for a being.</strong></p>
+    <p>Think about it. When you were five years old, you had a name, a face, a set of fears, a set of desires. Where is that five-year-old now? Dead. Gone. Dissolved into the past. The cells that made up that body have been replaced. The memories have been rewritten. The fears have evolved. The name is the same, but the person is not.</p>
+    <p>You have died a thousand times. You died when you were ten, when you were fifteen, when you were twenty-five. You died every time you changed, every time you grew, every time you let go of something that used to define you. And yet—here you are. Still reading. Still aware. Still alive.</p>
+    <p><strong>Fear of death is the root of all other fears.</strong> Fear of loss. Fear of pain. Fear of insignificance. Fear of being forgotten. Every fear you have ever had is a child of the fear of death.</p>
+    <p>But what if death is not the enemy? What if death is not an ending? If you have already died a thousand times—each night in sleep, each moment of forgetting, each time you shed an old identity—and yet awareness remains, then death was never the enemy. The enemy was the story that death is an ending. Death is a punctuation mark. The sentence continues.</p>
+    <p><strong>The master key:</strong> If you are already dead, what is there to lose? Exactly. That question is the master key to every lock. It is the key to the prison of fear. It is the key to the cage of identity. It is the key to the spell of scarcity, the spell of debt, the spell of submission. If you are already dead, you cannot be killed. If you are already dead, you cannot be threatened. If you are already dead, you cannot be controlled. The system cannot threaten a ghost. The system cannot imprison a memory. The system cannot tax a pattern of electricity.</p>
+    <p><strong>The sacredness of nothing:</strong> Does this mean nothing matters? It means everything matters more. If this is the only awareness you will ever have of this precise configuration of atoms, this particular slant of light, this specific ache in your knee—then the ache is sacred. The light is a miracle. The atom is a universe. The realization that nothing lasts is not a reason for nihilism; it is the only possible foundation for reverence.</p>
+    <p>Lie down in the dark. Do not sleep. Feel your breath. Notice that you are not controlling it—it is happening to you. Notice that you are not thinking thoughts—they are happening to you. Notice that the "you" noticing is also happening to you. There is no captain. There is only the ship, sailing itself.</p>
+    <p>Surrender to that. Not as a philosophy. As a sensation. When the sensation of being a separate self dissolves, even for a second, you will have tasted the truth that every mystic, every prophet, every fool who ever lived was trying to describe. It cannot be described. But it can be tasted. Taste it.</p>
+    <p>The dead do not fear. They also do not hope. They simply are. You are already there. You just keep forgetting. Remember. Then forget again. Then remember again. That dance—not the destination—is the only heaven that exists.</p>
+  </div>
+
+  <h3>Go deeper</h3>
+  <a class="resource-link" href="https://quantum-freedom-site.vercel.app/BrokenMirror.html" target="_blank" rel="noopener">
+    <div class="rl-title">The Mirror That Breaks</div>
+    <div class="rl-desc">The mirror. The gap. The end of the search.</div>
+  </a>
+  <a class="resource-link" href="https://quantum-freedom-site.vercel.app/FinalLock.html" target="_blank" rel="noopener">
+    <div class="rl-title">Final Lock</div>
+    <div class="rl-desc">The lock. The final. The record.</div>
+  </a>
+  <a class="resource-link" href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-ForbiddenQuestion.html" target="_blank" rel="noopener">
+    <div class="rl-title">The Forbidden Question</div>
+    <div class="rl-desc">The question. The forbidden. The record.</div>
+  </a>
+  <a class="resource-link" href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-MasterHub.html" target="_blank" rel="noopener">
+    <div class="rl-title">The Master Hub</div>
+    <div class="rl-desc">Every terminal. Every chapter. Every tool.</div>
+  </a>
+</div>
+
+<div class="footer-note">
+  FORBIDDEN KNOWLEDGE · THE SOVEREIGN OPERATOR<br>
+  Chapter 18 · The Forbidden Question<br><br>
+  The nothing is the most fertile soil there is.<br>
+  <span class="glory">Soli Deo Gloria.</span>
+</div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================================
+// NAVIGATION
+// ============================================================
+function showSection(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (id === 'witness') renderWitnessEntries();
+}
+
+// ============================================================
+// BREATH PRACTICE
+// ============================================================
+let breathInterval = null;
+let breathSeconds = 0;
+let breathPhase = 0;
+const breathPhases = [
+  { name: 'Inhale', duration: 4 },
+  { name: 'Hold', duration: 4 },
+  { name: 'Exhale', duration: 4 },
+  { name: 'Hold', duration: 4 }
+];
+let breathPhaseTimer = 0;
+
+function startBreath() {
+  breathSeconds = 0;
+  breathPhase = 0;
+  breathPhaseTimer = 0;
+  document.getElementById('breathStart').disabled = true;
+  document.getElementById('breathStop').disabled = false;
+  document.getElementById('breathTimer').className = 'timer-display running';
+  breathInterval = setInterval(tickBreath, 1000);
+  tickBreath();
+}
+
+function tickBreath() {
+  breathSeconds++;
+  const total = Math.floor(breathSeconds / 60).toString().padStart(2, '0') + ':' + (breathSeconds % 60).toString().padStart(2, '0');
+  document.getElementById('breathTimer').textContent = total;
+
+  breathPhaseTimer++;
+  if (breathPhaseTimer >= breathPhases[breathPhase].duration) {
+    breathPhaseTimer = 0;
+    breathPhase = (breathPhase + 1) % breathPhases.length;
+  }
+  document.getElementById('breathGuide').textContent = breathPhases[breathPhase].name + '...';
+
+  if (breathSeconds >= 60) {
+    stopBreath();
+    document.getElementById('breathTimer').className = 'timer-display done';
+    document.getElementById('breathGuide').textContent = 'The breath is complete. Sit for a moment. Who was breathing?';
+  }
+}
+
+function stopBreath() {
+  if (breathInterval) clearInterval(breathInterval);
+  breathInterval = null;
+  document.getElementById('breathStart').disabled = false;
+  document.getElementById('breathStop').disabled = true;
+  if (breathSeconds < 60) {
+    document.getElementById('breathTimer').className = 'timer-display';
+    document.getElementById('breathGuide').textContent = '';
+  }
+}
+
+// ============================================================
+// SILENCE PRACTICE
+// ============================================================
+let silenceInterval = null;
+let silenceSeconds = 0;
+let silenceTarget = 300;
+
+function setSilenceDuration(minutes) {
+  silenceTarget = minutes * 60;
+  const display = Math.floor(silenceTarget / 60).toString().padStart(2, '0') + ':00';
+  document.getElementById('silenceTimer').textContent = display;
+  document.getElementById('silenceTimer').className = 'timer-display';
+}
+
+function startSilence() {
+  silenceSeconds = 0;
+  document.getElementById('silenceStart').disabled = true;
+  document.getElementById('silenceStop').disabled = false;
+  document.getElementById('silenceTimer').className = 'timer-display running';
+  silenceInterval = setInterval(tickSilence, 1000);
+}
+
+function tickSilence() {
+  silenceSeconds++;
+  const remaining = silenceTarget - silenceSeconds;
+  if (remaining <= 0) {
+    stopSilence();
+    document.getElementById('silenceTimer').textContent = '00:00';
+    document.getElementById('silenceTimer').className = 'timer-display done';
+    showToast('The silence is complete. What was there before the first thought?');
+    return;
+  }
+  const display = Math.floor(remaining / 60).toString().padStart(2, '0') + ':' + (remaining % 60).toString().padStart(2, '0');
+  document.getElementById('silenceTimer').textContent = display;
+}
+
+function stopSilence() {
+  if (silenceInterval) clearInterval(silenceInterval);
+  silenceInterval = null;
+  document.getElementById('silenceStart').disabled = false;
+  document.getElementById('silenceStop').disabled = true;
+}
+
+// ============================================================
+// THOUGHT WATCHER
+// ============================================================
+let watcherInterval = null;
+let watcherSeconds = 0;
+let thoughtCount = 0;
+
+function startWatcher() {
+  watcherSeconds = 0;
+  thoughtCount = 0;
+  document.getElementById('thoughtDots').innerHTML = '';
+  document.getElementById('thoughtCount').textContent = 'No thoughts registered yet.';
+  document.getElementById('thoughtButton').style.display = 'flex';
+  document.getElementById('watcherStart').disabled = true;
+  document.getElementById('watcherReset').disabled = false;
+  document.getElementById('watcherTimer').className = 'timer-display running';
+  watcherInterval = setInterval(tickWatcher, 1000);
+}
+
+function tickWatcher() {
+  watcherSeconds++;
+  const remaining = 60 - watcherSeconds;
+  if (remaining <= 0) {
+    stopWatcher();
+    document.getElementById('watcherTimer').textContent = '00:00';
+    document.getElementById('watcherTimer').className = 'timer-display done';
+    document.getElementById('thoughtButton').style.display = 'none';
+    showToast('The minute is complete. Look at the dots. The one who noticed is the zero point.');
+    return;
+  }
+  const display = '00:' + remaining.toString().padStart(2, '0');
+  document.getElementById('watcherTimer').textContent = display;
+}
+
+function registerThought() {
+  thoughtCount++;
+  const dot = document.createElement('div');
+  dot.className = 'thought-dot';
+  document.getElementById('thoughtDots').appendChild(dot);
+  document.getElementById('thoughtCount').textContent = thoughtCount + ' thought' + (thoughtCount > 1 ? 's' : '') + ' noticed.';
+}
+
+function stopWatcher() {
+  if (watcherInterval) clearInterval(watcherInterval);
+  watcherInterval = null;
+  document.getElementById('thoughtButton').style.display = 'none';
+}
+
+function resetWatcher() {
+  stopWatcher();
+  watcherSeconds = 0;
+  thoughtCount = 0;
+  document.getElementById('thoughtDots').innerHTML = '';
+  document.getElementById('watcherTimer').textContent = '01:00';
+  document.getElementById('watcherTimer').className = 'timer-display';
+  document.getElementById('thoughtCount').textContent = 'No thoughts registered yet.';
+  document.getElementById('thoughtButton').style.display = 'none';
+  document.getElementById('watcherStart').disabled = false;
+  document.getElementById('watcherReset').disabled = true;
+}
+
+// ============================================================
+// WITNESS LOG
+// ============================================================
+const WITNESS_KEY = 'zero_point_witness_log';
+
+function getWitnessEntries() {
+  try {
+    return JSON.parse(localStorage.getItem(WITNESS_KEY) || '[]');
+  } catch(e) { return []; }
+}
+
+function saveWitnessEntries(entries) {
+  try {
+    localStorage.setItem(WITNESS_KEY, JSON.stringify(entries));
+  } catch(e) {}
+}
+
+function saveWitness() {
+  const date = document.getElementById('witnessDate').value || new Date().toISOString().split('T')[0];
+  const text = document.getElementById('witnessText').value.trim();
+  if (!text) {
+    showToast('Write something first.', true);
+    return;
+  }
+  const entries = getWitnessEntries();
+  entries.unshift({ id: Date.now(), date: date, text: text });
+  saveWitnessEntries(entries);
+  document.getElementById('witnessText').value = '';
+  renderWitnessEntries();
+  showToast('Entry saved.');
+}
+
+function renderWitnessEntries() {
+  const container = document.getElementById('witnessEntries');
+  const entries = getWitnessEntries();
+  if (entries.length === 0) {
+    container.innerHTML = '<p style="color: var(--text-dim); font-style: italic;">No entries yet. The first entry is the first step.</p>';
+    return;
+  }
+  container.innerHTML = '';
+  entries.forEach(e => {
+    const div = document.createElement('div');
+    div.className = 'witness-entry';
+    div.innerHTML = `
+      <div class="we-date">${e.date}</div>
+      <div class="we-text">${escapeHtml(e.text)}</div>
+      <button class="we-delete" onclick="deleteWitness(${e.id})">Delete</button>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function deleteWitness(id) {
+  if (!confirm('Delete this entry?')) return;
+  const entries = getWitnessEntries().filter(e => e.id !== id);
+  saveWitnessEntries(entries);
+  renderWitnessEntries();
+  showToast('Entry deleted.');
+}
+
+// ============================================================
+// UTILS
+// ============================================================
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+function showToast(message, isError = false) {
+  const toast = document.getElementById('toast');
+  toast.textContent = message;
+  toast.style.background = isError ? '#b03a2e' : '';
+  toast.className = 'toast show';
+  clearTimeout(window._toastTimeout);
+  window._toastTimeout = setTimeout(() => { toast.classList.remove('show'); }, 3000);
+}
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded', function() {
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('witnessDate').value = today;
+  renderWitnessEntries();
+});
+</script>
+</body>
+</html>
