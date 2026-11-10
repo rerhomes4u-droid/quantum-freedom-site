@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Book of Witness — Your Testimony, Your Record, Your Voice</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600;700&display=swap');
+  :root {
+    --bg: #0a0a0c; --surface: #121216; --surface-2: #1a1a20; --border: #2a2a32;
+    --text: #e8e6e3; --text-dim: #9a978f; --gold: #c9a227; --gold-dim: #8a6f1a;
+    --record: #3a7d5c; --suppressed: #b03a2e; --gap: #8a6f1a; --action: #00d2ff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'IBM Plex Sans', system-ui, sans-serif; background: var(--bg);
+    color: var(--text); line-height: 1.7; font-weight: 300; -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 900px; margin: 0 auto; padding: 0 24px 120px; }
+
+  header { padding: 56px 0 32px; border-bottom: 1px solid var(--border); margin-bottom: 40px; text-align: center; }
+  .kicker { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold); margin-bottom: 20px; }
+  h1 { font-size: clamp(26px, 6vw, 44px); font-weight: 700; line-height: 1.05; letter-spacing: -0.02em; margin-bottom: 16px; }
+  .subtitle { font-size: 17px; color: var(--text-dim); max-width: 680px; margin: 0 auto; }
+
+  .nav {
+    display: flex; flex-wrap: wrap; gap: 6px; justify-content: center;
+    margin-bottom: 40px; padding: 12px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 8px;
+  }
+  .nav button {
+    background: transparent; border: 1px solid var(--border); color: var(--text-dim);
+    padding: 8px 14px; border-radius: 4px; cursor: pointer;
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+    letter-spacing: 0.08em; text-transform: uppercase; transition: all 0.2s;
+  }
+  .nav button:hover { border-color: var(--gold); color: var(--gold); }
+  .nav button.active { background: var(--gold); color: var(--bg); border-color: var(--gold); font-weight: 600; }
+
+  .section { display: none; animation: fadeIn 0.4s ease; }
+  .section.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+  h2 { font-size: 24px; font-weight: 600; margin: 40px 0 16px; padding-top: 24px; border-top: 1px solid var(--border); }
+  h2:first-of-type { border-top: none; margin-top: 0; padding-top: 0; }
+  h3 { font-size: 17px; font-weight: 600; margin: 24px 0 12px; color: var(--gold); }
+  p { margin-bottom: 16px; font-size: 15px; color: var(--text-dim); }
+  .lead { font-size: 18px; color: var(--text); border-left: 2px solid var(--gold); padding-left: 20px; margin: 24px 0 32px; }
+  .highlight { color: var(--gold); font-weight: 600; }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 24px; margin: 16px 0; }
+  .card-title { font-weight: 600; font-size: 16px; color: var(--text); margin-bottom: 8px; }
+
+  .btn { background: var(--gold); color: var(--bg); border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; transition: all 0.2s; display: inline-block; text-decoration: none; }
+  .btn:hover { background: var(--gold-dim); color: var(--text); }
+  .btn-secondary { background: transparent; color: var(--gold); border: 1px solid var(--gold); }
+  .btn-secondary:hover { background: var(--gold); color: var(--bg); }
+  .btn-danger { background: var(--suppressed); color: white; }
+  .btn-danger:hover { background: #8a2a20; }
+  .btn-full { display: block; width: 100%; text-align: center; }
+  .btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+  .compact-input { width: 100%; padding: 12px 14px; background: var(--surface-2); color: var(--text); border: 1px solid var(--border); border-radius: 4px; font-family: 'IBM Plex Sans', sans-serif; font-size: 14px; margin: 6px 0; }
+  .compact-input:focus { outline: none; border-color: var(--gold); }
+  textarea.compact-input { min-height: 120px; resize: vertical; line-height: 1.6; }
+  label { display: block; margin-top: 12px; margin-bottom: 4px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); }
+
+  .result-box { background: var(--surface-2); border: 1px solid var(--gold); border-radius: 8px; padding: 24px; margin: 20px 0; display: none; }
+  .result-box.visible { display: block; animation: fadeIn 0.4s ease; }
+  .result-box h3 { color: var(--gold); margin-top: 0; }
+
+  .entry-list { list-style: none; margin: 16px 0; }
+  .entry-item { background: var(--surface-2); border-left: 3px solid var(--gold); border-radius: 4px; padding: 16px 20px; margin: 12px 0; }
+  .entry-item .entry-date { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: var(--gold); letter-spacing: 0.05em; margin-bottom: 6px; }
+  .entry-item .entry-type { font-family: 'IBM Plex Mono', monospace; font-size: 9px; padding: 2px 8px; border-radius: 3px; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 8px; display: inline-block; }
+  .entry-item .entry-text { font-size: 14px; color: var(--text); line-height: 1.6; }
+  .entry-item .entry-delete { background: transparent; border: none; color: var(--suppressed); font-size: 11px; cursor: pointer; margin-top: 8px; opacity: 0.5; }
+  .entry-item .entry-delete:hover { opacity: 1; }
+  .entry-item audio { width: 100%; margin-top: 10px; }
+
+  .type-testimony { background: rgba(201,162,39,0.15); color: var(--gold); border: 1px solid var(--gold); }
+  .type-record { background: rgba(58,125,92,0.15); color: var(--record); border: 1px solid var(--record); }
+  .type-gap { background: rgba(138,111,26,0.15); color: var(--gold); border: 1px solid var(--gold); }
+  .type-journal { background: rgba(0,210,255,0.12); color: var(--action); border: 1px solid var(--action); }
+  .type-voice { background: rgba(176,58,46,0.12); color: var(--suppressed); border: 1px solid var(--suppressed); }
+
+  .covenant-box { background: var(--surface-2); border: 2px solid var(--gold); border-radius: 8px; padding: 32px 28px; margin: 32px 0; text-align: center; }
+  .covenant-box h3 { color: var(--gold); margin-top: 0; font-size: 20px; }
+  .covenant-box p { color: var(--text); font-size: 15px; }
+  .covenant-box .covenant-text { font-style: italic; color: var(--gold); font-size: 16px; margin: 20px 0; }
+
+  .voice-panel { background: var(--surface); border: 2px solid var(--action); border-radius: 8px; padding: 28px 26px; margin: 24px 0; text-align: center; }
+  .voice-panel h3 { color: var(--action); margin-top: 0; }
+  .voice-status { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--text-dim); margin: 16px 0; letter-spacing: 0.05em; }
+  .voice-status.recording { color: var(--suppressed); animation: pulse 1.2s infinite; }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+  .voice-controls { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 16px; }
+  .voice-timer { font-family: 'IBM Plex Mono', monospace; font-size: 36px; color: var(--action); font-weight: 600; margin: 12px 0; }
+
+  .journal-mood { display: flex; gap: 8px; flex-wrap: wrap; margin: 12px 0; }
+  .journal-mood button { background: var(--surface-2); border: 1px solid var(--border); color: var(--text-dim); padding: 8px 14px; border-radius: 4px; cursor: pointer; font-family: 'IBM Plex Sans', sans-serif; font-size: 13px; transition: all 0.2s; }
+  .journal-mood button:hover { border-color: var(--gold); color: var(--text); }
+  .journal-mood button.selected { border-color: var(--gold); background: var(--gold); color: var(--bg); font-weight: 600; }
+
+  .footer-note { margin-top: 64px; padding-top: 32px; border-top: 1px solid var(--border); font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--text-dim); letter-spacing: 0.08em; text-align: center; line-height: 2; }
+  .footer-note .glory { color: var(--gold); font-weight: 600; }
+
+  @media (max-width: 600px) {
+    .wrap { padding: 0 16px 80px; }
+    header { padding: 32px 0 24px; }
+    .voice-timer { font-size: 28px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="kicker">Forbidden Knowledge · The Book of Witness</div>
+  <h1>Your Testimony. Your Record. Your Voice. Your Book.</h1>
+  <p class="subtitle">The archive is not just the record of the powerful. It is the record of the witness. Write your testimony. Record what you have verified. Name what you do not know. Record your voice. Write your journal. Sign the covenant. Download your book.</p>
+</header>
+
+<nav class="nav" id="mainNav">
+  <button class="active" onclick="showSection('testimony', this)">Testimony</button>
+  <button onclick="showSection('record', this)">Record</button>
+  <button onclick="showSection('gap', this)">Gaps</button>
+  <button onclick="showSection('journal', this)">Journal</button>
+  <button onclick="showSection('voice', this)">Voice</button>
+  <button onclick="showSection('covenant', this)">Covenant</button>
+  <button onclick="showSection('all', this)">My Book</button>
+</nav>
+
+<!-- TESTIMONY -->
+<div class="section active" id="testimony">
+  <h2>Your Testimony</h2>
+
+  <p class="lead">What have you seen? What have you lived? What have you survived? The testimony is not the proof. The testimony is the witness. Write it down. The record is the archive.</p>
+
+  <div class="card">
+    <div class="card-title">Record Your Testimony</div>
+    <label for="testimony-date">Date</label>
+    <input type="date" class="compact-input" id="testimony-date">
+    <label for="testimony-text">What did you witness?</label>
+    <textarea class="compact-input" id="testimony-text" placeholder="What did you see? What happened? Who was there? What did it cost you?"></textarea>
+    <button class="btn btn-full" onclick="saveEntry('testimony')" style="margin-top: 12px;">Save Testimony</button>
+  </div>
+
+  <h3>Your Testimony Entries</h3>
+  <div id="testimony-entries"></div>
+</div>
+
+<!-- RECORD -->
+<div class="section" id="record">
+  <h2>Your Record</h2>
+
+  <p>The record is what you have verified. The document you read. The court case you found. The source you checked. The claim you tested. The record is the evidence. Write it down.</p>
+
+  <div class="card">
+    <div class="card-title">Record What You Have Verified</div>
+    <label for="record-date">Date</label>
+    <input type="date" class="compact-input" id="record-date">
+    <label for="record-text">What did you verify?</label>
+    <textarea class="compact-input" id="record-text" placeholder="The document, the source, the claim, the finding. Cite it. Link it."></textarea>
+    <button class="btn btn-full" onclick="saveEntry('record')" style="margin-top: 12px;">Save Record</button>
+  </div>
+
+  <h3>Your Record Entries</h3>
+  <div id="record-entries"></div>
+</div>
+
+<!-- GAPS -->
+<div class="section" id="gap">
+  <h2>Your Gaps</h2>
+
+  <p>The gap is what you do not know. What has not been tested. What has not been verified. The gap is not a weakness. The gap is the truth. Name it.</p>
+
+  <div class="card">
+    <div class="card-title">Name Your Gaps</div>
+    <label for="gap-date">Date</label>
+    <input type="date" class="compact-input" id="gap-date">
+    <label for="gap-text">What do you not know?</label>
+    <textarea class="compact-input" id="gap-text" placeholder="What is the question you cannot answer? What is the claim you cannot verify? What is the gap?"></textarea>
+    <button class="btn btn-full" onclick="saveEntry('gap')" style="margin-top: 12px;">Save Gap</button>
+  </div>
+
+  <h3>Your Gap Entries</h3>
+  <div id="gap-entries"></div>
+</div>
+
+<!-- JOURNAL -->
+<div class="section" id="journal">
+  <h2>Your Journal</h2>
+
+  <p>The journal is the daily record. What did you do today? What did you learn? How did you feel? The journal is the trail. The trail is the proof that you were here.</p>
+
+  <div class="card">
+    <div class="card-title">Today's Entry</div>
+    <label for="journal-date">Date</label>
+    <input type="date" class="compact-input" id="journal-date">
+    <label>How are you feeling?</label>
+    <div class="journal-mood" id="journal-mood">
+      <button onclick="selectMood('peaceful', this)">Peaceful</button>
+      <button onclick="selectMood('grateful', this)">Grateful</button>
+      <button onclick="selectMood('tired', this)">Tired</button>
+      <button onclick="selectMood('angry', this)">Angry</button>
+      <button onclick="selectMood('afraid', this)">Afraid</button>
+      <button onclick="selectMood('hopeful', this)">Hopeful</button>
+    </div>
+    <label for="journal-text">What happened today?</label>
+    <textarea class="compact-input" id="journal-text" placeholder="What did you do? What did you learn? What did you notice?"></textarea>
+    <button class="btn btn-full" onclick="saveJournal()" style="margin-top: 12px;">Save Journal Entry</button>
+  </div>
+
+  <h3>Your Journal Entries</h3>
+  <div id="journal-entries"></div>
+</div>
+
+<!-- VOICE -->
+<div class="section" id="voice">
+  <h2>Your Voice</h2>
+
+  <p>Some testimony cannot be typed. Some testimony has to be spoken. This is the voice recorder. Speak your testimony. The app records it. The app transcribes it. The app saves it. The app lets you download the audio.</p>
+
+  <div class="voice-panel">
+    <h3>Audio Recorder</h3>
+    <div class="voice-timer" id="voiceTimer">00:00</div>
+    <div class="voice-status" id="voiceStatus">Ready. Press Record to begin.</div>
+    <div class="voice-controls">
+      <button class="btn" onclick="startRecording()" id="recordBtn">🎤 Record</button>
+      <button class="btn btn-danger" onclick="stopRecording()" id="stopBtn" disabled>⏹ Stop</button>
+      <button class="btn btn-secondary" onclick="downloadAudio()" id="downloadBtn" disabled>⬇ Download Audio</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Transcriber</div>
+    <p>Press "Start Transcribing" and speak. The browser will transcribe your speech in real time. When you stop, the transcript will be saved as a testimony entry.</p>
+    <button class="btn btn-full" onclick="startTranscribing()" id="transcribeBtn">🎙 Start Transcribing</button>
+    <button class="btn btn-full btn-danger" onclick="stopTranscribing()" id="transcribeStopBtn" disabled style="margin-top: 8px;">⏹ Stop Transcribing</button>
+    <div class="result-box" id="transcriptResult"></div>
+  </div>
+
+  <h3>Your Voice Entries</h3>
+  <div id="voice-entries"></div>
+</div>
+
+<!-- COVENANT -->
+<div class="section" id="covenant">
+  <h2>The Covenant</h2>
+
+  <div class="covenant-box">
+    <h3>The Covenant of the Witness</h3>
+    <p class="covenant-text">I will not kill.<br>I will love my neighbor.<br>I will protect the innocent.<br>I will name the specific.<br>I will find the corroboration.<br>I will mark the gap.<br>I will refuse to overclaim.</p>
+    <p>I am a witness. I am not a spectator. I will record what I see. I will share what I find. I will do the work.</p>
+    <label for="covenant-name">Sign Your Name</label>
+    <input type="text" class="compact-input" id="covenant-name" placeholder="Your Full Name">
+    <button class="btn btn-full" onclick="signCovenant()" style="margin-top: 12px;">Sign the Covenant</button>
+    <div class="result-box" id="covenantResult"></div>
+  </div>
+</div>
+
+<!-- ALL -->
+<div class="section" id="all">
+  <h2>My Book of Witness</h2>
+
+  <p>This is your book. Your testimony. Your record. Your gaps. Your journal. Your voice. Your covenant. Download it. Keep it. Share it.</p>
+
+  <button class="btn btn-full" onclick="generateBook()">Generate My Book of Witness</button>
+  <button class="btn btn-full btn-secondary" onclick="downloadBook()" style="margin-top: 8px;">Download My Book</button>
+
+  <div class="result-box" id="bookResult"></div>
+</div>
+
+<div class="footer-note">
+  FORBIDDEN KNOWLEDGE · THE SOVEREIGN OPERATOR<br>
+  The Book of Witness<br><br>
+  Test all things. Hold fast to what is good.<br>
+  <span class="glory">Soli Deo Gloria.</span>
+</div>
+
+</div>
+
+<script>
+// ============================================================
+// STATE
+// ============================================================
+const STORAGE_KEY = 'book_of_witness_entries_v2';
+let entries = [];
+let selectedMood = null;
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded', function() {
+  loadEntries();
+  renderAllEntries();
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('testimony-date').value = today;
+  document.getElementById('record-date').value = today;
+  document.getElementById('gap-date').value = today;
+  document.getElementById('journal-date').value = today;
+});
+
+function loadEntries() {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) entries = JSON.parse(stored);
+  } catch(e) { entries = []; }
+}
+
+function saveEntries() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+  } catch(e) {}
+}
+
+// ============================================================
+// NAVIGATION — THE FIX
+// ============================================================
+function showSection(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  const target = document.getElementById(id);
+  if (target) target.classList.add('active');
+  document.querySelectorAll('#mainNav button').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ============================================================
+// SAVE ENTRY
+// ============================================================
+function saveEntry(type) {
+  const dateId = type + '-date';
+  const textId = type + '-text';
+  const dateEl = document.getElementById(dateId);
+  const textEl = document.getElementById(textId);
+  const date = (dateEl && dateEl.value) || new Date().toISOString().split('T')[0];
+  const text = (textEl && textEl.value || '').trim();
+
+  if (!text) {
+    alert('Please write something first.');
+    return;
+  }
+
+  entries.unshift({
+    id: Date.now(),
+    type: type,
+    date: date,
+    text: text
+  });
+
+  saveEntries();
+  if (textEl) textEl.value = '';
+  renderAllEntries();
+  alert('Saved.');
+}
+
+// ============================================================
+// JOURNAL
+// ============================================================
+function selectMood(mood, btn) {
+  selectedMood = mood;
+  document.querySelectorAll('#journal-mood button').forEach(b => b.classList.remove('selected'));
+  if (btn) btn.classList.add('selected');
+}
+
+function saveJournal() {
+  const date = document.getElementById('journal-date').value || new Date().toISOString().split('T')[0];
+  const text = document.getElementById('journal-text').value.trim();
+
+  if (!text) {
+    alert('Please write something first.');
+    return;
+  }
+
+  const mood = selectedMood || 'unspecified';
+  entries.unshift({
+    id: Date.now(),
+    type: 'journal',
+    date: date,
+    text: text,
+    mood: mood
+  });
+
+  saveEntries();
+  document.getElementById('journal-text').value = '';
+  selectedMood = null;
+  document.querySelectorAll('#journal-mood button').forEach(b => b.classList.remove('selected'));
+  renderAllEntries();
+  alert('Journal entry saved.');
+}
+
+// ============================================================
+// RENDER
+// ============================================================
+function renderAllEntries() {
+  renderEntries('testimony');
+  renderEntries('record');
+  renderEntries('gap');
+  renderEntries('journal');
+  renderEntries('voice');
+}
+
+function renderEntries(type) {
+  const container = document.getElementById(type + '-entries');
+  if (!container) return;
+  const filtered = entries.filter(e => e.type === type);
+  if (filtered.length === 0) {
+    container.innerHTML = '<p style="color: var(--text-dim); font-style: italic;">No entries yet. The first entry is the first step.</p>';
+    return;
+  }
+  container.innerHTML = '';
+  filtered.forEach(e => {
+    const div = document.createElement('div');
+    div.className = 'entry-item';
+    let moodLine = '';
+    if (e.mood) moodLine = '<div style="font-size:12px;color:var(--action);margin-bottom:6px;">Mood: ' + escapeHtml(e.mood) + '</div>';
+    let audioLine = '';
+    if (e.audio) audioLine = '<audio controls src="' + e.audio + '"></audio>';
+    div.innerHTML = `
+      <div class="entry-date">${e.date}</div>
+      <span class="entry-type type-${e.type}">${e.type}</span>
+      ${moodLine}
+      <div class="entry-text">${escapeHtml(e.text)}</div>
+      ${audioLine}
+      <button class="entry-delete" onclick="deleteEntry(${e.id})">Delete</button>
+    `;
+    container.appendChild(div);
+  });
+}
+
+function deleteEntry(id) {
+  if (!confirm('Delete this entry?')) return;
+  entries = entries.filter(e => e.id !== id);
+  saveEntries();
+  renderAllEntries();
+}
+
+// ============================================================
+// VOICE RECORDING
+// ============================================================
+let mediaRecorder = null;
+let audioChunks = [];
+let voiceTimerInterval = null;
+let voiceSeconds = 0;
+let lastAudioUrl = null;
+let lastAudioBlob = null;
+
+function startRecording() {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    alert('Audio recording is not supported in this browser.');
+    return;
+  }
+  navigator.mediaDevices.getUserMedia({ audio: true }).then(function(stream) {
+    mediaRecorder = new MediaRecorder(stream);
+    audioChunks = [];
+    mediaRecorder.ondataavailable = function(e) {
+      if (e.data.size > 0) audioChunks.push(e.data);
+    };
+    mediaRecorder.onstop = function() {
+      const blob = new Blob(audioChunks, { type: 'audio/webm' });
+      lastAudioBlob = blob;
+      lastAudioUrl = URL.createObjectURL(blob);
+      document.getElementById('downloadBtn').disabled = false;
+      const reader = new FileReader();
+      reader.onloadend = function() {
+        const base64 = reader.result;
+        entries.unshift({
+          id: Date.now(),
+          type: 'voice',
+          date: new Date().toISOString().split('T')[0],
+          text: 'Voice recording (' + voiceSeconds + ' seconds)',
+          audio: base64
+        });
+        saveEntries();
+        renderAllEntries();
+      };
+      reader.readAsDataURL(blob);
+    };
+    mediaRecorder.start();
+    voiceSeconds = 0;
+    document.getElementById('voiceStatus').textContent = 'Recording...';
+    document.getElementById('voiceStatus').className = 'voice-status recording';
+    document.getElementById('recordBtn').disabled = true;
+    document.getElementById('stopBtn').disabled = false;
+    voiceTimerInterval = setInterval(function() {
+      voiceSeconds++;
+      const m = Math.floor(voiceSeconds / 60).toString().padStart(2, '0');
+      const s = (voiceSeconds % 60).toString().padStart(2, '0');
+      document.getElementById('voiceTimer').textContent = m + ':' + s;
+    }, 1000);
+  }).catch(function(err) {
+    alert('Could not access microphone: ' + err.message);
+  });
+}
+
+function stopRecording() {
+  if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+    mediaRecorder.stop();
+    mediaRecorder.stream.getTracks().forEach(function(t) { t.stop(); });
+  }
+  clearInterval(voiceTimerInterval);
+  document.getElementById('voiceStatus').textContent = 'Recording saved.';
+  document.getElementById('voiceStatus').className = 'voice-status';
+  document.getElementById('recordBtn').disabled = false;
+  document.getElementById('stopBtn').disabled = true;
+}
+
+function downloadAudio() {
+  if (!lastAudioBlob) return;
+  const url = URL.createObjectURL(lastAudioBlob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'witness-voice-' + new Date().toISOString().split('T')[0] + '.webm';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ============================================================
+// TRANSCRIBER
+// ============================================================
+let recognition = null;
+let transcriptText = '';
+
+function startTranscribing() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    alert('Speech recognition is not supported in this browser. Try Chrome or Edge.');
+    return;
+  }
+  recognition = new SpeechRecognition();
+  recognition.continuous = true;
+  recognition.interimResults = true;
+  recognition.lang = 'en-US';
+  transcriptText = '';
+
+  recognition.onresult = function(event) {
+    let finalText = '';
+    for (let i = event.resultIndex; i < event.results.length; i++) {
+      if (event.results[i].isFinal) {
+        finalText += event.results[i][0].transcript + ' ';
+      }
+    }
+    if (finalText) {
+      transcriptText += finalText;
+      const result = document.getElementById('transcriptResult');
+      result.classList.add('visible');
+      result.innerHTML = '<h3>Live Transcript</h3><p>' + escapeHtml(transcriptText) + '</p>';
+    }
+  };
+
+  recognition.onerror = function(event) {
+    document.getElementById('voiceStatus').textContent = 'Transcription error: ' + event.error;
+  };
+
+  recognition.start();
+  document.getElementById('transcribeBtn').disabled = true;
+  document.getElementById('transcribeStopBtn').disabled = false;
+  document.getElementById('voiceStatus').textContent = 'Transcribing... speak now.';
+  document.getElementById('voiceStatus').className = 'voice-status recording';
+}
+
+function stopTranscribing() {
+  if (recognition) recognition.stop();
+  document.getElementById('transcribeBtn').disabled = false;
+  document.getElementById('transcribeStopBtn').disabled = true;
+  document.getElementById('voiceStatus').textContent = 'Transcription stopped.';
+  document.getElementById('voiceStatus').className = 'voice-status';
+  if (transcriptText.trim()) {
+    entries.unshift({
+      id: Date.now(),
+      type: 'voice',
+      date: new Date().toISOString().split('T')[0],
+      text: 'Transcript: ' + transcriptText.trim()
+    });
+    saveEntries();
+    renderAllEntries();
+  }
+}
+
+// ============================================================
+// COVENANT
+// ============================================================
+function signCovenant() {
+  const name = document.getElementById('covenant-name').value.trim();
+  if (!name) {
+    alert('Please enter your name.');
+    return;
+  }
+  const covenant = 'COVENANT OF THE WITNESS\n\n' +
+    'I, ' + name + ', affirm:\n\n' +
+    'I will not kill.\n' +
+    'I will love my neighbor.\n' +
+    'I will protect the innocent.\n' +
+    'I will name the specific.\n' +
+    'I will find the corroboration.\n' +
+    'I will mark the gap.\n' +
+    'I will refuse to overclaim.\n\n' +
+    'I am a witness. I am not a spectator. I will record what I see. I will share what I find. I will do the work.\n\n' +
+    'Signed this day, ' + new Date().toLocaleDateString() + '.\n\n' +
+    '_________________________\n' +
+    name + '\n\n' +
+    'Soli Deo Gloria.';
+
+  const result = document.getElementById('covenantResult');
+  result.classList.add('visible');
+  result.innerHTML = '<h3>Your Signed Covenant</h3><pre style="white-space: pre-wrap; font-family: \'IBM Plex Mono\', monospace; font-size: 12px; line-height: 1.6; color: var(--text);">' + escapeHtml(covenant) + '</pre><button class="btn btn-full" onclick="downloadCovenant()" style="margin-top: 12px;">Download Covenant</button>';
+
+  window._covenant = covenant;
+}
+
+function downloadCovenant() {
+  if (!window._covenant) return;
+  const blob = new Blob([window._covenant], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'Covenant-of-the-Witness-' + new Date().toISOString().split('T')[0] + '.txt';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ============================================================
+// BOOK
+// ============================================================
+function generateBook() {
+  const types = ['testimony', 'record', 'gap', 'journal', 'voice'];
+  const labels = { testimony: 'TESTIMONY', record: 'RECORD', gap: 'GAPS', journal: 'JOURNAL', voice: 'VOICE' };
+
+  let book = 'THE BOOK OF WITNESS\n\n';
+  book += 'A personal record of testimony, verification, voice, and the gaps between them.\n\n';
+  book += 'Generated: ' + new Date().toLocaleDateString() + '\n\n';
+  book += '========================================\n\n';
+
+  types.forEach(function(type) {
+    const filtered = entries.filter(function(e) { return e.type === type; });
+    book += labels[type] + ' (' + filtered.length + ' entries)\n';
+    book += '----------------------------------------\n';
+    if (filtered.length === 0) {
+      book += 'No entries.\n';
+    } else {
+      filtered.forEach(function(e) {
+        book += 'Date: ' + e.date + '\n';
+        if (e.mood) book += 'Mood: ' + e.mood + '\n';
+        book += e.text + '\n\n';
+      });
+    }
+    book += '\n';
+  });
+
+  book += '========================================\n\n';
+  book += 'I am a witness. I am not a spectator.\n\n';
+  book += 'Soli Deo Gloria.\n';
+
+  const result = document.getElementById('bookResult');
+  result.classList.add('visible');
+  result.innerHTML = '<h3>Your Book of Witness</h3><pre style="white-space: pre-wrap; font-family: \'IBM Plex Mono\', monospace; font-size: 11px; line-height: 1.6; color: var(--text); max-height: 500px; overflow-y: auto;">' + escapeHtml(book) + '</pre>';
+
+  window._book = book;
+}
+
+function downloadBook() {
+  if (!window._book) generateBook();
+  if (!window._book) return;
+  const blob = new Blob([window._book], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'Book-of-Witness-' + new Date().toISOString().split('T')[0] + '.txt';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ============================================================
+// UTILS
+// ============================================================
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+</script>
+</body>
+</html>
