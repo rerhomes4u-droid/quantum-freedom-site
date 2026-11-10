@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Nation Operating System</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600;700&display=swap');
+  :root {
+    --bg: #0a0a0c; --surface: #121216; --surface-2: #1a1a20; --border: #2a2a32;
+    --text: #e8e6e3; --text-dim: #9a978f; --gold: #c9a227; --gold-dim: #8a6f1a;
+    --record: #3a7d5c; --suppressed: #b03a2e; --gap: #8a6f1a; --action: #00d2ff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'IBM Plex Sans', system-ui, sans-serif; background: var(--bg);
+    color: var(--text); line-height: 1.7; font-weight: 300; -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 0 24px 120px; }
+
+  header { padding: 56px 0 32px; border-bottom: 1px solid var(--border); margin-bottom: 40px; text-align: center; }
+  .kicker { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold); margin-bottom: 20px; }
+  h1 { font-size: clamp(26px, 6vw, 44px); font-weight: 700; line-height: 1.05; letter-spacing: -0.02em; margin-bottom: 16px; }
+  .subtitle { font-size: 17px; color: var(--text-dim); max-width: 680px; margin: 0 auto; }
+
+  .nav {
+    display: flex; flex-wrap: wrap; gap: 6px; justify-content: center;
+    margin-bottom: 40px; padding: 12px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 8px;
+  }
+  .nav button {
+    background: transparent; border: 1px solid var(--border); color: var(--text-dim);
+    padding: 8px 14px; border-radius: 4px; cursor: pointer;
+    font-family: 'IBM Plex Mono', monospace; font-size: 10px;
+    letter-spacing: 0.08em; text-transform: uppercase; transition: all 0.2s;
+  }
+  .nav button:hover { border-color: var(--gold); color: var(--gold); }
+  .nav button.active { background: var(--gold); color: var(--bg); border-color: var(--gold); font-weight: 600; }
+
+  .section { display: none; animation: fadeIn 0.4s ease; }
+  .section.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+  h2 { font-size: 24px; font-weight: 600; margin: 40px 0 16px; padding-top: 24px; border-top: 1px solid var(--border); }
+  h2:first-of-type { border-top: none; margin-top: 0; padding-top: 0; }
+  h3 { font-size: 17px; font-weight: 600; margin: 24px 0 12px; color: var(--gold); }
+  p { margin-bottom: 16px; font-size: 15px; color: var(--text-dim); }
+  .lead { font-size: 18px; color: var(--text); border-left: 2px solid var(--gold); padding-left: 20px; margin: 24px 0 32px; }
+  .highlight { color: var(--gold); font-weight: 600; }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 24px; margin: 16px 0; }
+  .card-title { font-weight: 600; font-size: 16px; color: var(--text); margin-bottom: 8px; }
+
+  .btn { background: var(--gold); color: var(--bg); border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; transition: all 0.2s; display: inline-block; text-decoration: none; }
+  .btn:hover { background: var(--gold-dim); color: var(--text); }
+  .btn-secondary { background: transparent; color: var(--gold); border: 1px solid var(--gold); }
+  .btn-secondary:hover { background: var(--gold); color: var(--bg); }
+  .btn-full { display: block; width: 100%; text-align: center; }
+
+  .result-box { background: var(--surface-2); border: 1px solid var(--gold); border-radius: 8px; padding: 24px; margin: 20px 0; display: none; }
+  .result-box.visible { display: block; animation: fadeIn 0.4s ease; }
+  .result-box h3 { color: var(--gold); margin-top: 0; }
+
+  .compact-input { width: 100%; padding: 10px 14px; background: var(--surface-2); color: var(--text); border: 1px solid var(--border); border-radius: 4px; font-family: 'IBM Plex Sans', sans-serif; font-size: 13px; margin: 6px 0; }
+  .compact-input:focus { outline: none; border-color: var(--gold); }
+  label { display: block; margin-top: 12px; margin-bottom: 4px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); }
+
+  .step-list { list-style: none; margin: 16px 0; }
+  .step-list li { display: flex; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--border); align-items: flex-start; }
+  .step-list li:last-child { border-bottom: none; }
+  .step-num { font-family: 'IBM Plex Mono', monospace; font-size: 20px; color: var(--gold); font-weight: 600; line-height: 1; min-width: 28px; }
+  .step-body { flex: 1; }
+  .step-body h4 { font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+  .step-body p { font-size: 13px; color: var(--text-dim); margin-bottom: 6px; }
+  .step-body a { color: var(--gold); font-weight: 600; font-size: 13px; }
+
+  .network-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; margin: 20px 0; }
+  .network-card { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 16px; text-decoration: none; color: var(--text); transition: all 0.2s; display: block; }
+  .network-card:hover { border-color: var(--gold); transform: translateY(-2px); }
+  .network-card .nc-title { font-weight: 600; font-size: 14px; color: var(--gold); margin-bottom: 4px; }
+  .network-card .nc-desc { font-size: 12px; color: var(--text-dim); line-height: 1.5; }
+
+  .footer-note { margin-top: 64px; padding-top: 32px; border-top: 1px solid var(--border); font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--text-dim); letter-spacing: 0.08em; text-align: center; line-height: 2; }
+  .footer-note .glory { color: var(--gold); font-weight: 600; }
+
+  @media (max-width: 600px) {
+    .wrap { padding: 0 16px 80px; }
+    header { padding: 32px 0 24px; }
+    .step-list li { flex-direction: column; gap: 8px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="kicker">Forbidden Knowledge · The Nation Operating System</div>
+  <h1>The Tools to Run a Nation. Not a Theory. An Operating System.</h1>
+  <p class="subtitle">You have the trust, the income, the sanctuary, and the node. Now you need the infrastructure: the bylaws, the membership application, the dispute resolution protocol, the treasury, the assembly rules, the mutual aid ledger, and the succession plan. Every document is a template. Every step is a protocol. Every link goes to a real tool.</p>
+</header>
+
+<nav class="nav">
+  <button class="active" onclick="showSection('bylaws', this)">Bylaws</button>
+  <button onclick="showSection('membership', this)">Membership</button>
+  <button onclick="showSection('dispute', this)">Dispute Resolution</button>
+  <button onclick="showSection('treasury', this)">Treasury</button>
+  <button onclick="showSection('assembly', this)">Assembly</button>
+  <button onclick="showSection('ledger', this)">Mutual Aid</button>
+  <button onclick="showSection('succession', this)">Succession</button>
+  <button onclick="showSection('network', this)">The Network</button>
+</nav>
+
+<!-- BYLAWS -->
+<div class="section active" id="bylaws">
+  <h2>The Bylaws Builder</h2>
+
+  <p class="lead">The bylaws are the constitution of the PMA. They define the name, the purpose, the membership, the governance, and the dissolution. They are the first document. They are the foundation.</p>
+
+  <div class="card">
+    <div class="card-title">Generate Your Bylaws</div>
+    <label for="pma-name">PMA Name</label>
+    <input type="text" class="compact-input" id="pma-name" placeholder="e.g., The Amnesty Coalition for Unity">
+    <label for="pma-purpose">Purpose (one sentence)</label>
+    <input type="text" class="compact-input" id="pma-purpose" placeholder="e.g., To build a sovereign community of free men and women">
+    <label for="pma-state">State of Formation</label>
+    <input type="text" class="compact-input" id="pma-state" placeholder="e.g., Wyoming">
+    <label for="pma-members">Membership Classes (comma separated)</label>
+    <input type="text" class="compact-input" id="pma-members" placeholder="e.g., Founding Member, Full Member, Associate Member">
+    <label for="pma-officers">Officers (comma separated)</label>
+    <input type="text" class="compact-input" id="pma-officers" placeholder="e.g., President, Secretary, Treasurer, Trustee">
+    <button class="btn btn-full" onclick="generateBylaws()" style="margin-top: 12px;">Generate Bylaws</button>
+    <div class="result-box" id="bylawsResult"></div>
+  </div>
+</div>
+
+<!-- MEMBERSHIP -->
+<div class="section" id="membership">
+  <h2>The Membership Application</h2>
+
+  <p>The membership application is the filter. It defines who can join. It requires the applicant to affirm the covenant, the declaration of sovereignty, and the code of conduct. It is the first document a new member signs.</p>
+
+  <div class="card">
+    <div class="card-title">The Application Template</div>
+    <p><strong>1. Statement of Faith.</strong> The applicant affirms the covenant: do not kill, love one another, protect the innocent.</p>
+    <p><strong>2. Declaration of Sovereignty.</strong> The applicant declares their family to be a sovereign entity under God.</p>
+    <p><strong>3. Code of Conduct.</strong> The applicant agrees to the code of conduct: no violence, no fraud, no exploitation, no trafficking.</p>
+    <p><strong>4. Arbitration Agreement.</strong> The applicant agrees to binding arbitration for any dispute within the PMA.</p>
+    <p><strong>5. Membership Class.</strong> The applicant selects their membership class.</p>
+    <p><strong>6. Signature.</strong> The applicant signs and dates the application.</p>
+    <p><a href="https://quantum-freedom-site.vercel.app/AmnestyApplication.html" target="_blank" rel="noopener">Open the Amnesty Application →</a></p>
+  </div>
+</div>
+
+<!-- DISPUTE RESOLUTION -->
+<div class="section" id="dispute">
+  <h2>The Dispute Resolution Protocol</h2>
+
+  <p>The PMA does not go to court. The PMA resolves disputes privately. The parties agree to binding arbitration. The arbitrator is chosen by the parties. The arbitration is binding. The protocol is the agreement.</p>
+
+  <ul class="step-list">
+    <li>
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h4>Notice of Dispute</h4>
+        <p>The party with the grievance sends a written notice to the other party. The notice states the specific claim, the specific harm, and the specific remedy requested.</p>
+      </div>
+    </li>
+    <li>
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h4>Selection of Arbitrator</h4>
+        <p>The parties select an arbitrator. The arbitrator is a member of the PMA in good standing. If the parties cannot agree, the trustee selects the arbitrator.</p>
+      </div>
+    </li>
+    <li>
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h4>Arbitration Hearing</h4>
+        <p>The hearing is private. The parties present their evidence. The arbitrator hears both sides. The arbitrator issues a written decision.</p>
+      </div>
+    </li>
+    <li>
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <h4>Binding Decision</h4>
+        <p>The decision is binding. The parties agree to abide by it. The decision is recorded in the PMA's minutes.</p>
+      </div>
+    </li>
+  </ul>
+</div>
+
+<!-- TREASURY -->
+<div class="section" id="treasury">
+  <h2>The Treasury</h2>
+
+  <p>The PMA's treasury is the trust account. It is separate from the members' personal accounts. It is managed by the treasurer. It is audited by the trustees. It is reported to the members.</p>
+
+  <div class="card">
+    <div class="card-title">The Treasury Structure</div>
+    <p><strong>1. The Trust Account.</strong> The PMA holds its funds in a trust account. The account is in the name of the trust. The trustee is the signatory.</p>
+    <p><strong>2. The Public Ledger.</strong> Every donation is recorded. Every expenditure is recorded. The ledger is public to the members.</p>
+    <p><strong>3. The Mutual Aid Fund.</strong> A percentage of every donation goes to the mutual aid fund. The fund is for members in crisis.</p>
+    <p><strong>4. The Audit.</strong> The trustees audit the treasury annually. The audit is reported to the members.</p>
+  </div>
+</div>
+
+<!-- ASSEMBLY -->
+<div class="section" id="assembly">
+  <h2>The Assembly Rules</h2>
+
+  <p>The assembly is the governing body of the PMA. It meets regularly. It votes on resolutions. It elects the trustees. It amends the bylaws. The rules are the procedure.</p>
+
+  <ul class="step-list">
+    <li>
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h4>Quorum</h4>
+        <p>A quorum is required for any binding vote. The quorum is defined in the bylaws. If the quorum is not met, the meeting is adjourned.</p>
+      </div>
+    </li>
+    <li>
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h4>Voting</h4>
+        <p>Every member in good standing has one vote. The vote is recorded in the minutes. The majority decides, unless the bylaws require a supermajority.</p>
+      </div>
+    </li>
+    <li>
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h4>Minutes</h4>
+        <p>The secretary records the minutes. The minutes include the date, the attendees, the resolutions, the votes, and the decisions. The minutes are kept in the PMA's archive.</p>
+      </div>
+    </li>
+    <li>
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <h4>Amendments</h4>
+        <p>The bylaws can be amended by a supermajority vote. The amendment is proposed in writing. The amendment is voted on at the next meeting.</p>
+      </div>
+    </li>
+  </ul>
+</div>
+
+<!-- MUTUAL AID -->
+<div class="section" id="ledger">
+  <h2>The Mutual Aid Ledger</h2>
+
+  <p>The mutual aid ledger is the record of who gave what, who received what, and what is owed. It is public to the members. It is the proof that the PMA is real.</p>
+
+  <div class="card">
+    <div class="card-title">The Ledger Template</div>
+    <p><strong>Member:</strong> [Name]</p>
+    <p><strong>Contribution:</strong> [Amount or service]</p>
+    <p><strong>Date:</strong> [Date]</p>
+    <p><strong>Recipient:</strong> [Name or fund]</p>
+    <p><strong>Purpose:</strong> [What the aid was for]</p>
+    <p><strong>Status:</strong> [Pending / Completed / Repaid]</p>
+  </div>
+
+  <p>The ledger is updated weekly. The ledger is audited quarterly. The ledger is the PMA's memory.</p>
+</div>
+
+<!-- SUCCESSION -->
+<div class="section" id="succession">
+  <h2>The Succession Plan</h2>
+
+  <p>The PMA is not a person. It is a covenant. The covenant survives the founder. The succession plan is the proof that the nation is bigger than any one member.</p>
+
+  <ul class="step-list">
+    <li>
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <h4>The Trustees</h4>
+        <p>The PMA has three trustees. Two must agree on any major decision. If one is incapacitated, the other two continue.</p>
+      </div>
+    </li>
+    <li>
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <h4>The Designated Successor</h4>
+        <p>The founder designates a successor in writing. The successor is a member in good standing. The successor is approved by the trustees.</p>
+      </div>
+    </li>
+    <li>
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <h4>The Keys</h4>
+        <p>The founder's digital keys, passwords, and access are held by the designated successor and one trustee. The deadman switch releases the archive if the founder does not check in.</p>
+      </div>
+    </li>
+    <li>
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <h4>The Covenant</h4>
+        <p>Every member signs the covenant. The covenant is the constitution. It does not change with the founder.</p>
+      </div>
+    </li>
+  </ul>
+</div>
+
+<!-- NETWORK -->
+<div class="section" id="network">
+  <h2>The Network</h2>
+
+  <p>The PMA is not alone. These are the organizations and tools that support the work. Every link is live.</p>
+
+  <div class="network-grid">
+    <a class="network-card" href="https://quantum-freedom-site.vercel.app/theNation.html" target="_blank" rel="noopener">
+      <div class="nc-title">The Amnesty Coalition for Unity</div>
+      <div class="nc-desc">The PMA. The 25 Pillars. The 007 status. The application.</div>
+    </a>
+    <a class="network-card" href="https://quantum-freedom-site.vercel.app/Colombia2026.html" target="_blank" rel="noopener">
+      <div class="nc-title">Colombia Complete Dossier</div>
+      <div class="nc-desc">The sanctuary in the mountains. The real door.</div>
+    </a>
+    <a class="network-card" href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-MasterHub.html" target="_blank" rel="noopener">
+      <div class="nc-title">The Master Hub</div>
+      <div class="nc-desc">Every terminal. Every chapter. Every tool.</div>
+    </a>
+    <a class="network-card" href="https://standingontherock.com/?ref=qbopuesmijo" target="_blank" rel="noopener">
+      <div class="nc-title">True Equity — Julian Swan</div>
+      <div class="nc-desc">The complete equity system. The system that compels performance.</div>
+    </a>
+    <a class="network-card" href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-LegalFortress.html" target="_blank" rel="noopener">
+      <div class="nc-title">Legal Fortress</div>
+      <div class="nc-desc">The legal architecture of equity. The framework for compelling performance.</div>
+    </a>
+    <a class="network-card" href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-HugoProtocol.html" target="_blank" rel="noopener">
+      <div class="nc-title">The Hugo Protocol</div>
+      <div class="nc-desc">The hospital protocol that protects your family.</div>
+    </a>
+  </div>
+</div>
+
+<div class="footer-note">
+  FORBIDDEN KNOWLEDGE · THE SOVEREIGN OPERATOR<br>
+  The Nation Operating System<br><br>
+  The bylaws. The membership. The dispute resolution. The treasury. The assembly. The mutual aid. The succession. The network.<br>
+  <span class="glory">Soli Deo Gloria.</span>
+</div>
+
+</div>
+
+<script>
+// ============================================================
+// NAVIGATION
+// ============================================================
+function showSection(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ============================================================
+// BYLAWS GENERATOR
+// ============================================================
+function generateBylaws() {
+  const name = document.getElementById('pma-name').value.trim();
+  const purpose = document.getElementById('pma-purpose').value.trim();
+  const state = document.getElementById('pma-state').value.trim();
+  const members = document.getElementById('pma-members').value.trim();
+  const officers = document.getElementById('pma-officers').value.trim();
+
+  if (!name || !purpose || !state || !members || !officers) {
+    alert('Please fill in all fields.');
+    return;
+  }
+
+  const bylaws = 'BYLAWS OF ' + name.toUpperCase() + '\n\n' +
+    'ARTICLE I — NAME\n' +
+    'The name of this Private Membership Association is ' + name + '.\n\n' +
+    'ARTICLE II — PURPOSE\n' +
+    'The purpose of this Association is ' + purpose + '.\n\n' +
+    'ARTICLE III — STATE OF FORMATION\n' +
+    'This Association is formed under the laws of the State of ' + state + '.\n\n' +
+    'ARTICLE IV — MEMBERSHIP\n' +
+    'The membership classes of this Association are: ' + members + '.\n\n' +
+    'ARTICLE V — OFFICERS\n' +
+    'The officers of this Association are: ' + officers + '.\n\n' +
+    'ARTICLE VI — GOVERNANCE\n' +
+    'The Association is governed by the Assembly. The Assembly meets regularly. The Assembly votes on resolutions. The Assembly elects the trustees.\n\n' +
+    'ARTICLE VII — COVENANT\n' +
+    'Every member affirms the covenant: do not kill, love one another, protect the innocent.\n\n' +
+    'ARTICLE VIII — DISPUTE RESOLUTION\n' +
+    'Any dispute within the Association is resolved by binding arbitration. The parties agree to abide by the arbitrator\'s decision.\n\n' +
+    'ARTICLE IX — AMENDMENT\n' +
+    'These bylaws may be amended by a supermajority vote of the Assembly.\n\n' +
+    'ARTICLE X — DISSOLUTION\n' +
+    'Upon dissolution, the assets of the Association are distributed to the members in good standing, or to a successor Association with the same purpose.\n\n' +
+    'Adopted this day, ' + new Date().toLocaleDateString() + '.\n\n' +
+    '_________________________\n' +
+    'President\n\n' +
+    '_________________________\n' +
+    'Secretary\n\n' +
+    'Soli Deo Gloria.';
+
+  const result = document.getElementById('bylawsResult');
+  result.classList.add('visible');
+  result.innerHTML = '<h3>Your Bylaws</h3><pre style="white-space: pre-wrap; font-family: \'IBM Plex Mono\', monospace; font-size: 11px; line-height: 1.6; color: var(--text); max-height: 400px; overflow-y: auto;">' + escapeHtml(bylaws) + '</pre><button class="btn btn-full" onclick="downloadBylaws()" style="margin-top: 12px;">Download Bylaws</button>';
+
+  window._bylaws = bylaws;
+}
+
+function downloadBylaws() {
+  if (!window._bylaws) return;
+  const blob = new Blob([window._bylaws], { type: 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'PMA-Bylaws-' + new Date().toISOString().split('T')[0] + '.txt';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ============================================================
+// UTILS
+// ============================================================
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+</script>
+</body>
+</html>
