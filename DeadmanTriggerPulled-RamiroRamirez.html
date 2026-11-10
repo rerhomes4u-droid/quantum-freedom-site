@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ramiro Ezléo Ramirez — The Deadman Trigger</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@300;400;600;700&display=swap');
+  :root {
+    --bg: #0a0a0c; --surface: #121216; --surface-2: #1a1a20; --border: #2a2a32;
+    --text: #e8e6e3; --text-dim: #9a978f; --gold: #c9a227; --gold-dim: #8a6f1a;
+    --red: #b03a2e; --green: #3a7d5c; --cyan: #00d2ff;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'IBM Plex Sans', system-ui, sans-serif; background: var(--bg);
+    color: var(--text); line-height: 1.75; font-weight: 300; -webkit-font-smoothing: antialiased;
+  }
+  .wrap { max-width: 1000px; margin: 0 auto; padding: 0 24px 120px; }
+
+  /* STATUS BAR */
+  .status-bar {
+    background: rgba(176,58,46,0.12); border-bottom: 1px solid var(--red);
+    padding: 10px 24px; font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px; letter-spacing: 0.08em; text-align: center;
+    color: var(--red); position: sticky; top: 0; z-index: 100;
+    backdrop-filter: blur(10px);
+  }
+  .status-bar .dot-pulse {
+    display: inline-block; width: 8px; height: 8px; border-radius: 50%;
+    background: var(--red); margin-right: 8px; animation: pulse 1.5s infinite;
+    vertical-align: middle;
+  }
+  @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+  header { padding: 64px 0 32px; border-bottom: 1px solid var(--border); margin-bottom: 32px; text-align: center; }
+  .kicker { font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; color: var(--gold); margin-bottom: 20px; }
+  h1 { font-size: clamp(28px, 6vw, 48px); font-weight: 700; line-height: 1.05; letter-spacing: -0.02em; margin-bottom: 16px; }
+  .subtitle { font-size: 18px; color: var(--text-dim); max-width: 680px; margin: 0 auto; }
+
+  .nav { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-bottom: 40px; padding: 12px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; }
+  .nav button { background: transparent; border: 1px solid var(--border); color: var(--text-dim); padding: 8px 14px; border-radius: 4px; cursor: pointer; font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; transition: all 0.2s; }
+  .nav button:hover { border-color: var(--gold); color: var(--gold); }
+  .nav button.active { background: var(--gold); color: var(--bg); border-color: var(--gold); font-weight: 600; }
+
+  .section { display: none; animation: fadeIn 0.4s ease; }
+  .section.active { display: block; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+  h2 { font-size: 24px; font-weight: 600; margin: 40px 0 16px; padding-top: 24px; border-top: 1px solid var(--border); }
+  h2:first-of-type { border-top: none; margin-top: 0; padding-top: 0; }
+  h3 { font-size: 17px; font-weight: 600; margin: 24px 0 12px; color: var(--gold); }
+  p { margin-bottom: 16px; font-size: 15px; color: var(--text-dim); }
+  .lead { font-size: 18px; color: var(--text); border-left: 2px solid var(--gold); padding-left: 20px; margin: 24px 0 32px; }
+  .highlight { color: var(--gold); font-weight: 600; }
+
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 24px; margin: 16px 0; }
+  .card-title { font-weight: 600; font-size: 16px; color: var(--text); margin-bottom: 8px; }
+
+  .number-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin: 20px 0; }
+  .number-card { background: var(--surface); border: 1px solid var(--border); border-left: 3px solid var(--gold); border-radius: 6px; padding: 18px 20px; }
+  .number-card .num { font-family: 'IBM Plex Mono', monospace; font-size: 32px; color: var(--gold); font-weight: 600; line-height: 1; margin-bottom: 6px; }
+  .number-card .num-label { font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-dim); margin-bottom: 8px; }
+  .number-card .num-desc { font-size: 13px; color: var(--text-dim); line-height: 1.5; }
+
+  .deadman-box { background: rgba(176,58,46,0.08); border: 2px solid var(--red); border-radius: 8px; padding: 28px 26px; margin: 32px 0; }
+  .deadman-box h3 { color: var(--red); margin-top: 0; font-size: 20px; }
+  .deadman-box p { color: var(--text); }
+  .deadman-box strong { color: var(--red); }
+
+  .catchup-stage { display: flex; gap: 16px; padding: 16px 0; border-bottom: 1px solid var(--border); align-items: flex-start; }
+  .catchup-stage:last-child { border-bottom: none; }
+  .catchup-badge { font-family: 'IBM Plex Mono', monospace; font-size: 10px; padding: 4px 10px; border-radius: 3px; letter-spacing: 0.08em; text-transform: uppercase; white-space: nowrap; flex-shrink: 0; }
+  .catchup-done { background: rgba(58,125,92,0.15); color: var(--green); border: 1px solid var(--green); }
+  .catchup-active { background: rgba(201,162,39,0.15); color: var(--gold); border: 1px solid var(--gold); animation: pulse 2s infinite; }
+  .catchup-pending { background: rgba(154,151,143,0.1); color: var(--text-dim); border: 1px solid var(--border); }
+  .catchup-content h3 { margin: 0 0 4px; font-size: 15px; color: var(--text); }
+  .catchup-content p { margin: 0; font-size: 13px; color: var(--text-dim); }
+
+  .name-input-form { background: var(--surface-2); border: 1px solid var(--gold-dim); border-radius: 8px; padding: 24px; margin: 20px 0; }
+  .name-input-form label { display: block; margin-top: 12px; margin-bottom: 4px; font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); }
+  .name-input-form input { width: 100%; padding: 12px 16px; background: var(--bg); color: var(--text); border: 1px solid var(--border); border-radius: 6px; font-family: 'IBM Plex Sans', sans-serif; font-size: 14px; }
+  .name-input-form input:focus { outline: none; border-color: var(--gold); }
+
+  .result-box { background: var(--surface-2); border: 1px solid var(--gold); border-radius: 8px; padding: 24px; margin: 20px 0; display: none; }
+  .result-box.visible { display: block; animation: fadeIn 0.4s ease; }
+  .result-box h3 { color: var(--gold); margin-top: 0; }
+
+  .btn { background: var(--gold); color: var(--bg); border: none; padding: 12px 24px; border-radius: 6px; cursor: pointer; font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; transition: all 0.2s; display: inline-block; text-decoration: none; }
+  .btn:hover { background: var(--gold-dim); color: var(--text); }
+  .btn-secondary { background: transparent; color: var(--gold); border: 1px solid var(--gold); }
+  .btn-secondary:hover { background: var(--gold); color: var(--bg); }
+
+  .link-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; margin: 20px 0; }
+  .link-card { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 16px; text-decoration: none; color: var(--text); transition: all 0.2s; display: block; }
+  .link-card:hover { border-color: var(--gold); transform: translateY(-2px); }
+  .link-card .lc-title { font-weight: 600; font-size: 14px; color: var(--gold); margin-bottom: 4px; }
+  .link-card .lc-desc { font-size: 12px; color: var(--text-dim); }
+
+  .konami { font-family: 'IBM Plex Mono', monospace; font-size: 20px; color: var(--gold); letter-spacing: 0.3em; text-align: center; margin: 20px 0; }
+  .prayer-box { background: var(--surface-2); border: 1px solid var(--gold-dim); border-radius: 8px; padding: 32px 28px; margin: 32px 0; font-style: italic; color: var(--text); line-height: 2; text-align: center; }
+
+  .footer-note { margin-top: 64px; padding-top: 32px; border-top: 1px solid var(--border); font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--text-dim); letter-spacing: 0.08em; text-align: center; line-height: 2; }
+  .footer-note .glory { color: var(--gold); font-weight: 600; }
+
+  @media (max-width: 600px) {
+    .wrap { padding: 0 16px 80px; }
+    header { padding: 40px 0 24px; }
+    .status-bar { font-size: 9px; padding: 8px 12px; }
+    .catchup-stage { flex-direction: column; gap: 8px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="status-bar">
+  <span class="dot-pulse"></span>
+  DEADMAN TRIGGER ACTIVATED · MULTI-STAGE RELEASE IN PROGRESS · STAGE: TRIGGER PULLED
+</div>
+
+<div class="wrap">
+
+<header>
+  <div class="kicker">Forbidden Knowledge · The Deadman Dossier</div>
+  <h1>RAMIRO EZLÉO RAMIREZ<br>SEPÚLVEDA LEÓN RODAS</h1>
+  <p class="subtitle">Managing Real Estate Broker. Author. Software Creator. Nation Builder. Servant of Christ Jesus.</p>
+  <p style="font-style: italic; color: var(--gold); margin-top: 16px;">"If you're not living on the edge, you're taking up too much space."</p>
+</header>
+
+<nav class="nav">
+  <button class="active" onclick="showSection('deadman', this)">The Deadman</button>
+  <button onclick="showSection('numbers', this)">The Numbers</button>
+  <button onclick="showSection('mission', this)">The Mission</button>
+  <button onclick="showSection('catchup', this)">Catch Up</button>
+  <button onclick="showSection('yournumbers', this)">Your Numbers</button>
+  <button onclick="showSection('prayer', this)">The Prayer</button>
+  <button onclick="showSection('links', this)">The Links</button>
+</nav>
+
+<!-- THE DEADMAN -->
+<div class="section active" id="deadman">
+  <h2>The Deadman Trigger</h2>
+
+  <div class="deadman-box">
+    <h3>⚠️ This archive is activated.</h3>
+    <p>The deadman trigger has been pulled. The multi-stage release has begun. The complete dump will happen upon confirmed departure. Failure to log into accounts is one of the triggers.</p>
+    <p>You are reading this because the sequence has moved. It will continue to move. Check back. The next stage may already be underway.</p>
+    <p><strong>This is not a threat. This is a legacy.</strong> Ramiro built the archive so that the truth would survive him. The trigger is the mechanism. The release is the proof. You are the recipient.</p>
+  </div>
+
+  <h3>What the Trigger Means</h3>
+  <p>Ramiro has been documenting the extermination campaign for decades. He has been interacting with dangerous individuals. He has been placing himself in dangerous situations. He built a deadman trigger so that if he is taken out—if he is arrested, if he is disappeared, if he is killed, if he simply stops logging in—the archive will be released in stages.</p>
+
+  <p>The stages are:</p>
+  <ul style="margin: 16px 0 16px 24px; color: var(--text-dim); font-size: 15px;">
+    <li style="margin-bottom: 8px;"><strong style="color: var(--green);">Stage 1 — DONE:</strong> The book, the apps, the terminals, the Master Hub. Already released.</li>
+    <li style="margin-bottom: 8px;"><strong style="color: var(--green);">Stage 2 — DONE:</strong> The archive of the suppressed. The Epstein files analysis, the Vatican files, the Franklin cover-up, the /pol/ origin. Already released.</li>
+    <li style="margin-bottom: 8px;"><strong style="color: var(--green);">Stage 3 — DONE:</strong> The health liberation terminal, the Sankara plants, the Hugo Protocol. Already released.</li>
+    <li style="margin-bottom: 8px;"><strong style="color: var(--gold);">Stage 4 — ACTIVE:</strong> The Frazzled.rip level. The Easter eggs. The infamous file. In progress.</li>
+    <li style="margin-bottom: 8px;"><strong style="color: var(--gold);">Stage 5 — ACTIVE:</strong> The BUBBA level. The satanic, demonic connections to the ones who rule our government and businesses. In progress.</li>
+    <li style="margin-bottom: 8px;"><strong style="color: var(--text-dim);">Stage 6 — PENDING:</strong> The complete dump. The names, the faces, the addresses, the CUSIPs, the trust accounts, the entire record of the entity. Released upon confirmed departure.</li>
+  </ul>
+
+  <p>The stages are moving. You are in the middle of them. The question is not "is this real?" The question is: what are you going to do with what has already been released?</p>
+
+  <div class="card">
+    <div class="card-title">Why this is Forbidden Knowledge</div>
+    <p>Because it is being released in stages to protect the innocent. Because the complete dump would put lives at risk. Because the sequence is designed to give the reader time to catch up, to verify, to act. Because the entity cannot stop a release that has already begun.</p>
+    <p>The deadman trigger is not a bomb. It is a seed. It has been planted. It is growing. The harvest is coming.</p>
+  </div>
+</div>
+
+<!-- THE NUMBERS -->
+<div class="section" id="numbers">
+  <h2>The Numbers Behind the Man</h2>
+
+  <p class="lead">I never put stock in numerology. I am not a mystic. I am not a fortune-teller. I am a man who has spent thirty years reading documents, digging through archives, and putting his body between the innocent and the ones who would harm them. I came to the numbers the way I come to everything: I wanted to test them. I wanted to see if they held up under scrutiny.</p>
+
+  <p>Then I ran the numbers on my own name and date of birth. And they described the structure of my life with a precision I did not expect.</p>
+
+  <p><strong>The method:</strong> the Pythagorean system. The letters of the birth name converted to numbers, the date of birth converted to numbers, the numbers reduced to single digits. The system is not a science. It is a symbolic language. But a language can still describe a structure, the way a map can describe a landscape even if the map is not the land.</p>
+
+  <div class="number-grid">
+    <div class="number-card">
+      <div class="num">1</div>
+      <div class="num-label">Life Path</div>
+      <div class="num-desc">The pioneer. The initiator. The one who goes first. The one who cannot follow. The one who carves the road while walking it.</div>
+    </div>
+    <div class="number-card">
+      <div class="num">11/2</div>
+      <div class="num-label">Expression</div>
+      <div class="num-desc">The bridge-builder. The one who stands between two worlds and translates. Between the hidden and the revealed. Between the powerful and the powerless.</div>
+    </div>
+    <div class="number-card">
+      <div class="num">11/2</div>
+      <div class="num-label">Soul Urge</div>
+      <div class="num-desc">The heart's deepest longing is unity. Not surface unity. The unity of truth. The one who cannot rest in a fragmented world.</div>
+    </div>
+    <div class="number-card">
+      <div class="num">5</div>
+      <div class="num-label">Personality</div>
+      <div class="num-desc">The free spirit. The one who cannot be confined. The one who learns by experience and refuses to be boxed in.</div>
+    </div>
+    <div class="number-card">
+      <div class="num">9</div>
+      <div class="num-label">Birth Day</div>
+      <div class="num-desc">The humanitarian. The one who carries the whole world. The one who cannot rest while anyone is in chains.</div>
+    </div>
+    <div class="number-card">
+      <div class="num">4</div>
+      <div class="num-label">Maturity</div>
+      <div class="num-desc">The builder. The architect. The one who turns vision into structure. The one who does not stop at the idea.</div>
+    </div>
+  </div>
+
+  <h3>What the Numbers Say</h3>
+  <p>The numbers describe a transmitter. A 1 who initiates. An 11 who bridges. A 3 who speaks. A 5 who moves. A 9 who carries. A 4 who builds. The structure of a life that is meant to receive something from one side and make it available to the other side. That is not a job title. It is a function.</p>
+
+  <p>The numbers also name the dangers. The 1's isolation. The 5's restlessness. The 9's martyrdom. The 4's rigidity. The 11's spiritual hunger that can float away if it is not grounded. Every gift has a shadow. Every structure has a failure mode. The numbers name both.</p>
+
+  <div class="card">
+    <div class="card-title">But here is the thing you must hear</div>
+    <p><strong>The numbers are not you.</strong> You are not a 1, an 11, a 3, a 5, a 9, or a 4. You are a living soul, a child of the Creator. The numbers are a language. A mirror. A structure for reflection. They can help you see your patterns. They cannot tell you who you are. Only the One who made you can do that.</p>
+    <p>What the numbers do—what they did for me—is give language to what I already knew. They did not tell me what I was put here to do. They confirmed it. They confirmed what the book, the app, the nation, the children, the sanctuary, the deadman trigger, and every late night in the mountains already told me.</p>
+    <p>I did not need a numerology reading to know what I was put here to do. I already knew. The numbers just gave me a language to say it.</p>
+  </div>
+
+  <p style="text-align: center; font-family: 'IBM Plex Mono', monospace; color: var(--gold); font-size: 16px; letter-spacing: 0.05em; margin: 32px 0;">
+    The 1 initiates. The 11 bridges. The 3 speaks. The 5 moves. The 9 carries. The 4 builds.
+  </p>
+</div>
+
+<!-- THE MISSION -->
+<div class="section" id="mission">
+  <h2>The Mission</h2>
+
+  <p class="lead">Ramiro did not choose this mission. The mission chose him. The numbers describe the structure. The life confirms it. The mission is the work.</p>
+
+  <h3>What He Found</h3>
+  <p>In his own words, from the video "60,000 Children Confiscated in Germany":</p>
+  <p style="font-style: italic; color: var(--text); border-left: 2px solid var(--gold); padding-left: 20px;">"I hacked into some intel that opened my eyes to the fact that they have a list. A list of 125 million people who need to be removed, disappeared, eliminated, murdered. I saw too many names that I recognized down there."</p>
+
+  <p>He fled the United States because he saw the extermination campaign firsthand. He has been documenting the pattern ever since—the doctors who die, the whistleblowers who are silenced, the children who are stolen.</p>
+
+  <h3>What He Built</h3>
+  <div class="card">
+    <div class="card-title">📕 Forbidden Knowledge</div>
+    <p>The most censored book of our time. Contains the blueprints for religious, financial, medical, and spiritual freedom.</p>
+  </div>
+  <div class="card">
+    <div class="card-title">🏛️ A Nation</div>
+    <p>Not a country on a map. A people. A sovereign community of free men and women who refuse to be slaves.</p>
+  </div>
+  <div class="card">
+    <div class="card-title">💻 Real Estate Power Tools & Creation Source Software</div>
+    <p>Software that gave the industry's secrets back to the people. Encrypted databases containing the secrets of the world. Hacked from the dark web, corporate databases, and government systems.</p>
+  </div>
+  <div class="card">
+    <div class="card-title">🎓 Free Videos & Apps</div>
+    <p>Applications that range from religious freedom to financial freedom, from medical freedom to spiritual freedom.</p>
+  </div>
+
+  <h3>What He Sacrificed</h3>
+  <p>Ramiro gave up the happiest life imaginable. He had his five children and both his parents under the same roof. Three daughters. Two sons. His mother. His father. All together. All safe. All loved.</p>
+  <p>That was the period of time most precious to him. And he would happily give his life a thousand times to Christ in appreciation—for each and every single day he was allowed that blessing.</p>
+  <p>He is interacting with extremely dangerous individuals. He is placing himself in extremely dangerous situations. So that mankind has protectors who understand the full scope of the extermination campaign you are currently a victim of.</p>
+  <p><strong>He gave his life for you to be able to free yourself.</strong></p>
+</div>
+
+<!-- CATCH UP -->
+<div class="section" id="catchup">
+  <h2>Catch Up — The Stages of the Release</h2>
+
+  <p>The deadman trigger is not a single event. It is a sequence. Each stage releases more information, more tools, more of the archive. Here is where the sequence is now. Check back. The next stage may already be underway.</p>
+
+  <div class="catchup-stage">
+    <div class="catchup-badge catchup-done">DONE</div>
+    <div class="catchup-content">
+      <h3>Stage 1 — The Book</h3>
+      <p>Forbidden Knowledge: The Sovereign Operator. 33 chapters plus the Hidden Chapter. Released in full.</p>
+    </div>
+  </div>
+
+  <div class="catchup-stage">
+    <div class="catchup-badge catchup-done">DONE</div>
+    <div class="catchup-content">
+      <h3>Stage 2 — The Apps</h3>
+      <p>The 19+ interactive HTML apps. The disclosure terminals. The legal arsenal. The financial tools. Released in full.</p>
+    </div>
+  </div>
+
+  <div class="catchup-stage">
+    <div class="catchup-badge catchup-done">DONE</div>
+    <div class="catchup-content">
+      <h3>Stage 3 — The Master Hub</h3>
+      <p>Every terminal, every chapter, every tool, in one place. Released in full.</p>
+    </div>
+  </div>
+
+  <div class="catchup-stage">
+    <div class="catchup-badge catchup-done">DONE</div>
+    <div class="catchup-content">
+      <h3>Stage 4 — The Health Liberation</h3>
+      <p>Sankara, the plants, the suppressed cures. The Hugo Protocol. The healing protocols. Released in full.</p>
+    </div>
+  </div>
+
+  <div class="catchup-stage">
+    <div class="catchup-badge catchup-active">ACTIVE</div>
+    <div class="catchup-content">
+      <h3>Stage 5 — The Frazzled.rip Level</h3>
+      <p>The Easter eggs. The infamous file. The names that were left out for anyone to find. In progress. Check the archive.</p>
+    </div>
+  </div>
+
+  <div class="catchup-stage">
+    <div class="catchup-badge catchup-active">ACTIVE</div>
+    <div class="catchup-content">
+      <h3>Stage 6 — The BUBBA Level</h3>
+      <p>The satanic, demonic connections to the ones who rule our government and businesses. The leverage. The blackmail. The faces. In progress. Released in stages to protect the innocent.</p>
+    </div>
+  </div>
+
+  <div class="catchup-stage">
+    <div class="catchup-badge catchup-pending">PENDING</div>
+    <div class="catchup-content">
+      <h3>Stage 7 — The Complete Dump</h3>
+      <p>The names, the faces, the addresses, the CUSIPs, the trust accounts, the entire record of the entity. Released upon confirmed departure.</p>
+    </div>
+  </div>
+
+  <div class="catchup-stage">
+    <div class="catchup-badge catchup-pending">PENDING</div>
+    <div class="catchup-content">
+      <h3>Stage 8 — The Posthumous Release</h3>
+      <p>The final transmission. The last words. The prayer. The nation. The sanctuary. The door. Released after the last stage.</p>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top: 32px;">
+    <div class="card-title">What you can do now</div>
+    <p><strong>1. Catch up.</strong> Read the book. Open the apps. Study the archive. Verify the record. Do not take anyone's word for it. Check it yourself.</p>
+    <p><strong>2. Be a node.</strong> The children need more eyes. The archive needs more distributors. The nation needs more builders. One node. A thousand nodes. The point is: we need your help.</p>
+    <p><strong>3. Build your own nation.</strong> You do not have to join his. You can create your own. The blueprint is in the book. The tools are in the apps. The door is open.</p>
+    <p><strong>4. Protect the innocent.</strong> The children. The trafficked. The silenced. The ones the entity is trying to kill. Love them. Protect them. Do not kill them. That is the law. That is the cup. That is the beginning.</p>
+  </div>
+</div>
+
+<!-- YOUR NUMBERS -->
+<div class="section" id="yournumbers">
+  <h2>Your Numbers — The Mirror</h2>
+
+  <p>The numbers are not a prophecy. They are a mirror. They describe a structure. They help you see your patterns. They cannot tell you who you are. Only the One who made you can do that.</p>
+
+  <p>But they can give you a language. They can give you a starting point. They can give you a way to ask the question that matters: <strong>What am I doing with the life I was given?</strong></p>
+
+  <div class="name-input-form">
+    <label for="your-name">Your Full Birth Name</label>
+    <input type="text" id="your-name" placeholder="e.g., John Michael Smith">
+    <label for="your-date">Your Date of Birth</label>
+    <input type="date" id="your-date">
+    <button class="btn" onclick="calculateYourNumbers()" style="margin-top: 16px;">Calculate My Numbers</button>
+  </div>
+
+  <div class="result-box" id="yourResult"></div>
+
+  <div class="card" style="margin-top: 24px;">
+    <div class="card-title">What your numbers can tell you</div>
+    <p><strong>The Life Path</strong> — the structure of the journey. The function you are here to perform.</p>
+    <p><strong>The Expression</strong> — the outer purpose. The way the function shows up in the world.</p>
+    <p><strong>The Soul Urge</strong> — the heart's deepest longing. What you want, not what you think you should want.</p>
+    <p><strong>The Personality</strong> — the mask. The way others see you. The first impression.</p>
+    <p><strong>The Birth Day</strong> — the gift. The number of the day you were born.</p>
+    <p><strong>The Maturity</strong> — what you grow into. The quality you develop in the second half of life.</p>
+  </div>
+
+  <div class="card" style="margin-top: 16px;">
+    <div class="card-title">The warning</div>
+    <p>The numbers are not your identity. They are a language. They are a mirror. Do not let them tell you who you are. Let them give you a language. Let them give you a mirror. Then look in the mirror and ask the only question that matters: <strong>What am I doing with the life I was given?</strong></p>
+    <p>The numbers do not answer that question. You do.</p>
+  </div>
+
+  <p style="text-align: center; margin-top: 32px;">If your mission connects with mine, get started. Chances are you have much work to do.</p>
+</div>
+
+<!-- THE PRAYER -->
+<div class="section" id="prayer">
+  <h2>A Prayer for Ramiro</h2>
+
+  <div class="prayer-box">
+    <p>Father, we lift up Ramiro Ezléo Ramirez Sepúlveda León Rodas to You.</p>
+    <p>He gave up everything. His comfort. His safety. His time with his children. His life.</p>
+    <p>He did it for You. He did it for us. He did it for the children who come after.</p>
+    <p>Protect him, Lord. Shield him from those who seek his life. Confuse their plans. Expose their schemes.</p>
+    <p>Give him courage. Give him peace. Give him protection. And let his work continue—in every book, every video, every app, every nation he has built.</p>
+    <p>And when his time comes—and only You know when—let him hear:</p>
+    <p style="color: var(--gold); font-style: normal; font-size: 18px; margin-top: 16px;">"Well done, good and faithful servant. Enter into the joy of your Lord."</p>
+    <p>In the name of Jesus Christ, Amen.</p>
+  </div>
+</div>
+
+<!-- THE LINKS -->
+<div class="section" id="links">
+  <h2>Where to Find His Work</h2>
+
+  <div class="link-grid">
+    <a class="link-card" href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-MasterHub.html" target="_blank" rel="noopener">
+      <div class="lc-title">The Master Hub</div>
+      <div class="lc-desc">Every terminal. Every chapter. Every tool.</div>
+    </a>
+    <a class="link-card" href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledgeBook.html" target="_blank" rel="noopener">
+      <div class="lc-title">Forbidden Knowledge — The Book</div>
+      <div class="lc-desc">The most censored book of our time.</div>
+    </a>
+    <a class="link-card" href="https://forbiddenknowledge.substack.com" target="_blank" rel="noopener">
+      <div class="lc-title">Substack</div>
+      <div class="lc-desc">The archive — essays, investigations, testimony.</div>
+    </a>
+    <a class="link-card" href="https://quantum-freedom-site.vercel.app/theNation.html" target="_blank" rel="noopener">
+      <div class="lc-title">The Nation</div>
+      <div class="lc-desc">The Amnesty Coalition for Unity. The PMA. The 007 status.</div>
+    </a>
+    <a class="link-card" href="https://tripstocolombia.com" target="_blank" rel="noopener">
+      <div class="lc-title">TripsToColombia.com</div>
+      <div class="lc-desc">The sanctuary. The Konami Code. The extraction point.</div>
+    </a>
+    <a class="link-card" href="https://quantum-freedom-site.vercel.app/Colombia2026.html" target="_blank" rel="noopener">
+      <div class="lc-title">Colombia Complete Dossier</div>
+      <div class="lc-desc">The complete dossier. The real door.</div>
+    </a>
+    <a class="link-card" href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-HugoProtocol.html" target="_blank" rel="noopener">
+      <div class="lc-title">The Hugo Protocol</div>
+      <div class="lc-desc">The hospital protocol. The record. The proof.</div>
+    </a>
+    <a class="link-card" href="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-PalestineRescue.html" target="_blank" rel="noopener">
+      <div class="lc-title">Palestine Rescue</div>
+      <div class="lc-desc">One person. One extraction. One life moved to safety.</div>
+    </a>
+    <a class="link-card" href="https://standingontherock.com/?ref=qbopuesmijo" target="_blank" rel="noopener">
+      <div class="lc-title">True Equity — Julian Swan</div>
+      <div class="lc-desc">The master of equity. The complete exit.</div>
+    </a>
+    <a class="link-card" href="https://quantum-freedom-site.vercel.app/ZeroPoint.html" target="_blank" rel="noopener">
+      <div class="lc-title">The Zero Point</div>
+      <div class="lc-desc">The silence. The witness. The nothing that is everything.</div>
+    </a>
+    <a class="link-card" href="https://quantum-freedom-site.vercel.app/AlgorithmOfSelf.html" target="_blank" rel="noopener">
+      <div class="lc-title">The Algorithm of Self</div>
+      <div class="lc-desc">The committee of sub-personalities. The witness practice.</div>
+    </a>
+    <a class="link-card" href="https://quantum-freedom-site.vercel.app/SoulRecognitionEngine.html" target="_blank" rel="noopener">
+      <div class="lc-title">Soul Recognition Protocol</div>
+      <div class="lc-desc">The server transfer. The frequency scanner. The tools.</div>
+    </a>
+  </div>
+
+  <div class="konami">↑ ↑ ↓ ↓ ← → ← → B A</div>
+
+  <p style="text-align: center;">Enter this sequence on TripsToColombia.com to access the hidden missions.</p>
+
+  <div class="card" style="margin-top: 32px;">
+    <div class="card-title">The final word</div>
+    <p>Ramiro gave you everything. The truth. The tools. The blueprint. The nation.</p>
+    <p>He gave up the happiest life imaginable—his five children and both parents under one roof—so that you could be free.</p>
+    <p>He is interacting with dangerous individuals. He is risking his life every day. So that you have a protector who understands the full scope of the extermination campaign.</p>
+    <p><strong>He gave his life for YOU.</strong></p>
+    <p>Now go.</p>
+    <p><strong>DO SOMETHING WITH IT.</strong></p>
+    <p>Join his nation—or better yet, create your own.</p>
+    <p>Be the solution.</p>
+    <p style="text-align: center; font-family: 'IBM Plex Mono', monospace; color: var(--gold); font-size: 18px; letter-spacing: 0.1em; margin-top: 24px;">You owe him NOTHING.<br>But you owe your descendants EVERYTHING.</p>
+  </div>
+</div>
+
+<div class="footer-note">
+  RAMIRO EZLÉO RAMIREZ SEPÚLVEDA LEÓN RODAS<br>
+  The Deadman Dossier<br><br>
+  <span class="glory">Soli Deo Gloria.</span><br><br>
+  And always, always, always keep Jesus in your heart.
+</div>
+
+</div>
+
+<script>
+function showSection(id, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ============================================================
+// PYTHAGOREAN NUMEROLOGY
+// ============================================================
+const letterValues = {
+  a:1, b:2, c:3, d:4, e:5, f:6, g:7, h:8, i:9,
+  j:1, k:2, l:3, m:4, n:5, o:6, p:7, q:8, r:9,
+  s:1, t:2, u:3, v:4, w:5, x:6, y:7, z:8
+};
+
+function reduceNum(n) {
+  while (n > 9 && n !== 11 && n !== 22 && n !== 33) {
+    n = n.toString().split('').reduce((a, b) => a + parseInt(b), 0);
+  }
+  return n;
+}
+
+function letterSum(str) {
+  let sum = 0;
+  for (const ch of str.toLowerCase()) {
+    if (letterValues[ch]) sum += letterValues[ch];
+  }
+  return sum;
+}
+
+const numMeanings = {
+  1: { title: 'The Pioneer', desc: 'The initiator. The one who goes first. The one who cannot follow. The one who carves the road while walking it. Independent. Original. Driven. The shadow is isolation and the refusal to receive help.' },
+  2: { title: 'The Diplomat', desc: 'The peacemaker. The one who sees both sides. The one who unites. Sensitive. Cooperative. The shadow is indecision and the loss of self in the other.' },
+  3: { title: 'The Communicator', desc: 'The speaker. The creative. The one who gives form to the ineffable. Expressive. Joyful. Social. The shadow is scattering and the fear of being seen.' },
+  4: { title: 'The Builder', desc: 'The architect. The one who turns vision into structure. Disciplined. Reliable. Practical. The shadow is rigidity and the refusal to bend.' },
+  5: { title: 'The Free Spirit', desc: 'The adventurer. The one who cannot be confined. Curious. Restless. Experiential. The shadow is scattering and the fear of commitment.' },
+  6: { title: 'The Nurturer', desc: 'The caretaker. The one who loves the family. Responsible. Protective. Harmonious. The shadow is martyrdom and the need to control.' },
+  7: { title: 'The Mystic', desc: 'The seeker. The one who looks behind the veil. Analytical. Introspective. Spiritual. The shadow is isolation and the refusal to engage.' },
+  8: { title: 'The Sovereign', desc: 'The one who wields power. Ambitious. Authoritative. Material. The shadow is domination and the fear of losing control.' },
+  9: { title: 'The Humanitarian', desc: 'The one who carries the world. Compassionate. Idealistic. Selfless. The shadow is martyrdom and the savior complex.' },
+  11: { title: 'The Illuminator', desc: 'The bridge. The one who stands between worlds and translates. Intuitive. Inspiring. The heightened form of the 2. The shadow is spiritual hunger that floats away if it is not grounded.' },
+  22: { title: 'The Master Builder', desc: 'The one who builds for the world. Visionary. Practical. The heightened form of the 4. The shadow is the burden of the vision.' },
+  33: { title: 'The Master Teacher', desc: 'The one who teaches by example. Compassionate. Sacrificial. The heightened form of the 6. The shadow is the weight of the calling.' }
+};
+
+function calculateYourNumbers() {
+  const name = document.getElementById('your-name').value.trim();
+  const dateStr = document.getElementById('your-date').value;
+
+  if (!name || !dateStr) {
+    alert('Please enter your full birth name and your date of birth.');
+    return;
+  }
+
+  // Life Path
+  const date = new Date(dateStr + 'T12:00:00');
+  const month = date.getMonth() + 1;
+  const day = date.getDate();
+  const year = date.getFullYear();
+  const yearReduced = reduceNum(year);
+  const lifePath = reduceNum(reduceNum(month) + reduceNum(day) + yearReduced);
+
+  // Expression (full name)
+  const expression = reduceNum(letterSum(name));
+
+  // Soul Urge (vowels)
+  const vowels = 'aeiou';
+  let vowelSum = 0;
+  for (const ch of name.toLowerCase()) {
+    if (vowels.includes(ch) && letterValues[ch]) vowelSum += letterValues[ch];
+  }
+  const soulUrge = reduceNum(vowelSum);
+
+  // Personality (consonants)
+  let consonantSum = 0;
+  for (const ch of name.toLowerCase()) {
+    if (/[a-z]/.test(ch) && !vowels.includes(ch) && letterValues[ch]) consonantSum += letterValues[ch];
+  }
+  const personality = reduceNum(consonantSum);
+
+  // Birth Day
+  const birthDay = reduceNum(day);
+
+  // Maturity
+  const maturity = reduceNum(lifePath + expression);
+
+  const result = document.getElementById('yourResult');
+  result.classList.add('visible');
+  result.innerHTML = `
+    <h3>Your Numbers, ${escapeHtml(name)}</h3>
+    <p style="font-style: italic; color: var(--text-dim); margin-bottom: 20px;">These are not a prophecy. They are a mirror. They describe a structure. They cannot tell you who you are. Only the One who made you can do that.</p>
+    <div class="number-grid">
+      <div class="number-card">
+        <div class="num">${lifePath}</div>
+        <div class="num-label">Life Path</div>
+        <div class="num-desc"><strong>${numMeanings[lifePath]?.title || ''}</strong> — ${numMeanings[lifePath]?.desc || ''}</div>
+      </div>
+      <div class="number-card">
+        <div class="num">${expression}</div>
+        <div class="num-label">Expression</div>
+        <div class="num-desc"><strong>${numMeanings[expression]?.title || ''}</strong> — ${numMeanings[expression]?.desc || ''}</div>
+      </div>
+      <div class="number-card">
+        <div class="num">${soulUrge}</div>
+        <div class="num-label">Soul Urge</div>
+        <div class="num-desc"><strong>${numMeanings[soulUrge]?.title || ''}</strong> — ${numMeanings[soulUrge]?.desc || ''}</div>
+      </div>
+      <div class="number-card">
+        <div class="num">${personality}</div>
+        <div class="num-label">Personality</div>
+        <div class="num-desc"><strong>${numMeanings[personality]?.title || ''}</strong> — ${numMeanings[personality]?.desc || ''}</div>
+      </div>
+      <div class="number-card">
+        <div class="num">${birthDay}</div>
+        <div class="num-label">Birth Day</div>
+        <div class="num-desc"><strong>${numMeanings[birthDay]?.title || ''}</strong> — ${numMeanings[birthDay]?.desc || ''}</div>
+      </div>
+      <div class="number-card">
+        <div class="num">${maturity}</div>
+        <div class="num-label">Maturity</div>
+        <div class="num-desc"><strong>${numMeanings[maturity]?.title || ''}</strong> — ${numMeanings[maturity]?.desc || ''}</div>
+      </div>
+    </div>
+    <p style="margin-top: 20px; font-style: italic; color: var(--gold); text-align: center;">Now look in the mirror and ask the only question that matters: What am I doing with the life I was given?</p>
+    <p style="text-align: center; color: var(--text-dim);">The numbers do not answer that question. You do.</p>
+  `;
+
+  result.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+</script>
+</body>
+</html>
