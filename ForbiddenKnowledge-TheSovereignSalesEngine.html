@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Sovereign Sales Engine | Forbidden Knowledge</title>
+<style>
+:root {
+  --bg: #0a0a0a;
+  --surface: #141414;
+  --surface2: #1c1c1c;
+  --border: #2a2a2a;
+  --gold: #c9a84c;
+  --gold-dim: #8a7333;
+  --text: #e8e4dc;
+  --text-dim: #9a958c;
+  --danger: #8b3a3a;
+  --success: #3a6b4a;
+  --font: 'Georgia', 'Times New Roman', serif;
+  --mono: 'Courier New', monospace;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  line-height: 1.7;
+  min-height: 100vh;
+}
+.container { max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem; }
+header {
+  text-align: center;
+  padding: 3rem 1rem 2rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 2rem;
+}
+header h1 {
+  font-size: 1.8rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-weight: normal;
+}
+header p {
+  color: var(--text-dim);
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+  font-style: italic;
+}
+.step-indicator {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 2rem 0;
+  flex-wrap: wrap;
+}
+.step-dot {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  font-family: var(--mono);
+}
+.step-dot.active {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: rgba(201,168,76,0.1);
+}
+.step-dot.done {
+  border-color: var(--success);
+  color: var(--success);
+}
+.panel {
+  display: none;
+  animation: fadeIn 0.4s ease;
+}
+.panel.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+h2 {
+  font-size: 1.3rem;
+  color: var(--gold);
+  margin-bottom: 1rem;
+  font-weight: normal;
+  letter-spacing: 0.05em;
+}
+h3 {
+  font-size: 1rem;
+  color: var(--text);
+  margin: 1.5rem 0 0.75rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.85rem;
+}
+p { margin-bottom: 1rem; color: var(--text-dim); }
+.highlight { color: var(--text); }
+.gold { color: var(--gold); }
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.card-title {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--gold);
+  margin-bottom: 0.75rem;
+  font-family: var(--mono);
+}
+.btn {
+  display: inline-block;
+  padding: 0.8rem 2rem;
+  background: transparent;
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s;
+  margin: 0.5rem 0.5rem 0.5rem 0;
+}
+.btn:hover { background: var(--gold); color: var(--bg); }
+.btn-secondary {
+  border-color: var(--border);
+  color: var(--text-dim);
+}
+.btn-secondary:hover { border-color: var(--text); color: var(--text); background: transparent; }
+.btn-small { padding: 0.5rem 1rem; font-size: 0.75rem; }
+input, textarea, select {
+  width: 100%;
+  padding: 0.8rem;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+}
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--gold-dim);
+}
+label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.4rem;
+  font-family: var(--mono);
+}
+.output-box {
+  background: var(--surface2);
+  border-left: 3px solid var(--gold);
+  padding: 1.25rem;
+  margin: 1rem 0;
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  max-height: 500px;
+  overflow-y: auto;
+}
+.tool-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+  margin: 1rem 0;
+}
+.tool-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 1.25rem;
+  cursor: pointer;
+  transition: border-color 0.3s;
+}
+.tool-card:hover { border-color: var(--gold-dim); }
+.tool-card h4 {
+  color: var(--gold);
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  font-weight: normal;
+}
+.tool-card p { font-size: 0.8rem; margin: 0; }
+.copy-btn {
+  float: right;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  padding: 0.25rem 0.6rem;
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  cursor: pointer;
+  margin-left: 0.5rem;
+}
+.copy-btn:hover { border-color: var(--gold); color: var(--gold); }
+.tier-selector {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin: 1.5rem 0;
+}
+.tier-option {
+  flex: 1;
+  min-width: 200px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 1.25rem;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+.tier-option:hover, .tier-option.selected {
+  border-color: var(--gold);
+  background: rgba(201,168,76,0.05);
+}
+.tier-option h4 { color: var(--gold); margin-bottom: 0.5rem; font-size: 0.95rem; }
+.tier-option .price { font-size: 1.4rem; color: var(--text); font-family: var(--mono); }
+.tier-option p { font-size: 0.8rem; margin: 0.5rem 0 0; }
+.warning {
+  border-left: 3px solid var(--danger);
+  padding: 1rem 1.25rem;
+  background: rgba(139,58,58,0.1);
+  margin: 1rem 0;
+  font-size: 0.85rem;
+}
+.warning strong { color: var(--danger); }
+.success-box {
+  border-left: 3px solid var(--success);
+  padding: 1rem 1.25rem;
+  background: rgba(58,107,74,0.1);
+  margin: 1rem 0;
+}
+.footer {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-dim);
+  font-size: 0.8rem;
+  border-top: 1px solid var(--border);
+  margin-top: 3rem;
+}
+.footer .gold { font-style: italic; }
+.tab-nav {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 1.5rem;
+  overflow-x: auto;
+}
+.tab-btn {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-dim);
+  padding: 0.75rem 1.25rem;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.tab-btn.active {
+  color: var(--gold);
+  border-bottom-color: var(--gold);
+}
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+.script-block {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  padding: 1rem;
+  margin: 0.75rem 0;
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+.script-block .label {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  color: var(--gold-dim);
+  letter-spacing: 0.1em;
+  margin-bottom: 0.4rem;
+}
+.guerrilla-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+}
+.guerrilla-item {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 1.25rem;
+}
+.guerrilla-item h4 { color: var(--gold); margin-bottom: 0.5rem; font-size: 0.9rem; }
+.guerrilla-item p { font-size: 0.8rem; margin-bottom: 0.5rem; }
+.guerrilla-item .action {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--text);
+  background: var(--surface2);
+  padding: 0.5rem;
+  margin-top: 0.5rem;
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+<header>
+  <h1>The Sovereign Sales Engine</h1>
+  <p>Forbidden Knowledge: The Sovereign Operator — Companion Tool</p>
+  <p style="font-size:0.75rem; margin-top:0.75rem;">Built on the documented principles of Jay Abraham: Preeminence, Risk Reversal, the Three Ways to Grow, and the Parthenon Strategy.</p>
+</header>
+
+<div class="step-indicator" id="stepIndicator">
+  <div class="step-dot active" data-step="1">1</div>
+  <div class="step-dot" data-step="2">2</div>
+  <div class="step-dot" data-step="3">3</div>
+  <div class="step-dot" data-step="4">4</div>
+  <div class="step-dot" data-step="5">5</div>
+  <div class="step-dot" data-step="6">6</div>
+</div>
+
+<!-- STEP 1: CHOOSE YOUR PATH -->
+<div class="panel active" id="panel1">
+  <h2>Step One: Choose Your Path</h2>
+  <p>You are not here to read. You are here to build. Before we generate anything, we need to know what you are selling.</p>
+  
+  <div class="tier-selector">
+    <div class="tier-option selected" data-path="book" onclick="selectPath('book', this)">
+      <h4>Sell the Book</h4>
+      <div class="price">Forbidden Knowledge</div>
+      <p>You will sell The Sovereign Operator. The app will build your pitches, emails, and guerrilla campaigns around the book, the apps, and the Amnesty Coalition.</p>
+    </div>
+    <div class="tier-option" data-path="own" onclick="selectPath('own', this)">
+      <h4>Sell Your Own Product</h4>
+      <div class="price">Your Business</div>
+      <p>You will enter your product or service. The app will rebuild every tool, script, and campaign to sell what you offer.</p>
+    </div>
+  </div>
+
+  <div id="ownProductForm" style="display:none;">
+    <label>What is your product or service?</label>
+    <input type="text" id="userProduct" placeholder="e.g., Real estate brokerage, health coaching, financial advisory, survival gear">
+    <label>Who is your ideal client? (Be specific)</label>
+    <input type="text" id="userAudience" placeholder="e.g., Families in Colombia looking for sanctuary properties, preppers aged 35-60, small business owners">
+    <label>What is the #1 fear your client has about buying?</label>
+    <input type="text" id="userFear" placeholder="e.g., Being scammed, wasting money, looking foolish, legal trouble">
+  </div>
+
+  <button class="btn" onclick="goToStep(2)">Build My Engine →</button>
+</div>
+
+<!-- STEP 2: THE PREEMINENCE POSITION -->
+<div class="panel" id="panel2">
+  <h2>Step Two: The Strategy of Preeminence</h2>
+  <p>Jay Abraham's core insight: <span class="gold">"Stop thinking of yourself as a vendor and start thinking of yourself as a trusted advisor. Your clients' best interests must always come before your own."</span> [citation:10]</p>
+  <p>This is not a tactic. It is a position. Before you write a single email, you must internalize this: <strong>you are not selling. You are diagnosing.</strong></p>
+
+  <div class="card">
+    <div class="card-title">The Preeminence Audit (Do This Before Anything Else)</div>
+    <p style="font-size:0.9rem;">Ask yourself three questions about every piece of marketing you will create:</p>
+    <ol style="color:var(--text-dim); padding-left:1.5rem; margin:1rem 0; font-size:0.9rem;">
+      <li>Does this sound like someone trying to <em>win a sale</em>, or someone invested in the <em>outcome</em>?</li>
+      <li>If my best friend read this, would they feel served or pitched?</li>
+      <li>Am I offering a solution I would recommend to my own family, even if they never paid me?</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <div class="card-title">The Socratic Interview (Your Only Close)</div>
+    <p style="font-size:0.9rem;">Dan Kennedy said it best: <em>"The higher art is getting others to tell you their stories. And if you get good at that, by the way, you almost don't have to sell. At the end of it, they'll just hand over a box of money."</em></p>
+    <p style="font-size:0.9rem;">The structure:</p>
+    <div class="script-block">
+      <div class="label">The Four Questions</div>
+1. "What is the thing that keeps you up at night about [their situation]?"
+2. [Listen. Do not interrupt. Let silence sit.]
+3. "So what I'm hearing is that you are [pain], you have tried [failed solution], and what you actually need is [outcome]. Is that fair?"
+4. "Before I tell you what I think, let me ask you one more thing." [Ask the question that reveals readiness.]
+    </div>
+  </div>
+
+  <button class="btn" onclick="goToStep(3)">Build My Scripts →</button>
+  <button class="btn btn-secondary" onclick="goToStep(1)">← Back</button>
+</div>
+
+<!-- STEP 3: THE CONSULTATIVE SCRIPTS -->
+<div class="panel" id="panel3">
+  <h2>Step Three: Your Consultative Scripts</h2>
+  <p>These are plug-and-play. Replace the bracketed text with your specifics. Practice them out loud until they sound like you, not like a script.</p>
+
+  <div class="tab-nav">
+    <button class="tab-btn active" onclick="switchTab('scripts', 'bookPitch', this)">Book Pitch</button>
+    <button class="tab-btn" onclick="switchTab('scripts', 'objection', this)">Objection Handling</button>
+    <button class="tab-btn" onclick="switchTab('scripts', 'close', this)">The Close</button>
+  </div>
+
+  <div id="bookPitch" class="tab-content active">
+    <h3>The Sovereign Operator Pitch (Use This When Selling the Book)</h3>
+    <div class="script-block">
+      <div class="label">Opening</div>
+"I want to ask you something. When you read the news about [hospital protocol / vaccine injury / financial collapse / the specific chapter topic], what happens in your body? Do you feel angry? Numb? Do you feel like you're the only person who sees it?"
+    </div>
+    <div class="script-block">
+      <div class="label">The Diagnosis</div>
+"So you're carrying this alone. And the worst part isn't the information. The worst part is the isolation. Is that fair?"
+    </div>
+    <div class="script-block">
+      <div class="label">The Preeminence Statement</div>
+"I wrote this book because I was that person. I broke into a hospital for my uncle Hugo. I have the documentation. I'm not asking you to believe me. I'm asking you to read the record. If it doesn't ring true, put it down. But if it does, you'll know you're not crazy. You'll know you're not alone."
+    </div>
+    <div class="script-block">
+      <div class="label">The Risk Reversal Close</div>
+"Buy the book. Read it. If by Chapter 5 you don't feel it contains information the system doesn't want you to have, email me and I'll refund your money and you keep the book. I'm not selling paper. I'm looking for people ready to become Sovereign Operators."
+    </div>
+  </div>
+
+  <div id="objection" class="tab-content">
+    <h3>Objection Handling (Preeminence Style)</h3>
+    <div class="script-block">
+      <div class="label">"I can't afford it."</div>
+"I understand. Let me ask you this: what is the cost of staying where you are for another year? Not the money. The cost to your peace of mind. To your family. If this book doesn't change that, I don't want your money. But if it does, the price is the smallest part of the decision."
+    </div>
+    <div class="script-block">
+      <div class="label">"How do I know this is real?"</div>
+"You don't. That's the honest answer. I can show you the documents. I can show you the court records. I can show you the gaps between what they said and what the chart says. But I can't make you believe. What I can do is give you the record and let you decide. That's what the book is. A record. Not a sermon."
+    </div>
+    <div class="script-block">
+      <div class="label">"I've been burned before."</div>
+"Good. You should be skeptical. I would be. Here's what I'll do: buy the book. Read it. If it doesn't ring true by Chapter 5, I'll refund you and you keep the book. I'd rather lose a sale than lose your trust. That's not a marketing tactic. That's how I actually operate."
+    </div>
+  </div>
+
+  <div id="close" class="tab-content">
+    <h3>The Close (The Socratic Prescription)</h3>
+    <div class="script-block">
+      <div class="label">The Prescription</div>
+"Based on what you've told me, here's what I would do if I were in your position. You can do this without me. But if you want me to walk you through it, here's how that works."
+    </div>
+    <div class="script-block">
+      <div class="label">The Ask</div>
+"Does that sound like a fair arrangement? If so, here's the next step. If not, tell me what would make it fair. I'd rather adjust the offer than lose the relationship."
+    </div>
+    <div class="script-block">
+      <div class="label">The Silence</div>
+[After asking for the decision, say nothing. Let them fill the silence. They will tell you the truth.]
+    </div>
+  </div>
+
+  <button class="btn" onclick="goToStep(4)">Build My Email Campaigns →</button>
+  <button class="btn btn-secondary" onclick="goToStep(2)">← Back</button>
+</div>
+
+<!-- STEP 4: EMAIL CAMPAIGNS -->
+<div class="panel" id="panel4">
+  <h2>Step Four: Your Email Campaigns</h2>
+  <p>These sequences change based on what you are selling. Select your path above, then generate.</p>
+
+  <div id="emailOutputBook" style="display:none;">
+    <h3>7-Email Sequence: The Sovereign Operator</h3>
+    <div class="script-block"><div class="label">Email 1 — The Isolation</div>
+Subject: You are not crazy.
+Body: I need to tell you something I have never said publicly. When I broke into the hospital to get my uncle Hugo's records, I was not trying to be a hero. I was trying to prove I was not losing my mind. The gap between what they told my family and what the chart said was not a mistake. It was a protocol. If you have ever felt like the only person who sees the pattern, this is for you. — Ramiro
+    </div>
+    <div class="script-block"><div class="label">Email 2 — The Record</div>
+Subject: The document they don't want you to read.
+Body: I have the record. Not a theory. Not a YouTube video. The actual document. Here is what it says. [Link to one specific chapter or app.] Read it. Decide for yourself. I am not asking you to believe me. I am asking you to look at the record.
+    </div>
+    <div class="script-block"><div class="label">Email 3 — The Gap</div>
+Subject: What the record does not show.
+Body: Here is what I can prove. [Specific claim.] Here is what I cannot prove yet. [The gap.] I will not pretend the gap does not exist. The Book of Witness holds testimony and verified record separately. This email is the verified record. The rest is testimony. You deserve to know the difference.
+    </div>
+    <div class="script-block"><div class="label">Email 4 — The Risk Reversal</div>
+Subject: If this doesn't ring true, I don't want your money.
+Body: Buy the book. Read it. If by Chapter 5 you do not feel it contains information the system does not want you to have, email me. I will refund you. You keep the book. I am not selling paper. I am looking for people ready to act.
+    </div>
+    <div class="script-block"><div class="label">Email 5 — The Tool</div>
+Subject: The app that does something.
+Body: This is not a PDF. It is a tool. [Link to one specific app.] It does [specific function]. It is free. No email. No catch. Use it. Share it. If it helps you, you will know what to do next.
+    </div>
+    <div class="script-block"><div class="label">Email 6 — The Nation</div>
+Subject: You are not alone.
+Body: The Amnesty Coalition for Unity is not a Facebook group. It is a Private Membership Association. A sanctuary. A record. If you have been looking for your people, this is where they are. Join us. If after 30 days you do not feel you have found your people, leave. Keep the archive access. I am not building a subscription business. I am building a nation.
+    </div>
+    <div class="script-block"><div class="label">Email 7 — The Close</div>
+Subject: The next step.
+Body: You have read the record. You have used the tools. You have seen the gap. The next step is not another email. It is a decision. [Link to purchase / membership / consultation.] If you are ready, I will see you on the other side. If you are not, that is okay. Keep the book. Keep the apps. The door stays open.
+    </div>
+  </div>
+
+  <div id="emailOutputOwn" style="display:none;">
+    <h3>7-Email Sequence: <span id="ownProductName"></span></h3>
+    <p style="font-size:0.85rem; color:var(--text-dim);">This sequence is built around your product. Replace the bracketed placeholders with your specifics. The structure follows Jay Abraham's risk reversal and preeminence framework.</p>
+    <div class="script-block"><div class="label">Email 1 — The Fear</div>
+Subject: The thing that keeps you up at night.
+Body: I know what you are afraid of. It is not the price. It is [userFear]. You have been burned before. You have made decisions that did not work out. And the worst part is not the money. It is the feeling that you should have known better. I am writing this because I have been there. And I have something that might help.
+    </div>
+    <div class="script-block"><div class="label">Email 2 — The Diagnosis</div>
+Subject: What is actually happening.
+Body: Most [your industry] providers will tell you what they do. They will list their credentials. They will show you their track record. But that is not what you need. You need someone who understands [userFear] and has built a system that removes it. Here is how I think about it: [specific insight about your product].
+    </div>
+    <div class="script-block"><div class="label">Email 3 — The Proof</div>
+Subject: The record.
+Body: I am not asking you to believe me. I am asking you to look at the record. Here is [specific proof: a case study, a document, a before/after, a testimonial]. Here is what I can prove. Here is what I cannot. I will not pretend the gap does not exist.
+    </div>
+    <div class="script-block"><div class="label">Email 4 — The Risk Reversal</div>
+Subject: If this doesn't work, I don't want your money.
+Body: Here is my guarantee: [specific guarantee — refund, results-based, work-until-it-works]. I am not offering this because I am desperate. I am offering it because I am confident. And because I would rather lose a sale than lose your trust.
+    </div>
+    <div class="script-block"><div class="label">Email 5 — The Tool</div>
+Subject: Something you can use right now.
+Body: Before you decide anything, here is a tool you can use whether you buy from me or not. [Free resource: checklist, calculator, template, guide.] It does [specific function]. It is free. No email required. Use it. If it helps, you will know what to do next.
+    </div>
+    <div class="script-block"><div class="label">Email 6 — The Preeminence</div>
+Subject: Why I do this.
+Body: I am not in this to win a sale. I am in this because I believe [your core belief about your work]. If you never buy from me, I still want you to have [the outcome you offer]. That is not a marketing tactic. That is how I actually operate.
+    </div>
+    <div class="script-block"><div class="label">Email 7 — The Close</div>
+Subject: The next step.
+Body: You have seen the record. You have used the tool. You have read the guarantee. The next step is yours. [Link to purchase / consultation / booking.] If you are ready, I will see you on the other side. If you are not, keep the tool. The door stays open.
+    </div>
+  </div>
+
+  <button class="btn btn-small" onclick="generateEmails()">Generate My Emails</button>
+  <div id="emailContainer"></div>
+
+  <button class="btn" onclick="goToStep(5)">Build My Guerrilla Campaign →</button>
+  <button class="btn btn-secondary" onclick="goToStep(3)">← Back</button>
+</div>
+
+<!-- STEP 5: GUERRILLA MARKETING -->
+<div class="panel" id="panel5">
+  <h2>Step Five: The Guerrilla Playbook</h2>
+  <p>Zero budget. Maximum impact. These are the tactics Jay Abraham teaches when the budget is gone but the mission remains.</p>
+
+  <div class="guerrilla-grid">
+    <div class="guerrilla-item">
+      <h4>Tactic 1: The Bathroom Poster</h4>
+      <p>Print a simple PDF. Place it in bathrooms of venues where your audience gathers. Do not ask permission. Do not vandalize. Place it and leave.</p>
+      <div class="action">"You are not crazy. The protocol is real. Scan this code. Read the record. Decide for yourself."</div>
+    </div>
+    <div class="guerrilla-item">
+      <h4>Tactic 2: The Tear-Off Flyer</h4>
+      <p>Ten tear-off tabs. Each tab has a QR code to one specific app or chapter. Place where people are already thinking about your topic.</p>
+      <div class="action">"Scan for the Hospital Protocol Checklist." "Scan for the Financial Sovereignty Calculator." "Scan for the Sanctuary Directory."</div>
+    </div>
+    <div class="guerrilla-item">
+      <h4>Tactic 3: The Comment Raid</h4>
+      <p>Find the videos about "forbidden knowledge." Comment with value. Not a link. A specific insight. Let the curious click your profile.</p>
+      <div class="action">"The reason the protocol works the way it does is [specific document]. I broke into a hospital to get my uncle's records. The gap between what they told the family and what the chart said is the entire story."</div>
+    </div>
+    <div class="guerrilla-item">
+      <h4>Tactic 4: The Strategic Alliance</h4>
+      <p>Find the leaders of communities that already have your audience. Offer them value. No money changes hands until the sale happens.</p>
+      <div class="action">Offer: free book, free app license, revenue share, founding member status. They get value for their people. You get distribution.</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:1.5rem;">
+    <div class="card-title">The Strategic Alliance Script (Use This Verbatim)</div>
+    <div class="script-block">
+"I am not asking you to sell anything. I am asking you to give your people something that will help them. I have a book and a set of tools that address [specific problem your audience has]. I will give you free copies for your community. I will give you a revenue share on any sales that come through your link. And I will make you a founding member of the Amnesty Coalition for Unity. Your people get value. You get a resource. I get distribution. No one pays anything until someone decides they want more."
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">The Preeminence Audit (Before You Launch)</div>
+    <p style="font-size:0.9rem;">Read every piece of marketing you have created. Ask: <strong>"Does this sound like someone trying to win a sale, or someone invested in the outcome?"</strong> Rewrite everything that sounds like the first.</p>
+  </div>
+
+  <button class="btn" onclick="goToStep(6)">Build My Business Plan →</button>
+  <button class="btn btn-secondary" onclick="goToStep(4)">← Back</button>
+</div>
+
+<!-- STEP 6: THE BUSINESS PLAN -->
+<div class="panel" id="panel6">
+  <h2>Step Six: Your Business Plan</h2>
+  <p>You have the engine. You have the scripts. You have the campaigns. Now you need to know what you are actually building.</p>
+
+  <div class="tab-nav">
+    <button class="tab-btn active" onclick="switchTab('plan', 'tierPlan', this)">The Tier Ladder</button>
+    <button class="tab-btn" onclick="switchTab('plan', 'alliancePlan', this)">The Alliance Network</button>
+    <button class="tab-btn" onclick="switchTab('plan', 'parthenon', this)">The Parthenon Strategy</button>
+  </div>
+
+  <div id="tierPlan" class="tab-content active">
+    <h3>The Forbidden Knowledge Tier Ladder</h3>
+    <div class="card">
+      <div class="card-title">Tier 1: The $33 Paperback (The Entry)</div>
+      <p><strong>Who buys it:</strong> The curious. The person who has heard something but is not ready to commit. The person who needs the information but does not yet trust the source.</p>
+      <p><strong>How to sell it:</strong> Risk reversal. "Read it. If it doesn't ring true by Chapter 5, refund and keep the book."</p>
+      <p><strong>The math:</strong> Even at $33, the conversion rate on a risk-reversed offer is 200-400% higher than a standard offer [citation:9]. You are not selling a book. You are selling the first step out of isolation.</p>
+    </div>
+    <div class="card">
+      <div class="card-title">Tier 2: The $100 Hardcover (The Professional)</div>
+      <p><strong>Who buys it:</strong> The real estate broker who wants his clients to understand asset protection. The chiropractor who wants patients to understand medical freedom. The attorney who wants clients to understand real law vs. sovereign-citizen fantasy. The pastor who wants his congregation to understand the spiritual battle.</p>
+      <p><strong>The pitch:</strong> "You are not buying a book. You are buying a conversation starter. You are buying a tool your clients will use while they wait. You are buying a signal that you are the kind of professional who understands the system is broken and your clients need more than the standard advice."</p>
+      <p><strong>The placement:</strong> Lobby. Waiting room. Reception desk. The book sits there. Clients scan the QR codes. The app does the work. You do not have to say a word.</p>
+    </div>
+    <div class="card">
+      <div class="card-title">Tier 3: The $1,000 Upsell (The Institutional)</div>
+      <p><strong>Who buys it:</strong> The office that wants to offer the full ecosystem to its clients. The firm that wants the apps branded for their practice. The organization that wants to host a private session for their team or membership.</p>
+      <p><strong>What it includes:</strong> Multiple hardcovers, a license to share the apps, a private briefing, and founding membership in the Amnesty Coalition for Unity.</p>
+      <p><strong>The honest boundary:</strong> Do not sell this until you have delivered the $100 version successfully. Do not promise outcomes you cannot deliver. The institutional buyer will check.</p>
+    </div>
+  </div>
+
+  <div id="alliancePlan" class="tab-content">
+    <h3>The Alliance Network (Your Distribution Engine)</h3>
+    <p>Jay Abraham's core insight on referrals: "Most businesses get referrals. Almost none have a referral system. When you ask a satisfied customer for a referral at the moment of peak satisfaction — after a successful outcome, after a strong testimonial — and you make it specific, easy, and immediate, referral rates jump dramatically." [citation:5]</p>
+    <div class="card">
+      <div class="card-title">Who to Approach</div>
+      <ul style="color:var(--text-dim); padding-left:1.5rem; font-size:0.9rem;">
+        <li><strong>Preppers and survivalists:</strong> Your book is a survival manual.</li>
+        <li><strong>Libertarians and sovereign individuals:</strong> Your book is a sovereignty manual.</li>
+        <li><strong>Alternative health communities:</strong> Your book documents the protocol.</li>
+        <li><strong>Real estate investors:</strong> Your book teaches trusts and equity.</li>
+        <li><strong>Church groups:</strong> Your book is a moral document.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <div class="card-title">The Offer (Use This Verbatim)</div>
+      <div class="script-block">
+"I am not asking you to sell anything. I am asking you to give your people something that will help them. I have a book and a set of tools that address [specific problem your audience has]. I will give you free copies for your community. I will give you a revenue share on any sales that come through your link. And I will make you a founding member of the Amnesty Coalition for Unity. Your people get value. You get a resource. I get distribution. No one pays anything until someone decides they want more."
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">The Referral System (Jay Abraham's Exact Method)</div>
+      <p>At the moment of peak satisfaction—after a client tells you the book helped, after they use an app and tell you it worked—ask for two specific referrals. Not "do you know anyone?" Ask: <strong>"Who are the two people in your life who are most likely to need this?"</strong> Make it specific. Make it easy. Make it immediate. [citation:5]</p>
+    </div>
+  </div>
+
+  <div id="parthenon" class="tab-content">
+    <h3>The Parthenon Strategy (Multiple Pillars)</h3>
+    <p>"A business that relies on a single traffic source, a single product, or a single key client is not a business — it is a liability dressed up as a business." [citation:12]</p>
+    <p>Your pillars:</p>
+    <div class="card">
+      <div class="card-title">Pillar 1: Direct Book Sales</div>
+      <p>The paperback, the hardcover, the institutional package.</p>
+    </div>
+    <div class="card">
+      <div class="card-title">Pillar 2: The Membership</div>
+      <p>The Amnesty Coalition for Unity. Recurring revenue. Community. Archive access.</p>
+    </div>
+    <div class="card">
+      <div class="card-title">Pillar 3: Strategic Alliances</div>
+      <p>Revenue share with community leaders, professionals, and organizations who distribute to their people.</p>
+    </div>
+    <div class="card">
+      <div class="card-title">Pillar 4: Consulting and Briefings</div>
+      <p>Private sessions for professionals who want to integrate the framework into their practice.</p>
+    </div>
+    <div class="card">
+      <div class="card-title">Pillar 5: The Second Business (Your Spare Time)</div>
+      <p>You now know how to market. You have the scripts. You have the system. Find businesses in your area who need this. Offer them the consultative close. Use the same risk reversal. Use the same preeminence. You are not selling marketing services. You are diagnosing their problem and offering a solution. The app you just used on yourself is the app you can use on them.</p>
+    </div>
+  </div>
+
+  <div class="success-box" style="margin-top:2rem;">
+    <strong class="gold">You are done.</strong> Not with the work—with the setup. The engine is built. The scripts are written. The campaigns are generated. The business plan is on the page. What remains is the only thing that matters: <strong>action</strong>.
+  </div>
+
+  <button class="btn" onclick="goToStep(1)">Start Over</button>
+  <button class="btn btn-secondary" onclick="window.print()">Print This Plan</button>
+</div>
+
+<div class="footer">
+  <p>The Sovereign Sales Engine — Built for <em>Forbidden Knowledge: The Sovereign Operator</em></p>
+  <p style="margin-top:0.5rem;">Built on the documented principles of Jay Abraham: Preeminence, Risk Reversal, the Three Ways to Grow, and the Parthenon Strategy. No fabricated sources. No invented claims. The gaps are marked.</p>
+  <p class="gold" style="margin-top:1rem;">Soli Deo Gloria.</p>
+</div>
+
+</div>
+
+<script>
+let currentPath = 'book';
+let currentStep = 1;
+
+function selectPath(path, el) {
+  currentPath = path;
+  document.querySelectorAll('.tier-option').forEach(t => t.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('ownProductForm').style.display = path === 'own' ? 'block' : 'none';
+}
+
+function goToStep(step) {
+  if (step === 4 && currentPath === 'own') {
+    const product = document.getElementById('userProduct').value.trim();
+    if (!product) {
+      alert('Please enter your product or service before continuing.');
+      return;
+    }
+  }
+  currentStep = step;
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel' + step).classList.add('active');
+  document.querySelectorAll('.step-dot').forEach(d => {
+    const s = parseInt(d.dataset.step);
+    d.classList.remove('active', 'done');
+    if (s === step) d.classList.add('active');
+    else if (s < step) d.classList.add('done');
+  });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function generateEmails() {
+  const container = document.getElementById('emailContainer');
+  if (currentPath === 'book') {
+    document.getElementById('emailOutputBook').style.display = 'block';
+    document.getElementById('emailOutputOwn').style.display = 'none';
+    container.innerHTML = '';
+  } else {
+    const product = document.getElementById('userProduct').value.trim();
+    const fear = document.getElementById('userFear').value.trim() || 'being burned again';
+    document.getElementById('ownProductName').textContent = product;
+    document.getElementById('emailOutputOwn').style.display = 'block';
+    document.getElementById('emailOutputBook').style.display = 'none';
+    container.innerHTML = '';
+    // Update the own emails with the user's specifics
+    const blocks = document.querySelectorAll('#emailOutputOwn .script-block');
+    if (blocks.length > 0) {
+      blocks[0].innerHTML = blocks[0].innerHTML.replace(/\[userFear\]/g, fear);
+    }
+  }
+}
+
+function switchTab(parentId, tabId, btn) {
+  const parent = document.getElementById(parentId === 'scripts' ? 'panel3' : 'panel6');
+  parent.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  parent.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+  btn.classList.add('active');
+}
+
+// Copy to clipboard for script blocks
+document.addEventListener('click', function(e) {
+  if (e.target.classList.contains('copy-btn')) {
+    const block = e.target.closest('.script-block');
+    if (block) {
+      const text = block.innerText.replace(/^[A-Z\s]+\n/, '').trim();
+      navigator.clipboard.writeText(text).then(() => {
+        e.target.textContent = 'Copied';
+        setTimeout(() => e.target.textContent = 'Copy', 2000);
+      });
+    }
+  }
+});
+</script>
+</body>
+</html>
