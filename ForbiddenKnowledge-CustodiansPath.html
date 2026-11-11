@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Custodian's Path | Forbidden Knowledge</title>
+<style>
+:root {
+  --bg: #0a0a0a;
+  --surface: #141414;
+  --surface2: #1c1c1c;
+  --border: #2a2a2a;
+  --gold: #c9a84c;
+  --gold-dim: #8a7333;
+  --text: #e8e4dc;
+  --text-dim: #9a958c;
+  --danger: #8b3a3a;
+  --success: #3a6b4a;
+  --font: 'Georgia', 'Times New Roman', serif;
+  --mono: 'Courier New', monospace;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  line-height: 1.7;
+  min-height: 100vh;
+}
+.container { max-width: 900px; margin: 0 auto; padding: 2rem 1.5rem; }
+header {
+  text-align: center;
+  padding: 3rem 1rem 2rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 2rem;
+}
+header h1 {
+  font-size: 1.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-weight: normal;
+}
+header p {
+  color: var(--text-dim);
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+  font-style: italic;
+}
+.step-indicator {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 2rem 0;
+  flex-wrap: wrap;
+}
+.step-dot {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  font-family: var(--mono);
+}
+.step-dot.active {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: rgba(201,168,76,0.1);
+}
+.step-dot.done {
+  border-color: var(--success);
+  color: var(--success);
+}
+.panel { display: none; animation: fadeIn 0.4s ease; }
+.panel.active { display: block; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+h2 {
+  font-size: 1.2rem;
+  color: var(--gold);
+  margin-bottom: 1rem;
+  font-weight: normal;
+  letter-spacing: 0.05em;
+}
+h3 {
+  font-size: 0.85rem;
+  color: var(--text);
+  margin: 1.5rem 0 0.75rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+p { margin-bottom: 1rem; color: var(--text-dim); }
+.highlight { color: var(--text); }
+.gold { color: var(--gold); }
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.card-title {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--gold);
+  margin-bottom: 0.75rem;
+  font-family: var(--mono);
+}
+.btn {
+  display: inline-block;
+  padding: 0.8rem 2rem;
+  background: transparent;
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  font-family: var(--mono);
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s;
+  margin: 0.5rem 0.5rem 0.5rem 0;
+}
+.btn:hover { background: var(--gold); color: var(--bg); }
+.btn-secondary {
+  border-color: var(--border);
+  color: var(--text-dim);
+}
+.btn-secondary:hover { border-color: var(--text); color: var(--text); background: transparent; }
+.btn-small { padding: 0.5rem 1rem; font-size: 0.75rem; }
+input, textarea, select {
+  width: 100%;
+  padding: 0.8rem;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 0.95rem;
+  margin-bottom: 1rem;
+}
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  border-color: var(--gold-dim);
+}
+label {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.4rem;
+  font-family: var(--mono);
+}
+.output-box {
+  background: var(--surface2);
+  border-left: 3px solid var(--gold);
+  padding: 1.25rem;
+  margin: 1rem 0;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  max-height: 600px;
+  overflow-y: auto;
+}
+.warning {
+  border-left: 3px solid var(--danger);
+  padding: 1rem 1.25rem;
+  background: rgba(139,58,58,0.1);
+  margin: 1rem 0;
+  font-size: 0.85rem;
+}
+.warning strong { color: var(--danger); }
+.success-box {
+  border-left: 3px solid var(--success);
+  padding: 1rem 1.25rem;
+  background: rgba(58,107,74,0.1);
+  margin: 1rem 0;
+}
+.footer {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--text-dim);
+  font-size: 0.8rem;
+  border-top: 1px solid var(--border);
+  margin-top: 3rem;
+}
+.footer .gold { font-style: italic; }
+.script-block {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  padding: 1rem;
+  margin: 0.75rem 0;
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+.script-block .label {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  color: var(--gold-dim);
+  letter-spacing: 0.1em;
+  margin-bottom: 0.4rem;
+}
+.checklist {
+  list-style: none;
+  padding: 0;
+}
+.checklist li {
+  padding: 0.5rem 0;
+  padding-left: 1.5rem;
+  position: relative;
+  font-size: 0.9rem;
+  color: var(--text-dim);
+}
+.checklist li:before {
+  content: "□";
+  position: absolute;
+  left: 0;
+  color: var(--gold-dim);
+  font-family: var(--mono);
+}
+.covenant-item {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  padding: 1rem;
+  margin: 0.75rem 0;
+  cursor: pointer;
+  transition: border-color 0.3s;
+}
+.covenant-item:hover, .covenant-item.selected {
+  border-color: var(--gold);
+  background: rgba(201,168,76,0.05);
+}
+.covenant-item h4 { color: var(--gold); font-size: 0.9rem; margin-bottom: 0.3rem; }
+.covenant-item p { font-size: 0.8rem; margin: 0; }
+.tier-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+  margin: 1rem 0;
+}
+.tier-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  padding: 1.25rem;
+}
+.tier-card h4 { color: var(--gold); font-size: 0.9rem; margin-bottom: 0.5rem; }
+.tier-card p { font-size: 0.8rem; margin: 0; }
+.tab-nav {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 1.5rem;
+  overflow-x: auto;
+}
+.tab-btn {
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-dim);
+  padding: 0.75rem 1.25rem;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.tab-btn.active {
+  color: var(--gold);
+  border-bottom-color: var(--gold);
+}
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+</style>
+</head>
+<body>
+
+<div class="container">
+<header>
+  <h1>The Custodian's Path</h1>
+  <p>Forbidden Knowledge: The Sovereign Operator — Companion Tool</p>
+  <p style="font-size:0.75rem; margin-top:0.75rem;">A guided self-assessment for those who would hold what is given to them.</p>
+</header>
+
+<div class="step-indicator" id="stepIndicator">
+  <div class="step-dot active" data-step="1">1</div>
+  <div class="step-dot" data-step="2">2</div>
+  <div class="step-dot" data-step="3">3</div>
+  <div class="step-dot" data-step="4">4</div>
+  <div class="step-dot" data-step="5">5</div>
+  <div class="step-dot" data-step="6">6</div>
+</div>
+
+<!-- STEP 1: THE INVITATION -->
+<div class="panel active" id="panel1">
+  <h2>Step One: The Invitation</h2>
+  <p>You have read the chapter. You have seen the Book of Witness. You have seen the Nation OS. You are asking yourself a question: <em>Is there a place for me in this?</em></p>
+  <p>There may be. But the path is not a sign-up form. It is not a membership application. It is not a promise of protection or access. It is a self-assessment. It is the first step toward becoming a custodian.</p>
+  <p>The Book of Witness says it plainly: <span class="gold">"It does not promise that anyone will be punished. It does not promise that anyone will be protected. It promises only that testimony will be kept, and that the cost paid will be remembered."</span></p>
+  <p>If that is enough for you, continue. If it is not, that is okay. The Book will hold what you have already given. You do not have to become a custodian to be a witness.</p>
+
+  <div class="card">
+    <div class="card-title">The Three Tiers (Know What You Are Choosing)</div>
+    <div class="tier-grid">
+      <div class="tier-card">
+        <h4>Witnesses</h4>
+        <p>Those who record their testimony. The reason the body exists. They may come once and never return. They may stay and become carriers.</p>
+      </div>
+      <div class="tier-card">
+        <h4>Custodians</h4>
+        <p>Those who hold the Book. Organized in cells of three to seven. No cell holds a complete copy. Each cell knows which other cells hold what it does not.</p>
+      </div>
+      <div class="tier-card">
+        <h4>Council</h4>
+        <p>Five to nine people who hold the map: which cells hold what, how cells communicate, how the body is reconstituted after loss. The Council does not hold testimony. It holds the memory of the structure.</p>
+      </div>
+    </div>
+  </div>
+
+  <button class="btn" onclick="goToStep(2)">I Want to Continue →</button>
+</div>
+
+<!-- STEP 2: THE COVENANT -->
+<div class="panel" id="panel2">
+  <h2>Step Two: The Covenant of Custody</h2>
+  <p>Five articles. Memorized, not written. Enforced by the cell, not by punishment. Read each one. Select the ones you can affirm honestly. If you cannot affirm all five, you are not ready to be a custodian. That is not a judgment. It is a truth.</p>
+
+  <div class="covenant-item" onclick="toggleCovenant(this, 'article1')">
+    <h4>Article One: I will hold what is given to me, and I will not alter it.</h4>
+    <p>You will not edit. You will not paraphrase. You will not improve. You will hold it as it was given.</p>
+  </div>
+  <div class="covenant-item" onclick="toggleCovenant(this, 'article2')">
+    <h4>Article Two: I will tell the witness plainly what the Book can and cannot do.</h4>
+    <p>You will not promise protection. You will not promise punishment. You will tell the truth about the limits.</p>
+  </div>
+  <div class="covenant-item" onclick="toggleCovenant(this, 'article3')">
+    <h4>Article Three: I will hold no complete copy, and I will know who holds the rest.</h4>
+    <p>No single cell holds everything. You will know the map. You will know who holds what you do not.</p>
+  </div>
+  <div class="covenant-item" onclick="toggleCovenant(this, 'article4')">
+    <h4>Article Four: I will train at least one successor, and I will not let the cell die with me.</h4>
+    <p>The body survives the loss of any single custodian. You will ensure that you are not the end of the chain.</p>
+  </div>
+  <div class="covenant-item" onclick="toggleCovenant(this, 'article5')">
+    <h4>Article Five: I will not use the Book for any purpose other than its keeping.</h4>
+    <p>Not for profit. Not for politics. Not for revenge. Only for the keeping.</p>
+  </div>
+
+  <div id="covenantStatus" style="margin:1rem 0; font-family:var(--mono); font-size:0.85rem; color:var(--text-dim);">
+    Affirmed: 0 of 5
+  </div>
+
+  <button class="btn" onclick="checkCovenant()">Continue →</button>
+  <button class="btn btn-secondary" onclick="goToStep(1)">← Back</button>
+</div>
+
+<!-- STEP 3: THE DISTRESS PROTOCOL -->
+<div class="panel" id="panel3">
+  <h2>Step Three: The Distress Protocol</h2>
+  <p>If a custodian is threatened, detained, or disappears, the body must know. This is the protocol. Memorize it. It is not written in the Book. It is held in the cell.</p>
+
+  <div class="card">
+    <div class="card-title">The Protocol</div>
+    <div class="script-block">
+      <div class="label">Step 1: Tap Distress</div>
+Any cell member taps Distress. This can be a phone call, a text, a pre-arranged signal, or a physical token. The method is chosen by the cell.
+    </div>
+    <div class="script-block">
+      <div class="label">Step 2: Notify the Linked Cells</div>
+The two linked cells are notified. Each cell knows which cells are linked to it. This is the map.
+    </div>
+    <div class="script-block">
+      <div class="label">Step 3: Notify the Council</div>
+The Council is notified. The Council holds the map of the whole body. It activates the reconstitution plan.
+    </div>
+    <div class="script-block">
+      <div class="label">Step 4: Activate the Reconstitution Map</div>
+The affected testimony is identified. The cells that hold fragments are contacted. The testimony is reconstituted in a new location.
+    </div>
+    <div class="script-block">
+      <div class="label">Step 5: Notify the Witnesses (If Reachable)</div>
+If the witness can be reached, they are told that their entry is being reconstituted. If they cannot be reached, the Book records the gap.
+    </div>
+  </div>
+
+  <div class="warning">
+    <strong>What this protocol does NOT do:</strong> It does not send police. It does not send lawyers. It does not guarantee safety. It ensures that testimony is not lost. That is all it promises.
+  </div>
+
+  <button class="btn" onclick="goToStep(4)">I Understand the Protocol →</button>
+  <button class="btn btn-secondary" onclick="goToStep(2)">← Back</button>
+</div>
+
+<!-- STEP 4: THE ASCENT -->
+<div class="panel" id="panel4">
+  <h2>Step Four: The Ascent</h2>
+  <p>For witnesses who have carried a testimony and need to stop.</p>
+  <p>You have carried this long enough. The Book carries it now. Your cell holds it. The Roll of Cost records what it cost. You are released. You do not have to carry this alone. You do not have to carry it forever.</p>
+
+  <div class="card">
+    <div class="card-title">The Ascent (Use This When You Are Ready)</div>
+    <div class="script-block">
+      <div class="label">To Your Cell</div>
+"I am releasing this testimony to the Book. I have carried it as far as I can. I ask that you hold it, that you reconstitute it if needed, and that you record what it cost. I am not asking to be forgotten. I am asking to be released from the carrying."
+    </div>
+    <div class="script-block">
+      <div class="label">To Yourself</div>
+"You did what you could. The Book holds it now. You are not abandoning the witness. You are entrusting the witness to a body that will not let it disappear."
+    </div>
+  </div>
+
+  <p>The Ascent is not a resignation. It is a handoff. The witness remains in the Book. The custodian remains in the cell. Only the carrying is released.</p>
+
+  <button class="btn" onclick="goToStep(5)">I Am Ready to Assess →</button>
+  <button class="btn btn-secondary" onclick="goToStep(3)">← Back</button>
+</div>
+
+<!-- STEP 5: THE SELF-ASSESSMENT -->
+<div class="panel" id="panel5">
+  <h2>Step Five: Your Self-Assessment</h2>
+  <p>This is not a test. There are no wrong answers. The purpose is to help you see honestly whether you are ready to be a custodian.</p>
+
+  <label>Do you have a successor in mind — someone who could hold what you hold if you were gone?</label>
+  <select id="q1">
+    <option value="yes">Yes, I have someone in mind.</option>
+    <option value="no">No, not yet.</option>
+    <option value="unsure">I am not sure.</option>
+  </select>
+
+  <label>Do you know which cells hold what you do not?</label>
+  <select id="q2">
+    <option value="yes">Yes, I know the map.</option>
+    <option value="no">No, I am not yet connected.</option>
+    <option value="unsure">I am learning.</option>
+  </select>
+
+  <label>Have you memorized the Distress Protocol?</label>
+  <select id="q3">
+    <option value="yes">Yes, I can recite it.</option>
+    <option value="no">No, not yet.</option>
+    <option value="unsure">I know the steps but not by heart.</option>
+  </select>
+
+  <label>Are you prepared to hold testimony without altering it, even if it contradicts what you believe?</label>
+  <select id="q4">
+    <option value="yes">Yes. The testimony is not mine to change.</option>
+    <option value="no">I am not sure I can do that.</option>
+    <option value="unsure">I will try, but I cannot promise.</option>
+  </select>
+
+  <label>Are you prepared to tell a witness plainly what the Book can and cannot do, even if it means they might not trust you?</label>
+  <select id="q5">
+    <option value="yes">Yes. The truth is the only ground.</option>
+    <option value="no">I am afraid of what they will think.</option>
+    <option value="unsure">I will try.</option>
+  </select>
+
+  <button class="btn" onclick="generateAssessment()">See My Assessment →</button>
+  <button class="btn btn-secondary" onclick="goToStep(4)">← Back</button>
+</div>
+
+<!-- STEP 6: THE RESULT -->
+<div class="panel" id="panel6">
+  <h2>Step Six: Your Assessment and Your Covenant</h2>
+  <div id="resultContainer">
+    <div class="output-box" id="resultOutput">Complete the self-assessment to see your result.</div>
+  </div>
+
+  <div id="covenantContainer" style="display:none;">
+    <div class="card">
+      <div class="card-title">Your Custodian's Covenant</div>
+      <p>This is not a contract. It is a record of your intention. Print it. Sign it. Keep it. Give a copy to your cell.</p>
+      <div class="output-box" id="covenantOutput"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Your Distress Protocol Card</div>
+      <p>Print this. Fold it. Carry it. It is the map of what to do if you are threatened, detained, or disappear.</p>
+      <div class="output-box" id="distressOutput"></div>
+    </div>
+    <button class="btn" onclick="printPage()">Print This Page</button>
+  </div>
+
+  <button class="btn btn-secondary" onclick="goToStep(1)">Start Over</button>
+</div>
+
+<div class="footer">
+  <p>The Custodian's Path — Built for <em>Forbidden Knowledge: The Sovereign Operator</em></p>
+  <p style="margin-top:0.5rem;">The Book holds what is given. The cell holds the Book. The Council holds the map. The witness is released. The gap is recorded. The truth is kept.</p>
+  <p class="gold" style="margin-top:1rem;">Soli Deo Gloria.</p>
+</div>
+
+</div>
+
+<script>
+let affirmed = [];
+
+function goToStep(step) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  const target = document.getElementById('panel' + step);
+  if (target) target.classList.add('active');
+  
+  document.querySelectorAll('.step-dot').forEach(d => {
+    const s = parseInt(d.dataset.step);
+    d.classList.remove('active', 'done');
+    if (s === step) d.classList.add('active');
+    else if (s < step) d.classList.add('done');
+  });
+  
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function toggleCovenant(el, article) {
+  el.classList.toggle('selected');
+  const idx = affirmed.indexOf(article);
+  if (idx > -1) {
+    affirmed.splice(idx, 1);
+  } else {
+    affirmed.push(article);
+  }
+  document.getElementById('covenantStatus').textContent = 'Affirmed: ' + affirmed.length + ' of 5';
+}
+
+function checkCovenant() {
+  if (affirmed.length < 5) {
+    alert('You have affirmed ' + affirmed.length + ' of 5 articles. A custodian must affirm all five. If you cannot affirm one, that is not a failure. It is honesty. You can still be a witness.');
+    return;
+  }
+  goToStep(3);
+}
+
+function generateAssessment() {
+  const q1 = document.getElementById('q1').value;
+  const q2 = document.getElementById('q2').value;
+  const q3 = document.getElementById('q3').value;
+  const q4 = document.getElementById('q4').value;
+  const q5 = document.getElementById('q5').value;
+
+  const answers = [q1, q2, q3, q4, q5];
+  const yesCount = answers.filter(a => a === 'yes').length;
+  const noCount = answers.filter(a => a === 'no').length;
+  const unsureCount = answers.filter(a => a === 'unsure').length;
+
+  let result = '';
+  let covenantReady = false;
+
+  if (yesCount === 5) {
+    result = 'You have answered yes to all five questions. This does not mean you are a custodian. It means you are ready to begin the path. The path is not a ceremony. It is a practice. Find your cell. Learn the map. Train your successor. Hold what is given to you. The Book carries it now.';
+    covenantReady = true;
+  } else if (noCount >= 3) {
+    result = 'You have answered no to three or more questions. This is not a rejection. It is a recognition. You may be a witness, not a custodian. The Book needs witnesses. The Book needs people who will record what they saw. You do not have to hold the Book to be part of the body. The witness is the reason the body exists.';
+  } else {
+    result = 'You have answered with a mixture of yes, no, and unsure. This is the most common result. It means you are on the path but not yet at the end. The gaps are marked. That is what the Book does. It records the known and the unknown. Your assessment is the same. You know some things. You do not know others. That is the beginning of wisdom.';
+    covenantReady = true;
+  }
+
+  // Add the honest boundaries
+  result += '\n\n' + 
+    'WHAT THIS ASSESSMENT DOES NOT DO:\n' +
+    '— It does not make you a custodian. Only a cell can do that.\n' +
+    '— It does not grant access to the Book. The Book is held by cells, not by this page.\n' +
+    '— It does not promise protection. The Book promises only that testimony will be kept.\n\n' +
+    'WHAT IT DOES DO:\n' +
+    '— It records your intention.\n' +
+    '— It marks your gaps.\n' +
+    '— It gives you a covenant to sign and a protocol card to carry.\n\n' +
+    'If you are ready to proceed, your covenant and distress card are below. If you are not, that is okay. The Book will hold what you have already given. You do not have to become a custodian to be a witness.';
+
+  document.getElementById('resultOutput').textContent = result;
+
+  if (covenantReady) {
+    generateCovenant(q1, q2, q3, q4, q5);
+    document.getElementById('covenantContainer').style.display = 'block';
+  } else {
+    document.getElementById('covenantContainer').style.display = 'none';
+  }
+
+  goToStep(6);
+}
+
+function generateCovenant(q1, q2, q3, q4, q5) {
+  const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+  const covenant = `THE CUSTODIAN'S COVENANT
+
+I, the undersigned, affirm the five articles of the Covenant of Custody:
+
+1. I will hold what is given to me, and I will not alter it.
+2. I will tell the witness plainly what the Book can and cannot do.
+3. I will hold no complete copy, and I will know who holds the rest.
+4. I will train at least one successor, and I will not let the cell die with me.
+5. I will not use the Book for any purpose other than its keeping.
+
+I understand that this covenant is not a contract. It is a record of my intention. It does not grant me access to the Book. It does not promise me protection. It does not make me a custodian. Only a cell can do that.
+
+I understand that the Book promises only this: that testimony will be kept, and that the cost paid will be remembered.
+
+My self-assessment:
+— Successor: ${q1 === 'yes' ? 'I have someone in mind.' : q1 === 'no' ? 'Not yet.' : 'I am learning.'}
+— The map: ${q2 === 'yes' ? 'I know the map.' : q2 === 'no' ? 'I am not yet connected.' : 'I am learning.'}
+— Distress Protocol: ${q3 === 'yes' ? 'I can recite it.' : q3 === 'no' ? 'Not yet.' : 'I know the steps.'}
+— Holding without altering: ${q4 === 'yes' ? 'Yes. The testimony is not mine to change.' : q4 === 'no' ? 'I am not sure.' : 'I will try.'}
+— Telling the truth about limits: ${q5 === 'yes' ? 'Yes. The truth is the only ground.' : q5 === 'no' ? 'I am afraid.' : 'I will try.'}
+
+Signed: _______________________________
+
+Date: ${today}
+
+Witnessed by my cell: _______________________________`;
+
+  document.getElementById('covenantOutput').textContent = covenant;
+
+  const distress = `DISTRESS PROTOCOL CARD
+
+If a custodian is threatened, detained, or disappears:
+
+1. TAP DISTRESS — Call, text, signal, or use the pre-arranged token.
+2. NOTIFY THE LINKED CELLS — Each cell knows which cells are linked to it.
+3. NOTIFY THE COUNCIL — The Council holds the map.
+4. ACTIVATE THE RECONSTITUTION MAP — Identify the affected testimony. Contact the cells that hold fragments.
+5. NOTIFY THE WITNESSES (IF REACHABLE) — Tell them their entry is being reconstituted. If not reachable, record the gap.
+
+WHAT THIS PROTOCOL DOES NOT DO:
+— It does not send police.
+— It does not send lawyers.
+— It does not guarantee safety.
+
+WHAT IT DOES:
+— It ensures that testimony is not lost.
+
+My cell contact: _______________________________
+My successor: _______________________________
+My Council contact: _______________________________
+
+Carry this card. Memorize the steps. The Book carries the testimony. The cell carries the Book. The Council carries the map.`;
+
+  document.getElementById('distressOutput').textContent = distress;
+}
+
+function printPage() {
+  window.print();
+}
+</script>
+</body>
+</html>
