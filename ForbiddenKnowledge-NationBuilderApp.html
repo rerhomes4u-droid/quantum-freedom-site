@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Nation Builder | Forbidden Knowledge</title>
+<style>
+:root{--bg:#0a0a0a;--surface:#141414;--surface2:#1c1c1c;--border:#2a2a2a;--gold:#c9a84c;--gold-dim:#8a7333;--text:#e8e4dc;--text-dim:#9a958c;--danger:#8b3a3a;--success:#3a6b4a;--font:'Georgia','Times New Roman',serif;--mono:'Courier New',monospace;}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:var(--font);line-height:1.7;min-height:100vh;}
+.container{max-width:900px;margin:0 auto;padding:2rem 1.5rem;}
+header{text-align:center;padding:3rem 1rem 2rem;border-bottom:1px solid var(--border);margin-bottom:2rem;}
+header h1{font-size:1.6rem;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);font-weight:normal;}
+header p{color:var(--text-dim);font-size:.9rem;margin-top:.5rem;font-style:italic;}
+.step-indicator{display:flex;justify-content:center;gap:.5rem;margin:2rem 0;flex-wrap:wrap;}
+.step-dot{width:34px;height:34px;border-radius:50%;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:.7rem;color:var(--text-dim);font-family:var(--mono);}
+.step-dot.active{border-color:var(--gold);color:var(--gold);background:rgba(201,168,76,.1);}
+.step-dot.done{border-color:var(--success);color:var(--success);}
+.panel{display:none;animation:fadeIn .4s ease;}
+.panel.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+h2{font-size:1.2rem;color:var(--gold);margin-bottom:1rem;font-weight:normal;letter-spacing:.05em;}
+h3{font-size:.85rem;color:var(--text);margin:1.5rem 0 .75rem;font-weight:bold;text-transform:uppercase;letter-spacing:.08em;}
+p{margin-bottom:1rem;color:var(--text-dim);}
+.gold{color:var(--gold);}
+.card{background:var(--surface);border:1px solid var(--border);padding:1.5rem;margin-bottom:1.5rem;}
+.card-title{font-size:.8rem;text-transform:uppercase;letter-spacing:.12em;color:var(--gold);margin-bottom:.75rem;font-family:var(--mono);}
+.btn{display:inline-block;padding:.8rem 2rem;background:transparent;border:1px solid var(--gold);color:var(--gold);font-family:var(--mono);font-size:.85rem;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:all .3s;margin:.5rem .5rem .5rem 0;}
+.btn:hover{background:var(--gold);color:var(--bg);}
+.btn-secondary{border-color:var(--border);color:var(--text-dim);}
+.btn-secondary:hover{border-color:var(--text);color:var(--text);background:transparent;}
+input,textarea,select{width:100%;padding:.8rem;background:var(--surface2);border:1px solid var(--border);color:var(--text);font-family:var(--font);font-size:.95rem;margin-bottom:1rem;}
+input:focus,textarea:focus,select:focus{outline:none;border-color:var(--gold-dim);}
+label{display:block;font-size:.8rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.4rem;font-family:var(--mono);}
+.output-box{background:var(--surface2);border-left:3px solid var(--gold);padding:1.25rem;margin:1rem 0;font-family:var(--mono);font-size:.78rem;line-height:1.6;white-space:pre-wrap;word-wrap:break-word;max-height:500px;overflow-y:auto;}
+.warning{border-left:3px solid var(--danger);padding:1rem 1.25rem;background:rgba(139,58,58,.1);margin:1rem 0;font-size:.85rem;}
+.warning strong{color:var(--danger);}
+.success-box{border-left:3px solid var(--success);padding:1rem 1.25rem;background:rgba(58,107,74,.1);margin:1rem 0;}
+.footer{text-align:center;padding:3rem 1rem;color:var(--text-dim);font-size:.8rem;border-top:1px solid var(--border);margin-top:3rem;}
+.footer .gold{font-style:italic;}
+.room-section{background:var(--surface);border:1px solid var(--border);padding:1.25rem;margin-bottom:1rem;}
+.room-section h4{color:var(--gold);font-size:.9rem;margin-bottom:.75rem;font-weight:normal;}
+.item-row{display:grid;grid-template-columns:2fr .7fr 1fr auto;gap:.5rem;margin-bottom:.5rem;align-items:center;}
+.item-row input{margin-bottom:0;font-size:.85rem;padding:.5rem;}
+.remove-item{background:transparent;border:1px solid var(--border);color:var(--text-dim);padding:.5rem;cursor:pointer;font-family:var(--mono);font-size:.7rem;}
+.remove-item:hover{border-color:var(--danger);color:var(--danger);}
+.add-item{background:transparent;border:1px dashed var(--border);color:var(--text-dim);padding:.5rem;width:100%;cursor:pointer;font-family:var(--mono);font-size:.75rem;margin-top:.5rem;}
+.add-item:hover{border-color:var(--gold-dim);color:var(--gold-dim);}
+.total-display{font-family:var(--mono);font-size:1.2rem;color:var(--gold);text-align:right;padding:1rem;border-top:1px solid var(--border);margin-top:1rem;}
+.checklist{list-style:none;padding:0;}
+.checklist li{padding:.5rem 0 .5rem 1.5rem;position:relative;font-size:.9rem;color:var(--text-dim);}
+.checklist li:before{content:"\25A1";position:absolute;left:0;color:var(--gold-dim);font-family:var(--mono);}
+</style>
+</head>
+<body>
+<div class="container">
+<header>
+<h1>The Nation Builder</h1>
+<p>Forbidden Knowledge: The Sovereign Operator &mdash; Companion Tool</p>
+<p style="font-size:.75rem;margin-top:.75rem;">The guided sequence: inventory, promissory note, revocable trust, family trust, bank package.</p>
+</header>
+
+<div class="step-indicator" id="stepIndicator">
+<div class="step-dot active" data-step="1">1</div>
+<div class="step-dot" data-step="2">2</div>
+<div class="step-dot" data-step="3">3</div>
+<div class="step-dot" data-step="4">4</div>
+<div class="step-dot" data-step="5">5</div>
+<div class="step-dot" data-step="6">6</div>
+</div>
+
+<!-- STEP 1 -->
+<div class="panel active" id="panel1">
+<h2>Step One: The Architecture</h2>
+<p>You are not building a trust. You are building a <span class="gold">nation</span>. A three-tier structure. A waterfall. A promissory note. A credit line. A legacy.</p>
+<p>Before you enter a single item, you must understand what you are building and what it can and cannot do.</p>
+
+<div class="card">
+<div class="card-title">The Three Tiers</div>
+<p><strong>Tier One: The Revocable Living Trust.</strong> Created during your lifetime. You are the grantor, the trustee, the beneficiary. You control it. It holds your assets. It avoids probate. It provides incapacity planning.</p>
+<p><strong>Tier Two: The Irrevocable Family Trust.</strong> The beneficiary of the revocable trust is not a person. It is another trust. When you die (or a triggering event occurs), the assets waterfall into the family trust. No probate. No individual tax liability on the waterfall.</p>
+<p><strong>Tier Three: The Business Trust.</strong> Optional. For business assets and intellectual property. The business trust holds the IP. The corporation operates. The LLC holds the DBA. You assign a percentage &mdash; less than 50% &mdash; to the revocable trust.</p>
+</div>
+
+<div class="card">
+<div class="card-title">The Mechanism: The Promissory Note</div>
+<p>You inventory everything you own. You assign the original value. You add it up. <span class="gold">That total becomes the value of a promissory note that the trust creates to purchase those items from you.</span></p>
+<p>The trust owes you. You hold the promissory note. As the trust generates income, you take non-taxable distributions off that note because the trust owes you.</p>
+</div>
+
+<div class="warning">
+<strong>What this app is NOT:</strong> It is not legal advice. It does not replace an attorney. It does not guarantee the bank will lend. It does not make self-dealing legal. If you create a false instrument, present it, and it is not backed by real value, that is a criminal offense. This app generates the blueprint. The professionals execute it.
+</div>
+
+<div class="warning">
+<strong>What a trust cannot do:</strong> It cannot protect you from criminal prosecution. It cannot work if you never fund it. No trust takes effect until it is funded. It cannot be administered by you alone if it is irrevocable. It cannot be used to hide assets from a pending creditor &mdash; that is a fraudulent transfer.
+</div>
+
+<button class="btn" onclick="goToStep(2)">Begin the Inventory &rarr;</button>
+</div>
+
+<!-- STEP 2 -->
+<div class="panel" id="panel2">
+<h2>Step Two: The Manifest (Inventory)</h2>
+<p>Walk through your home. Every room. Every closet. Every drawer. List every item. Assign the <span class="gold">original value</span> &mdash; not the depreciated value, not the resale value. The value you declare. You are the sovereign. You set the value.</p>
+<p>This inventory is the manifest. It is the basis of the promissory note. It is the foundation of the nation.</p>
+
+<div id="roomsContainer"></div>
+<button class="btn" onclick="addRoom()">+ Add Another Room</button>
+<div class="total-display">Total Declared Value: $<span id="grandTotal">0</span></div>
+
+<button class="btn" onclick="validateInventory()" style="margin-top:1rem;">Lock the Manifest &rarr;</button>
+<button class="btn btn-secondary" onclick="goToStep(1)">&larr; Back</button>
+</div>
+
+<!-- STEP 3 -->
+<div class="panel" id="panel3">
+<h2>Step Three: The Promissory Note</h2>
+<p>The trust purchases your assets from you. The trust owes you. The promissory note is the evidence of that debt.</p>
+
+<label>Your Full Legal Name (the Grantor and the Note Holder)</label>
+<input type="text" id="grantorName" placeholder="e.g., John Michael Smith">
+
+<label>The Name of Your Trust</label>
+<input type="text" id="trustName" placeholder="e.g., The Smith Family Revocable Living Trust">
+
+<label>The Date of the Note</label>
+<input type="date" id="noteDate">
+
+<label>Interest Rate on the Note (e.g., 2.5% &mdash; the Applicable Federal Rate is a common choice)</label>
+<input type="text" id="interestRate" placeholder="e.g., 2.5%">
+
+<button class="btn" onclick="generateNote()">Generate the Promissory Note &rarr;</button>
+
+<div id="noteContainer" style="display:none;">
+<div class="output-box" id="noteOutput"></div>
+<button class="btn" onclick="copyTo('noteOutput')">Copy Note</button>
+</div>
+
+<button class="btn btn-secondary" onclick="goToStep(2)">&larr; Back</button>
+</div>
+
+<!-- STEP 4 -->
+<div class="panel" id="panel4">
+<h2>Step Four: The Revocable Living Trust</h2>
+<p>The revocable trust is the vessel. It holds the assets. It receives the promissory note. It waterfalls into the family trust at death.</p>
+
+<label>Successor Trustee (who serves if you cannot)</label>
+<input type="text" id="successorTrustee" placeholder="e.g., Jane Smith, or a corporate trustee">
+
+<label>Trust Protector (optional &mdash; oversight without control)</label>
+<input type="text" id="trustProtector" placeholder="e.g., a trusted third party">
+
+<label>The Family Trust Name (the beneficiary of the revocable trust)</label>
+<input type="text" id="familyTrustName" placeholder="e.g., The Smith Family Irrevocable Trust">
+
+<label>Incapacity Standard</label>
+<select id="incapacityStandard">
+<option value="two-physicians">Written certification by two licensed physicians</option>
+<option value="one-physician">Written certification by one licensed physician</option>
+<option value="judicial">Judicial finding of incapacity</option>
+</select>
+
+<button class="btn" onclick="generateTrust()">Generate the Trust Structure &rarr;</button>
+
+<div id="trustContainer" style="display:none;">
+<div class="output-box" id="trustOutput"></div>
+<button class="btn" onclick="copyTo('trustOutput')">Copy Trust Structure</button>
+</div>
+
+<button class="btn btn-secondary" onclick="goToStep(3)">&larr; Back</button>
+</div>
+
+<!-- STEP 5 -->
+<div class="panel" id="panel5">
+<h2>Step Five: The Bank Package</h2>
+<p>This is what you carry to the institution. Not to a branch. To the private wealth or trust department in a major office building. You speak their language. You are not fishing for information. You are directing them.</p>
+
+<div class="card">
+<div class="card-title">What Goes in the Package</div>
+<ul class="checklist">
+<li>The signed promissory note (from Step Three)</li>
+<li>The inventory manifest (from Step Two)</li>
+<li>The certificate of trust (the short instrument the attorney prepares &mdash; this app gives you the structure)</li>
+<li>The trust agreement (the full document the attorney prepares)</li>
+<li>Your ID and the trust's EIN (if the trust has one &mdash; a revocable trust typically uses your SSN; an irrevocable trust uses its own EIN, and you should not be the responsible party)</li>
+<li>A cover letter requesting a discussion of a credit line against the trust's assets</li>
+</ul>
+</div>
+
+<button class="btn" onclick="generateBankPackage()">Generate the Bank Package &rarr;</button>
+
+<div id="bankContainer" style="display:none;">
+<div class="output-box" id="bankOutput"></div>
+<button class="btn" onclick="copyTo('bankOutput')">Copy Bank Package</button>
+</div>
+
+<div class="warning" style="margin-top:1.5rem;">
+<strong>The warning Black Swan gave:</strong> "Once you start messing with their money &mdash; if they are the mafia, you do not mess with their money." Self-dealing is a crime. You cannot do this yourself without the professionals. The institution must be involved. The bank decides what it will lend. You declare what you own.
+</div>
+
+<button class="btn" onclick="goToStep(6)">The Final Word &rarr;</button>
+<button class="btn btn-secondary" onclick="goToStep(4)">&larr; Back</button>
+</div>
+
+<!-- STEP 6 -->
+<div class="panel" id="panel6">
+<h2>Step Six: The Nation</h2>
+<div class="success-box">
+<strong class="gold">You have the manifest. You have the note. You have the structure. You have the package.</strong>
+</div>
+<p>You do not need my permission. You do not need a government to recognize you. You declared it. You counted what is yours. You set the value. You built the structure.</p>
+
+<div class="card">
+<div class="card-title">The One-Year Timeline</div>
+<p><strong>Month One:</strong> Complete the manifest. Sign it. Date it.</p>
+<p><strong>Month Two:</strong> Consult an attorney. Draft the revocable trust and the family trust. The attorney prepares the certificate of trust.</p>
+<p><strong>Month Three:</strong> Execute the promissory note. Transfer the first assets into the trust.</p>
+<p><strong>Month Four:</strong> Take the package to the bank. Request the credit line discussion. The bank decides.</p>
+<p><strong>Months Five through Twelve:</strong> Fund the trust. Acquire the life insurance policy naming the family trust as beneficiary. Refine the structure. Train your successor.</p>
+</div>
+
+<div class="warning">
+<strong>The honest boundary:</strong> This is not legal or financial advice. The bank may decline. The attorney will charge fees. The life insurance may be expensive. The structure may not fit your situation. Consult professionals. Do not sign anything you do not understand. The blueprint is simple. The execution requires diligence.
+</div>
+
+<div class="card">
+<div class="card-title">Why This Matters</div>
+<p>Wars are everywhere. The U.S. military is joined to Israel. American bombs are being dropped on Palestinian children. We do not want our offspring killing innocent children. We do not want our sons and daughters sent to fight in wars that have nothing to do with them, for a system that has already declared them expendable.</p>
+<p>The nation you build is the protection. The trust is the shield. The manifest is the declaration. The life insurance is the legacy. Your children will not be conscripted into a war machine. They will be citizens of your nation.</p>
+</div>
+
+<button class="btn" onclick="goToStep(1)">Start Over</button>
+<button class="btn btn-secondary" onclick="window.print()">Print This Page</button>
+</div>
+
+<div class="footer">
+<p>The Nation Builder &mdash; Built for <em>Forbidden Knowledge: The Sovereign Operator</em></p>
+<p style="margin-top:.5rem;">You are the sovereign. You set the value. The manifest is the foundation. The trust is the structure. The nation is yours.</p>
+<p class="gold" style="margin-top:1rem;">Soli Deo Gloria.</p>
+</div>
+</div>
+
+<script>
+var roomCount = 0;
+
+function initRooms() {
+  var container = document.getElementById('roomsContainer');
+  container.innerHTML = '';
+  roomCount = 0;
+  ['Living Room', 'Kitchen', 'Master Bedroom', 'Bathroom', 'Garage'].forEach(function(name){ addRoom(name); });
+}
+
+function addRoom(name) {
+  roomCount++;
+  var container = document.getElementById('roomsContainer');
+  var roomDiv = document.createElement('div');
+  roomDiv.className = 'room-section';
+  roomDiv.id = 'room-' + roomCount;
+  var safeName = (name || '').replace(/"/g, '&quot;');
+  roomDiv.innerHTML = '<h4>Room ' + roomCount + ': <input type="text" class="room-name" value="' + safeName + '" placeholder="e.g., Living Room, Kitchen, Master Bedroom" style="width:auto;display:inline-block;padding:.25rem .5rem;font-size:.9rem;margin-bottom:0;"></h4>' +
+    '<div class="items-container" id="items-' + roomCount + '"></div>' +
+    '<button class="add-item" onclick="addItem(' + roomCount + ')">+ Add Item</button>';
+  container.appendChild(roomDiv);
+  addItem(roomCount); addItem(roomCount); addItem(roomCount);
+}
+
+function addItem(roomId) {
+  var container = document.getElementById('items-' + roomId);
+  var itemRow = document.createElement('div');
+  itemRow.className = 'item-row';
+  itemRow.innerHTML = '<input type="text" class="item-name" placeholder="Item name">' +
+    '<input type="text" class="item-qty" placeholder="Qty" value="1">' +
+    '<input type="number" class="item-value" placeholder="Original Value ($)" step="0.01" onchange="updateTotal()" oninput="updateTotal()">' +
+    '<button class="remove-item" onclick="this.parentElement.remove(); updateTotal();">&times;</button>';
+  container.appendChild(itemRow);
+  updateTotal();
+}
+
+function updateTotal() {
+  var total = 0;
+  var values = document.querySelectorAll('.item-value');
+  for (var i = 0; i < values.length; i++) {
+    var val = parseFloat(values[i].value) || 0;
+    var qtyInput = values[i].parentElement.querySelector('.item-qty');
+    var qty = parseFloat(qtyInput ? qtyInput.value : 1) || 1;
+    total += val * qty;
+  }
+  document.getElementById('grandTotal').textContent = total.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2});
+  return total;
+}
+
+function goToStep(step) {
+  document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('active'); });
+  var target = document.getElementById('panel' + step);
+  if (target) target.classList.add('active');
+  document.querySelectorAll('.step-dot').forEach(function(d){
+    var s = parseInt(d.dataset.step);
+    d.classList.remove('active','done');
+    if (s === step) d.classList.add('active');
+    else if (s < step) d.classList.add('done');
+  });
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function validateInventory() {
+  var total = updateTotal();
+  if (total <= 0) {
+    alert('You must enter at least one item with a value before locking the manifest.');
+    return;
+  }
+  goToStep(3);
+}
+
+function collectInventory() {
+  var text = '';
+  var grandTotal = 0;
+  document.querySelectorAll('.room-section').forEach(function(room){
+    var roomName = room.querySelector('.room-name').value || 'Unnamed Room';
+    text += '\n' + roomName.toUpperCase() + '\n' + '----------------------------------------\n';
+    var roomTotal = 0;
+    var items = room.querySelectorAll('.item-row');
+    items.forEach(function(item){
+      var itemName = item.querySelector('.item-name').value.trim();
+      var qty = parseFloat(item.querySelector('.item-qty').value) || 1;
+      var val = parseFloat(item.querySelector('.item-value').value) || 0;
+      if (itemName && val > 0) {
+        var lineTotal = qty * val;
+        text += itemName + ' | Qty: ' + qty + ' | Original Value: $' + val.toFixed(2) + ' | Line Total: $' + lineTotal.toFixed(2) + '\n';
+        roomTotal += lineTotal;
+      }
+    });
+    text += 'Room Total: $' + roomTotal.toFixed(2) + '\n';
+    grandTotal += roomTotal;
+  });
+  return {text: text, total: grandTotal};
+}
+
+function generateNote() {
+  var name = document.getElementById('grantorName').value.trim() || '[YOUR NAME]';
+  var trust = document.getElementById('trustName').value.trim() || '[YOUR TRUST NAME]';
+  var date = document.getElementById('noteDate').value || '[DATE]';
+  var rate = document.getElementById('interestRate').value.trim() || '2.5%';
+  var inv = collectInventory();
+
+  var note = 'PROMISSORY NOTE\n\n' +
+    'Principal Amount: $' + inv.total.toFixed(2) + '\n' +
+    'Date: ' + date + '\n' +
+    'Interest Rate: ' + rate + ' per annum\n\n' +
+    'FOR VALUE RECEIVED, the undersigned ' + trust + ' (the "Trust"), a revocable living trust organized under the laws of the State of [STATE], and ' + name + ', as Trustee of the Trust (the "Trustee"), jointly and severally, promise to pay to the order of ' + name + ' (the "Note Holder"), the principal sum of $' + inv.total.toFixed(2) + ', together with interest at the rate of ' + rate + ' per annum, on the unpaid principal balance.\n\n' +
+    '1. PURPOSE. This Note evidences the purchase by the Trust of the tangible personal property described in the Manifest of Assets attached hereto as Exhibit A. The Manifest was prepared by the Note Holder and represents the original declared value of the assets transferred to the Trust.\n\n' +
+    '2. PAYMENT. The Trust shall pay the Note Holder in monthly installments of principal and interest, or as the Trust generates income, or as the parties may agree in writing. No payment is required from the Note Holder personally.\n\n' +
+    '3. DISTRIBUTIONS. Because the Trust owes the Note Holder, any distributions made to the Note Holder in satisfaction of this Note are not taxable income to the Note Holder. The Note Holder is receiving a return of the Note Holder\'s own property.\n\n' +
+    '4. PREPAYMENT. This Note may be prepaid in whole or in part at any time without penalty.\n\n' +
+    '5. DEFAULT. In the event of default, the Note Holder may exercise any and all remedies available at law or in equity, subject to the terms of the Trust Agreement.\n\n' +
+    '6. GOVERNING LAW. This Note shall be governed by the laws of the State of [STATE].\n\n' +
+    '7. NON-RECOURSE. This Note is non-recourse against the Note Holder personally. The Note Holder is not personally liable for any obligation of the Trust.\n\n' +
+    '8. EXHIBIT A. The Manifest of Assets is attached hereto and incorporated by reference.\n\n' +
+    'IN WITNESS WHEREOF, the parties have executed this Note as of the date first written above.\n\n' +
+    '_________________________________________\n' + name + ', Trustee of ' + trust + '\n\n' +
+    '_________________________________________\n' + name + ', Note Holder\n\n\n' +
+    'EXHIBIT A: MANIFEST OF ASSETS\n' + '========================================\n' +
+    inv.text + '\n' +
+    'TOTAL DECLARED VALUE: $' + inv.total.toFixed(2) + '\n\n' +
+    'Signed: _______________________________\n' +
+    'Dated: _______________________________';
+
+  document.getElementById('noteOutput').textContent = note;
+  document.getElementById('noteContainer').style.display = 'block';
+}
+
+function generateTrust() {
+  var name = document.getElementById('grantorName').value.trim() || '[YOUR NAME]';
+  var trust = document.getElementById('trustName').value.trim() || '[YOUR TRUST NAME]';
+  var successor = document.getElementById('successorTrustee').value.trim() || '[SUCCESSOR TRUSTEE]';
+  var protector = document.getElementById('trustProtector').value.trim() || '[TRUST PROTECTOR - optional]';
+  var family = document.getElementById('familyTrustName').value.trim() || '[FAMILY TRUST NAME]';
+  var incapacitySelect = document.getElementById('incapacityStandard');
+  var incapacityLabel = incapacitySelect.options[incapacitySelect.selectedIndex].text;
+  var date = document.getElementById('noteDate').value || '[DATE]';
+
+  var trustText = 'REVOCABLE LIVING TRUST &mdash; STRUCTURE\n\n' +
+    'ARTICLE I: NAME\n' +
+    'The Trust shall be known as ' + trust + ', dated ' + date + '.\n\n' +
+    'ARTICLE II: PARTIES\n' +
+    'Grantor: ' + name + '\n' +
+    'Trustee: ' + name + '\n' +
+    'Successor Trustee: ' + successor + '\n' +
+    'Trust Protector: ' + protector + ' (oversight without control; can remove a trustee for cause but cannot direct distributions)\n\n' +
+    'ARTICLE III: BENEFICIARY\n' +
+    'During the Grantor\'s lifetime: the Grantor.\n' +
+    'Upon the Grantor\'s death or incapacity: ' + family + ', an irrevocable family trust to be established by the Grantor or the Successor Trustee.\n' +
+    'The beneficiary shall NOT be any individual person, so that the assets waterfall without triggering individual income tax liability and without exposure to individual creditors.\n\n' +
+    'ARTICLE IV: FUNDING\n' +
+    'The Trust shall be funded by the Promissory Note dated ' + date + ' in the amount of the Manifest of Assets, and by any other assets the Grantor transfers to the Trust.\n\n' +
+    'ARTICLE V: INCAPACITY\n' +
+    'The Grantor shall be deemed incapacitated upon: ' + incapacityLabel + '.\n' +
+    'Upon incapacity, the Successor Trustee shall assume administration of the Trust and may pay the Grantor\'s living expenses, medical expenses, and obligations from the Trust assets.\n\n' +
+    'ARTICLE VI: WATERFALL\n' +
+    'Upon the Grantor\'s death, the Trust becomes irrevocable and all assets shall flow to ' + family + ' without probate administration, without court involvement, and without individual tax liability. The Successor Trustee shall take all steps necessary to effect this decanting.\n\n' +
+    'ARTICLE VII: TRUST PROTECTOR\n' +
+    'The Trust Protector may remove the Trustee for cause, including breach of fiduciary duty. The Trust Protector shall not direct distributions. The Trust Protector has oversight but not control.\n\n' +
+    'ARTICLE VIII: SPENDTHRIFT\n' +
+    'The interest of any beneficiary in the Trust shall not be subject to voluntary or involuntary transfer, assignment, or anticipation by any beneficiary, and shall not be liable for or subject to the debts, contracts, liabilities, or torts of any beneficiary.\n\n' +
+    'ARTICLE IX: LIMITS\n' +
+    'This Trust does not protect the Grantor from the Grantor\'s own creditors. It does not shelter the Grantor from taxes during the Grantor\'s lifetime. It does not protect the Grantor from criminal prosecution. It does not create immunity of any kind. It is a structure for control, continuity, incapacity planning, and probate avoidance.\n\n' +
+    'ARTICLE X: AMENDMENT AND REVOCATION\n' +
+    'The Grantor may amend or revoke this Trust at any time while competent. The Trust becomes irrevocable upon the Grantor\'s death or incapacity.\n\n' +
+    'SIGNED: _________________________________\n' + name + ', Grantor and Trustee\n' +
+    'DATED: _________________________________';
+
+  document.getElementById('trustOutput').textContent = trustText;
+  document.getElementById('trustContainer').style.display = 'block';
+}
+
+function generateBankPackage() {
+  var name = document.getElementById('grantorName').value.trim() || '[YOUR NAME]';
+  var trust = document.getElementById('trustName').value.trim() || '[YOUR TRUST NAME]';
+  var inv = collectInventory();
+
+  var pkg = 'BANK PACKAGE &mdash; COVER LETTER\n\n' +
+    'Date: ____________________\n\n' +
+    'To: Private Wealth / Trust Department\n\n' +
+    'Re: Credit Line Discussion &mdash; ' + trust + '\n\n' +
+    'Dear [Institution]:\n\n' +
+    'I am the Grantor and Trustee of ' + trust + '. The Trust holds a Promissory Note in the amount of $' + inv.total.toFixed(2) + ', executed in consideration of the Trust\'s purchase of the tangible personal property described in the attached Manifest of Assets.\n\n' +
+    'I am requesting a credit line discussion based on the Trust\'s assets and the Note. The Note is secured by the Manifest of Assets and is non-recourse against me personally.\n\n' +
+    'Enclosed:\n' +
+    '1. Promissory Note\n' +
+    '2. Manifest of Assets (Exhibit A)\n' +
+    '3. Certificate of Trust (prepared by my attorney)\n' +
+    '4. Trust Agreement (prepared by my attorney)\n' +
+    '5. Identification and Trust EIN documentation\n\n' +
+    'I am not seeking legal advice. I am seeking a business discussion about whether the Institution is willing to extend credit against the Trust\'s assets. If the Institution is not interested, I will appreciate a clear answer. If it is interested, I am prepared to provide whatever documentation the Institution requires.\n\n' +
+    'Respectfully,\n\n' +
+    '_________________________________\n' + name + '\n' +
+    'Trustee, ' + trust + '\n\n' +
+    'Trust Assets Summary:\n' + inv.text + '\n\n' +
+    'Total Declared Value: $' + inv.total.toFixed(2) + '\n\n' +
+    'NOTE: The Institution decides what it will lend. This letter is a request for a discussion, not a demand, and not a guarantee.';
+
+  document.getElementById('bankOutput').textContent = pkg;
+  document.getElementById('bankContainer').style.display = 'block';
+}
+
+function copyTo(id) {
+  var text = document.getElementById(id).textContent;
+  if (!text) { alert('Nothing to copy yet.'); return; }
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(function(){ alert('Copied to clipboard.'); }).catch(function(){ fallbackCopy(text); });
+  } else { fallbackCopy(text); }
+}
+
+function fallbackCopy(text) {
+  var ta = document.createElement('textarea');
+  ta.value = text;
+  document.body.appendChild(ta);
+  ta.select();
+  try { document.execCommand('copy'); alert('Copied to clipboard.'); }
+  catch(e){ alert('Copy failed. Select the text manually.'); }
+  document.body.removeChild(ta);
+}
+
+document.addEventListener('DOMContentLoaded', function(){
+  initRooms();
+  var today = new Date().toISOString().split('T')[0];
+  var dateField = document.getElementById('noteDate');
+  if (dateField) dateField.value = today;
+  updateTotal();
+});
+</script>
+</body>
+</html>
