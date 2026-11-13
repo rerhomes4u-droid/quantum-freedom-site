@@ -347,8 +347,8 @@
     let currentLoadingTask = null;
 
     // preloaded
-    let preloadedPDFs = [null, null, null];
-    let preloadedNames = ['How to use this app', 'Love Frequencies Manual', 'Practical Frugal Money Guide'];
+    let preloadedPDFs = [null, null, null, null];
+    let preloadedNames = ['How to use this app', 'Love Frequencies Manual', 'Practical Frugal Money Guide', 'Forbidden Knowledge'];
     let preloadReady = false;
 
     // speech
@@ -446,7 +446,7 @@
     });
     speedDownBtn.addEventListener('click', () => {
         speechRate = Math.max(0.5, +(speechRate - 0.1).toFixed(1));
-        speedDisplay.textContent = speedRate + '×';
+        speedDisplay.textContent = speechRate + '×';
         speedDisplay.textContent = speechRate.toFixed(1) + '×';
         if (isSpeaking) restartSpeechFromCurrentSentence();
     });
@@ -798,25 +798,28 @@
             addText(d, 'Frugality is not about saying no to everything. It is about saying yes to what matters most.', L, y + 4);
             preloadedPDFs[2] = d.output('arraybuffer');
         }
-// ---------- DOC 4 : FORBIDDEN KNOWLEDGE ----------
-try {
-    const response = await fetch('./ForbiddenKnowledge2026.pdf');
-    if (!response.ok) throw new Error('HTTP ' + response.status);
-    preloadedPDFs[3] = await response.arrayBuffer();
-} catch (err) {
-    console.warn('Could not load ForbiddenKnowledge2026.pdf:', err);
-}
+        
+        // ---------- DOC 4 : FORBIDDEN KNOWLEDGE ----------
+        try {
+            const response = await fetch('./ForbiddenKnowledge2026.pdf');
+            if (!response.ok) throw new Error('HTTP ' + response.status);
+            preloadedPDFs[3] = await response.arrayBuffer();
+        } catch (err) {
+            console.warn('Could not load ForbiddenKnowledge2026.pdf:', err);
+        }
+        
         preloadReady = true;
     }
 
     async function loadPreloaded(index) {
         if (!preloadReady) { showMessage('Built‑in PDFs still generating…', true); return; }
-        if (index < 0 || index > 2) return;
+        // FIXED: Allowed 0, 1, 2, and 3!
+        if (index < 0 || index > 3) return;
         document.querySelectorAll('.preload-group button').forEach(b => b.classList.remove('active'));
         const btn = document.getElementById('preload-btn-' + index);
         if (btn) btn.classList.add('active');
         const ab = preloadedPDFs[index];
-        if (!ab) { showMessage('Error: PDF not generated.', true); return; }
+        if (!ab) { showMessage('Error: PDF not generated. Check file name.', true); return; }
         await loadPDFFromArrayBuffer(ab, preloadedNames[index]);
     }
 
