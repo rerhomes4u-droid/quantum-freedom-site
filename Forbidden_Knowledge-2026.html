@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <title>✨ the greatest PDF reader · ever · now it READS to you</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: #1a1e24;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+            transition: background 0.2s;
+        }
+        body.light { background: #f2f4f8; }
+
+        /* ---------- TOOLBAR ---------- */
+        .toolbar {
+            display: flex; flex-wrap: wrap; align-items: center; gap: 0.55rem;
+            padding: 0.7rem 1rem;
+            background: #0d1117; color: #e6edf3;
+            border-bottom: 1px solid #30363d;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 10; transition: background 0.2s, border-color 0.2s;
+        }
+        body.light .toolbar { background:#fff; color:#1e293b; border-bottom-color:#cbd5e1; box-shadow:0 4px 12px rgba(0,0,0,0.05); }
+
+        .toolbar button, .toolbar label, .toolbar .file-input-label {
+            background:#21262d; border:1px solid #3d444d; color:#e6edf3;
+            padding:0.5rem 0.9rem; border-radius:40px;
+            font-size:0.9rem; font-weight:500; cursor:pointer;
+            display:inline-flex; align-items:center; gap:0.4rem;
+            transition:all 0.15s; white-space:nowrap;
+            box-shadow:0 1px 3px rgba(0,0,0,0.2); line-height:1.2;
+        }
+        body.light .toolbar button, body.light .toolbar label, body.light .toolbar .file-input-label {
+            background:#f1f5f9; border-color:#cbd5e1; color:#0f172a; box-shadow:0 1px 3px rgba(0,0,0,0.05);
+        }
+        .toolbar button:hover, .toolbar label:hover, .toolbar .file-input-label:hover {
+            background:#30363d; border-color:#6e7681;
+        }
+        body.light .toolbar button:hover, body.light .toolbar label:hover, body.light .toolbar .file-input-label:hover {
+            background:#e2e8f0; border-color:#94a3b8;
+        }
+        .toolbar button:active { transform: scale(0.96); }
+        .toolbar .spacer { flex: 1; }
+
+        .zoom-group {
+            display:flex; align-items:center; gap:0.25rem;
+            background:#0d1117; border-radius:40px;
+            padding:0.15rem; border:1px solid #3d444d;
+        }
+        body.light .zoom-group { background:#fff; border-color:#cbd5e1; }
+        .zoom-group button { border:none; background:transparent; padding:0.4rem 0.8rem; border-radius:30px; box-shadow:none; }
+        .zoom-group button:hover { background:#30363d; }
+        body.light .zoom-group button:hover { background:#e2e8f0; }
+        .zoom-value { min-width:3.2rem; text-align:center; font-weight:600; font-size:0.9rem; }
+
+        #file-input { display:none; }
+
+        .preload-group {
+            display:flex; gap:0.4rem; flex-wrap:wrap; align-items:center;
+            background:#0d1117; padding:0.2rem 0.6rem 0.2rem 0.8rem;
+            border-radius:40px; border:1px solid #3d444d;
+        }
+        body.light .preload-group { background:#fff; border-color:#cbd5e1; }
+        .preload-group span { font-size:0.8rem; opacity:0.8; margin-right:0.2rem; white-space:nowrap; }
+        .preload-group button {
+            background:#21262d; border:1px solid #3d444d; color:#e6edf3;
+            padding:0.3rem 0.9rem; border-radius:30px;
+            font-size:0.8rem; font-weight:500; cursor:pointer;
+            transition:all 0.15s; white-space:nowrap;
+        }
+        body.light .preload-group button { background:#f1f5f9; border-color:#cbd5e1; color:#0f172a; }
+        .preload-group button:hover { background:#30363d; }
+        body.light .preload-group button:hover { background:#e2e8f0; }
+        .preload-group button.active { background:#1f6feb; border-color:#1f6feb; color:#fff; }
+
+        /* ---------- READING SPEED / VOICE ---------- */
+        .speech-controls {
+            display:flex; align-items:center; gap:0.35rem;
+            background:#0d1117; padding:0.2rem 0.6rem;
+            border-radius:40px; border:1px solid #3d444d;
+        }
+        body.light .speech-controls { background:#fff; border-color:#cbd5e1; }
+        .speech-controls label { font-size:0.75rem; opacity:0.75; white-space:nowrap; }
+        .speech-controls select {
+            background:transparent; color:inherit; border:none; font-size:0.8rem;
+            padding:0.25rem 0.3rem; outline:none; cursor:pointer; max-width:120px;
+        }
+        body.light .speech-controls select { color:#0f172a; }
+        .speech-controls select option { background:#21262d; color:#e6edf3; }
+        body.light .speech-controls select option { background:#fff; color:#0f172a; }
+        .speed-value { min-width:2.4rem; text-align:center; font-size:0.75rem; font-weight:600; }
+
+        /* ---------- MAIN AREA ---------- */
+        .main-area {
+            flex: 1; display: flex; flex-direction: row;
+            overflow: hidden;
+        }
+
+        /* sidebar: extracted text + spoken controls */
+        .speech-panel {
+            width: 340px; min-width: 260px; max-width: 420px;
+            background: #0d1117; color: #e6edf3;
+            border-right: 1px solid #30363d;
+            display: flex; flex-direction: column;
+            transition: background 0.2s, border-color 0.2s;
+        }
+        body.light .speech-panel { background:#fff; color:#0f172a; border-right-color:#cbd5e1; }
+
+        .speech-panel .panel-header {
+            padding: 0.8rem 1rem 0.6rem;
+            border-bottom: 1px solid #30363d;
+            display: flex; flex-direction: column; gap: 0.5rem;
+        }
+        body.light .speech-panel .panel-header { border-bottom-color:#cbd5e1; }
+        .speech-panel .panel-header h2 { font-size: 0.95rem; font-weight: 600; display:flex; align-items:center; gap:0.4rem; }
+
+        /* big play button */
+        .play-row {
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+        .play-btn {
+            flex: 1;
+            background: #238636; border: none; color: white;
+            padding: 0.7rem 1rem; border-radius: 40px;
+            font-size: 0.95rem; font-weight: 700; cursor: pointer;
+            display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
+            transition: all 0.15s; box-shadow: 0 4px 12px rgba(35,134,54,0.35);
+        }
+        .play-btn:hover { background:#2ea043; }
+        .play-btn:active { transform: scale(0.97); }
+        .play-btn.stop-mode { background:#da3633; box-shadow:0 4px 12px rgba(218,54,51,0.35); }
+        .play-btn.stop-mode:hover { background:#f85149; }
+
+        .speech-panel .panel-header .meta {
+            font-size: 0.75rem; opacity: 0.7; display: flex; justify-content: space-between;
+        }
+
+        /* the spoken text display */
+        .spoken-text {
+            flex: 1; overflow-y: auto; padding: 1rem 1.1rem;
+            font-size: 0.92rem; line-height: 1.65;
+            font-family: Georgia, 'Times New Roman', serif;
+            scroll-behavior: smooth;
+        }
+        .spoken-text .sentence {
+            display: inline; padding: 1px 0; transition: background 0.15s;
+            border-radius: 3px;
+        }
+        .spoken-text .sentence.active {
+            background: #1f6feb; color: white; box-shadow: 0 0 0 3px #1f6feb;
+            border-radius: 3px;
+        }
+        body.light .spoken-text .sentence.active { background:#1f6feb; color:#fff; }
+        .spoken-text .empty-hint {
+            opacity: 0.5; font-family: system-ui, sans-serif; font-size: 0.85rem;
+            line-height: 1.5; font-style: italic;
+        }
+
+        /* reader area */
+        .reader-container {
+            flex: 1; overflow-y: auto; overflow-x: auto;
+            padding: 1.5rem 1rem;
+            display: flex; flex-direction: column; align-items: center;
+            scroll-behavior: smooth; position: relative;
+            background: #1a1e24; transition: background 0.2s;
+        }
+        body.light .reader-container { background:#f2f4f8; }
+
+        #pdf-canvas {
+            display: block;
+            box-shadow: 0 20px 35px -8px rgba(0,0,0,0.7);
+            border-radius: 12px; transition: box-shadow 0.2s, filter 0.2s;
+            background: white; max-width: 100%; height: auto;
+        }
+        body.light #pdf-canvas { box-shadow: 0 20px 35px -8px rgba(0,0,0,0.2); }
+
+        .filter-sepia #pdf-canvas { filter: sepia(0.45) contrast(1.1) brightness(0.98); }
+        .filter-high-contrast #pdf-canvas { filter: contrast(1.6) brightness(1.05); }
+        .filter-invert #pdf-canvas { filter: invert(1) hue-rotate(180deg) contrast(1.1); }
+
+        .page-nav {
+            position: sticky; bottom: 1rem;
+            display: flex; gap: 0.7rem; align-items: center;
+            background: #0d1117ee; backdrop-filter: blur(12px);
+            padding: 0.45rem 1.1rem; border-radius: 60px;
+            border: 1px solid #30363d; color: #e6edf3;
+            margin-top: 1rem; font-weight: 500;
+            box-shadow: 0 10px 25px -10px black; z-index: 5;
+        }
+        body.light .page-nav { background:#ffffffdd; border-color:#cbd5e1; color:#0f172a; box-shadow:0 10px 25px -10px rgba(0,0,0,0.15); }
+        .page-nav button {
+            background:#21262d; border:1px solid #3d444d; color:#e6edf3;
+            padding:0.4rem 1rem; border-radius:40px; font-weight:600;
+            cursor:pointer; font-size:0.9rem;
+        }
+        body.light .page-nav button { background:#f1f5f9; border-color:#cbd5e1; color:#0f172a; }
+        .page-nav button:hover { background:#30363d; }
+        body.light .page-nav button:hover { background:#e2e8f0; }
+        .page-nav span { font-variant-numeric: tabular-nums; min-width:5.5rem; text-align:center; font-weight:600; }
+
+        .status-msg {
+            position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%);
+            background: #0d1117ee; backdrop-filter: blur(12px); color: white;
+            padding: 0.7rem 1.8rem; border-radius: 60px; font-weight: 500;
+            border: 1px solid #30363d; pointer-events: none;
+            opacity: 0; transition: opacity 0.2s; z-index: 100;
+            font-size: 0.9rem; box-shadow: 0 8px 20px rgba(0,0,0,0.5);
+            white-space: nowrap; max-width: 90vw; overflow: hidden; text-overflow: ellipsis;
+        }
+        body.light .status-msg { background:#ffffffdd; color:#0f172a; border-color:#cbd5e1; }
+        .status-msg.show { opacity: 1; }
+
+        /* responsive */
+        @media (max-width: 800px) {
+            .main-area { flex-direction: column-reverse; }
+            .speech-panel {
+                width: 100%; max-width: none; min-width: 0;
+                max-height: 40vh; border-right: none; border-top: 1px solid #30363d;
+            }
+            body.light .speech-panel { border-top-color:#cbd5e1; }
+            .spoken-text { font-size: 0.88rem; }
+            .preload-group span { display: none; }
+        }
+        @media (max-width: 600px) {
+            .toolbar { gap:0.35rem; padding:0.55rem; }
+            .toolbar button, .toolbar label, .file-input-label { padding:0.4rem 0.65rem; font-size:0.78rem; }
+            .zoom-group button { padding:0.3rem 0.5rem; }
+            .zoom-value { min-width:2.6rem; font-size:0.78rem; }
+            .speech-controls label { display:none; }
+            .speech-controls select { max-width:90px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ============ TOOLBAR ============ -->
+<div class="toolbar">
+    <input type="file" id="file-input" accept="application/pdf, .pdf" />
+    <label for="file-input" class="file-input-label" id="file-label">📄 Open PDF</label>
+
+    <div class="preload-group" id="preload-group">
+        <span>📚 built‑in:</span>
+        <button data-preload="0" id="preload-btn-0">📘 how to use</button>
+        <button data-preload="1" id="preload-btn-1">💖 love frequencies</button>
+        <button data-preload="2" id="preload-btn-2">💰 frugal money</button>
+    </div>
+
+    <div class="zoom-group">
+        <button id="zoom-out" title="Zoom out">−</button>
+        <span class="zoom-value" id="zoom-display">100%</span>
+        <button id="zoom-in" title="Zoom in">+</button>
+        <button id="zoom-reset" title="Reset zoom">↺</button>
+    </div>
+
+    <button id="filter-sepia" title="Sepia tone">🌙 Sepia</button>
+    <button id="filter-contrast" title="High contrast">◐ Contrast</button>
+    <button id="filter-invert" title="Dark mode (invert)">🌓 Invert</button>
+    <button id="filter-normal" title="Normal colors">☀️ Normal</button>
+    <button id="theme-toggle" title="Toggle light/dark UI">🌗 Theme</button>
+
+    <span class="spacer"></span>
+    <span id="page-indicator-toolbar" style="font-size:0.9rem; opacity:0.9;">— / —</span>
+</div>
+
+<!-- ============ MAIN ============ -->
+<div class="main-area">
+
+    <!-- LEFT: speech panel -->
+    <aside class="speech-panel">
+        <div class="panel-header">
+            <h2>🎧 Read to me</h2>
+            <div class="play-row">
+                <button class="play-btn" id="play-btn">▶ Read this page</button>
+                <button class="play-btn stop-mode" id="stop-btn" style="flex:0 0 auto; padding:0.7rem 0.9rem;" title="Stop">■</button>
+            </div>
+            <div class="meta">
+                <span id="sentence-count">—</span>
+                <span id="speech-status">idle</span>
+            </div>
+            <div class="speech-controls">
+                <label>Speed</label>
+                <button id="speed-down" style="background:transparent;border:none;color:inherit;cursor:pointer;font-size:1rem;">−</button>
+                <span class="speed-value" id="speed-display">1.0×</span>
+                <button id="speed-up" style="background:transparent;border:none;color:inherit;cursor:pointer;font-size:1rem;">+</button>
+                <label style="margin-left:0.4rem;">Voice</label>
+                <select id="voice-select"></select>
+            </div>
+        </div>
+        <div class="spoken-text" id="spoken-text">
+            <div class="empty-hint">Load a PDF, then press “Read this page”. The extracted text will appear here and each sentence will be highlighted as it is spoken aloud.</div>
+        </div>
+    </aside>
+
+    <!-- RIGHT: canvas -->
+    <div class="reader-container" id="reader-container">
+        <canvas id="pdf-canvas"></canvas>
+        <div class="page-nav">
+            <button id="prev-page" aria-label="Previous page">←</button>
+            <span id="page-indicator">1 / 1</span>
+            <button id="next-page" aria-label="Next page">→</button>
+        </div>
+    </div>
+</div>
+
+<div class="status-msg" id="status-msg"></div>
+
+<script>
+(function(){
+    // ================= PDF.js setup =================
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+
+    // ================= DOM =================
+    const canvas = document.getElementById('pdf-canvas');
+    const ctx = canvas.getContext('2d');
+    const fileInput = document.getElementById('file-input');
+    const fileLabel = document.getElementById('file-label');
+    const readerContainer = document.getElementById('reader-container');
+    const prevBtn = document.getElementById('prev-page');
+    const nextBtn = document.getElementById('next-page');
+    const pageIndicator = document.getElementById('page-indicator');
+    const pageIndicatorToolbar = document.getElementById('page-indicator-toolbar');
+    const zoomDisplay = document.getElementById('zoom-display');
+    const zoomInBtn = document.getElementById('zoom-in');
+    const zoomOutBtn = document.getElementById('zoom-out');
+    const zoomResetBtn = document.getElementById('zoom-reset');
+    const filterSepia = document.getElementById('filter-sepia');
+    const filterContrast = document.getElementById('filter-contrast');
+    const filterInvert = document.getElementById('filter-invert');
+    const filterNormal = document.getElementById('filter-normal');
+    const themeToggle = document.getElementById('theme-toggle');
+    const statusMsg = document.getElementById('status-msg');
+
+    // speech DOM
+    const playBtn = document.getElementById('play-btn');
+    const stopBtn = document.getElementById('stop-btn');
+    const spokenTextEl = document.getElementById('spoken-text');
+    const sentenceCountEl = document.getElementById('sentence-count');
+    const speechStatusEl = document.getElementById('speech-status');
+    const speedDisplay = document.getElementById('speed-display');
+    const speedUpBtn = document.getElementById('speed-up');
+    const speedDownBtn = document.getElementById('speed-down');
+    const voiceSelect = document.getElementById('voice-select');
+
+    // ================= state =================
+    let pdfDoc = null;
+    let currentPage = 1;
+    let totalPages = 1;
+    let currentScale = 1.0;
+    let currentPageRendering = false;
+    let pendingPage = null;
+    let currentFilter = 'normal';
+    let isLightTheme = false;
+
+    // preloaded PDFs
+    let preloadedPDFs = [null, null, null];
+    let preloadedNames = ['How to use this app', 'Love Frequencies Manual', 'Practical Frugal Money Guide'];
+    let preloadReady = false;
+
+    // ================= SPEECH ENGINE state =================
+    const synth = window.speechSynthesis;
+    let currentUtterance = null;
+    let isSpeaking = false;
+    let sentences = [];           // array of {text, index}
+    let sentenceEls = [];         // parallel array of DOM spans
+    let currentSentenceIdx = -1;
+    let speechRate = 1.0;
+    let availableVoices = [];
+    let selectedVoiceName = null;
+    let autoAdvancePage = true;    // when page finishes, go to next page and read it
+
+    // ================= helpers =================
+    function showMessage(text, isError = false) {
+        statusMsg.textContent = text;
+        statusMsg.style.borderColor = isError ? '#f85149' : '#30363d';
+        statusMsg.classList.add('show');
+        clearTimeout(window.msgTimeout);
+        window.msgTimeout = setTimeout(() => statusMsg.classList.remove('show'), 2800);
+    }
+
+    function updatePageUI() {
+        const indicator = `${currentPage} / ${totalPages}`;
+        pageIndicator.textContent = indicator;
+        pageIndicatorToolbar.textContent = indicator;
+    }
+    function updateZoomUI() { zoomDisplay.textContent = Math.round(currentScale * 100) + '%'; }
+
+    function applyFilter(filter) {
+        document.body.classList.remove('filter-sepia','filter-high-contrast','filter-invert');
+        if (filter === 'sepia') document.body.classList.add('filter-sepia');
+        else if (filter === 'contrast') document.body.classList.add('filter-high-contrast');
+        else if (filter === 'invert') document.body.classList.add('filter-invert');
+        currentFilter = filter;
+    }
+
+    function setSpeechStatus(s) { speechStatusEl.textContent = s; }
+
+    // ================= VOICE LOADING =================
+    function populateVoices() {
+        availableVoices = synth.getVoices();
+        voiceSelect.innerHTML = '';
+        if (!availableVoices.length) {
+            const opt = document.createElement('option');
+            opt.textContent = 'No voices found';
+            voiceSelect.appendChild(opt);
+            return;
+        }
+        availableVoices.forEach((v, i) => {
+            const opt = document.createElement('option');
+            opt.value = i;
+            opt.textContent = `${v.name} (${v.lang})`;
+            voiceSelect.appendChild(opt);
+        });
+        // keep previous selection if possible
+        if (selectedVoiceName) {
+            const idx = availableVoices.findIndex(v => v.name === selectedVoiceName);
+            if (idx >= 0) voiceSelect.value = idx;
+        } else {
+            // prefer an English voice
+            const enIdx = availableVoices.findIndex(v => v.lang && v.lang.toLowerCase().startsWith('en'));
+            voiceSelect.value = enIdx >= 0 ? enIdx : 0;
+        }
+    }
+    if (typeof speechSynthesis !== 'undefined') {
+        populateVoices();
+        speechSynthesis.onvoiceschanged = populateVoices;
+    }
+    voiceSelect.addEventListener('change', () => {
+        const v = availableVoices[parseInt(voiceSelect.value,10)];
+        if (v) selectedVoiceName = v.name;
+    });
+
+    // ================= SPEED =================
+    speedUpBtn.addEventListener('click', () => {
+        speechRate = Math.min(2.0, +(speechRate + 0.1).toFixed(1));
+        speedDisplay.textContent = speechRate.toFixed(1) + '×';
+        if (isSpeaking) { restartSpeechFromCurrentSentence(); }
+    });
+    speedDownBtn.addEventListener('click', () => {
+        speechRate = Math.max(0.5, +(speechRate - 0.1).toFixed(1));
+        speedDisplay.textContent = speechRate.toFixed(1) + '×';
+        if (isSpeaking) { restartSpeechFromCurrentSentence(); }
+    });
+
+    // ================= EXTRACT TEXT FROM PDF PAGE =================
+    async function extractPageText(pageNum) {
+        if (!pdfDoc) return '';
+        const page = await pdfDoc.getPage(pageNum);
+        const tc = await page.getTextContent();
+        // join text items with spaces, preserve reasonable reading order
+        let text = '';
+        let lastY = null;
+        tc.items.forEach(item => {
+            const str = item.str;
+            if (!str) return;
+            // simple heuristic: add space if there's a gap
+            if (text && !/\s$/.test(text) && !/^[.,;:!?)\]]/.test(str)) {
+                text += ' ';
+            }
+            text += str;
+        });
+        // normalize whitespace
+        text = text.replace(/\s+/g, ' ').trim();
+        return text;
+    }
+
+    // split into sentences (reasonable, handles Mr. / Dr. etc. loosely)
+    function splitIntoSentences(text) {
+        if (!text) return [];
+        // split on . ! ? followed by space or end, but avoid splitting abbreviations
+        const rough = text.match(/[^.!?]+[.!?]+(\s|$)|[^.!?]+$/g) || [text];
+        return rough.map(s => s.trim()).filter(s => s.length > 0);
+    }
+
+    // ================= DISPLAY SENTENCES IN PANEL =================
+    function displaySentences(sentenceArray) {
+        spokenTextEl.innerHTML = '';
+        sentenceEls = [];
+        if (!sentenceArray.length) {
+            const hint = document.createElement('div');
+            hint.className = 'empty-hint';
+            hint.textContent = 'No text found on this page. Try the next page.';
+            spokenTextEl.appendChild(hint);
+            sentenceCountEl.textContent = '0 sentences';
+            return;
+        }
+        sentenceArray.forEach((s, i) => {
+            const span = document.createElement('span');
+            span.className = 'sentence';
+            span.textContent = s + ' ';
+            span.dataset.idx = i;
+            spokenTextEl.appendChild(span);
+            sentenceEls.push(span);
+        });
+        sentenceCountEl.textContent = sentenceArray.length + ' sentence' + (sentenceArray.length === 1 ? '' : 's');
+        currentSentenceIdx = -1;
+    }
+
+    function highlightSentence(idx) {
+        sentenceEls.forEach(el => el.classList.remove('active'));
+        if (idx >= 0 && idx < sentenceEls.length) {
+            const el = sentenceEls[idx];
+            el.classList.add('active');
+            // scroll into view within panel
+            try {
+                el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+            } catch(e) { el.scrollIntoView(false); }
+        }
+        currentSentenceIdx = idx;
+    }
+
+    // ================= SPEAK SENTENCES =================
+    function speakFromIndex(startIdx) {
+        if (!synth) { showMessage('Speech synthesis not supported in this browser.', true); return; }
+        // cancel anything in progress
+        synth.cancel();
+        isSpeaking = true;
+        playBtn.textContent = '⏸ Stop reading';
+        playBtn.classList.add('stop-mode');
+        setSpeechStatus('speaking…');
+
+        const speakNext = (idx) => {
+            if (!isSpeaking) return;
+            if (idx >= sentences.length) {
+                // finished page
+                setSpeechStatus('page finished');
+                highlightSentence(-1);
+                if (autoAdvancePage && currentPage < totalPages) {
+                    showMessage('Page finished — moving to next page…');
+                    // small pause then advance
+                    setTimeout(async () => {
+                        if (!isSpeaking) return;
+                        await goToPageAndRead(currentPage + 1);
+                    }, 600);
+                } else {
+                    stopSpeakingUI();
+                }
+                return;
+            }
+            const sentenceText = sentences[idx].text;
+            const utter = new SpeechSynthesisUtterance(sentenceText);
+            utter.rate = speechRate;
+            // voice
+            if (selectedVoiceName) {
+                const v = availableVoices.find(v => v.name === selectedVoiceName);
+                if (v) utter.voice = v;
+            } else {
+                const v = availableVoices[parseInt(voiceSelect.value,10)];
+                if (v) utter.voice = v;
+            }
+            utter.onstart = () => {
+                highlightSentence(idx);
+                setSpeechStatus(`speaking sentence ${idx+1}/${sentences.length}`);
+            };
+            utter.onend = () => {
+                if (isSpeaking && currentSentenceIdx === idx) {
+                    speakNext(idx + 1);
+                }
+            };
+            utter.onerror = (e) => {
+                if (e.error === 'interrupted' || e.error === 'canceled') return;
+                console.warn('speech error', e);
+                if (isSpeaking) speakNext(idx + 1);
+            };
+            currentUtterance = utter;
+            synth.speak(utter);
+        };
+
+        speakNext(startIdx);
+    }
+
+    function stopSpeakingUI() {
+        isSpeaking = false;
+        playBtn.textContent = '▶ Read this page';
+        playBtn.classList.remove('stop-mode');
+        setSpeechStatus('idle');
+        highlightSentence(-1);
+        currentUtterance = null;
+    }
+
+    function stopSpeaking() {
+        if (synth) synth.cancel();
+        stopSpeakingUI();
+    }
+
+    function restartSpeechFromCurrentSentence() {
+        // restart from the current sentence index (or 0)
+        const idx = currentSentenceIdx >= 0 ? currentSentenceIdx : 0;
+        isSpeaking = true;
+        speakFromIndex(idx);
+    }
+
+    // ================= MAIN PLAY BUTTON =================
+    playBtn.addEventListener('click', async () => {
+        if (isSpeaking) {
+            stopSpeaking();
+            return;
+        }
+        if (!pdfDoc) {
+            showMessage('Please load a PDF first.', true);
+            return;
+        }
+        // make sure we have sentences for current page
+        if (!sentences.length) {
+            await prepareSpeechForCurrentPage();
+        }
+        if (sentences.length) {
+            speakFromIndex(0);
+        } else {
+            showMessage('No readable text found on this page.', true);
+        }
+    });
+
+    stopBtn.addEventListener('click', stopSpeaking);
+
+    // ================= PREPARE SPEECH FOR CURRENT PAGE =================
+    async function prepareSpeechForCurrentPage() {
+        setSpeechStatus('extracting text…');
+        const raw = await extractPageText(currentPage);
+        const arr = splitIntoSentences(raw);
+        sentences = arr.map((t, i) => ({ text: t, index: i }));
+        displaySentences(sentences.map(s => s.text));
+        return sentences;
+    }
+
+    // ================= GO TO PAGE AND (optionally) READ =================
+    async function goToPageAndRead(pageNum) {
+        if (pageNum < 1 || pageNum > totalPages) return;
+        stopSpeaking();
+        await renderPage(pageNum);
+        await prepareSpeechForCurrentPage();
+        // only auto-read if we were in speaking mode before the page turn
+        if (isSpeaking) {
+            // isSpeaking was reset by stop; so set it and start
+            isSpeaking = true;
+            speakFromIndex(0);
+        }
+    }
+
+    // ================= RENDER PAGE =================
+    async function renderPage(pageNum) {
+        if (!pdfDoc) return;
+        if (pageNum < 1 || pageNum > totalPages) return;
+        if (currentPageRendering) { pendingPage = pageNum; return; }
+        currentPageRendering = true;
+        try {
+            const page = await pdfDoc.getPage(pageNum);
+            const viewport = page.getViewport({ scale: currentScale });
+            canvas.width = viewport.width;
+            canvas.height = viewport.height;
+            await page.render({ canvasContext: ctx, viewport }).promise;
+            currentPage = pageNum;
+            updatePageUI();
+        } catch (err) {
+            console.error('render error', err);
+            showMessage('Error rendering page', true);
+        } finally {
+            currentPageRendering = false;
+            if (pendingPage !== null) {
+                const p = pendingPage;
+                pendingPage = null;
+                if (p !== currentPage) renderPage(p);
+            }
+        }
+    }
+
+    // ================= ZOOM =================
+    function changeZoom(factor) {
+        if (!pdfDoc) return;
+        let newScale = currentScale * factor;
+        newScale = Math.min(5.0, Math.max(0.25, newScale));
+        if (Math.abs(newScale - currentScale) < 0.001) return;
+        currentScale = newScale;
+        updateZoomUI();
+        renderPage(currentPage);
+    }
+    function resetZoom() {
+        if (!pdfDoc) return;
+        currentScale = 1.0; updateZoomUI(); renderPage(currentPage);
+    }
+
+    // ================= LOAD PDF =================
+    async function loadPDFFromArrayBuffer(arrayBuffer, displayName) {
+        stopSpeaking();
+        try {
+            showMessage('Loading PDF…');
+            const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+            pdfDoc = await loadingTask.promise;
+            totalPages = pdfDoc.numPages;
+            currentPage = 1;
+            if (displayName) fileLabel.textContent = '📄 ' + displayName.substring(0,22) + (displayName.length>22?'…':'');
+            updatePageUI();
+            await renderPage(1);
+            await prepareSpeechForCurrentPage();
+            showMessage('Ready: ' + totalPages + ' page' + (totalPages===1?'':'s') + '. Press “Read this page”.');
+        } catch (err) {
+            console.error(err);
+            showMessage('Failed to load PDF: ' + err.message, true);
+            pdfDoc = null; totalPages = 0; currentPage = 0;
+            updatePageUI(); ctx.clearRect(0,0,canvas.width,canvas.height);
+        }
+    }
+
+    function loadPDFFromFile(file) {
+        if (!file || (file.type !== 'application/pdf' && !file.name.endsWith('.pdf'))) {
+            showMessage('Please select a valid PDF file.', true); return;
+        }
+        const fr = new FileReader();
+        fr.onload = (e) => loadPDFFromArrayBuffer(e.target.result, file.name.replace(/\.pdf$/i,''));
+        fr.readAsArrayBuffer(file);
+    }
+
+    // ================= PRELOADED PDF GENERATION =================
+    async function generatePreloadedPDFs() {
+        const { jsPDF } = window.jspdf;
+        // shared helpers
+        const addText = (doc, text, x, y, opts={}) => {
+            const maxWidth = 170, lineHeight = opts.lineHeight || 6;
+            const split = doc.splitTextToSize(text, maxWidth);
+            let cy = y;
+            split.forEach(line => {
+                if (cy > 270) { doc.addPage(); cy = 20; }
+                doc.text(line, x, cy);
+                cy += lineHeight;
+            });
+            return cy;
+        };
+
+        // ---------- DOC 1 : HOW TO USE (now with reading instructions) ----------
+        {
+            const d = new jsPDF({ unit:'mm', format:'a4' });
+            let y = 20; const L = 20;
+            d.setFontSize(22); d.setFont('helvetica','bold');
+            y = addText(d, '✨ How to Use This App', L, y, { lineHeight: 10 }); y += 4;
+            d.setFontSize(11); d.setFont('helvetica','normal');
+            y = addText(d, 'Welcome. This app is a PDF reader that READS to you out loud. You can also read visually, but the super power is the voice. Here is how it works.', L, y); y += 6;
+
+            d.setFontSize(14); d.setFont('helvetica','bold');
+            y = addText(d, '🎧 The Read‑to‑Me Panel', L, y, { lineHeight: 8 }); y += 2;
+            d.setFontSize(11); d.setFont('helvetica','normal');
+            y = addText(d, 'On the left you will see a panel called "Read to me". When you load a PDF, the app extracts the text from the current page and splits it into sentences. Press the big green "Read this page" button and the app will speak each sentence aloud, highlighting the sentence currently being spoken.', L, y); y += 6;
+
+            d.setFontSize(14); d.setFont('helvetica','bold');
+            y = addText(d, '⏸ Stopping & Auto‑Advance', L, y, { lineHeight: 8 }); y += 2;
+            d.setFontSize(11); d.setFont('helvetica','normal');
+            y = addText(d, 'Press the red ■ button (or click the play button again) to stop. When a page finishes, the app automatically turns to the next page and keeps reading — you can just sit back and listen to an entire document.', L, y); y += 6;
+
+            d.setFontSize(14); d.setFont('helvetica','bold');
+            y = addText(d, '⚡ Speed & Voice', L, y, { lineHeight: 8 }); y += 2;
+            d.setFontSize(11); d.setFont('helvetica','normal');
+            y = addText(d, 'Use the − and + buttons next to "Speed" to slow down or speed up the voice. Use the voice dropdown to pick any voice installed on your device (male, female, different accents). The app remembers your choice.', L, y); y += 6;
+
+            d.setFontSize(14); d.setFont('helvetica','bold');
+            y = addText(d, '📂 Loading Your Own PDFs', L, y, { lineHeight: 8 }); y += 2;
+            d.setFontSize(11); d.setFont('helvetica','normal');
+            y = addText(d, 'Click "Open PDF" or drag‑and‑drop a file onto the reading area. The app will extract text and make it read aloud just like the built‑in documents. Note: scanned PDFs (images of text) may not have extractable text.', L, y); y += 6;
+
+            d.setFontSize(14); d.setFont('helvetica','bold');
+            y = addText(d, '📖 Reading the traditional way', L, y, { lineHeight: 8 }); y += 2;
+            d.setFontSize(11); d.setFont('helvetica','normal');
+            y = addText(d, 'The right side shows the actual PDF page. You can zoom with the toolbar buttons or +/− keys, flip pages with the arrows or the ← → keys, and change colors with the Sepia / Contrast / Invert filters. The 🌗 Theme button flips the app between dark and light.', L, y); y += 6;
+
+            d.setFontSize(10); d.setFont('helvetica','italic');
+            addText(d, '— Now press "Read this page" and listen. —', L, y + 4);
+
+            preloadedPDFs[0] = d.output('arraybuffer');
+        }
+
+        // ---------- DOC 2 : LOVE FREQUENCIES ----------
+        {
+            const d = new jsPDF({ unit:'mm', format:'a4' });
+            let y = 20; const L = 20;
+            d.setFontSize(22); d.setFont('helvetica','bold');
+            y = addText(d, '💖 Attracting Love Frequencies', L, y, { lineHeight: 10 }); y += 2;
+            d.setFontSize(12); d.setFont('helvetica','italic');
+            y = addText(d, 'A morning manual for a positive, loving day', L, y); y += 8;
+
+            d.setFontSize(11); d.setFont('helvetica','normal');
+            y = addText(d, 'Love is not something you chase. It is a frequency you tune into. When you start the day in a high vibration state, you naturally attract kindness, connection, and warmth. This manual offers simple, practical steps to raise your love frequency from the moment you wake up.', L, y); y += 6;
+
+            const sections = [
+                ['1. The first three minutes', 'Before you check your phone, place a hand on your heart. Take three slow breaths. With each exhale, silently say: I am love. I am loved. This anchors your nervous system in safety and opens your heart space.'],
+                ['2. Gratitude for the invisible', 'Think of three things you are grateful for that you cannot see: a memory of kindness, a future possibility, the air you breathe. Gratitude is the fastest way to shift your frequency toward love.'],
+                ['3. Speak to yourself as you would to a lover', 'Your inner dialogue sets your outer reality. Replace "I am not enough" with "I am becoming everything I need." Replace "I am alone" with "I am connected to all that is." Your words are frequencies.'],
+                ['4. A small act of kindness', 'Before noon, do one tiny thing for someone else: hold a door, send a kind message, smile at a stranger. Love multiplies when it moves through you.'],
+                ['5. Protect your energy', 'Notice what drains you. Social media? The news? A conversation that leaves you heavy? You are allowed to step away. Love frequencies require a clean inner atmosphere.'],
+                ['6. End the day with a love inventory', 'Before sleep, recall three moments of love you gave or received. Let that feeling fill your chest. Sleep in that frequency.']
+            ];
+            sections.forEach(([title, body]) => {
+                d.setFontSize(14); d.setFont('helvetica','bold');
+                y = addText(d, title, L, y, { lineHeight: 8 }); y += 2;
+                d.setFontSize(11); d.setFont('helvetica','normal');
+                y = addText(d, body, L, y); y += 6;
+            });
+
+            d.setFontSize(10); d.setFont('helvetica','italic');
+            addText(d, 'Remember: you are not attracting love — you are becoming love. The world mirrors your frequency.', L, y + 4);
+
+            preloadedPDFs[1] = d.output('arraybuffer');
+        }
+
+        // ---------- DOC 3 : FRUGAL MONEY ----------
+        {
+            const d = new jsPDF({ unit:'mm', format:'a4' });
+            let y = 20; const L = 20;
+            d.setFontSize(22); d.setFont('helvetica','bold');
+            y = addText(d, '💰 The Frugal Path', L, y, { lineHeight: 10 }); y += 2;
+            d.setFontSize(12); d.setFont('helvetica','italic');
+            y = addText(d, 'A practical money guide for today’s consumer', L, y); y += 8;
+
+            d.setFontSize(11); d.setFont('helvetica','normal');
+            y = addText(d, 'Consumer culture tells you that more is better. Frugality tells you that enough is freedom. This guide is not about deprivation. It is about intentional spending. Here are practical, tested steps to keep more of what you earn and align your spending with your values.', L, y); y += 6;
+
+            const sections = [
+                ['1. Track every dollar for 30 days', 'You cannot change what you do not see. Use a notebook or a free app. Write down every purchase, no matter how small. At the end of the month, highlight the expenses that brought you joy and those that did not. Most people find 20 to 30 percent of spending is leakage.'],
+                ['2. The 24‑hour rule', 'For any non essential purchase over a small threshold, say 20 dollars, wait 24 hours before buying. This simple pause eliminates most impulse buys. If you still want it the next day, consider it, but often the urge fades.'],
+                ['3. Cook at home (and actually enjoy it)', 'Eating out is one of the biggest budget leaks. Learn five simple meals you love. Buy ingredients in bulk. Invest in a slow cooker. The savings can be hundreds per month, and the health benefits are real.'],
+                ['4. Cancel unused subscriptions', 'Go through your bank statements and list every recurring charge. Ask yourself: did I use this last month? If not, cancel it. The average person wastes over 200 dollars per year on forgotten subscriptions.'],
+                ['5. Buy used first', 'Before buying new, check second hand marketplaces, thrift stores, or library sales. For furniture, books, tools, and even clothing, used is often just as good and sometimes better quality. This also keeps items out of landfills.'],
+                ['6. Automate your savings', 'Set up an automatic transfer to a savings account the day after payday. Even 20 dollars per week adds up. You cannot spend what you do not see. This is the easiest way to build a buffer.'],
+                ['7. Embrace free entertainment', 'Libraries, parks, hiking, community events, free museum days, board games with friends. There is an abundance of joy that costs nothing. Reclaim the simple pleasures that consumer culture has overshadowed.']
+            ];
+            sections.forEach(([title, body]) => {
+                d.setFontSize(14); d.setFont('helvetica','bold');
+                y = addText(d, title, L, y, { lineHeight: 8 }); y += 2;
+                d.setFontSize(11); d.setFont('helvetica','normal');
+                y = addText(d, body, L, y); y += 6;
+            });
+
+            d.setFontSize(10); d.setFont('helvetica','italic');
+            addText(d, 'Frugality is not about saying no to everything. It is about saying yes to what matters most.', L, y + 4);
+
+            preloadedPDFs[2] = d.output('arraybuffer');
+        }
+
+        preloadReady = true;
+        showMessage('3 built‑in documents ready — press “Read this page” to hear them.', false);
+    }
+
+    async function loadPreloaded(index) {
+        if (!preloadReady) { showMessage('Built‑in PDFs still generating…', true); return; }
+        if (index < 0 || index > 2) return;
+        document.querySelectorAll('.preload-group button').forEach(b => b.classList.remove('active'));
+        const activeBtn = document.getElementById('preload-btn-' + index);
+        if (activeBtn) activeBtn.classList.add('active');
+        const ab = preloadedPDFs[index];
+        if (!ab) { showMessage('Error: PDF not generated.', true); return; }
+        await loadPDFFromArrayBuffer(ab, preloadedNames[index]);
+    }
+
+    // ================= INIT =================
+    (async function init() {
+        // placeholder canvas
+        canvas.width = 600; canvas.height = 400;
+        ctx.fillStyle = '#2d333b'; ctx.fillRect(0,0,600,400);
+        ctx.font = 'bold 22px system-ui, sans-serif';
+        ctx.fillStyle = '#8b949e'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+        ctx.fillText('📖 Preparing your library…', 300, 200);
+        updatePageUI(); updateZoomUI(); applyFilter('normal');
+        speedDisplay.textContent = '1.0×';
+
+        try {
+            await generatePreloadedPDFs();
+            await loadPreloaded(0);
+        } catch (e) {
+            console.error(e);
+            showMessage('Could not generate built‑in PDFs.', true);
+        }
+    })();
+
+    // ================= EVENTS =================
+    document.querySelectorAll('.preload-group button').forEach(btn => {
+        btn.addEventListener('click', (e) => loadPreloaded(parseInt(e.currentTarget.dataset.preload,10)));
+    });
+
+    fileInput.addEventListener('change', (e) => {
+        const f = e.target.files[0];
+        if (f) {
+            document.querySelectorAll('.preload-group button').forEach(b => b.classList.remove('active'));
+            loadPDFFromFile(f);
+        }
+        fileInput.value = '';
+    });
+
+    prevBtn.addEventListener('click', async () => {
+        if (pdfDoc && currentPage > 1) {
+            const wasSpeaking = isSpeaking;
+            stopSpeaking();
+            await renderPage(currentPage - 1);
+            await prepareSpeechForCurrentPage();
+            if (wasSpeaking) { isSpeaking = true; speakFromIndex(0); }
+        }
+    });
+    nextBtn.addEventListener('click', async () => {
+        if (pdfDoc && currentPage < totalPages) {
+            const wasSpeaking = isSpeaking;
+            stopSpeaking();
+            await renderPage(currentPage + 1);
+            await prepareSpeechForCurrentPage();
+            if (wasSpeaking) { isSpeaking = true; speakFromIndex(0); }
+        }
+    });
+
+    window.addEventListener('keydown', (e) => {
+        if (!pdfDoc) return;
+        if (e.key === 'ArrowLeft') { e.preventDefault(); if (currentPage > 1) { const s = isSpeaking; stopSpeaking(); renderPage(currentPage-1).then(()=>prepareSpeechForCurrentPage()).then(()=>{ if(s){isSpeaking=true;speakFromIndex(0);} }); } }
+        else if (e.key === 'ArrowRight') { e.preventDefault(); if (currentPage < totalPages) { const s = isSpeaking; stopSpeaking(); renderPage(currentPage+1).then(()=>prepareSpeechForCurrentPage()).then(()=>{ if(s){isSpeaking=true;speakFromIndex(0);} }); } }
+        else if (e.key === '+' || e.key === '=') { e.preventDefault(); changeZoom(1.15); }
+        else if (e.key === '-') { e.preventDefault(); changeZoom(1/1.15); }
+        else if (e.key === '0') { e.preventDefault(); resetZoom(); }
+        else if (e.key === ' ') { e.preventDefault(); playBtn.click(); }
+    });
+
+    zoomInBtn.addEventListener('click', () => changeZoom(1.15));
+    zoomOutBtn.addEventListener('click', () => changeZoom(1/1.15));
+    zoomResetBtn.addEventListener('click', resetZoom);
+
+    filterSepia.addEventListener('click', () => applyFilter('sepia'));
+    filterContrast.addEventListener('click', () => applyFilter('contrast'));
+    filterInvert.addEventListener('click', () => applyFilter('invert'));
+    filterNormal.addEventListener('click', () => applyFilter('normal'));
+
+    themeToggle.addEventListener('click', () => {
+        isLightTheme = !isLightTheme;
+        document.body.classList.toggle('light', isLightTheme);
+    });
+
+    // drag & drop
+    readerContainer.addEventListener('dragover', (e) => { e.preventDefault(); readerContainer.style.opacity='0.8'; });
+    readerContainer.addEventListener('dragleave', () => { readerContainer.style.opacity='1'; });
+    readerContainer.addEventListener('drop', (e) => {
+        e.preventDefault(); readerContainer.style.opacity='1';
+        const f = e.dataTransfer.files[0];
+        if (f) { document.querySelectorAll('.preload-group button').forEach(b => b.classList.remove('active')); loadPDFFromFile(f); }
+    });
+    window.addEventListener('dragover', (e) => e.preventDefault());
+    window.addEventListener('drop', (e) => e.preventDefault());
+
+    // stop speech if tab closes
+    window.addEventListener('beforeunload', () => { if (synth) synth.cancel(); });
+})();
+</script>
+</body>
+</html>
