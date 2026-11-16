@@ -3,291 +3,219 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-<title>✨ the greatest PDF reader · ever · big‑file edition</title>
+<title>📖 Forbidden Knowledge 2026</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
         font-family: system-ui, 'Segoe UI', Roboto, sans-serif;
         background: #1a1e24; display: flex; flex-direction: column;
         height: 100vh; overflow: hidden; transition: background 0.2s;
+        user-select: none; -webkit-user-select: none; /* Prevents text highlighting on triple tap */
     }
     body.light { background: #f2f4f8; }
 
-    /* ---------- TOOLBAR ---------- */
+    /* ---------- CLEAN TOOLBAR ---------- */
     .toolbar {
-        display:flex; flex-wrap:wrap; align-items:center; gap:0.55rem;
-        padding:0.7rem 1rem; background:#0d1117; color:#e6edf3;
-        border-bottom:1px solid #30363d; box-shadow:0 4px 12px rgba(0,0,0,0.3);
-        z-index:10; transition:background 0.2s, border-color 0.2s;
+        display: flex; align-items: center; justify-content: space-between;
+        padding: 0.6rem 1rem; background: #0d1117; color: #e6edf3;
+        border-bottom: 1px solid #30363d; z-index: 10;
     }
-    body.light .toolbar { background:#fff; color:#1e293b; border-bottom-color:#cbd5e1; }
-    .toolbar button, .toolbar label, .toolbar .file-input-label {
-        background:#21262d; border:1px solid #3d444d; color:#e6edf3;
-        padding:0.5rem 0.9rem; border-radius:40px; font-size:0.9rem;
-        font-weight:500; cursor:pointer; display:inline-flex; align-items:center;
-        gap:0.4rem; transition:all 0.15s; white-space:nowrap; line-height:1.2;
+    body.light .toolbar { background: #fff; color: #1e293b; border-bottom-color: #cbd5e1; }
+    
+    .toolbar-title { font-weight: 700; font-size: 1rem; letter-spacing: 0.5px; }
+    
+    .toolbar-controls { display: flex; gap: 0.4rem; align-items: center; }
+    
+    .toolbar button {
+        background: #21262d; border: 1px solid #3d444d; color: #e6edf3;
+        padding: 0.4rem 0.7rem; border-radius: 8px; font-size: 0.8rem;
+        cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 0.3rem;
     }
-    body.light .toolbar button, body.light .toolbar label, body.light .toolbar .file-input-label {
-        background:#f1f5f9; border-color:#cbd5e1; color:#0f172a;
-    }
-    .toolbar button:hover, .toolbar label:hover, .toolbar .file-input-label:hover { background:#30363d; border-color:#6e7681; }
-    body.light .toolbar button:hover, body.light .toolbar label:hover { background:#e2e8f0; border-color:#94a3b8; }
-    .toolbar button:active { transform:scale(0.96); }
-    .toolbar .spacer { flex:1; }
-
-    .zoom-group {
-        display:flex; align-items:center; gap:0.25rem;
-        background:#0d1117; border-radius:40px; padding:0.15rem; border:1px solid #3d444d;
-    }
-    body.light .zoom-group { background:#fff; border-color:#cbd5e1; }
-    .zoom-group button { border:none; background:transparent; padding:0.4rem 0.8rem; border-radius:30px; }
-    .zoom-group button:hover { background:#30363d; }
-    body.light .zoom-group button:hover { background:#e2e8f0; }
-    .zoom-value { min-width:3.2rem; text-align:center; font-weight:600; font-size:0.9rem; }
-
-    #file-input { display:none; }
-
-    .preload-group {
-        display:flex; gap:0.4rem; flex-wrap:wrap; align-items:center;
-        background:#0d1117; padding:0.2rem 0.6rem 0.2rem 0.8rem;
-        border-radius:40px; border:1px solid #3d444d;
-    }
-    body.light .preload-group { background:#fff; border-color:#cbd5e1; }
-    .preload-group span { font-size:0.8rem; opacity:0.8; margin-right:0.2rem; white-space:nowrap; }
-    .preload-group button {
-        background:#21262d; border:1px solid #3d444d; color:#e6edf3;
-        padding:0.3rem 0.9rem; border-radius:30px; font-size:0.8rem;
-        font-weight:500; cursor:pointer; transition:all 0.15s; white-space:nowrap;
-    }
-    body.light .preload-group button { background:#f1f5f9; border-color:#cbd5e1; color:#0f172a; }
-    .preload-group button:hover { background:#30363d; }
-    body.light .preload-group button:hover { background:#e2e8f0; }
-    .preload-group button.active { background:#1f6feb; border-color:#1f6feb; color:#fff; }
-
-    /* ---------- MAIN ---------- */
-    .main-area { flex:1; display:flex; flex-direction:row; overflow:hidden; }
-
-    .speech-panel {
-        width:340px; min-width:260px; max-width:420px;
-        background:#0d1117; color:#e6edf3;
-        border-right:1px solid #30363d;
-        display:flex; flex-direction:column;
-    }
-    body.light .speech-panel { background:#fff; color:#0f172a; border-right-color:#cbd5e1; }
-    .speech-panel .panel-header {
-        padding:0.8rem 1rem 0.6rem; border-bottom:1px solid #30363d;
-        display:flex; flex-direction:column; gap:0.5rem;
-    }
-    body.light .speech-panel .panel-header { border-bottom-color:#cbd5e1; }
-    .speech-panel .panel-header h2 { font-size:0.95rem; font-weight:600; display:flex; align-items:center; gap:0.4rem; }
-    .play-row { display:flex; align-items:center; gap:0.5rem; }
-    .play-btn {
-        flex:1; background:#238636; border:none; color:white;
-        padding:0.7rem 1rem; border-radius:40px; font-size:0.95rem; font-weight:700;
-        cursor:pointer; display:inline-flex; align-items:center; justify-content:center;
-        gap:0.4rem; transition:all 0.15s; box-shadow:0 4px 12px rgba(35,134,54,0.35);
-    }
-    .play-btn:hover { background:#2ea043; }
-    .play-btn:active { transform:scale(0.97); }
-    .play-btn.stop-mode { background:#da3633; box-shadow:0 4px 12px rgba(218,54,51,0.35); }
-    .play-btn.stop-mode:hover { background:#f85149; }
-    .play-btn:disabled { background:#30363d; box-shadow:none; cursor:not-allowed; opacity:0.6; }
-    .speech-panel .panel-header .meta {
-        font-size:0.75rem; opacity:0.7; display:flex; justify-content:space-between;
-    }
-    .spoken-text {
-        flex:1; overflow-y:auto; padding:1rem 1.1rem;
-        font-size:0.92rem; line-height:1.65;
-        font-family: Georgia, 'Times New Roman', serif; scroll-behavior:smooth;
-    }
-    .spoken-text .sentence {
-        display:inline; padding:1px 0; transition:background 0.15s; border-radius:3px;
-    }
-    .spoken-text .sentence.active { background:#1f6feb; color:white; box-shadow:0 0 0 3px #1f6feb; }
-    .spoken-text .empty-hint {
-        opacity:0.55; font-family:system-ui,sans-serif; font-size:0.85rem;
-        line-height:1.55; font-style:italic;
-    }
-    .speech-controls {
-        display:flex; align-items:center; gap:0.35rem;
-        background:#0d1117; padding:0.2rem 0.6rem;
-        border-radius:40px; border:1px solid #3d444d;
-    }
-    body.light .speech-controls { background:#fff; border-color:#cbd5e1; }
-    .speech-controls label { font-size:0.75rem; opacity:0.75; white-space:nowrap; }
-    .speech-controls select {
-        background:transparent; color:inherit; border:none; font-size:0.8rem;
-        padding:0.25rem 0.3rem; outline:none; cursor:pointer; max-width:120px;
-    }
-    body.light .speech-controls select { color:#0f172a; }
-    .speech-controls select option { background:#21262d; color:#e6edf3; }
-    body.light .speech-controls select option { background:#fff; color:#0f172a; }
-    .speed-value { min-width:2.4rem; text-align:center; font-size:0.75rem; font-weight:600; }
-
+    body.light .toolbar button { background: #f1f5f9; border-color: #cbd5e1; color: #0f172a; }
+    .toolbar button:hover { background: #30363d; }
+    body.light .toolbar button:hover { background: #e2e8f0; }
+    
+    /* ---------- MAIN LAYOUT ---------- */
+    .main-area { flex: 1; display: flex; flex-direction: row; overflow: hidden; }
+    
+    /* Reader Canvas */
     .reader-container {
-        flex:1; overflow-y:auto; overflow-x:auto; padding:1.5rem 1rem;
-        display:flex; flex-direction:column; align-items:center;
-        scroll-behavior:smooth; position:relative;
-        background:#1a1e24; transition:background 0.2s;
+        flex: 1; overflow-y: auto; overflow-x: auto; padding: 1.5rem;
+        display: flex; flex-direction: column; align-items: center;
+        position: relative; background: #1a1e24; transition: background 0.2s;
     }
-    body.light .reader-container { background:#f2f4f8; }
-
+    body.light .reader-container { background: #f2f4f8; }
     #pdf-canvas {
-        display:block; box-shadow:0 20px 35px -8px rgba(0,0,0,0.7);
-        border-radius:12px; transition:box-shadow 0.2s, filter 0.2s;
-        background:white; max-width:100%; height:auto;
+        display: block; box-shadow: 0 10px 30px -5px rgba(0,0,0,0.5);
+        border-radius: 4px; background: white; max-width: 100%; height: auto;
     }
-    body.light #pdf-canvas { box-shadow:0 20px 35px -8px rgba(0,0,0,0.2); }
 
-    .filter-sepia #pdf-canvas { filter:sepia(0.45) contrast(1.1) brightness(0.98); }
-    .filter-high-contrast #pdf-canvas { filter:contrast(1.6) brightness(1.05); }
-    .filter-invert #pdf-canvas { filter:invert(1) hue-rotate(180deg) contrast(1.1); }
+    /* ---------- HUGE FLOATING READ BUTTON ---------- */
+    .big-play-container {
+        position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%);
+        z-index: 20; display: flex; gap: 1rem;
+    }
+    .big-play-btn {
+        background: #238636; color: white; border: none;
+        padding: 1.2rem 2.5rem; border-radius: 60px;
+        font-size: 1.4rem; font-weight: 800; cursor: pointer;
+        box-shadow: 0 10px 25px rgba(35,134,54,0.5);
+        display: flex; align-items: center; gap: 0.8rem;
+        transition: transform 0.1s, background 0.2s;
+    }
+    .big-play-btn:hover { background: #2ea043; transform: scale(1.05); }
+    .big-play-btn:active { transform: scale(0.95); }
+    .big-play-btn.stop-mode { background: #da3633; box-shadow: 0 10px 25px rgba(218,54,51,0.5); }
+    
+    /* ---------- SIDE TEXT PANEL (for transcription) ---------- */
+    .speech-panel {
+        width: 300px; background: #0d1117; color: #e6edf3;
+        border-left: 1px solid #30363d; display: flex; flex-direction: column;
+        transition: transform 0.3s ease;
+    }
+    body.light .speech-panel { background: #fff; color: #0f172a; border-left-color: #cbd5e1; }
+    .speech-panel.hidden { transform: translateX(100%); position: absolute; right: 0; height: 100%; }
+    
+    .speech-header { padding: 1rem; border-bottom: 1px solid #30363d; display: flex; justify-content: space-between; align-items: center; }
+    body.light .speech-header { border-bottom-color: #cbd5e1; }
+    .speech-header h2 { font-size: 0.9rem; font-weight: 600; opacity: 0.8; }
+    
+    .spoken-text {
+        flex: 1; overflow-y: auto; padding: 1rem;
+        font-family: Georgia, serif; font-size: 0.95rem; line-height: 1.6;
+    }
+    .spoken-text .sentence { display: inline; padding: 2px 0; border-radius: 4px; transition: background 0.2s; }
+    .spoken-text .sentence.active { background: #1f6feb; color: white; }
 
-    .page-nav {
-        position:sticky; bottom:1rem; display:flex; gap:0.7rem; align-items:center;
-        background:#0d1117ee; backdrop-filter:blur(12px);
-        padding:0.45rem 1.1rem; border-radius:60px; border:1px solid #30363d;
-        color:#e6edf3; margin-top:1rem; font-weight:500;
-        box-shadow:0 10px 25px -10px black; z-index:5;
+    /* ---------- GAME MODAL ---------- */
+    .modal-overlay {
+        position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px);
+        display: flex; align-items: center; justify-content: center;
+        z-index: 1000; opacity: 0; pointer-events: none; transition: opacity 0.3s;
     }
-    body.light .page-nav { background:#ffffffdd; border-color:#cbd5e1; color:#0f172a; }
-    .page-nav button {
-        background:#21262d; border:1px solid #3d444d; color:#e6edf3;
-        padding:0.4rem 1rem; border-radius:40px; font-weight:600;
-        cursor:pointer; font-size:0.9rem;
+    .modal-overlay.show { opacity: 1; pointer-events: auto; }
+    
+    .game-menu {
+        background: #21262d; border: 1px solid #30363d; border-radius: 16px;
+        padding: 2rem; width: 90%; max-width: 400px; text-align: center;
+        box-shadow: 0 20px 40px rgba(0,0,0,0.6); transform: translateY(20px); transition: transform 0.3s;
     }
-    body.light .page-nav button { background:#f1f5f9; border-color:#cbd5e1; color:#0f172a; }
-    .page-nav button:hover { background:#30363d; }
-    body.light .page-nav button:hover { background:#e2e8f0; }
-    .page-nav span { font-variant-numeric:tabular-nums; min-width:5.5rem; text-align:center; font-weight:600; }
+    .modal-overlay.show .game-menu { transform: translateY(0); }
+    
+    .game-menu h2 { color: #e6edf3; margin-bottom: 0.5rem; font-size: 1.5rem; }
+    .game-menu p { color: #8b949e; font-size: 0.9rem; margin-bottom: 1.5rem; }
+    
+    .game-btn {
+        display: block; width: 100%; padding: 1rem; margin-bottom: 0.8rem;
+        background: #30363d; color: #e6edf3; border: 1px solid #3d444d;
+        border-radius: 12px; font-size: 1rem; font-weight: 600; cursor: pointer;
+        transition: all 0.15s;
+    }
+    .game-btn:hover { background: #3d444d; transform: scale(1.02); }
+    .close-modal { background: #da3633; color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 30px; cursor: pointer; margin-top: 1rem; font-weight: bold; }
+    
+    /* Game Arena */
+    .game-arena { display: none; width: 100%; }
+    .game-arena.active { display: block; }
+    
+    /* Game 1: Reaction */
+    #reaction-box { width: 100%; height: 200px; border-radius: 12px; background: #da3633; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.1s; }
+    #reaction-box.ready { background: #238636; }
+    #reaction-text { color: white; font-size: 1.2rem; font-weight: bold; text-align: center; }
+    
+    /* Game 2: Memory */
+    .memory-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 1rem; }
+    .memory-card { aspect-ratio: 1; background: #30363d; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 2rem; cursor: pointer; transition: background 0.2s; }
+    .memory-card.flipped { background: #1f6feb; }
+    .memory-card.matched { background: #238636; cursor: default; }
+    
+    /* Game 3: Word Scramble */
+    .scramble-word { font-size: 2rem; font-weight: bold; color: #e6edf3; letter-spacing: 5px; margin-bottom: 1rem; text-transform: uppercase; }
+    #scramble-input { width: 100%; padding: 0.8rem; border-radius: 8px; border: none; background: #30363d; color: white; font-size: 1.2rem; text-align: center; margin-bottom: 1rem; outline: none; }
+    #scramble-submit { background: #1f6feb; color: white; border: none; padding: 0.8rem; width: 100%; border-radius: 8px; font-weight: bold; cursor: pointer; }
 
-    .status-msg {
-        position:fixed; bottom:1.5rem; left:50%; transform:translateX(-50%);
-        background:#0d1117ee; backdrop-filter:blur(12px); color:white;
-        padding:0.7rem 1.8rem; border-radius:60px; font-weight:500;
-        border:1px solid #30363d; pointer-events:none; opacity:0;
-        transition:opacity 0.2s; z-index:100; font-size:0.9rem;
-        box-shadow:0 8px 20px rgba(0,0,0,0.5); white-space:nowrap;
-        max-width:90vw; overflow:hidden; text-overflow:ellipsis;
-    }
-    body.light .status-msg { background:#ffffffdd; color:#0f172a; border-color:#cbd5e1; }
-    .status-msg.show { opacity:1; }
-
-    /* loading overlay */
-    .loading-overlay {
-        position:fixed; inset:0; background:#0d1117ee; backdrop-filter:blur(6px);
-        display:flex; flex-direction:column; align-items:center; justify-content:center;
-        z-index:200; color:#e6edf3; gap:1.2rem; padding:2rem;
-        transition:opacity 0.3s; text-align:center;
-    }
-    .loading-overlay.hidden { opacity:0; pointer-events:none; }
-    .spinner {
-        width:60px; height:60px; border:5px solid rgba(255,255,255,0.15);
-        border-top-color:#1f6feb; border-radius:50%; animation:spin 0.9s linear infinite;
-    }
-    @keyframes spin { to { transform:rotate(360deg); } }
-    .loading-overlay h3 { font-size:1.2rem; font-weight:600; }
-    .loading-overlay p { font-size:0.9rem; opacity:0.8; max-width:400px; line-height:1.5; }
-    .loading-overlay .progress-text { font-size:0.85rem; opacity:0.9; font-variant-numeric:tabular-nums; }
-    .loading-overlay button {
-        background:#21262d; border:1px solid #3d444d; color:#e6edf3;
-        padding:0.6rem 1.4rem; border-radius:40px; font-weight:600;
-        cursor:pointer; font-size:0.9rem; margin-top:0.5rem;
-    }
-    .loading-overlay button:hover { background:#30363d; }
-
-    @media (max-width:800px) {
-        .main-area { flex-direction:column-reverse; }
-        .speech-panel { width:100%; max-width:none; min-width:0; max-height:40vh; border-right:none; border-top:1px solid #30363d; }
-        body.light .speech-panel { border-top-color:#cbd5e1; }
-        .spoken-text { font-size:0.88rem; }
-        .preload-group span { display:none; }
-    }
-    @media (max-width:600px) {
-        .toolbar { gap:0.35rem; padding:0.55rem; }
-        .toolbar button, .toolbar label, .file-input-label { padding:0.4rem 0.65rem; font-size:0.78rem; }
-        .zoom-group button { padding:0.3rem 0.5rem; }
-        .zoom-value { min-width:2.6rem; font-size:0.78rem; }
-        .speech-controls label { display:none; }
-        .speech-controls select { max-width:90px; }
+    /* ---------- MOBILE RESPONSIVENESS ---------- */
+    @media (max-width: 700px) {
+        .main-area { flex-direction: column; }
+        .speech-panel { width: 100%; height: 200px; border-left: none; border-top: 1px solid #30363d; }
+        body.light .speech-panel { border-top-color: #cbd5e1; }
+        .big-play-btn { padding: 1rem 2rem; font-size: 1.2rem; }
+        .toolbar-title { display: none; }
     }
 </style>
 </head>
 <body>
 
+<!-- CLEAN TOOLBAR -->
 <div class="toolbar">
-    <input type="file" id="file-input" accept="application/pdf, .pdf" />
-    <label for="file-input" class="file-input-label" id="file-label">📄 Open PDF</label>
-
-    <div class="preload-group" id="preload-group">
-        <span>📚 built‑in:</span>
-        <button data-preload="0" id="preload-btn-0">📘 how to use</button>
-        <button data-preload="1" id="preload-btn-1">📕 Forbidden Knowledge</button>
+    <div class="toolbar-title">📖 Forbidden Knowledge</div>
+    <div class="toolbar-controls">
+        <button id="toggle-text-btn">📝 Text</button>
+        <button id="theme-toggle">🌗</button>
     </div>
-
-    <div class="zoom-group">
-        <button id="zoom-out">−</button>
-        <span class="zoom-value" id="zoom-display">100%</span>
-        <button id="zoom-in">+</button>
-        <button id="zoom-reset">↺</button>
-    </div>
-
-    <button id="filter-sepia">🌙 Sepia</button>
-    <button id="filter-contrast">◐ Contrast</button>
-    <button id="filter-invert">🌓 Invert</button>
-    <button id="filter-normal">☀️ Normal</button>
-    <button id="theme-toggle">🌗 Theme</button>
-
-    <span class="spacer"></span>
-    <span id="page-indicator-toolbar" style="font-size:0.9rem; opacity:0.9;">— / —</span>
 </div>
 
 <div class="main-area">
-    <aside class="speech-panel">
-        <div class="panel-header">
-            <h2>🎧 Read to me</h2>
-            <div class="play-row">
-                <button class="play-btn" id="play-btn" disabled>▶ Read this page</button>
-                <button class="play-btn stop-mode" id="stop-btn" style="flex:0 0 auto; padding:0.7rem 0.9rem;">■</button>
-            </div>
-            <div class="meta">
-                <span id="sentence-count">—</span>
-                <span id="speech-status">idle</span>
-            </div>
-            <div class="speech-controls">
-                <label>Speed</label>
-                <button id="speed-down" style="background:transparent;border:none;color:inherit;cursor:pointer;font-size:1rem;">−</button>
-                <span class="speed-value" id="speed-display">1.0×</span>
-                <button id="speed-up" style="background:transparent;border:none;color:inherit;cursor:pointer;font-size:1rem;">+</button>
-                <label style="margin-left:0.4rem;">Voice</label>
-                <select id="voice-select"></select>
-            </div>
-        </div>
-        <div class="spoken-text" id="spoken-text">
-            <div class="empty-hint">Load a PDF, then press “Read this page”. Text for the current page will appear here and each sentence will be highlighted as it is spoken.</div>
-        </div>
-    </aside>
-
+    <!-- READER -->
     <div class="reader-container" id="reader-container">
         <canvas id="pdf-canvas"></canvas>
-        <div class="page-nav">
-            <button id="prev-page">←</button>
-            <span id="page-indicator">1 / 1</span>
-            <button id="next-page">→</button>
+        
+        <!-- HUGE PLAY BUTTON -->
+        <div class="big-play-container">
+            <button class="big-play-btn" id="play-btn">▶ Read to Me</button>
         </div>
     </div>
+
+    <!-- TRANSCRIPT PANEL -->
+    <aside class="speech-panel hidden" id="speech-panel">
+        <div class="speech-header">
+            <h2>Live Transcript</h2>
+            <button id="close-text-btn" style="background:none;border:none;color:inherit;cursor:pointer;">✕</button>
+        </div>
+        <div class="spoken-text" id="spoken-text">
+            <div style="opacity:0.5; font-style:italic;">Press "Read to Me" to begin.</div>
+        </div>
+    </aside>
 </div>
 
-<div class="status-msg" id="status-msg"></div>
+<!-- GAME MODAL -->
+<div class="modal-overlay" id="game-modal">
+    <div class="game-menu">
+        <div id="menu-view">
+            <h2>🎮 Secret Games</h2>
+            <p>You found the hidden menu! Pick a quick break.</p>
+            <button class="game-btn" onclick="startGame(1)">⚡ Reaction Test</button>
+            <button class="game-btn" onclick="startGame(2)">🧠 Memory Match</button>
+            <button class="game-btn" onclick="startGame(3)">🔤 Word Scramble</button>
+            <button class="close-modal" onclick="closeModal()">Back to Reading</button>
+        </div>
 
-<div class="loading-overlay hidden" id="loading-overlay">
-    <div class="spinner"></div>
-    <h3 id="loading-title">Preparing…</h3>
-    <p id="loading-detail">This can take a while for large PDFs. The app parses only what it needs.</p>
-    <div class="progress-text" id="loading-progress"></div>
-    <button id="loading-cancel">Cancel</button>
+        <!-- GAME 1 -->
+        <div id="game-1" class="game-arena">
+            <h3 style="color:white; margin-bottom:1rem;">⚡ Reaction Test</h3>
+            <p style="color:#8b949e; margin-bottom:1rem;">Tap the box as soon as it turns green.</p>
+            <div id="reaction-box" onclick="reactionClick()"><span id="reaction-text">Wait for green...</span></div>
+            <button class="close-modal" onclick="closeModal()" style="margin-top:1rem;">Back</button>
+        </div>
+
+        <!-- GAME 2 -->
+        <div id="game-2" class="game-arena">
+            <h3 style="color:white; margin-bottom:1rem;">🧠 Memory Match</h3>
+            <div class="memory-grid" id="memory-grid"></div>
+            <button class="close-modal" onclick="closeModal()">Back</button>
+        </div>
+
+        <!-- GAME 3 -->
+        <div id="game-3" class="game-arena">
+            <h3 style="color:white; margin-bottom:1rem;">🔤 Word Scramble</h3>
+            <div class="scramble-word" id="scramble-word">LOADING</div>
+            <input type="text" id="scramble-input" placeholder="Type the word..." autocomplete="off">
+            <button id="scramble-submit" onclick="checkScramble()">Submit</button>
+            <div id="scramble-msg" style="color:#8b949e; margin-top:1rem; font-size:0.9rem;"></div>
+            <button class="close-modal" onclick="closeModal()" style="margin-top:1rem;">Back</button>
+        </div>
+    </div>
 </div>
 
 <script>
@@ -297,159 +225,85 @@
     // ===== DOM =====
     const canvas = document.getElementById('pdf-canvas');
     const ctx = canvas.getContext('2d');
-    const fileInput = document.getElementById('file-input');
-    const fileLabel = document.getElementById('file-label');
     const readerContainer = document.getElementById('reader-container');
-    const prevBtn = document.getElementById('prev-page');
-    const nextBtn = document.getElementById('next-page');
-    const pageIndicator = document.getElementById('page-indicator');
-    const pageIndicatorToolbar = document.getElementById('page-indicator-toolbar');
-    const zoomDisplay = document.getElementById('zoom-display');
-    const zoomInBtn = document.getElementById('zoom-in');
-    const zoomOutBtn = document.getElementById('zoom-out');
-    const zoomResetBtn = document.getElementById('zoom-reset');
-    const filterSepia = document.getElementById('filter-sepia');
-    const filterContrast = document.getElementById('filter-contrast');
-    const filterInvert = document.getElementById('filter-invert');
-    const filterNormal = document.getElementById('filter-normal');
-    const themeToggle = document.getElementById('theme-toggle');
-    const statusMsg = document.getElementById('status-msg');
-
     const playBtn = document.getElementById('play-btn');
-    const stopBtn = document.getElementById('stop-btn');
+    const speechPanel = document.getElementById('speech-panel');
     const spokenTextEl = document.getElementById('spoken-text');
-    const sentenceCountEl = document.getElementById('sentence-count');
-    const speechStatusEl = document.getElementById('speech-status');
-    const speedDisplay = document.getElementById('speed-display');
-    const speedUpBtn = document.getElementById('speed-up');
-    const speedDownBtn = document.getElementById('speed-down');
-    const voiceSelect = document.getElementById('voice-select');
+    const toggleTextBtn = document.getElementById('toggle-text-btn');
+    const closeTextBtn = document.getElementById('close-text-btn');
+    const themeToggle = document.getElementById('theme-toggle');
 
-    const loadingOverlay = document.getElementById('loading-overlay');
-    const loadingTitle = document.getElementById('loading-title');
-    const loadingDetail = document.getElementById('loading-detail');
-    const loadingProgress = document.getElementById('loading-progress');
-    const loadingCancel = document.getElementById('loading-cancel');
-
-    // ===== state =====
+    // ===== STATE =====
     let pdfDoc = null;
     let currentPage = 1;
     let totalPages = 1;
     let currentScale = 1.0;
-    let currentPageRendering = false;
-    let pendingPage = null;
-    let isLightTheme = false;
-
-    // loading state
-    let loadingCancelled = false;
-    let currentLoadingTask = null;
-
-    // preloaded
-    let preloadedPDFs = [null, null, null];
-    let preloadedNames = ['How to use this app', 'Love Frequencies Manual', 'Practical Frugal Money Guide'];
-    let preloadReady = false;
-
-    // speech
+    
+    // Speech State
     const synth = window.speechSynthesis;
-    let currentUtterance = null;
     let isSpeaking = false;
     let sentences = [];
     let sentenceEls = [];
     let currentSentenceIdx = -1;
-    let speechRate = 1.0;
+    let autoAdvancePage = true;
     let availableVoices = [];
     let selectedVoiceName = null;
-    let autoAdvancePage = true;
-    let pendingAutoRead = false; // when advancing, remember to auto-read next page
 
-    // ===== helpers =====
-    function showMessage(text, isError = false) {
-        statusMsg.textContent = text;
-        statusMsg.style.borderColor = isError ? '#f85149' : '#30363d';
-        statusMsg.classList.add('show');
-        clearTimeout(window.msgTimeout);
-        window.msgTimeout = setTimeout(() => statusMsg.classList.remove('show'), 2800);
-    }
-
-    function updatePageUI() {
-        const ind = `${currentPage} / ${totalPages}`;
-        pageIndicator.textContent = ind;
-        pageIndicatorToolbar.textContent = ind;
-    }
-    function updateZoomUI() { zoomDisplay.textContent = Math.round(currentScale * 100) + '%'; }
-
-    function applyFilter(f) {
-        document.body.classList.remove('filter-sepia','filter-high-contrast','filter-invert');
-        if (f === 'sepia') document.body.classList.add('filter-sepia');
-        else if (f === 'contrast') document.body.classList.add('filter-high-contrast');
-        else if (f === 'invert') document.body.classList.add('filter-invert');
-    }
-
-    function setSpeechStatus(s) { speechStatusEl.textContent = s; }
-
-    // ===== loading overlay =====
-    function showLoading(title, detail) {
-        loadingTitle.textContent = title || 'Preparing…';
-        loadingDetail.textContent = detail || '';
-        loadingProgress.textContent = '';
-        loadingOverlay.classList.remove('hidden');
-        loadingCancelled = false;
-    }
-    function updateLoadingProgress(text) { loadingProgress.textContent = text; }
-    function hideLoading() { loadingOverlay.classList.add('hidden'); }
-
-    loadingCancel.addEventListener('click', () => {
-        loadingCancelled = true;
-        if (currentLoadingTask) {
-            try { currentLoadingTask.destroy(); } catch(e) {}
+    // ===== LOAD THE BOOK =====
+    async function loadPDF() {
+        try {
+            playBtn.textContent = 'Loading...';
+            playBtn.disabled = true;
+            const response = await fetch('./ForbiddenKnowledge2026.pdf');
+            if (!response.ok) throw new Error('HTTP ' + response.status);
+            const arrayBuffer = await response.arrayBuffer();
+            
+            const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+            pdfDoc = await loadingTask.promise;
+            totalPages = pdfDoc.numPages;
+            currentPage = 1;
+            
+            await renderPage(1);
+            playBtn.textContent = '▶ Read to Me';
+            playBtn.disabled = false;
+        } catch (err) {
+            console.error(err);
+            playBtn.textContent = '❌ Error Loading Book';
+            playBtn.style.background = '#da3633';
         }
-        hideLoading();
-        showMessage('Loading cancelled.', true);
-    });
+    }
 
-    // ===== voices =====
+    async function renderPage(pageNum) {
+        if (!pdfDoc) return;
+        const page = await pdfDoc.getPage(pageNum);
+        // Fit to screen width
+        const containerWidth = readerContainer.clientWidth - 40;
+        const viewport = page.getViewport({ scale: 1.0 });
+        currentScale = containerWidth / viewport.width;
+        const scaledViewport = page.getViewport({ scale: currentScale });
+        
+        canvas.width = scaledViewport.width;
+        canvas.height = scaledViewport.height;
+        await page.render({ canvasContext: ctx, viewport: scaledViewport }).promise;
+        currentPage = pageNum;
+        
+        // Auto-scroll to top on new page
+        readerContainer.scrollTop = 0;
+    }
+
+    // ===== SPEECH ENGINE =====
     function populateVoices() {
         availableVoices = synth.getVoices();
-        voiceSelect.innerHTML = '';
-        if (!availableVoices.length) {
-            const o = document.createElement('option'); o.textContent = 'No voices'; voiceSelect.appendChild(o); return;
-        }
-        availableVoices.forEach((v, i) => {
-            const o = document.createElement('option');
-            o.value = i;
-            o.textContent = `${v.name} (${v.lang})`;
-            voiceSelect.appendChild(o);
-        });
-        if (selectedVoiceName) {
-            const idx = availableVoices.findIndex(v => v.name === selectedVoiceName);
-            if (idx >= 0) voiceSelect.value = idx;
-        } else {
+        if (availableVoices.length > 0 && !selectedVoiceName) {
             const enIdx = availableVoices.findIndex(v => v.lang && v.lang.toLowerCase().startsWith('en'));
-            voiceSelect.value = enIdx >= 0 ? enIdx : 0;
+            selectedVoiceName = availableVoices[enIdx >= 0 ? enIdx : 0].name;
         }
     }
     if (typeof speechSynthesis !== 'undefined') {
         populateVoices();
         speechSynthesis.onvoiceschanged = populateVoices;
     }
-    voiceSelect.addEventListener('change', () => {
-        const v = availableVoices[parseInt(voiceSelect.value, 10)];
-        if (v) selectedVoiceName = v.name;
-    });
 
-    speedUpBtn.addEventListener('click', () => {
-        speechRate = Math.min(2.0, +(speechRate + 0.1).toFixed(1));
-        speedDisplay.textContent = speechRate.toFixed(1) + '×';
-        if (isSpeaking) restartSpeechFromCurrentSentence();
-    });
-    speedDownBtn.addEventListener('click', () => {
-        speechRate = Math.max(0.5, +(speechRate - 0.1).toFixed(1));
-        speedDisplay.textContent = speedRate + '×';
-        speedDisplay.textContent = speechRate.toFixed(1) + '×';
-        if (isSpeaking) restartSpeechFromCurrentSentence();
-    });
-
-    // ===== text extraction (lazy, per page) =====
     async function extractPageText(pageNum) {
         if (!pdfDoc) return '';
         try {
@@ -463,10 +317,7 @@
                 text += s;
             });
             return text.replace(/\s+/g, ' ').trim();
-        } catch (e) {
-            console.warn('extract error', e);
-            return '';
-        }
+        } catch (e) { return ''; }
     }
 
     function splitIntoSentences(text) {
@@ -479,23 +330,16 @@
         spokenTextEl.innerHTML = '';
         sentenceEls = [];
         if (!arr.length) {
-            const hint = document.createElement('div');
-            hint.className = 'empty-hint';
-            hint.textContent = 'No readable text on this page (it may be a scanned image or contain only QR codes). The app will skip ahead automatically.';
-            spokenTextEl.appendChild(hint);
-            sentenceCountEl.textContent = '0 sentences';
+            spokenTextEl.innerHTML = '<div style="opacity:0.5; font-style:italic;">No readable text on this page (image or QR code only). Skipping ahead...</div>';
             return;
         }
         arr.forEach((s, i) => {
             const span = document.createElement('span');
             span.className = 'sentence';
             span.textContent = s + ' ';
-            span.dataset.idx = i;
             spokenTextEl.appendChild(span);
             sentenceEls.push(span);
         });
-        sentenceCountEl.textContent = arr.length + ' sentence' + (arr.length === 1 ? '' : 's');
-        currentSentenceIdx = -1;
     }
 
     function highlightSentence(idx) {
@@ -503,60 +347,50 @@
         if (idx >= 0 && idx < sentenceEls.length) {
             const el = sentenceEls[idx];
             el.classList.add('active');
-            try { el.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } catch(e) { el.scrollIntoView(false); }
+            el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
         }
-        currentSentenceIdx = idx;
     }
 
-    // ===== speaking =====
+    async function prepareSpeech() {
+        const raw = await extractPageText(currentPage);
+        const arr = splitIntoSentences(raw);
+        sentences = arr.map((t, i) => ({ text: t, index: i }));
+        displaySentences(arr);
+        return arr.length;
+    }
+
     function speakFromIndex(startIdx) {
-        if (!synth) { showMessage('Speech synthesis not supported.', true); return; }
         synth.cancel();
         isSpeaking = true;
-        playBtn.textContent = '⏸ Stop reading';
+        playBtn.textContent = '⏸ Stop Reading';
         playBtn.classList.add('stop-mode');
-        setSpeechStatus('speaking…');
 
         const speakNext = (idx) => {
             if (!isSpeaking) return;
             if (idx >= sentences.length) {
-                setSpeechStatus('page finished');
                 highlightSentence(-1);
                 if (autoAdvancePage && currentPage < totalPages) {
-                    showMessage('Page finished — moving to next page…');
                     setTimeout(async () => {
                         if (!isSpeaking) return;
-                        pendingAutoRead = true;
-                        await goToPage(currentPage + 1, true);
-                    }, 500);
+                        await renderPage(currentPage + 1);
+                        const count = await prepareSpeech();
+                        if (count > 0) speakFromIndex(0);
+                        else goToPageAndRead(currentPage + 1);
+                    }, 800);
                 } else {
                     stopSpeakingUI();
                 }
                 return;
             }
-            const s = sentences[idx].text;
-            const u = new SpeechSynthesisUtterance(s);
-            u.rate = speechRate;
+            
+            const u = new SpeechSynthesisUtterance(sentences[idx].text);
             if (selectedVoiceName) {
                 const v = availableVoices.find(v => v.name === selectedVoiceName);
                 if (v) u.voice = v;
-            } else {
-                const v = availableVoices[parseInt(voiceSelect.value, 10)];
-                if (v) u.voice = v;
             }
-            u.onstart = () => {
-                highlightSentence(idx);
-                setSpeechStatus(`speaking ${idx+1}/${sentences.length}`);
-            };
-            u.onend = () => {
-                if (isSpeaking && currentSentenceIdx === idx) speakNext(idx + 1);
-            };
-            u.onerror = (e) => {
-                if (e.error === 'interrupted' || e.error === 'canceled') return;
-                console.warn('speech error', e);
-                if (isSpeaking) speakNext(idx + 1);
-            };
-            currentUtterance = u;
+            u.onstart = () => highlightSentence(idx);
+            u.onend = () => { if (isSpeaking) speakNext(idx + 1); };
+            u.onerror = () => { if (isSpeaking) speakNext(idx + 1); };
             synth.speak(u);
         };
         speakNext(startIdx);
@@ -564,271 +398,197 @@
 
     function stopSpeakingUI() {
         isSpeaking = false;
-        playBtn.textContent = '▶ Read this page';
+        playBtn.textContent = '▶ Read to Me';
         playBtn.classList.remove('stop-mode');
-        setSpeechStatus('idle');
         highlightSentence(-1);
-        currentUtterance = null;
-    }
-    function stopSpeaking() { if (synth) synth.cancel(); stopSpeakingUI(); }
-    function restartSpeechFromCurrentSentence() {
-        const idx = currentSentenceIdx >= 0 ? currentSentenceIdx : 0;
-        isSpeaking = true;
-        speakFromIndex(idx);
     }
 
-    // ===== prepare speech for current page (lazy) =====
-    async function prepareSpeechForCurrentPage() {
-        setSpeechStatus('extracting text…');
-        const raw = await extractPageText(currentPage);
-        const arr = splitIntoSentences(raw);
-        sentences = arr.map((t, i) => ({ text: t, index: i }));
-        displaySentences(arr);
-        setSpeechStatus('idle');
-        return arr.length;
+    playBtn.addEventListener('click', async () => {
+        if (isSpeaking) {
+            synth.cancel();
+            stopSpeakingUI();
+            return;
+        }
+        playBtn.textContent = 'Loading Text...';
+        const count = await prepareSpeech();
+        if (count > 0) {
+            speakFromIndex(0);
+        } else {
+            // Skip image-only page
+            if (currentPage < totalPages) {
+                await renderPage(currentPage + 1);
+                playBtn.click(); // restart on next page
+            } else {
+                playBtn.textContent = '▶ Read to Me';
+                alert('No more readable text in the book.');
+            }
+        }
+    });
+
+    async function goToPageAndRead(pageNum) {
+        await renderPage(pageNum);
+        const count = await prepareSpeech();
+        if (count > 0) speakFromIndex(0);
+        else if (currentPage < totalPages) goToPageAndRead(currentPage + 1);
+        else stopSpeakingUI();
     }
 
-    // ===== render page =====
-    async function renderPage(pageNum) {
-        if (!pdfDoc) return;
-        if (pageNum < 1 || pageNum > totalPages) return;
-        if (currentPageRendering) { pendingPage = pageNum; return; }
-        currentPageRendering = true;
-        try {
-            const page = await pdfDoc.getPage(pageNum);
-            const viewport = page.getViewport({ scale: currentScale });
-            canvas.width = viewport.width;
-            canvas.height = viewport.height;
-            await page.render({ canvasContext: ctx, viewport }).promise;
-            currentPage = pageNum;
-            updatePageUI();
-        } catch (err) {
-            console.error('render error', err);
-            showMessage('Error rendering page', true);
-        } finally {
-            currentPageRendering = false;
-            if (pendingPage !== null) {
-                const p = pendingPage;
-                pendingPage = null;
-                if (p !== currentPage) renderPage(p);
+    // ===== UI TOGGLES =====
+    toggleTextBtn.addEventListener('click', () => speechPanel.classList.toggle('hidden'));
+    closeTextBtn.addEventListener('click', () => speechPanel.classList.add('hidden'));
+    
+    themeToggle.addEventListener('click', () => {
+        document.body.classList.toggle('light');
+    });
+
+    // Resize handler to keep PDF fitting screen
+    window.addEventListener('resize', () => {
+        if (pdfDoc) renderPage(currentPage);
+    });
+
+    // ===== SECRET TRIPLE TAP GAME MENU =====
+    let tapCount = 0;
+    let tapTimer = null;
+    
+    document.addEventListener('click', (e) => {
+        // Ignore taps on buttons to prevent accidental opening
+        if (e.target.closest('button') || e.target.closest('.game-menu')) return;
+
+        tapCount++;
+        if (tapCount === 1) {
+            tapTimer = setTimeout(() => { tapCount = 0; }, 600);
+        }
+        if (tapCount === 3) {
+            clearTimeout(tapTimer);
+            tapCount = 0;
+            document.getElementById('game-modal').classList.add('show');
+            document.getElementById('menu-view').style.display = 'block';
+            document.querySelectorAll('.game-arena').forEach(el => el.classList.remove('active'));
+        }
+    });
+
+    window.closeModal = function() {
+        document.getElementById('game-modal').classList.remove('show');
+        synth.cancel(); // stop any reading
+        stopSpeakingUI();
+    };
+
+    // ===== MINI GAMES LOGIC =====
+    window.startGame = function(id) {
+        document.getElementById('menu-view').style.display = 'none';
+        document.querySelectorAll('.game-arena').forEach(el => el.classList.remove('active'));
+        document.getElementById('game-' + id).classList.add('active');
+        
+        if (id === 1) initReaction();
+        if (id === 2) initMemory();
+        if (id === 3) initScramble();
+    };
+
+    // Game 1: Reaction Test
+    let reactionState = 'waiting';
+    let reactionTimeout = null;
+    let startTime = 0;
+    function initReaction() {
+        reactionState = 'waiting';
+        const box = document.getElementById('reaction-box');
+        const text = document.getElementById('reaction-text');
+        box.classList.remove('ready');
+        box.style.background = '#da3633';
+        text.textContent = 'Wait for green...';
+        
+        reactionTimeout = setTimeout(() => {
+            reactionState = 'ready';
+            box.style.background = '#238636';
+            text.textContent = 'TAP NOW!';
+            startTime = Date.now();
+        }, Math.random() * 3000 + 1500);
+    }
+    window.reactionClick = function() {
+        if (reactionState === 'waiting') {
+            clearTimeout(reactionTimeout);
+            document.getElementById('reaction-text').textContent = 'Too early! Click Back and try again.';
+            reactionState = 'failed';
+        } else if (reactionState === 'ready') {
+            const time = Date.now() - startTime;
+            document.getElementById('reaction-text').textContent = `${time} ms! ⚡`;
+            reactionState = 'done';
+        }
+    };
+
+    // Game 2: Memory Match
+    const symbols = ['🚀','🧠','🔥','💎','🌟','🎯'];
+    let flippedCards = [];
+    let matchedPairs = 0;
+    function initMemory() {
+        const grid = document.getElementById('memory-grid');
+        grid.innerHTML = '';
+        flippedCards = [];
+        matchedPairs = 0;
+        
+        let deck = [...symbols, ...symbols].sort(() => Math.random() - 0.5);
+        deck.forEach((sym, i) => {
+            const card = document.createElement('div');
+            card.className = 'memory-card';
+            card.dataset.symbol = sym;
+            card.dataset.idx = i;
+            card.onclick = () => flipCard(card);
+            grid.appendChild(card);
+        });
+    }
+    function flipCard(card) {
+        if (card.classList.contains('flipped') || card.classList.contains('matched') || flippedCards.length >= 2) return;
+        
+        card.classList.add('flipped');
+        card.textContent = card.dataset.symbol;
+        flippedCards.push(card);
+        
+        if (flippedCards.length === 2) {
+            if (flippedCards[0].dataset.symbol === flippedCards[1].dataset.symbol) {
+                flippedCards[0].classList.add('matched');
+                flippedCards[1].classList.add('matched');
+                flippedCards = [];
+                matchedPairs++;
+                if (matchedPairs === 6) {
+                    setTimeout(() => alert('You won! 🎉'), 300);
+                }
+            } else {
+                setTimeout(() => {
+                    flippedCards[0].classList.remove('flipped');
+                    flippedCards[1].classList.remove('flipped');
+                    flippedCards[0].textContent = '';
+                    flippedCards[1].textContent = '';
+                    flippedCards = [];
+                }, 800);
             }
         }
     }
 
-    // ===== go to page + optionally auto‑read =====
-    async function goToPage(pageNum, autoRead = false) {
-        if (pageNum < 1 || pageNum > totalPages) return;
-        stopSpeaking();
-        await renderPage(pageNum);
-        const count = await prepareSpeechForCurrentPage();
-        if (autoRead && count > 0) {
-            isSpeaking = true;
-            speakFromIndex(0);
-        } else if (autoRead && count === 0 && currentPage < totalPages) {
-            // page has no text — skip ahead
-            showMessage('No text on this page — skipping ahead…');
-            setTimeout(() => goToPage(currentPage + 1, true), 700);
-        }
+    // Game 3: Word Scramble
+    const words = ['MAGIC', 'POWER', 'FREEDOM', 'KNOWLEDGE', 'SECRET', 'FUTURE', 'LIGHT'];
+    let currentWord = '';
+    function initScramble() {
+        currentWord = words[Math.floor(Math.random() * words.length)];
+        const scrambled = currentWord.split('').sort(() => Math.random() - 0.5).join('');
+        document.getElementById('scramble-word').textContent = scrambled;
+        document.getElementById('scramble-input').value = '';
+        document.getElementById('scramble-msg').textContent = '';
+        document.getElementById('scramble-input').focus();
     }
-
-    // ===== zoom =====
-    function changeZoom(f) {
-        if (!pdfDoc) return;
-        let ns = currentScale * f;
-        ns = Math.min(5.0, Math.max(0.25, ns));
-        if (Math.abs(ns - currentScale) < 0.001) return;
-        currentScale = ns; updateZoomUI(); renderPage(currentPage);
-    }
-    function resetZoom() { if (!pdfDoc) return; currentScale = 1.0; updateZoomUI(); renderPage(currentPage); }
-
-    // ===== load PDF (with progress + cancel) =====
-    async function loadPDFFromArrayBuffer(arrayBuffer, displayName) {
-        stopSpeaking();
-        hideLoading();
-        showLoading('Opening PDF…', 'Parsing document structure. Large PDFs may take a few moments.');
-        loadingCancelled = false;
-
-        try {
-            const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
-            currentLoadingTask = loadingTask;
-            loadingTask.onProgress = (p) => {
-                if (p && p.total) {
-                    updateLoadingProgress(`Loading ${Math.round((p.loaded / p.total) * 100)}% — ${Math.round(p.loaded/1024)} KB of ${Math.round(p.total/1024)} KB`);
-                } else {
-                    updateLoadingProgress(`Loaded ${Math.round((p.loaded||0)/1024)} KB…`);
-                }
-            };
-            const doc = await loadingTask.promise;
-            if (loadingCancelled) { try { doc.destroy(); } catch(e){} return; }
-
-            pdfDoc = doc;
-            totalPages = doc.numPages;
-            currentPage = 1;
-            if (displayName) fileLabel.textContent = '📄 ' + displayName.substring(0, 22) + (displayName.length > 22 ? '…' : '');
-            updatePageUI();
-
-            // show first page immediately
-            await renderPage(1);
-            hideLoading();
-            playBtn.disabled = false;
-            showMessage(`Loaded ${totalPages} page${totalPages === 1 ? '' : 's'}. Press “Read this page”.`);
-
-            // lazy — extract text for page 1 in background, don't block
-            prepareSpeechForCurrentPage();
-        } catch (err) {
-            if (loadingCancelled) return;
-            console.error(err);
-            hideLoading();
-            showMessage('Failed to load PDF: ' + err.message, true);
-            pdfDoc = null; totalPages = 0; currentPage = 0;
-            updatePageUI();
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            playBtn.disabled = true;
-        } finally {
-            currentLoadingTask = null;
+    window.checkScramble = function() {
+        const val = document.getElementById('scramble-input').value.toUpperCase();
+        if (val === currentWord) {
+            document.getElementById('scramble-msg').textContent = 'Correct! 🎉';
+            document.getElementById('scramble-msg').style.color = '#238636';
+            setTimeout(() => { closeModal(); }, 1500);
+        } else {
+            document.getElementById('scramble-msg').textContent = 'Not quite. Try again!';
+            document.getElementById('scramble-msg').style.color = '#da3633';
         }
-    }
+    };
 
-    function loadPDFFromFile(file) {
-        if (!file || (file.type !== 'application/pdf' && !file.name.endsWith('.pdf'))) {
-            showMessage('Please select a valid PDF file.', true); return;
-        }
-        const fr = new FileReader();
-        fr.onload = (e) => loadPDFFromArrayBuffer(e.target.result, file.name.replace(/\.pdf$/i, ''));
-        fr.readAsArrayBuffer(file);
-    }
+    // ===== INIT =====
+    loadPDF();
 
-    // ===== preloaded PDF generation =====
-    async function generatePreloadedPDFs() {
-        const { jsPDF } = window.jspdf;
-        const addText = (doc, text, x, y, opts = {}) => {
-            const maxW = 170, lh = opts.lineHeight || 6;
-            const split = doc.splitTextToSize(text, maxW);
-            let cy = y;
-            split.forEach(line => {
-                if (cy > 270) { doc.addPage(); cy = 20; }
-                doc.text(line, x, cy); cy += lh;
-            });
-            return cy;
-        };
-
-        // DOC 1 : FORBIDDEN KNOWLEDGE ----------
-try {
-    const response = await fetch('./Forbidden_Knowledge.pdf');
-    if (!response.ok) throw new Error('HTTP ' + response.status);
-    preloadedPDFs[3] = await response.arrayBuffer();
-} catch (err) {
-    console.warn('Could not load Forbidden_Knowledge.pdf:', err);
-}
-        preloadReady = true;
-    }
-
-    async function loadPreloaded(index) {
-        if (!preloadReady) { showMessage('Built‑in PDFs still generating…', true); return; }
-        if (index < 0 || index > 2) return;
-        document.querySelectorAll('.preload-group button').forEach(b => b.classList.remove('active'));
-        const btn = document.getElementById('preload-btn-' + index);
-        if (btn) btn.classList.add('active');
-        const ab = preloadedPDFs[index];
-        if (!ab) { showMessage('Error: PDF not generated.', true); return; }
-        await loadPDFFromArrayBuffer(ab, preloadedNames[index]);
-    }
-
-    // ===== init =====
-    (async function init() {
-        canvas.width = 600; canvas.height = 400;
-        ctx.fillStyle = '#2d333b'; ctx.fillRect(0, 0, 600, 400);
-        ctx.font = 'bold 22px system-ui, sans-serif';
-        ctx.fillStyle = '#8b949e'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
-        ctx.fillText('📖 Preparing your library…', 300, 200);
-        updatePageUI(); updateZoomUI();
-        speedDisplay.textContent = '1.0×';
-
-        try {
-            await generatePreloadedPDFs();
-            await loadPreloaded(0);
-        } catch (e) {
-            console.error(e);
-            showMessage('Could not generate built‑in PDFs.', true);
-        }
-    })();
-
-    // ===== events =====
-    document.querySelectorAll('.preload-group button').forEach(btn => {
-        btn.addEventListener('click', (e) => loadPreloaded(parseInt(e.currentTarget.dataset.preload, 10)));
-    });
-
-    fileInput.addEventListener('change', (e) => {
-        const f = e.target.files[0];
-        if (f) {
-            document.querySelectorAll('.preload-group button').forEach(b => b.classList.remove('active'));
-            loadPDFFromFile(f);
-        }
-        fileInput.value = '';
-    });
-
-    prevBtn.addEventListener('click', async () => {
-        if (pdfDoc && currentPage > 1) {
-            const was = isSpeaking;
-            await goToPage(currentPage - 1, was);
-        }
-    });
-    nextBtn.addEventListener('click', async () => {
-        if (pdfDoc && currentPage < totalPages) {
-            const was = isSpeaking;
-            await goToPage(currentPage + 1, was);
-        }
-    });
-
-    window.addEventListener('keydown', (e) => {
-        if (!pdfDoc) return;
-        if (e.key === 'ArrowLeft') { e.preventDefault(); if (currentPage > 1) goToPage(currentPage - 1, isSpeaking); }
-        else if (e.key === 'ArrowRight') { e.preventDefault(); if (currentPage < totalPages) goToPage(currentPage + 1, isSpeaking); }
-        else if (e.key === '+' || e.key === '=') { e.preventDefault(); changeZoom(1.15); }
-        else if (e.key === '-') { e.preventDefault(); changeZoom(1/1.15); }
-        else if (e.key === '0') { e.preventDefault(); resetZoom(); }
-        else if (e.key === ' ') { e.preventDefault(); playBtn.click(); }
-    });
-
-    zoomInBtn.addEventListener('click', () => changeZoom(1.15));
-    zoomOutBtn.addEventListener('click', () => changeZoom(1/1.15));
-    zoomResetBtn.addEventListener('click', resetZoom);
-
-    filterSepia.addEventListener('click', () => applyFilter('sepia'));
-    filterContrast.addEventListener('click', () => applyFilter('contrast'));
-    filterInvert.addEventListener('click', () => applyFilter('invert'));
-    filterNormal.addEventListener('click', () => applyFilter('normal'));
-
-    themeToggle.addEventListener('click', () => {
-        isLightTheme = !isLightTheme;
-        document.body.classList.toggle('light', isLightTheme);
-    });
-
-    // play / stop
-    playBtn.addEventListener('click', async () => {
-        if (isSpeaking) { stopSpeaking(); return; }
-        if (!pdfDoc) { showMessage('Please load a PDF first.', true); return; }
-        if (!sentences.length) await prepareSpeechForCurrentPage();
-        if (sentences.length) speakFromIndex(0);
-        else {
-            showMessage('No text on this page — skipping ahead…');
-            if (currentPage < totalPages) goToPage(currentPage + 1, true);
-        }
-    });
-    stopBtn.addEventListener('click', stopSpeaking);
-
-    // drag & drop
-    readerContainer.addEventListener('dragover', (e) => { e.preventDefault(); readerContainer.style.opacity = '0.8'; });
-    readerContainer.addEventListener('dragleave', () => { readerContainer.style.opacity = '1'; });
-    readerContainer.addEventListener('drop', (e) => {
-        e.preventDefault(); readerContainer.style.opacity = '1';
-        const f = e.dataTransfer.files[0];
-        if (f) { document.querySelectorAll('.preload-group button').forEach(b => b.classList.remove('active')); loadPDFFromFile(f); }
-    });
-    window.addEventListener('dragover', (e) => e.preventDefault());
-    window.addEventListener('drop', (e) => e.preventDefault());
-
-    window.addEventListener('beforeunload', () => { if (synth) synth.cancel(); });
 })();
 </script>
 </body>
