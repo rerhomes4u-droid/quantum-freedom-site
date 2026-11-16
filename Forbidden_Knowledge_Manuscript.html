@@ -15,7 +15,7 @@
         --accent: #1f6feb;
         --success: #238636;
         --danger: #da3633;
-        --highlight: #f1e05a; /* Sentence highlight */
+        --highlight: #f1e05a;
     }
 
     body.light {
@@ -156,17 +156,14 @@
     }
     #panic-screen.active { display: flex; }
     
-    /* Dashboard Header */
     .dash-header { background: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
     .dash-logo { font-weight: 800; font-size: 1.2rem; color: #3b82f6; display: flex; align-items: center; gap: 0.5rem; }
     .dash-user { display: flex; align-items: center; gap: 1rem; font-size: 0.9rem; color: #6b7280; }
     .dash-avatar { width: 36px; height: 36px; background: #dbeafe; color: #1d4ed8; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
 
-    /* Dashboard Content */
     .dash-content { padding: 2rem; max-width: 1200px; margin: 0 auto; width: 100%; flex: 1; }
     .dash-title { font-size: 1.8rem; font-weight: 700; margin-bottom: 1.5rem; }
     
-    /* Stats Grid */
     .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
     .stat-card { background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e5e7eb; }
     .stat-title { font-size: 0.85rem; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; margin-bottom: 0.5rem; }
@@ -174,7 +171,6 @@
     .stat-change { font-size: 0.9rem; font-weight: 600; color: #10b981; display: flex; align-items: center; gap: 0.25rem; }
     .stat-change.negative { color: #ef4444; }
 
-    /* Charts & Tables */
     .dash-row { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
     @media (max-width: 900px) { .dash-row { grid-template-columns: 1fr; } }
     
@@ -182,14 +178,12 @@
     .card-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid #e5e7eb; font-weight: 700; font-size: 1.05rem; display: flex; justify-content: space-between; }
     .card-body { padding: 1.5rem; }
 
-    /* Fake Chart */
     .chart-bars { display: flex; align-items: flex-end; height: 200px; gap: 1rem; padding-top: 1rem; }
     .chart-bar-wrapper { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 0.5rem; height: 100%; }
     .chart-bar { width: 100%; background: #3b82f6; border-radius: 4px 4px 0 0; transition: height 0.5s ease; opacity: 0.8; }
     .chart-bar:hover { opacity: 1; }
     .chart-label { font-size: 0.75rem; color: #6b7280; font-weight: 500; }
 
-    /* Tasks List */
     .task-item { display: flex; align-items: center; gap: 1rem; padding: 1rem 0; border-bottom: 1px solid #f3f4f6; }
     .task-item:last-child { border-bottom: none; }
     .task-check { width: 20px; height: 20px; border-radius: 50%; border: 2px solid #d1d5db; cursor: pointer; }
@@ -198,7 +192,6 @@
     .task-text { font-size: 0.95rem; font-weight: 500; color: #374151; }
     .task-text.done { text-decoration: line-through; color: #9ca3af; }
 
-    /* Floating Exit Button */
     .dash-exit { position: fixed; bottom: 20px; right: 20px; background: #1f2937; color: white; padding: 12px 24px; border-radius: 30px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.2); border: none; display: flex; align-items: center; gap: 8px; }
     .dash-exit:hover { background: #374151; }
 
@@ -224,7 +217,6 @@
     .game-arena { display: none; width: 100%; }
     .game-arena.active { display: block; }
     
-    /* Mini Games */
     #reaction-box { width: 100%; height: 180px; border-radius: 12px; background: var(--danger); display: flex; align-items: center; justify-content: center; cursor: pointer; margin-top: 1rem; }
     #reaction-box.ready { background: var(--success); }
     #reaction-text { color: white; font-size: 1.2rem; font-weight: bold; }
@@ -581,7 +573,6 @@
             return;
         }
         
-        // Group into paragraphs of 4 sentences for better readability
         let currentP = document.createElement('div');
         currentP.className = 'paragraph';
         
@@ -625,6 +616,7 @@
         return arr.length;
     }
 
+    // FIXED: Using addEventListener to prevent crashes
     function speakFromIndex(startIdx) {
         synth.cancel();
         isSpeaking = true;
@@ -656,17 +648,19 @@
                 if (v) u.voice = v;
             }
             
-            u.onstart = () => {
+            u.addEventListener('start', () => {
                 currentSentenceIdx = idx;
                 highlightSentence(idx);
-            };
-            u.onend = () => {
+            });
+            
+            u.addEventListener('end', () => {
                 if (isSpeaking) speakNext(idx + 1);
-            };
-            u.onerror = (e) => {
+            });
+            
+            u.addEventListener('error', (e) => {
                 if (e.error === 'interrupted' || e.error === 'canceled') return;
                 if (isSpeaking) speakNext(idx + 1);
-            };
+            });
             
             synth.speak(u);
         };
