@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
-<title>📖 Forbidden Knowledge 2026</title>
+<title>📖 Forbidden Knowledge</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
 <style>
     :root {
@@ -13,10 +13,9 @@
         --text-muted: #8b949e;
         --border: #30363d;
         --accent: #1f6feb;
-        --accent-hover: #388bfd;
         --success: #238636;
         --danger: #da3633;
-        --highlight: #f1e05a; /* Word highlight color */
+        --highlight: #f1e05a; /* Sentence highlight */
     }
 
     body.light {
@@ -40,7 +39,7 @@
 
     /* ---------- PROGRESS BAR ---------- */
     .progress-bar-container {
-        position: fixed; top: 0; left: 0; width: 100%; height: 3px;
+        position: fixed; top: 0; left: 0; width: 100%; height: 4px;
         background: rgba(0,0,0,0.2); z-index: 1000;
     }
     .progress-bar {
@@ -66,7 +65,7 @@
         display: flex; align-items: center; justify-content: space-between;
         padding: 0.6rem 1rem; background: var(--bg-panel);
         border-bottom: 1px solid var(--border); z-index: 50;
-        transition: transform 0.3s ease, background 0.3s;
+        transition: transform 0.3s ease;
     }
     .toolbar.hidden-header { transform: translateY(-100%); position: absolute; width: 100%; }
     
@@ -136,32 +135,72 @@
 
     /* ---------- SIDEBAR TRANSCRIPT ---------- */
     .speech-panel {
-        width: 320px; background: var(--bg-panel); border-left: 1px solid var(--border);
+        width: 340px; background: var(--bg-panel); border-left: 1px solid var(--border);
         display: flex; flex-direction: column; transition: transform 0.3s ease;
     }
     .speech-panel.hidden { transform: translateX(100%); position: absolute; right: 0; height: 100%; box-shadow: -10px 0 20px rgba(0,0,0,0.2); }
     
     .speech-header { padding: 1rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-    .spoken-text { flex: 1; overflow-y: auto; padding: 1.2rem; font-family: Georgia, serif; font-size: 1rem; line-height: 1.7; }
+    .spoken-text { flex: 1; overflow-y: auto; padding: 1.5rem; font-family: Georgia, serif; font-size: 1.05rem; line-height: 1.8; }
     
-    /* Immersive Word Highlighting */
-    .spoken-text .word { display: inline; padding: 1px 0; border-radius: 3px; transition: background 0.1s, color 0.1s; }
-    .spoken-text .word.active { background: var(--highlight); color: #000; font-weight: 600; }
-    .spoken-text .sentence { display: inline; cursor: pointer; }
-    .spoken-text .sentence:hover { text-decoration: underline; text-decoration-color: var(--accent); text-decoration-thickness: 2px; }
+    .spoken-text .paragraph { margin-bottom: 1.5rem; }
+    .spoken-text .sentence { display: inline; padding: 2px 0; border-radius: 4px; transition: background 0.2s; cursor: pointer; }
+    .spoken-text .sentence:hover { background: var(--border); }
+    .spoken-text .sentence.active { background: var(--highlight); color: #000; font-weight: 500; }
 
-    /* ---------- PANIC MODE (FAKE SPREADSHEET) ---------- */
+    /* ---------- PANIC MODE (MARKETING DASHBOARD) ---------- */
     #panic-screen {
-        position: fixed; inset: 0; background: #f8f9fa; z-index: 10000;
-        display: none; flex-direction: column; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        color: #333;
+        position: fixed; inset: 0; background: #f3f4f6; z-index: 10000;
+        display: none; flex-direction: column; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        color: #1f2937; overflow-y: auto;
     }
     #panic-screen.active { display: flex; }
-    .panic-header { background: #217346; color: white; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; }
-    .panic-grid { flex: 1; display: grid; grid-template-columns: 50px 1fr; overflow: auto; }
-    .panic-col { display: flex; flex-direction: column; }
-    .panic-cell { border-right: 1px solid #ddd; border-bottom: 1px solid #ddd; padding: 5px 10px; height: 30px; display: flex; align-items: center; background: white; }
-    .panic-cell.header { background: #f0f0f0; font-weight: bold; justify-content: center; }
+    
+    /* Dashboard Header */
+    .dash-header { background: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e5e7eb; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .dash-logo { font-weight: 800; font-size: 1.2rem; color: #3b82f6; display: flex; align-items: center; gap: 0.5rem; }
+    .dash-user { display: flex; align-items: center; gap: 1rem; font-size: 0.9rem; color: #6b7280; }
+    .dash-avatar { width: 36px; height: 36px; background: #dbeafe; color: #1d4ed8; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+
+    /* Dashboard Content */
+    .dash-content { padding: 2rem; max-width: 1200px; margin: 0 auto; width: 100%; flex: 1; }
+    .dash-title { font-size: 1.8rem; font-weight: 700; margin-bottom: 1.5rem; }
+    
+    /* Stats Grid */
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+    .stat-card { background: white; padding: 1.5rem; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e5e7eb; }
+    .stat-title { font-size: 0.85rem; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; margin-bottom: 0.5rem; }
+    .stat-value { font-size: 2.2rem; font-weight: 800; color: #111827; margin-bottom: 0.5rem; }
+    .stat-change { font-size: 0.9rem; font-weight: 600; color: #10b981; display: flex; align-items: center; gap: 0.25rem; }
+    .stat-change.negative { color: #ef4444; }
+
+    /* Charts & Tables */
+    .dash-row { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
+    @media (max-width: 900px) { .dash-row { grid-template-columns: 1fr; } }
+    
+    .card { background: white; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #e5e7eb; overflow: hidden; }
+    .card-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid #e5e7eb; font-weight: 700; font-size: 1.05rem; display: flex; justify-content: space-between; }
+    .card-body { padding: 1.5rem; }
+
+    /* Fake Chart */
+    .chart-bars { display: flex; align-items: flex-end; height: 200px; gap: 1rem; padding-top: 1rem; }
+    .chart-bar-wrapper { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 0.5rem; height: 100%; }
+    .chart-bar { width: 100%; background: #3b82f6; border-radius: 4px 4px 0 0; transition: height 0.5s ease; opacity: 0.8; }
+    .chart-bar:hover { opacity: 1; }
+    .chart-label { font-size: 0.75rem; color: #6b7280; font-weight: 500; }
+
+    /* Tasks List */
+    .task-item { display: flex; align-items: center; gap: 1rem; padding: 1rem 0; border-bottom: 1px solid #f3f4f6; }
+    .task-item:last-child { border-bottom: none; }
+    .task-check { width: 20px; height: 20px; border-radius: 50%; border: 2px solid #d1d5db; cursor: pointer; }
+    .task-check.done { background: #10b981; border-color: #10b981; position: relative; }
+    .task-check.done::after { content: '✓'; color: white; position: absolute; top: -2px; left: 3px; font-size: 14px; font-weight: bold; }
+    .task-text { font-size: 0.95rem; font-weight: 500; color: #374151; }
+    .task-text.done { text-decoration: line-through; color: #9ca3af; }
+
+    /* Floating Exit Button */
+    .dash-exit { position: fixed; bottom: 20px; right: 20px; background: #1f2937; color: white; padding: 12px 24px; border-radius: 30px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.2); border: none; display: flex; align-items: center; gap: 8px; }
+    .dash-exit:hover { background: #374151; }
 
     /* ---------- GAME MODAL ---------- */
     .modal-overlay {
@@ -203,6 +242,8 @@
         .speech-panel { width: 100%; height: 40vh; border-left: none; border-top: 1px solid var(--border); }
         .speech-panel.hidden { transform: translateY(100%); width: 100%; height: 40vh; }
         .deck-panel { flex-direction: column; align-items: stretch; }
+        .dash-content { padding: 1rem; }
+        .dash-title { font-size: 1.4rem; }
     }
 </style>
 </head>
@@ -216,47 +257,82 @@
     <p style="color: var(--text-muted); font-size: 0.9rem;">Optimizing reader engine...</p>
 </div>
 
-<!-- PANIC MODE -->
-<div id="panic-screen" onclick="togglePanic()">
-    <div class="panic-header">
-        <span>Q3_Financial_Projections_Internal.xlsx</span>
-        <span style="font-size: 0.8rem;">AutoSave Off</span>
-    </div>
-    <div style="display: flex; background: #f0f0f0; border-bottom: 1px solid #ccc; padding: 5px 10px; font-size: 12px; color: #666;">
-        <span style="margin-right: 20px;">File</span><span style="margin-right: 20px;">Home</span><span style="margin-right: 20px;">Insert</span><span>Formulas</span>
-    </div>
-    <div class="panic-grid">
-        <div class="panic-col">
-            <div class="panic-cell header">1</div><div class="panic-cell header">2</div><div class="panic-cell header">3</div><div class="panic-cell header">4</div><div class="panic-cell header">5</div><div class="panic-cell header">6</div><div class="panic-cell header">7</div><div class="panic-cell header">8</div><div class="panic-cell header">9</div><div class="panic-cell header">10</div>
+<!-- PANIC MODE (MARKETING DASHBOARD) -->
+<div id="panic-screen">
+    <div class="dash-header">
+        <div class="dash-logo">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            NexusGrowth Agency
         </div>
-        <div class="panic-col" style="flex: 1;">
-            <div class="panic-cell header" style="justify-content: flex-start;">A</div>
-            <div class="panic-cell">Revenue Projections</div>
-            <div class="panic-cell">Q1 Total</div>
-            <div class="panic-cell">$45,200</div>
-            <div class="panic-cell">$52,100</div>
-            <div class="panic-cell">$48,900</div>
-            <div class="panic-cell">Total YTD</div>
-            <div class="panic-cell">$146,200</div>
-            <div class="panic-cell">Variance</div>
-            <div class="panic-cell">+4.2%</div>
-        </div>
-        <div class="panic-col" style="flex: 1; display: none;" id="panic-extra-col">
-            <div class="panic-cell header" style="justify-content: flex-start;">B</div>
-            <div class="panic-cell">Q2 Total</div>
-            <div class="panic-cell">$58,400</div>
-            <div class="panic-cell">$61,200</div>
-            <div class="panic-cell">$59,800</div>
-            <div class="panic-cell">Status</div>
-            <div class="panic-cell" style="color: green;">On Track</div>
-            <div class="panic-cell">Review Date</div>
-            <div class="panic-cell">10/15/2026</div>
-            <div class="panic-cell">Notes</div>
+        <div class="dash-user">
+            <span>Q3 Performance Overview</span>
+            <div class="dash-avatar">RR</div>
         </div>
     </div>
-    <div style="padding: 10px; background: #217346; color: white; text-align: center; font-size: 12px; cursor: pointer;">
-        Tap anywhere to close
+    
+    <div class="dash-content">
+        <div class="dash-title">Campaign Dashboard</div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-title">Total Ad Spend</div>
+                <div class="stat-value">$124,592</div>
+                <div class="stat-change">↑ 12.5% vs last month</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">Return on Ad Spend (ROAS)</div>
+                <div class="stat-value">4.2x</div>
+                <div class="stat-change">↑ 0.8x vs last month</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">Conversion Rate</div>
+                <div class="stat-value">3.84%</div>
+                <div class="stat-change negative">↓ 0.2% vs last month</div>
+            </div>
+        </div>
+
+        <div class="dash-row">
+            <div class="card">
+                <div class="card-header">
+                    <span>Revenue vs Spend</span>
+                    <span style="color:#6b7280; font-size:0.85rem;">Last 6 Months</span>
+                </div>
+                <div class="card-body">
+                    <div class="chart-bars">
+                        <div class="chart-bar-wrapper"><div class="chart-bar" style="height: 40%;"></div><div class="chart-label">Apr</div></div>
+                        <div class="chart-bar-wrapper"><div class="chart-bar" style="height: 55%;"></div><div class="chart-label">May</div></div>
+                        <div class="chart-bar-wrapper"><div class="chart-bar" style="height: 45%;"></div><div class="chart-label">Jun</div></div>
+                        <div class="chart-bar-wrapper"><div class="chart-bar" style="height: 70%;"></div><div class="chart-label">Jul</div></div>
+                        <div class="chart-bar-wrapper"><div class="chart-bar" style="height: 85%;"></div><div class="chart-label">Aug</div></div>
+                        <div class="chart-bar-wrapper"><div class="chart-bar" style="height: 95%; background: #10b981;"></div><div class="chart-label">Sep</div></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">Action Items</div>
+                <div class="card-body">
+                    <div class="task-item">
+                        <div class="task-check done"></div>
+                        <div class="task-text done">Review Q3 Facebook Ads budget</div>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-check done"></div>
+                        <div class="task-text done">Update landing page copy for A/B test</div>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-check" onclick="this.classList.toggle('done'); this.nextElementSibling.classList.toggle('done')"></div>
+                        <div class="task-text">Schedule client strategy call (Acme Corp)</div>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-check" onclick="this.classList.toggle('done'); this.nextElementSibling.classList.toggle('done')"></div>
+                        <div class="task-text">Analyze TikTok ad creative performance</div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+    <button class="dash-exit" onclick="togglePanic()">Close Workspace ✕</button>
 </div>
 
 <div id="app-container" style="display: none; height: 100vh; flex-direction: column;">
@@ -324,7 +400,7 @@
                 <button class="icon-btn" onclick="document.getElementById('speech-panel').classList.add('hidden')" style="border:none; width:24px; height:24px;">✕</button>
             </div>
             <div class="spoken-text" id="spoken-text">
-                <div style="opacity:0.5; font-style:italic; font-size:0.9rem;">Press "Read to Me" to begin. Tap any word to read from there.</div>
+                <div style="opacity:0.5; font-style:italic; font-size:0.9rem;">Press "Read to Me" to begin. Tap any sentence to read from there.</div>
             </div>
         </aside>
     </div>
@@ -387,8 +463,7 @@
     const synth = window.speechSynthesis;
     let isSpeaking = false;
     let sentences = [];
-    let words = []; // Array of word elements for highlighting
-    let currentWordIdx = -1;
+    let sentenceEls = [];
     let currentSentenceIdx = -1;
     let speechRate = 1.0;
     let availableVoices = [];
@@ -439,7 +514,6 @@
         currentPage = pageNum;
         readerContainer.scrollTop = 0;
         
-        // Update progress bar
         progressBar.style.width = ((currentPage / totalPages) * 100) + '%';
         
         prepareSpeech();
@@ -499,43 +573,48 @@
 
     function displaySentences(arr) {
         spokenTextEl.innerHTML = '';
-        words = [];
+        sentenceEls = [];
         sentences = [];
+        
         if (!arr.length) {
             spokenTextEl.innerHTML = '<div style="opacity:0.5; font-style:italic; padding:1rem;">No readable text. Skipping...</div>';
             return;
         }
         
+        // Group into paragraphs of 4 sentences for better readability
+        let currentP = document.createElement('div');
+        currentP.className = 'paragraph';
+        
         arr.forEach((s, i) => {
             sentences.push({ text: s, index: i });
-            const sentenceSpan = document.createElement('span');
-            sentenceSpan.className = 'sentence';
-            sentenceSpan.style.display = 'block';
-            sentenceSpan.style.marginBottom = '0.5rem';
             
-            // Split sentence into words for immersive highlighting
-            const wordsArr = s.split(' ');
-            wordsArr.forEach((w, wIdx) => {
-                const wordSpan = document.createElement('span');
-                wordSpan.className = 'word';
-                wordSpan.textContent = w + ' ';
-                wordSpan.onclick = () => {
-                    if (!isSpeaking) playBtn.click();
-                    currentSentenceIdx = i;
-                    speakFromIndex(i);
-                };
-                sentenceSpan.appendChild(wordSpan);
-                words.push({ el: wordSpan, sentenceIdx: i, wordIdx: wIdx });
-            });
-            spokenTextEl.appendChild(sentenceSpan);
+            const span = document.createElement('span');
+            span.className = 'sentence';
+            span.textContent = s + ' ';
+            span.onclick = () => {
+                if (!isSpeaking) playBtn.click();
+                currentSentenceIdx = i;
+                speakFromIndex(i);
+            };
+            
+            currentP.appendChild(span);
+            sentenceEls.push(span);
+            
+            if ((i + 1) % 4 === 0) {
+                spokenTextEl.appendChild(currentP);
+                currentP = document.createElement('div');
+                currentP.className = 'paragraph';
+            }
         });
+        if (currentP.hasChildNodes()) spokenTextEl.appendChild(currentP);
     }
 
-    function highlightWord(idx) {
-        words.forEach(w => w.el.classList.remove('active'));
-        if (idx >= 0 && idx < words.length) {
-            words[idx].el.classList.add('active');
-            words[idx].el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    function highlightSentence(idx) {
+        sentenceEls.forEach(el => el.classList.remove('active'));
+        if (idx >= 0 && idx < sentenceEls.length) {
+            const el = sentenceEls[idx];
+            el.classList.add('active');
+            el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
         }
     }
 
@@ -552,11 +631,10 @@
         playBtn.textContent = '⏸ Stop Reading';
         playBtn.classList.add('stop-mode');
 
-        const speakNextSentence = (sIdx) => {
+        const speakNext = (idx) => {
             if (!isSpeaking) return;
-            if (sIdx >= sentences.length) {
-                // Page finished, auto advance
-                highlightWord(-1);
+            if (idx >= sentences.length) {
+                highlightSentence(-1);
                 if (currentPage < totalPages) {
                     setTimeout(async () => {
                         if (!isSpeaking) return;
@@ -571,47 +649,28 @@
                 return;
             }
             
-            const sentenceText = sentences[sIdx].text;
-            const u = new SpeechSynthesisUtterance(sentenceText);
+            const u = new SpeechSynthesisUtterance(sentences[idx].text);
             u.rate = speechRate;
             if (selectedVoiceName) {
                 const v = availableVoices.find(v => v.name === selectedVoiceName);
                 if (v) u.voice = v;
             }
             
-            // Word-by-word boundary highlighting (the expensive feature)
-            u.onboundary = (event) => {
-                if (event.name === 'word') {
-                    // Find the word index within our flat `words` array
-                    const sentenceWords = words.filter(w => w.sentenceIdx === sIdx);
-                    let charCount = 0;
-                    for (let i = 0; i < sentenceWords.length; i++) {
-                        const wText = sentenceWords[i].el.textContent;
-                        if (charCount >= event.charIndex) {
-                            highlightWord(words.indexOf(sentenceWords[i]));
-                            break;
-                        }
-                        charCount += wText.length;
-                    }
-                }
-            };
-            
             u.onstart = () => {
-                currentSentenceIdx = sIdx;
+                currentSentenceIdx = idx;
+                highlightSentence(idx);
             };
-            
             u.onend = () => {
-                if (isSpeaking) speakNextSentence(sIdx + 1);
+                if (isSpeaking) speakNext(idx + 1);
             };
-            
             u.onerror = (e) => {
                 if (e.error === 'interrupted' || e.error === 'canceled') return;
-                if (isSpeaking) speakNextSentence(sIdx + 1);
+                if (isSpeaking) speakNext(idx + 1);
             };
             
             synth.speak(u);
         };
-        speakNextSentence(startIdx);
+        speakNext(startIdx);
     }
 
     async function goToNextReadablePage(pageNum) {
@@ -629,7 +688,7 @@
         isSpeaking = false;
         playBtn.textContent = '▶ Read to Me';
         playBtn.classList.remove('stop-mode');
-        highlightWord(-1);
+        highlightSentence(-1);
     }
 
     playBtn.addEventListener('click', async () => {
@@ -643,7 +702,6 @@
         if (count > 0) {
             speakFromIndex(0);
         } else {
-            // Auto-skip empty pages instantly
             if (currentPage < totalPages) {
                 await renderPage(currentPage + 1);
                 playBtn.click();
@@ -748,7 +806,6 @@
         if (isPanicMode) {
             synth.cancel();
             panicScreen.classList.add('active');
-            document.getElementById('panic-extra-col').style.display = window.innerWidth > 600 ? 'flex' : 'none';
         } else {
             panicScreen.classList.remove('active');
         }
@@ -772,7 +829,7 @@
         if (id === 3) initScramble();
     };
 
-    // (Mini Games Logic stays the same as previous version)
+    // Mini Games Logic
     let reactionState = 'waiting'; let reactionTimeout = null; let startTime = 0;
     function initReaction() {
         reactionState = 'waiting';
