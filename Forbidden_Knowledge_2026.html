@@ -49,12 +49,24 @@
 
     /* ---------- LOADING SCREEN ---------- */
     #loading-screen {
-        position: fixed; inset: 0; background: var(--bg-main); z-index: 9999;
+        position: fixed; inset: 0; background: #0d1117; z-index: 9999;
         display: flex; flex-direction: column; align-items: center; justify-content: center;
-        transition: opacity 0.5s;
+        transition: opacity 0.8s ease;
     }
+    
+    .book-cover-img {
+        width: 280px; max-width: 80vw; height: auto;
+        border-radius: 8px; box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.1);
+        margin-bottom: 2rem; animation: float 3s ease-in-out infinite;
+    }
+    @keyframes float {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+        100% { transform: translateY(0px); }
+    }
+
     .spinner {
-        width: 50px; height: 50px; border: 4px solid rgba(255,255,255,0.1);
+        width: 40px; height: 40px; border: 3px solid rgba(255,255,255,0.1);
         border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite;
         margin-bottom: 1rem;
     }
@@ -87,12 +99,19 @@
         flex: 1; overflow-y: auto; overflow-x: auto; padding: 2rem 1rem 9rem 1rem;
         display: flex; flex-direction: column; align-items: center;
         background: var(--bg-main); scroll-behavior: smooth;
+        background-image: url('https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-BookCover.jpg');
+        background-size: contain;
+        background-position: center;
+        background-repeat: no-repeat;
     }
 
     #pdf-canvas {
         display: block; box-shadow: 0 10px 30px -5px rgba(0,0,0,0.5);
         border-radius: 4px; background: white; max-width: 100%; height: auto;
-        transition: filter 0.3s;
+        transition: filter 0.3s, opacity 0.5s;
+        position: relative;
+        z-index: 2;
+        opacity: 0; /* Starts invisible, fades in when PDF loads */
     }
 
     /* Filters */
@@ -244,8 +263,9 @@
 <div class="progress-bar-container"><div class="progress-bar" id="progress-bar"></div></div>
 
 <div id="loading-screen">
+    <img src="https://quantum-freedom-site.vercel.app/ForbiddenKnowledge-BookCover.jpg" alt="Forbidden Knowledge Book Cover" class="book-cover-img">
     <div class="spinner"></div>
-    <h2 style="font-weight: 600; margin-bottom: 0.5rem;">Preparing Forbidden Knowledge</h2>
+    <h2 style="font-weight: 600; margin-bottom: 0.5rem; color: white;">Preparing Forbidden Knowledge</h2>
     <p style="color: var(--text-muted); font-size: 0.9rem;">Optimizing reader engine...</p>
 </div>
 
@@ -465,11 +485,14 @@
     // ===== INIT =====
     async function init() {
         await loadPDF();
+        // Fade out loading screen
         loadingScreen.style.opacity = '0';
         setTimeout(() => {
             loadingScreen.style.display = 'none';
             appContainer.style.display = 'flex';
-        }, 500);
+            // Fade the PDF canvas in so the background cover peeks through for a second
+            canvas.style.opacity = '1';
+        }, 800);
     }
 
     async function loadPDF() {
@@ -501,6 +524,9 @@
         
         canvas.width = scaledViewport.width;
         canvas.height = scaledViewport.height;
+        
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
         await page.render({ canvasContext: ctx, viewport: scaledViewport }).promise;
         
         currentPage = pageNum;
@@ -616,7 +642,6 @@
         return arr.length;
     }
 
-    // FIXED: Using addEventListener to prevent crashes
     function speakFromIndex(startIdx) {
         synth.cancel();
         isSpeaking = true;
