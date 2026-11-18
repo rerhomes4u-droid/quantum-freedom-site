@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🎙️ The Sovereign Operator - Interview Command Center</title>
+<style>
+    :root {
+        --bg: #0f172a;
+        --panel: #1e293b;
+        --text: #f8fafc;
+        --text-muted: #94a3b8;
+        --accent: #ef4444;
+        --success: #22c55e;
+        --border: #334155;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        display: flex;
+        height: 100vh;
+        overflow: hidden;
+    }
+
+    /* ================= SIDEBAR ================= */
+    .sidebar {
+        width: 280px;
+        background: var(--panel);
+        border-right: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .sidebar-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid var(--border);
+        text-align: center;
+    }
+
+    .sidebar-header h1 {
+        font-size: 1.2rem;
+        font-weight: 800;
+        color: var(--accent);
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+    
+    .sidebar-header p {
+        font-size: 0.8rem;
+        color: var(--text-muted);
+        margin-top: 0.5rem;
+    }
+
+    .nav-list {
+        flex: 1;
+        overflow-y: auto;
+        padding: 1rem 0;
+    }
+
+    .nav-item {
+        padding: 1rem 1.5rem;
+        cursor: pointer;
+        border-left: 4px solid transparent;
+        transition: all 0.2s;
+        font-weight: 500;
+        font-size: 0.95rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .nav-item:hover {
+        background: rgba(255,255,255,0.05);
+    }
+
+    .nav-item.active {
+        border-left-color: var(--accent);
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--accent);
+    }
+
+    .nav-item.completed {
+        color: var(--success);
+    }
+
+    .nav-item .check {
+        width: 18px;
+        height: 18px;
+        border: 2px solid var(--text-muted);
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        color: transparent;
+    }
+
+    .nav-item.completed .check {
+        background: var(--success);
+        border-color: var(--success);
+        color: white;
+    }
+
+    /* Timer */
+    .timer-panel {
+        padding: 1.5rem;
+        border-top: 1px solid var(--border);
+        background: #0b1120;
+        text-align: center;
+    }
+
+    .timer-display {
+        font-size: 2.5rem;
+        font-weight: 900;
+        font-variant-numeric: tabular-nums;
+        color: var(--text);
+        margin-bottom: 0.5rem;
+    }
+
+    .timer-display.warning {
+        color: var(--accent);
+        animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.5; }
+        100% { opacity: 1; }
+    }
+
+    .timer-controls {
+        display: flex;
+        gap: 0.5rem;
+        justify-content: center;
+    }
+
+    .timer-btn {
+        background: var(--border);
+        border: none;
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 0.8rem;
+        transition: background 0.2s;
+    }
+    
+    .timer-btn:hover { background: #475569; }
+    .timer-btn.reset { background: var(--accent); }
+    .timer-btn.reset:hover { background: #dc2626; }
+
+    /* ================= MAIN CONTENT ================= */
+    .main-content {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto;
+        padding: 3rem;
+        scroll-behavior: smooth;
+    }
+
+    .section {
+        display: none;
+        max-width: 900px;
+        margin: 0 auto;
+        width: 100%;
+        animation: fadeIn 0.3s ease-out;
+    }
+
+    .section.active {
+        display: block;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .section-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin-bottom: 0.5rem;
+        color: var(--text);
+        line-height: 1.1;
+    }
+
+    .section-subtitle {
+        font-size: 1.1rem;
+        color: var(--accent);
+        margin-bottom: 2rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .talking-point {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        border-left: 4px solid var(--accent);
+    }
+
+    .talking-point h3 {
+        font-size: 1.2rem;
+        margin-bottom: 0.75rem;
+        color: #fca5a5;
+    }
+
+    .talking-point p {
+        font-size: 1.1rem;
+        line-height: 1.7;
+        color: #e2e8f0;
+        margin-bottom: 0.75rem;
+    }
+
+    .talking-point ul {
+        margin-left: 1.5rem;
+        margin-top: 0.5rem;
+        color: #cbd5e1;
+        line-height: 1.6;
+    }
+
+    .talking-point li {
+        margin-bottom: 0.5rem;
+    }
+
+    .quote-block {
+        font-style: italic;
+        color: #fbbf24;
+        font-size: 1.2rem;
+        padding: 1rem;
+        border-left: 2px solid #fbbf24;
+        background: rgba(251, 191, 36, 0.1);
+        margin: 1rem 0;
+    }
+
+    .highlight {
+        color: #fca5a5;
+        font-weight: 700;
+    }
+
+    /* Emergency Panel */
+    .emergency-panel {
+        background: #450a0a;
+        border: 1px solid #7f1d1d;
+        border-radius: 12px;
+        padding: 2rem;
+        margin-top: 2rem;
+    }
+
+    .emergency-panel h3 {
+        color: #fca5a5;
+        margin-bottom: 1rem;
+        font-size: 1.3rem;
+    }
+
+    .emergency-panel p {
+        color: #fecaca;
+        margin-bottom: 1rem;
+        line-height: 1.6;
+    }
+
+    .btn-next {
+        display: inline-block;
+        background: var(--accent);
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 700;
+        font-size: 1.1rem;
+        margin-top: 2rem;
+        cursor: pointer;
+        border: none;
+        transition: background 0.2s;
+    }
+
+    .btn-next:hover { background: #dc2626; }
+
+</style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h1>Sovereign Operator</h1>
+            <p>Interview Command Center</p>
+        </div>
+        
+        <div class="nav-list" id="nav-list">
+            <div class="nav-item active" data-target="s1"><div class="check">✓</div> 1. The Hook</div>
+            <div class="nav-item" data-target="s2"><div class="check">✓</div> 2. Dr. Group (The Root)</div>
+            <div class="nav-item" data-target="s3"><div class="check">✓</div> 3. The APEC Misdirection</div>
+            <div class="nav-item" data-target="s4"><div class="check">✓</div> 4. The Synagogue of Satan</div>
+            <div class="nav-item" data-target="s5"><div class="check">✓</div> 5. Love You to Abandon</div>
+            <div class="nav-item" data-target="s6"><div class="check">✓</div> 6. The Free Book</div>
+            <div class="nav-item" data-target="s7" style="color: #fca5a5;"><div class="check" style="border-color:#fca5a5;"></div> ⚠️ Emergency Q&A</div>
+        </div>
+
+        <div class="timer-panel">
+            <div class="timer-display" id="timer-display">00:00</div>
+            <div class="timer-controls">
+                <button class="timer-btn" id="btn-start">Start</button>
+                <button class="timer-btn" id="btn-pause">Pause</button>
+                <button class="timer-btn reset" id="btn-reset">Reset</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content" id="main-content">
+
+        <!-- SECTION 1 -->
+        <div class="section active" id="s1">
+            <h2 class="section-title">The Hook: The Two Wings</h2>
+            <div class="section-subtitle">Establishing the premise immediately</div>
+            
+            <div class="talking-point">
+                <h3>Open Strong</h3>
+                <p>"Chris, I love you to abandon. And I say that to everyone watching right now."</p>
+                <p>"I have two rules in my house. Keep Jesus in your heart, and love people enough to let them walk away if they don't want the truth. We are not here to make friends today. We are here to drop truth bombs."</p>
+            </div>
+
+            <div class="talking-point">
+                <h3>The Rotten Bird</h3>
+                <p>"The Right and the Left are two wings of the same rotten bird. They pretend to fight, but they fly in the exact same direction. They are the institutionalized class that keeps us trapped."</p>
+                <ul>
+                    <li>They argue over pronouns while the banks drain the economy.</li>
+                    <li>They argue over borders while they traffic children through those same borders.</li>
+                    <li>They argue over red vs. blue, while the system itself is the color of death.</li>
+                </ul>
+            </div>
+
+            <button class="btn-next" onclick="nextSection()">Next: The Root Cause →</button>
+        </div>
+
+        <!-- SECTION 2 -->
+        <div class="section" id="s2">
+            <h2 class="section-title">Dr. Group: The Root Cause</h2>
+            <div class="section-subtitle">The microcosm is the macrocosm</div>
+
+            <div class="talking-point">
+                <h3>The Syllabus</h3>
+                <p>"I just went through Dr. Group's Natural Health Coach syllabus. It is incredible. But listen to the philosophy: <strong>You do not treat the symptom. You treat the root cause.</strong>"</p>
+                <p>"If the liver is toxic, you don't just take a pill for the headache. You detoxify the liver. You cleanse the temple."</p>
+            </div>
+
+            <div class="talking-point">
+                <h3>The Metaphor for the Nation</h3>
+                <p>"Our nation is a body. The politicians are fighting over the symptoms—taxes, inflation, who said what on Twitter. But the root cause of the dis-ease is the toxicity of the system itself."</p>
+                <div class="quote-block">"We are being poisoned by the very entities that claim to heal us."</div>
+                <p>"Dr. Group teaches us to address the four instigators: the toxic gut, the toxic liver, parasites, and heavy metals. In the body politic, our four instigators are the central banks, the media, the deep state, and the pharmaceutical cartel."</p>
+            </div>
+
+            <button class="btn-next" onclick="nextSection()">Next: The APEC Misdirection →</button>
+        </div>
+
+        <!-- SECTION 3 -->
+        <div class="section" id="s3">
+            <h2 class="section-title">The APEC Misdirection</h2>
+            <div class="section-subtitle">The greatest magic trick on earth</div>
+
+            <div class="talking-point">
+                <h3>The Agenda</h3>
+                <p>"Chris, look at the image you sent me about the APEC Summit in Shenzhen on November 19th. Nuclear Arms, War in Iran, Ukraine, Global Trade, World Peace."</p>
+                <p>"It sounds so important, doesn't it? It's a stage play."</p>
+            </div>
+
+            <div class="talking-point">
+                <h3>The Missing Topic</h3>
+                <p>"Notice what is NOT on the agenda. They aren't talking about the Epstein files. They aren't talking about the child trafficking networks they are using to blackmail each other. They aren't talking about the medical protocols that killed my uncle Hugo."</p>
+                <p><span class="highlight">"It is all misdirection.</span> While the world watches the magicians shake hands in Shenzhen, they are picking our pockets and destroying our children's future."</p>
+            </div>
+
+            <button class="btn-next" onclick="nextSection()">Next: The Synagogue of Satan →</button>
+        </div>
+
+        <!-- SECTION 4 -->
+        <div class="section" id="s4">
+            <h2 class="section-title">The Synagogue of Satan</h2>
+            <div class="section-subtitle">Those who claim to be of God, but violate His laws</div>
+
+            <div class="talking-point">
+                <h3>Defining the Enemy</h3>
+                <p>"When I talk about the Synagogue of Satan, I am not talking about a religion. I am talking about a spirit. It is the spirit of those who claim to be of God, but violate His most fundamental laws."</p>
+                <p>"And what is the most fundamental law? <strong>Thou Shalt Not Kill.</strong>"</p>
+            </div>
+
+            <div class="talking-point">
+                <h3>They Are Murderers</h3>
+                <p>"They fund the wars. They push the deadly vaccines. They use child sacrifice as leverage. They are the ones Jesus warned us about—the wolves in sheep's clothing."</p>
+                <ul>
+                    <li>They sit in the halls of power and pretend to be philanthropists.</li>
+                    <li>They claim to be the caretakers of the planet, while they poison our water and our air.</li>
+                    <li>They are the ones who murdered my uncle Hugo in a hospital bed.</li>
+                </ul>
+                <div class="quote-block">"You will know them by their fruits. And their fruits are death."</div>
+            </div>
+
+            <button class="btn-next" onclick="nextSection()">Next: Love You to Abandon →</button>
+        </div>
+
+        <!-- SECTION 5 -->
+        <div class="section" id="s5">
+            <h2 class="section-title">Love You to Abandon</h2>
+            <div class="section-subtitle">The call to sovereignty</div>
+
+            <div class="talking-point">
+                <h3>The Hard Truth</h3>
+                <p>"We have to stop trying to save the system. We have to build our own."</p>
+                <p>"You don't fix a rotting house by rearranging the furniture. You leave it and build a fortress on higher ground."</p>
+            </div>
+
+            <div class="talking-point">
+                <h3>Building the Nation</h3>
+                <p>"This is what my book is about. It's about creating your own nation. It's about becoming a Sovereign Operator."</p>
+                <p>"It is about taking the power back—legally, financially, and spiritually. We forgive them for their sins, but we do not let them rule over us anymore."</p>
+            </div>
+
+            <button class="btn-next" onclick="nextSection()">Next: The Free Book →</button>
+        </div>
+
+        <!-- SECTION 6 -->
+        <div class="section" id="s6">
+            <h2 class="section-title">The Book & The Phase Release</h2>
+            <div class="section-subtitle">Arming the people</div>
+
+            <div class="talking-point">
+                <h3>The Airline Shutdown</h3>
+                <p>"This week, the airline shutdown triggered a new phase. The system is showing its cracks. People are starting to realize they can't rely on the infrastructure."</p>
+                <p>"We need to respect that shift. We need to arm ourselves with knowledge right now."</p>
+            </div>
+
+            <div class="talking-point">
+                <h3>The Free Release</h3>
+                <p>"That is why I am giving away my book, <em>Forbidden Knowledge: The Sovereign Operator</em>, completely free right now."</p>
+                <p>"I don't want your money. I want your eyes. I want you to read it, verify it, and get angry enough to do something about it."</p>
+                <p>"The link is in the description. Download it. Read it. Share it with someone who is still asleep."</p>
+            </div>
+
+            <button class="btn-next" onclick="nextSection()">Emergency Q&A →</button>
+        </div>
+
+        <!-- SECTION 7 -->
+        <div class="section" id="s7">
+            <h2 class="section-title">Emergency Q&A</h2>
+            <div class="section-subtitle">If the conversation goes off-script</div>
+
+            <div class="emergency-panel">
+                <h3>Q: What do you say to people who think you're a conspiracy theorist?</h3>
+                <p><strong>Answer:</strong> "I am not afraid of your checking. I am afraid of your not checking. I am not your priest. I am not your professor. I am your brother. Check the court records. Check the Epstein files. Check the VAERS data. I love you enough to let you check."</p>
+            </div>
+
+            <div class="emergency-panel">
+                <h3>Q: How do we fight back against these elites?</h3>
+                <p><strong>Answer:</strong> "We don't fight them on their terms. We outsmart them. We remove ourselves from their jurisdiction. We build parallel societies. We create our own wealth. We build the Amnesty Coalition for Unity and we stop paying their taxes."</p>
+            </div>
+
+            <div class="emergency-panel">
+                <h3>Q: Why did you choose to give the book away for free?</h3>
+                <p><strong>Answer:</strong> "Because free knowledge is often unvalued, and unvalued knowledge is never used. This is a transaction of love. The airline shutdowns show we are in a new phase. I need people armed with this information *yesterday*."</p>
+            </div>
+
+            <div class="emergency-panel">
+                <h3>Q: What is the most important thing people can do right now?</h3>
+                <p><strong>Answer:</strong> "Get right with God. Protect your family. Detoxify your body (thank you Dr. Group). Stop watching the news and start reading the documents. And start building your own nation."</p>
+            </div>
+        </div>
+
+    </div>
+
+<script>
+    // Navigation Logic
+    const navItems = document.querySelectorAll('.nav-item');
+    const sections = document.querySelectorAll('.section');
+    let currentIndex = 0;
+
+    function showSection(index) {
+        // Update Nav
+        navItems.forEach((item, i) => {
+            if (i === index) {
+                item.classList.add('active');
+            } else {
+                item.classList.remove('active');
+            }
+        });
+
+        // Update Sections
+        sections.forEach((sec, i) => {
+            if (i === index) {
+                sec.classList.add('active');
+            } else {
+                sec.classList.remove('active');
+            }
+        });
+
+        // Scroll to top of main content
+        document.getElementById('main-content').scrollTop = 0;
+        currentIndex = index;
+    }
+
+    navItems.forEach((item, index) => {
+        item.addEventListener('click', () => {
+            showSection(index);
+            // Mark as completed if moving past it
+            if (index > 0) {
+                navItems[index - 1].classList.add('completed');
+            }
+        });
+    });
+
+    function nextSection() {
+        if (currentIndex < sections.length - 1) {
+            // Mark current as completed
+            navItems[currentIndex].classList.add('completed');
+            showSection(currentIndex + 1);
+        }
+    }
+
+    // Timer Logic
+    let timerInterval;
+    let seconds = 0;
+    let isRunning = false;
+
+    const timerDisplay = document.getElementById('timer-display');
+    const btnStart = document.getElementById('btn-start');
+    const btnPause = document.getElementById('btn-pause');
+    const btnReset = document.getElementById('btn-reset');
+
+    function updateTimerDisplay() {
+        const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+        const s = (seconds % 60).toString().padStart(2, '0');
+        timerDisplay.textContent = `${m}:${s}`;
+        
+        // Warn if over 45 minutes
+        if (seconds >= 2700) {
+            timerDisplay.classList.add('warning');
+        } else {
+            timerDisplay.classList.remove('warning');
+        }
+    }
+
+    btnStart.addEventListener('click', () => {
+        if (!isRunning) {
+            isRunning = true;
+            timerInterval = setInterval(() => {
+                seconds++;
+                updateTimerDisplay();
+            }, 1000);
+        }
+    });
+
+    btnPause.addEventListener('click', () => {
+        isRunning = false;
+        clearInterval(timerInterval);
+    });
+
+    btnReset.addEventListener('click', () => {
+        isRunning = false;
+        clearInterval(timerInterval);
+        seconds = 0;
+        updateTimerDisplay();
+    });
+
+    // Initialize first state
+    updateTimerDisplay();
+</script>
+</body>
+</html>
