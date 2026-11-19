@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⚙️ The Sovereign Operator Engine</title>
+<style>
+    :root {
+        --bg: #050505;
+        --panel: #0f0f0f;
+        --card: #1a1a1a;
+        --text: #e5e5e5;
+        --muted: #888888;
+        --border: #2a2a2a;
+        --accent: #f59e0b;
+        --success: #10b981;
+        --blue: #3b82f6;
+        --purple: #8b5cf6;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        font-family: 'Inter', -apple-system, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        display: flex;
+        min-height: 100vh;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+        width: 260px;
+        background: var(--panel);
+        border-right: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        height: 100vh;
+    }
+    .logo {
+        padding: 1.5rem;
+        font-size: 1rem;
+        font-weight: 900;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: var(--accent);
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .nav { flex: 1; padding: 1rem 0; }
+    .nav-item {
+        padding: 0.9rem 1.5rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-weight: 600;
+        color: var(--muted);
+        border-left: 3px solid transparent;
+        transition: all 0.2s;
+        font-size: 0.85rem;
+    }
+    .nav-item:hover { color: var(--text); background: rgba(255,255,255,0.02); }
+    .nav-item.active { color: var(--accent); border-left-color: var(--accent); background: rgba(245, 158, 11, 0.1); }
+
+    /* MAIN */
+    .main {
+        flex: 1;
+        margin-left: 260px;
+        padding: 2rem 3rem;
+        max-width: 1000px;
+    }
+    .view { display: none; animation: fadeIn 0.3s; }
+    .view.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    h1 { font-size: 2rem; margin-bottom: 0.5rem; }
+    .subtitle { color: var(--muted); font-size: 1rem; margin-bottom: 2rem; line-height: 1.6; }
+
+    /* CARDS */
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
+    .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1.5rem;
+        position: relative;
+        overflow: hidden;
+    }
+    .card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; width: 4px; height: 100%;
+        background: var(--accent);
+    }
+    .card h3 { font-size: 1.1rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+    .card p { color: var(--muted); font-size: 0.85rem; line-height: 1.5; margin-bottom: 1rem; }
+
+    .btn {
+        background: transparent;
+        color: var(--text);
+        border: 1px solid var(--border);
+        padding: 0.7rem 1.2rem;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.85rem;
+    }
+    .btn:hover { background: var(--border); }
+    .btn-primary { background: var(--accent); color: #000; border: none; }
+    .btn-primary:hover { background: #d97706; }
+    .btn-blue { background: var(--blue); color: white; border: none; }
+    .btn-blue:hover { background: #2563eb; }
+    .btn-purple { background: var(--purple); color: white; border: none; }
+    .btn-purple:hover { background: #7c3aed; }
+
+    /* CODE BLOCK */
+    .code-block {
+        background: #000;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 1rem;
+        font-family: 'Courier New', monospace;
+        font-size: 0.8rem;
+        line-height: 1.5;
+        color: #a5b4fc;
+        white-space: pre-wrap;
+        position: relative;
+        margin-top: 1rem;
+    }
+    .copy-btn {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+        background: var(--card);
+        color: white;
+        border: none;
+        padding: 0.3rem 0.6rem;
+        border-radius: 4px;
+        font-size: 0.7rem;
+        cursor: pointer;
+    }
+    .copy-btn:hover { background: var(--accent); }
+
+    .toast {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        background: var(--success);
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: 8px;
+        font-weight: bold;
+        opacity: 0;
+        transition: 0.3s;
+        transform: translateY(20px);
+        z-index: 1000;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+</style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="logo">⚙️ Sovereign Engine</div>
+        <div class="nav">
+            <div class="nav-item active" onclick="switchView('dashboard')">📊 Command</div>
+            <div class="nav-item" onclick="switchView('workers')">🤖 The Workers</div>
+            <div class="nav-item" onclick="switchView('recruit')">🎯 The Recruitment</div>
+            <div class="nav-item" onclick="switchView('deploy')">🚀 Deployment</div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main">
+
+        <!-- VIEW: COMMAND -->
+        <div class="view active" id="view-dashboard">
+            <h1>The Sovereign Operator Engine</h1>
+            <p class="subtitle">This is not a game. This is the deployment dashboard for the autonomous agents that will run Joaq'n'Jadro's business, recruit their peers, and distribute Forbidden Knowledge.</p>
+            
+            <div class="grid">
+                <div class="card">
+                    <h3>🤖 The Workers</h3>
+                    <p>Deploy real autonomous agents that run 24/7. They write content, hunt leads, and close deals without you lifting a finger.</p>
+                    <button class="btn btn-primary" onclick="switchView('workers')">View Workers</button>
+                </div>
+                <div class="card">
+                    <h3>🎯 The Recruitment</h3>
+                    <p>Generate the exact scripts and systems to teach your peers how to sell the book and earn 50% commission. Build the army.</p>
+                    <button class="btn btn-blue" onclick="switchView('recruit')">Open Recruitment</button>
+                </div>
+                <div class="card">
+                    <h3>🚀 Deployment</h3>
+                    <p>The step-by-step technical guide to install and configure the workers on your own machines.</p>
+                    <button class="btn btn-purple" onclick="switchView('deploy')">Deploy Now</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: WORKERS -->
+        <div class="view" id="view-workers">
+            <h1>The Workers: Real Autonomous Agents</h1>
+            <p class="subtitle">These are the tools the hackers are actually using. They are not prompt libraries. They are execution engines that run on your hardware and connect to your business.</p>
+
+            <div class="grid">
+                <div class="card">
+                    <h3>🦞 Hermes Agent</h3>
+                    <p><strong>262,786 ⭐</strong> — "The agent that grows with you." It learns from every task and writes a "skill file" so it gets better at that specific task next time. This is the one that evolves.</p>
+                    <a href="https://github.com/hermes-agent/hermes-agent" target="_blank" class="btn">View Repo</a>
+                </div>
+                <div class="card">
+                    <h3>🦾 AutoAgents</h3>
+                    <p><strong>Rust-based multi-agent framework.</strong> Reason, Act, Remember, Collaborate. Designed for performance, safety, and scalability. Can run in the browser via WASM [citation:1].</p>
+                    <a href="https://github.com/liquidos-ai/AutoAgents" target="_blank" class="btn">View Repo</a>
+                </div>
+                <div class="card">
+                    <h3>📞 OpenCloser</h3>
+                    <p><strong>Open source AI SDR.</strong> AI cold calling, lead generation, sales automation. Full AI sales team running locally on your desktop. Built-in Twilio phone lines [citation:12].</p>
+                    <a href="https://github.com/issacops/opencloser-v2" target="_blank" class="btn">View Repo</a>
+                </div>
+                <div class="card">
+                    <h3>🧠 Eltes</h3>
+                    <p><strong>85+ specialized agents in 15 departments.</strong> C-Suite agents, A2A collaboration, knowledge graph, missions. The full AI agency in a box [citation:10].</p>
+                    <a href="https://github.com/zester4/eltes" target="_blank" class="btn">View Repo</a>
+                </div>
+                <div class="card">
+                    <h3>📱 ShapelessAI</h3>
+                    <p><strong>Social media agent.</strong> Schedule and publish posts across platforms via CLI. Durable jobs that run whether you stay connected or not [citation:5].</p>
+                    <a href="https://github.com/firstclasstree/shapelessai" target="_blank" class="btn">View Repo</a>
+                </div>
+                <div class="card">
+                    <h3>🌊 FlowWink</h3>
+                    <p><strong>Autonomous agentic CMS.</strong> FlowPilot writes content, qualifies leads, sends campaigns, and books meetings. Replaces 4 products in one [citation:9].</p>
+                    <a href="https://github.com/magnusfroste/flowwink" target="_blank" class="btn">View Repo</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: RECRUITMENT -->
+        <div class="view" id="view-recruit">
+            <h1>The Recruitment: Build the Army</h1>
+            <p class="subtitle">Joaquín and Alejandro don't just sell tours. They teach their peers how to sell Forbidden Knowledge and earn 50% commission. Here is the system.</p>
+
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <h3>🎯 The Pitch</h3>
+                <p>Use this exact script to recruit your first 5 peers. It's not a sales pitch. It's an invitation to sovereignty.</p>
+                <div class="code-block" id="recruit-pitch">
+                    <button class="copy-btn" onclick="copyText('recruit-pitch')">Copy</button>
+"Hey [Name], I know you're grinding. I was too. But I found something that changed everything.
+
+It's a book called Forbidden Knowledge. It exposes the system, but more importantly, it gives you the tools to exit it.
+
+Here's the deal: I can get you a free copy. Read it. If it hits you like it hit me, I'll show you how to sell it to your network and keep 50% of every sale.
+
+No startup cost. No inventory. Just truth and a system.
+
+You in?"
+                </div>
+            </div>
+
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <h3>📚 The Training</h3>
+                <p>Once they say yes, give them this prompt to generate their own marketing materials.</p>
+                <div class="code-block" id="recruit-training">
+                    <button class="copy-btn" onclick="copyText('recruit-training')">Copy</button>
+Act as a Sovereign Operator Trainer. I have a new recruit who wants to sell the book "Forbidden Knowledge: The Sovereign Operator" and earn 50% commission.
+
+They are [describe them: e.g., a tour guide in Colombia, a street vendor, a student].
+
+Write a 3-day training plan:
+Day 1: How to explain the book to a stranger in 30 seconds.
+Day 2: How to post on social media without being spammy.
+Day 3: How to close a sale and collect the deposit.
+
+Keep it simple. Keep it actionable. This is for someone who has never sold anything before.
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>💰 The Ledger</h3>
+                <p>Track every recruit, their sales, and their commission. The 50/50 split is the covenant.</p>
+                <table style="width:100%; border-collapse: collapse; margin-top: 1rem; font-size: 0.85rem;">
+                    <tr style="border-bottom: 1px solid var(--border); color: var(--muted); text-align: left;">
+                        <th style="padding: 0.5rem;">Recruit</th>
+                        <th style="padding: 0.5rem;">Sales</th>
+                        <th style="padding: 0.5rem;">Commission (50%)</th>
+                        <th style="padding: 0.5rem;">Nation (50%)</th>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.5rem;"><input type="text" placeholder="Name" style="background:transparent; border:none; color:white; width:100%;"></td>
+                        <td style="padding: 0.5rem;"><input type="number" placeholder="0" style="background:transparent; border:none; color:white; width:100%;"></td>
+                        <td style="padding: 0.5rem;">$0.00</td>
+                        <td style="padding: 0.5rem;">$0.00</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <!-- VIEW: DEPLOY -->
+        <div class="view" id="view-deploy">
+            <h1>Deployment: Install the Workers</h1>
+            <p class="subtitle">This is the technical guide. Give this to Joaquín and Alejandro. They don't need to understand the code. They just need to follow the steps.</p>
+
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <h3>Step 1: Install Docker</h3>
+                <p>Most of these agents run in Docker containers. It's a way to run software without messing up your computer.</p>
+                <p style="color: var(--muted);">Download Docker Desktop from docker.com. Install it. Open it. Leave it running in the background.</p>
+            </div>
+
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <h3>Step 2: Deploy OpenCloser (The Sales Agent)</h3>
+                <p>This is the AI that will hunt leads and make calls for you.</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyText('deploy-opencloser')">Copy</button>
+# Open your terminal (Command Prompt on Windows, Terminal on Mac)
+# Run these commands one by one:
+
+git clone https://github.com/issacops/opencloser-v2.git
+cd opencloser
+npm install
+npm run tauri dev
+                </div>
+                <p style="color: var(--muted); margin-top: 0.5rem;">Once it opens, click "Demo Mode" to see it work without any API keys. Then, add your Gemini API key (free from Google AI Studio) to enable real AI.</p>
+            </div>
+
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <h3>Step 3: Deploy ShapelessAI (The Social Media Agent)</h3>
+                <p>This agent will schedule and post your content automatically.</p>
+                <div class="code-block">
+                    <button class="copy-btn" onclick="copyText('deploy-shapeless')">Copy</button>
+# Install the Shapeless CLI
+npm install -g shapeless
+
+# Log in (you'll need a free account from shapelessai.com)
+shapeless login
+
+# Connect your Instagram, TikTok, and Facebook accounts
+shapeless connections
+
+# Schedule a post
+shapeless posts create --to <your-instagram-id> --text "The adventure of a lifetime awaits in Colombia. Link in bio." --queue
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Step 4: The Morning Routine</h3>
+                <p>Every morning, the boys do this:</p>
+                <ol style="margin-left: 1.5rem; color: var(--muted); line-height: 1.8;">
+                    <li>Open OpenCloser. Check the leads the AI found overnight.</li>
+                    <li>Approve the follow-up messages.</li>
+                    <li>Open Shapeless. Check the posts scheduled for the day.</li>
+                    <li>Record one raw video on their phone. Upload it. Let the AI write the captions.</li>
+                    <li>Go ride ATVs. The agents work while they play.</li>
+                </ol>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="toast" id="toast">Copied!</div>
+
+<script>
+    function switchView(id) {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        document.getElementById('view-' + id).classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
+
+    function copyText(id) {
+        const el = document.getElementById(id);
+        const text = el.innerText.replace('Copy', '').trim();
+        navigator.clipboard.writeText(text).then(() => {
+            const toast = document.getElementById('toast');
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        });
+    }
+</script>
+</body>
+</html>
