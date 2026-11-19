@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🏔️ Wild Adventures: The Sovereign Game</title>
+<style>
+    :root {
+        --bg: #0f172a;
+        --panel: #1e293b;
+        --card: #334155;
+        --text: #f8fafc;
+        --muted: #94a3b8;
+        --accent: #f59e0b; /* Adventure Gold */
+        --success: #10b981;
+        --blue: #3b82f6;
+        --purple: #8b5cf6;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+        font-family: 'Segoe UI', Roboto, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        overflow-x: hidden;
+    }
+
+    /* HEADER */
+    header {
+        background: var(--panel);
+        padding: 1rem 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--card);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
+
+    .logo {
+        font-size: 1.2rem;
+        font-weight: 900;
+        color: var(--accent);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .stats {
+        display: flex;
+        gap: 1.5rem;
+        font-weight: bold;
+    }
+
+    .stat-item {
+        display: flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+    
+    .xp-bar-container {
+        width: 150px;
+        height: 10px;
+        background: #000;
+        border-radius: 5px;
+        overflow: hidden;
+    }
+    .xp-bar {
+        height: 100%;
+        background: var(--accent);
+        width: 0%;
+        transition: width 0.5s ease;
+    }
+
+    /* MAIN GAME AREA */
+    .game-container {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+    }
+
+    .mission-card {
+        background: var(--panel);
+        border: 2px solid var(--card);
+        border-radius: 16px;
+        padding: 3rem;
+        max-width: 800px;
+        width: 100%;
+        text-align: center;
+        position: relative;
+        animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes popIn {
+        from { opacity: 0; transform: scale(0.9); }
+        to { opacity: 1; transform: scale(1); }
+    }
+
+    .level-badge {
+        background: var(--purple);
+        color: white;
+        padding: 0.4rem 1rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        position: absolute;
+        top: -15px;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .mission-title {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        color: var(--accent);
+    }
+
+    .mission-desc {
+        font-size: 1.2rem;
+        color: var(--muted);
+        margin-bottom: 2rem;
+        line-height: 1.6;
+    }
+
+    .reward-box {
+        background: rgba(16, 185, 129, 0.1);
+        border: 1px dashed var(--success);
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+        font-weight: bold;
+        color: var(--success);
+    }
+
+    /* BUTTONS */
+    .btn {
+        background: var(--card);
+        color: var(--text);
+        border: none;
+        padding: 1rem 2rem;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn:hover { background: #475569; transform: translateY(-2px); }
+    .btn-primary { background: var(--accent); color: #000; }
+    .btn-primary:hover { background: #d97706; }
+    .btn-success { background: var(--success); color: white; }
+    .btn-success:hover { background: #059669; }
+
+    /* MODAL / UPGRADE */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.8);
+        z-index: 200;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+    }
+    .modal.active { display: flex; }
+
+    .modal-content {
+        background: var(--panel);
+        border: 2px solid var(--accent);
+        border-radius: 16px;
+        padding: 2rem;
+        max-width: 600px;
+        width: 100%;
+        text-align: center;
+        animation: popIn 0.3s;
+    }
+
+    .modal-content h2 {
+        color: var(--accent);
+        margin-bottom: 1rem;
+        font-size: 2rem;
+    }
+
+    .prompt-box {
+        background: #000;
+        color: #a5b4fc;
+        padding: 1rem;
+        border-radius: 8px;
+        font-family: monospace;
+        text-align: left;
+        font-size: 0.9rem;
+        line-height: 1.5;
+        margin-top: 1rem;
+        position: relative;
+    }
+
+    .copy-btn {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+        background: var(--card);
+        color: white;
+        border: none;
+        padding: 0.3rem 0.6rem;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+    .copy-btn:hover { background: var(--accent); }
+
+    .toast {
+        position: fixed;
+        bottom: 2rem;
+        left: 50%;
+        transform: translateX(-50%) translateY(100px);
+        background: var(--success);
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: 30px;
+        font-weight: bold;
+        opacity: 0;
+        transition: all 0.3s;
+        z-index: 300;
+    }
+    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+</style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">🏔️ Wild Adventures</div>
+        <div class="stats">
+            <div class="stat-item">⭐ <span id="level-display">Level 1</span></div>
+            <div class="stat-item">
+                XP: <span id="xp-display">0</span>/100
+                <div class="xp-bar-container"><div class="xp-bar" id="xp-bar"></div></div>
+            </div>
+        </div>
+    </header>
+
+    <div class="game-container">
+        <div class="mission-card" id="mission-card">
+            <!-- Content injected by JS -->
+        </div>
+    </div>
+
+    <!-- UPGRADE MODAL -->
+    <div class="modal" id="upgrade-modal">
+        <div class="modal-content">
+            <h2>🎉 LEVEL UP!</h2>
+            <p>You have unlocked a <strong>Sovereign Upgrade</strong>. Copy this prompt and paste it into ChatGPT to automate your business.</p>
+            <div class="prompt-box" id="upgrade-prompt">
+                <!-- Prompt injected -->
+                <button class="copy-btn" onclick="copyUpgrade()">Copy</button>
+            </div>
+            <button class="btn btn-primary" style="margin-top: 2rem;" onclick="closeModalAndContinue()">Continue Mission →</button>
+        </div>
+    </div>
+
+    <div class="toast" id="toast">Copied!</div>
+
+<script>
+    // GAME STATE
+    let currentLevel = 1;
+    let currentXP = 0;
+    const xpPerLevel = 100;
+
+    // MISSIONS DATA
+    const missions = [
+        {
+            level: 1,
+            title: "The Setup",
+            desc: "Before you can sell the adventure, you need to show it. Grab your wireless mic, your phone, and go stand next to the ATVs. Record a 15-second raw video of you talking about the thrill of the ride.",
+            reward: "+50 XP",
+            xp: 50,
+            upgradePrompt: "Act as a Social Media Video Editor. I have a 15-second raw video of me standing next to an ATV in Colombia. Give me 3 different engaging text overlays (hooks) I can put on this video for TikTok and Instagram Reels to get people to click my link.",
+            nextAction: "Complete Mission"
+        },
+        {
+            level: 2,
+            title: "The Hook",
+            desc: "That video is great. Now, we need to turn it into a money-maker. Open ChatGPT, paste the prompt you just unlocked, and use the hooks it generates. Post the video to TikTok, Instagram, and Facebook.",
+            reward: "+50 XP",
+            xp: 50,
+            upgradePrompt: "Act as a Growth Hacker. I just posted a video about my ATV tours. Write me 5 different caption options for Instagram that create urgency and include a Call to Action to click the link in my bio (TripsToColombia.com).",
+            nextAction: "Video Posted"
+        },
+        {
+            level: 3,
+            title: "The Hunter",
+            desc: "Now that the content is out, it's time to hunt. Use your phone to send 5 DMs to people who liked your video. Be friendly, not spammy. Invite them to the adventure.",
+            reward: "+100 XP",
+            xp: 100,
+            upgradePrompt: "Act as a Sales Outreach Specialist. Write me a short, friendly Instagram DM template to send to someone who liked my post. It must feel personal, not like a bot. Offer them a '10% deposit' to lock in their spot.",
+            nextAction: "DMs Sent"
+        },
+        {
+            level: 4,
+            title: "The Covenant",
+            desc: "Someone replied! They want to book. It's time to close the deal. Use the prompt to generate the exact WhatsApp message to send them with the 10% deposit link.",
+            reward: "+100 XP",
+            xp: 100,
+            upgradePrompt: "Act as a Sales Closer. Write a WhatsApp message to a lead who is interested in booking an ATV tour. Explain the 10% non-refundable deposit that locks in their spot and supports the local community. Provide a direct payment link placeholder.",
+            nextAction: "Deal Closed"
+        },
+        {
+            level: 5,
+            title: "The Ecosystem",
+            desc: "You have a customer. Now, you need a system. Use the deposit tracker to log this sale. Half goes to you, half goes to the foundation. This is the engine.",
+            reward: "+100 XP",
+            xp: 100,
+            upgradePrompt: "Act as a Financial Analyst. I just received a 10% deposit on a $1000 tour. Calculate the 50% split for the referrer and the foundation. Then, write a 3-step plan to reinvest the foundation's half into local community projects.",
+            nextAction: "Log Sale"
+        },
+        {
+            level: 6,
+            title: "The Empire",
+            desc: "You have proven the model. Now, let's deploy the Autonomous Agents to run it without you. Use this final prompt to build a 24/7 marketing machine.",
+            reward: "MAX LEVEL",
+            xp: 100,
+            upgradePrompt: "Act as an AI Automation Architect. I want to deploy OpenClaw or AdClaw to run my Instagram and TikTok marketing automatically. Give me a step-by-step guide to set up an autonomous agent that generates 1 video per day promoting my ATV tours.",
+            nextAction: "Finish Game"
+        }
+    ];
+
+    // RENDER MISSION
+    function renderMission() {
+        const mission = missions.find(m => m.level === currentLevel);
+        const card = document.getElementById('mission-card');
+
+        if (!mission) {
+            card.innerHTML = `
+                <h1 class="mission-title">👑 You Win!</h1>
+                <p class="mission-desc">You have completed the Sovereign Operator training. You are no longer just running a tour company. You are running an empire. Now, go build it.</p>
+            `;
+            return;
+        }
+
+        card.innerHTML = `
+            <div class="level-badge">Level ${mission.level}</div>
+            <h1 class="mission-title">${mission.title}</h1>
+            <p class="mission-desc">${mission.desc}</p>
+            <div class="reward-box">Reward: ${mission.reward}</div>
+            <button class="btn btn-primary" onclick="completeMission()">${mission.nextAction}</button>
+        `;
+
+        // Update UI
+        document.getElementById('level-display').textContent = 'Level ' + currentLevel;
+        document.getElementById('xp-display').textContent = currentXP;
+        document.getElementById('xp-bar').style.width = (currentXP % 100) + '%';
+    }
+
+    // COMPLETE MISSION
+    function completeMission() {
+        const mission = missions.find(m => m.level === currentLevel);
+        
+        // Add XP
+        currentXP += mission.xp;
+        
+        // Show Upgrade Modal
+        document.getElementById('upgrade-prompt').innerHTML = `
+            <button class="copy-btn" onclick="copyUpgrade()">Copy</button>
+            ${mission.upgradePrompt}
+        `;
+        document.getElementById('upgrade-modal').classList.add('active');
+
+        // Animate XP bar
+        document.getElementById('xp-display').textContent = currentXP;
+        document.getElementById('xp-bar').style.width = (currentXP % 100) + '%';
+    }
+
+    // CLOSE MODAL & NEXT LEVEL
+    function closeModalAndContinue() {
+        document.getElementById('upgrade-modal').classList.remove('active');
+        
+        currentLevel++;
+        
+        if (currentLevel > missions.length) {
+            renderMission(); // Render win screen
+        } else {
+            renderMission();
+        }
+    }
+
+    // COPY UPGRADE PROMPT
+    function copyUpgrade() {
+        const text = document.getElementById('upgrade-prompt').innerText.replace('Copy', '').trim();
+        navigator.clipboard.writeText(text).then(() => {
+            const toast = document.getElementById('toast');
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        });
+    }
+
+    // INIT
+    renderMission();
+
+</script>
+</body>
+</html>
