@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⚔️ Project Omega: Sovereign Defense Command</title>
+<style>
+    :root {
+        --bg: #050505;
+        --panel: #111111;
+        --text: #e5e5e5;
+        --muted: #888888;
+        --border: #222222;
+        --accent: #ef4444; /* Red for Omega / War */
+        --accent-hover: #dc2626;
+        --blue: #3b82f6;
+        --gold: #fbbf24;
+        --success: #10b981;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+        font-family: 'Inter', -apple-system, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        height: 100vh;
+        display: flex;
+        overflow: hidden;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+        width: 280px;
+        background: var(--panel);
+        border-right: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .logo {
+        padding: 2rem 1.5rem;
+        font-size: 1.2rem;
+        font-weight: 900;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--accent);
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .logo span { font-size: 1.5rem; }
+
+    .nav {
+        flex: 1;
+        padding: 1rem 0;
+    }
+
+    .nav-item {
+        padding: 1rem 1.5rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-weight: 600;
+        color: var(--muted);
+        border-left: 3px solid transparent;
+        transition: all 0.2s;
+    }
+
+    .nav-item:hover { color: var(--text); background: rgba(255,255,255,0.02); }
+    .nav-item.active { color: var(--accent); border-left-color: var(--accent); background: rgba(239, 68, 68, 0.1); }
+
+    .alert-panel {
+        padding: 1.5rem;
+        border-top: 1px solid var(--border);
+        background: rgba(239, 68, 68, 0.05);
+    }
+
+    .alert-btn {
+        width: 100%;
+        background: var(--accent);
+        color: white;
+        border: none;
+        padding: 1rem;
+        border-radius: 8px;
+        font-weight: 800;
+        font-size: 1rem;
+        cursor: pointer;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+        70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
+
+    /* MAIN */
+    .main {
+        flex: 1;
+        overflow-y: auto;
+        padding: 3rem;
+        position: relative;
+    }
+
+    .view { display: none; max-width: 1000px; margin: 0 auto; animation: fadeIn 0.3s; }
+    .view.active { display: block; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    h1 { font-size: 2.5rem; margin-bottom: 0.5rem; letter-spacing: -1px; }
+    .subtitle { color: var(--muted); font-size: 1.1rem; margin-bottom: 2rem; line-height: 1.5; }
+
+    /* CARDS */
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
+
+    .card {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1.5rem;
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.2s;
+    }
+
+    .card:hover { transform: translateY(-4px); border-color: #333; }
+
+    .card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; width: 4px; height: 100%;
+        background: var(--accent);
+    }
+
+    .card h3 { font-size: 1.2rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+    .card p { color: var(--muted); font-size: 0.9rem; line-height: 1.5; margin-bottom: 1.5rem; }
+
+    .btn {
+        background: transparent;
+        color: var(--text);
+        border: 1px solid var(--border);
+        padding: 0.8rem 1.2rem;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .btn:hover { background: var(--border); }
+    .btn-primary { background: var(--accent); color: white; border: none; }
+    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-blue { background: var(--blue); color: white; border: none; }
+    .btn-blue:hover { background: #2563eb; }
+
+    /* FORMS */
+    .form-group { margin-bottom: 1.5rem; }
+    .form-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+    .form-group input, .form-group textarea, .form-group select {
+        width: 100%;
+        background: #000;
+        border: 1px solid var(--border);
+        color: var(--text);
+        padding: 1rem;
+        border-radius: 6px;
+        font-family: inherit;
+        font-size: 1rem;
+    }
+    .form-group input:focus, .form-group textarea:focus { outline: none; border-color: var(--accent); }
+    .form-group textarea { min-height: 120px; resize: vertical; }
+
+    .output-box {
+        background: #000;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 1.5rem;
+        font-family: 'Courier New', monospace;
+        font-size: 0.95rem;
+        line-height: 1.6;
+        color: #a5b4fc;
+        white-space: pre-wrap;
+        margin-top: 1rem;
+    }
+
+    .toast {
+        position: fixed; bottom: 2rem; right: 2rem;
+        background: var(--accent); color: white; padding: 1rem 2rem;
+        border-radius: 6px; font-weight: 800; font-size: 0.9rem;
+        opacity: 0; transition: 0.3s; transform: translateY(20px);
+        pointer-events: none; z-index: 1000;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    /* Alert Modal */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0,0,0,0.9);
+        z-index: 2000;
+        align-items: center;
+        justify-content: center;
+    }
+    .modal.active { display: flex; }
+    .modal-content {
+        background: #1a0000;
+        border: 2px solid var(--accent);
+        border-radius: 12px;
+        padding: 3rem;
+        max-width: 600px;
+        text-align: center;
+        box-shadow: 0 0 50px rgba(239,68,68,0.5);
+    }
+    .modal-content h2 { color: var(--accent); margin-bottom: 1rem; font-size: 2rem; }
+    .modal-content p { margin-bottom: 2rem; line-height: 1.6; }
+
+</style>
+</head>
+<body>
+
+    <!-- EMERGENCY MODAL -->
+    <div class="modal" id="emergency-modal">
+        <div class="modal-content">
+            <h2>🚨 RED ALERT</h2>
+            <p>This is the emergency response protocol. The AI will generate the exact habeas corpus filing, the emergency contacts for constitutional lawyers, and the step-by-step script for dealing with law enforcement or medical authorities.</p>
+            <button class="btn btn-primary" onclick="generateEmergency()">Generate Emergency Filing</button>
+            <button class="btn" style="margin-top: 1rem;" onclick="closeModal()">Cancel</button>
+        </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="logo">
+            <span>⚔️</span> Project Omega
+        </div>
+        <div class="nav">
+            <div class="nav-item active" onclick="switchView('dashboard')">🛡️ Command Center</div>
+            <div class="nav-item" onclick="switchView('legal')">⚖️ Legal Arsenal</div>
+            <div class="nav-item" onclick="switchView('medical')">🩺 Medical Shield</div>
+            <div class="nav-item" onclick="switchView('intel')">🕵️ Intel & Comms</div>
+        </div>
+        <div class="alert-panel">
+            <button class="alert-btn" onclick="openModal()">🚨 RED ALERT</button>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main">
+
+        <!-- VIEW: DASHBOARD -->
+        <div class="view active" id="view-dashboard">
+            <h1>Omega Command Center</h1>
+            <p class="subtitle">Rooted in Jesus. Armed with the truth. This is the iron rod. When the system comes for your family, you don't panic. You deploy Omega.</p>
+            
+            <div class="grid">
+                <div class="card">
+                    <h3>⚖️ The Legal Shield</h3>
+                    <p>Generate Affidavits of Truth, Writs of Quo Warranto, and Cease & Desist orders to shut down CPS, the IRS, or a hospital.</p>
+                    <button class="btn btn-primary" onclick="switchView('legal')">Open Arsenal</button>
+                </div>
+                <div class="card">
+                    <h3>🩺 The Medical Protocol</h3>
+                    <p>Access Dr. Group's root-cause protocols. Generate medical refusal forms and detox protocols for the bioweapon.</p>
+                    <button class="btn btn-blue" onclick="switchView('medical')">Open Shield</button>
+                </div>
+                <div class="card">
+                    <h3>🕵️ The Intel Network</h3>
+                    <p>Access the deadman trigger files, the Epstein document indexes, and the redaction bypass guides.</p>
+                    <button class="btn" onclick="switchView('intel')">Open Intel</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: LEGAL -->
+        <div class="view" id="view-legal">
+            <h1>Legal Arsenal</h1>
+            <p class="subtitle">The system uses color of law. We use the law of color (the living soul). Generate the documents that stop them in their tracks.</p>
+
+            <div class="form-group">
+                <label>What is the situation?</label>
+                <select id="legal-scenario">
+                    <option value="cps">CPS / Child Protective Services at the door</option>
+                    <option value="irs">IRS / Tax Notice</option>
+                    <option value="hospital">Hospital / Medical Protocol (Hugo Protocol)</option>
+                    <option value="court">Court Summons / Traffic Stop</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>Your Name (in ALL CAPS - the strawman)</label>
+                <input type="text" id="legal-name" placeholder="JOHN DOE">
+            </div>
+            <div class="form-group">
+                <label>Opposing Party (Agency Name)</label>
+                <input type="text" id="legal-opponent" placeholder="e.g., Child Protective Services">
+            </div>
+            <button class="btn btn-primary" onclick="generateLegal()">⚖️ Generate Legal Document</button>
+
+            <div id="legal-output" style="display:none;" class="output-box"></div>
+        </div>
+
+        <!-- VIEW: MEDICAL -->
+        <div class="view" id="view-medical">
+            <h1>Medical Shield</h1>
+            <p class="subtitle">They used the medical system to murder Hugo. We will not let them do it to your family. Generate the exact refusal forms and root-cause protocols.</p>
+
+            <div class="form-group">
+                <label>Patient Name</label>
+                <input type="text" id="med-name" placeholder="Full Name">
+            </div>
+            <div class="form-group">
+                <label>Hospital / Facility Name</label>
+                <input type="text" id="med-hospital" placeholder="e.g., Memorial Hospital">
+            </div>
+            <div class="form-group">
+                <label>Condition / Threat</label>
+                <select id="med-threat">
+                    <option value="covid">COVID / Respiratory</option>
+                    <option value="vaccine">Vaccine Injury / Spike Protein</option>
+                    <option value="general">General Detox / Root Cause</option>
+                </select>
+            </div>
+            <button class="btn btn-blue" onclick="generateMedical()">🩺 Generate Medical Shield</button>
+
+            <div id="medical-output" style="display:none;" class="output-box"></div>
+        </div>
+
+        <!-- VIEW: INTEL -->
+        <div class="view" id="view-intel">
+            <h1>Intel & Comms</h1>
+            <p class="subtitle">The deadman trigger has been flipped. The files are out. Here is how you access them and how you protect yourself from the psychological warfare.</p>
+
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <h3>📂 The Epstein / Bubba Files</h3>
+                <p>If a file doesn't load, add <strong>.jpg</strong> or <strong>.mp4</strong> to the end of the URL. If a PDF is redacted, highlight the black box, copy it, and paste it into a new document to reveal the text.</p>
+                <p style="color: var(--gold); font-size: 0.9rem;">The tools are in the app. The record is in the app. You decide what to believe.</p>
+            </div>
+
+            <div class="card" style="margin-bottom: 1.5rem; border-left-color: var(--blue);">
+                <h3>💬 PR & Crisis Commander</h3>
+                <p>When the media attacks, or when you need to write a press release, use the PR Commander Agent to generate the narrative.</p>
+                <button class="btn btn-primary" onclick="generatePR()">Generate PR Prompt</button>
+                <div id="pr-output" style="display:none; margin-top: 1rem;" class="output-box"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="toast" id="toast">Success</div>
+
+<script>
+    // Navigation
+    function switchView(id) {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        
+        document.getElementById('view-' + id).classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
+
+    // Modal
+    function openModal() {
+        document.getElementById('emergency-modal').classList.add('active');
+    }
+    function closeModal() {
+        document.getElementById('emergency-modal').classList.remove('active');
+    }
+
+    // Generate Legal Document
+    function generateLegal() {
+        const scenario = document.getElementById('legal-scenario').value;
+        const name = document.getElementById('legal-name').value || "[YOUR NAME]";
+        const opponent = document.getElementById('legal-opponent').value || "[OPPOSING PARTY]";
+
+        let letter = "";
+
+        if (scenario === 'cps') {
+            letter = `AFFIDAVIT OF TRUTH AND NOTICE OF LIABILITY\n\nTO: ${opponent}\n\nI, ${name}, a living soul, do hereby declare that I am the father/mother of the children in question. I do NOT consent to any investigation, interview, or removal of my children.\n\nAny attempt to remove my children without a warrant signed by a neutral magistrate, based on probable cause and sworn affidavit, will be met with a federal lawsuit under 42 U.S.C. § 1983 for deprivation of civil rights.\n\nFurthermore, I invoke my 5th Amendment right to remain silent and my 4th Amendment right to be free from unreasonable search and seizure. \n\nThis is a formal notice of liability. You are hereby put on notice that you will be held personally liable for any damages caused by your actions.\n\nSigned,\n${name}`;
+        } else if (scenario === 'irs') {
+            letter = `NOTICE OF DEFECTIVE INSTRUMENT AND AFFIDAVIT OF TRUTH\n\nTO: ${opponent}\n\nI, ${name}, do hereby state that I am not a "person" as defined in the Internal Revenue Code. I am a living soul, a child of the Creator.\n\nI do not consent to the assessment of any tax against my labor. I have committed no taxable event.\n\nThis document is a legal affidavit. Any attempt to enforce a levy or lien against my property without a court order will be met with a Writ of Quo Warranto and a lawsuit for damages.\n\nSigned,\n${name}`;
+        } else if (scenario === 'hospital') {
+            letter = `NOTICE OF LIABILITY AND REFUSAL OF CONSENT\n\nTO: ${opponent}\n\nI, ${name}, do hereby refuse consent to any medical protocol that violates the Nuremberg Code (1947).\n\nI specifically refuse the COVID protocol, mRNA therapies, and any experimental treatments. \n\nAny attempt to administer these treatments or restrict family access will be met with immediate legal action for battery, medical malpractice, and murder (if death occurs).\n\nSigned,\n${name}`;
+        } else {
+            letter = `AFFIDAVIT OF TRUTH\n\nI, ${name}, do hereby state that I am a living soul, not a corporate fiction.\n\nI do not consent to the jurisdiction of any maritime/admiralty court. I reserve all my rights.\n\nSigned,\n${name}`;
+        }
+
+        document.getElementById('legal-output').textContent = letter;
+        document.getElementById('legal-output').style.display = 'block';
+        showToast("Legal Document Generated");
+    }
+
+    // Generate Medical Shield
+    function generateMedical() {
+        const name = document.getElementById('med-name').value || "[PATIENT NAME]";
+        const hospital = document.getElementById('med-hospital').value || "[HOSPITAL]";
+        const threat = document.getElementById('med-threat').value;
+
+        let protocol = "";
+
+        if (threat === 'covid') {
+            protocol = `PROTOCOL FOR ${name} (COVID / RESPIRATORY)\n\n1. **Refuse the ventilator.** The Hugo Protocol proves they turn up the pressure to blow out the lungs.\n2. **Administer Ivermectin.** 0.2 mg/kg (or as directed by a healthcare professional).\n3. **Hydrate with pure water.** No tap water. \n4. **Nutrition.** No sugar. Organic broths, garlic, and Vitamin C.\n5. **Oxygen.** Use a nasal cannula, not a respirator, to keep oxygen levels up.\n\nSIGNED: ${name}`;
+        } else if (threat === 'vaccine') {
+            protocol = `PROTOCOL FOR ${name} (SPIKE PROTEIN DETOX)\n\n1. **Chlorella and Cilantro.** Bind to heavy metals and spike proteins.\n2. **NAC (N-Acetyl Cysteine).** Replenish glutathione.\n3. **Fasting.** 16-24 hours to activate autophagy (cellular cleanup).\n4. **Hydration.** Structured water with trace minerals.\n5. **Dr. Group's Root Cause Protocol.** Detox the liver and gut.\n\nSIGNED: ${name}`;
+        } else {
+            protocol = `GENERAL ROOT CAUSE PROTOCOL FOR ${name}\n\n1. **Detox the Liver.** Dr. Group's liver cleanse.\n2. **Parasite Cleanse.** Herbal tinctures.\n3. **Pure Water Fasting.** 24-48 hours.\n4. **Organic Diet.** Live foods, no processed sugar.\n5. **Vibrational Healing.** Sunlight, grounding, and prayer.\n\nSIGNED: ${name}`;
+        }
+
+        document.getElementById('medical-output').textContent = protocol;
+        document.getElementById('medical-output').style.display = 'block';
+        showToast("Medical Protocol Generated");
+    }
+
+    // Generate PR Prompt
+    function generatePR() {
+        const prompt = `Act as a PR Commander Agent. Write a press release for the Sovereign Operator, Ramiro Ramirez, announcing the release of his book "Forbidden Knowledge: The Sovereign Operator". \n\nInclude a "Rapid Response" script for when a journalist calls him a "conspiracy theorist." The response must pivot to the court records, the Epstein files, and the VAERS data. \n\nKeep the tone authoritative, calm, and unapologetic.`;
+
+        document.getElementById('pr-output').textContent = prompt;
+        document.getElementById('pr-output').style.display = 'block';
+        showToast("PR Prompt Generated");
+    }
+
+    // Emergency Filing
+    function generateEmergency() {
+        closeModal();
+        showToast("🚨 Emergency filing generated. Check your downloads.");
+        
+        const filing = `EMERGENCY WRIT OF HABEAS CORPUS\n\nTO THE HONORABLE COURT:\n\nMy name is [YOUR NAME]. I am being detained/held against my will by [AGENCY]. I demand immediate release and a hearing.\n\nI am a living soul, not a corporate fiction. I invoke my right to due process under the 5th Amendment.\n\nSigned,\n[YOUR NAME]`;
+        
+        const blob = new Blob([filing], {type: 'text/plain'});
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'Emergency-Habeas-Corpus.txt';
+        a.click();
+    }
+
+    // Toast
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 3000);
+    }
+</script>
+</body>
+</html>
