@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⚙️ The Sovereign Workstation</title>
+<style>
+    :root {
+        --bg: #0a0a0a;
+        --panel: #141414;
+        --text: #e5e5e5;
+        --muted: #888888;
+        --border: #262626;
+        --accent: #f59e0b; /* Amber/Gold for Work */
+        --accent-hover: #d97706;
+        --success: #10b981;
+        --blue: #3b82f6;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        display: flex;
+        height: 100vh;
+        overflow: hidden;
+    }
+
+    /* ================= SIDEBAR ================= */
+    .sidebar {
+        width: 300px;
+        background: var(--panel);
+        border-right: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .sidebar-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .sidebar-header h1 {
+        font-size: 1.1rem;
+        font-weight: 800;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: var(--accent);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .agent-list {
+        flex: 1;
+        overflow-y: auto;
+        padding: 1rem 0;
+    }
+
+    .agent-btn {
+        width: 100%;
+        text-align: left;
+        padding: 1rem 1.5rem;
+        background: transparent;
+        border: none;
+        border-left: 3px solid transparent;
+        color: var(--muted);
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-size: 0.95rem;
+        font-weight: 600;
+    }
+
+    .agent-btn:hover { background: rgba(255,255,255,0.03); color: var(--text); }
+    .agent-btn.active { background: rgba(245, 158, 11, 0.1); border-left-color: var(--accent); color: var(--accent); }
+
+    .agent-icon { font-size: 1.2rem; }
+
+    /* ================= MAIN ================= */
+    .main {
+        flex: 1;
+        overflow-y: auto;
+        padding: 3rem;
+    }
+
+    .container { max-width: 900px; margin: 0 auto; }
+
+    .header h2 {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .header p {
+        color: var(--muted);
+        font-size: 1.1rem;
+        margin-bottom: 2rem;
+        line-height: 1.5;
+    }
+
+    .workflow-step {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 1.5rem;
+        position: relative;
+    }
+
+    .step-number {
+        position: absolute;
+        top: -12px;
+        left: 2rem;
+        background: var(--accent);
+        color: #000;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 900;
+        font-size: 0.8rem;
+    }
+
+    .workflow-step h3 {
+        font-size: 1.2rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+    .form-group input, .form-group textarea, .form-group select {
+        width: 100%;
+        background: #000;
+        border: 1px solid var(--border);
+        color: var(--text);
+        padding: 1rem;
+        border-radius: 8px;
+        font-family: inherit;
+        font-size: 1rem;
+    }
+    .form-group input:focus, .form-group textarea:focus { outline: none; border-color: var(--accent); }
+    .form-group textarea { min-height: 100px; resize: vertical; }
+
+    /* The Final Payload */
+    .payload-box {
+        background: #000;
+        border: 1px solid var(--accent);
+        border-radius: 8px;
+        padding: 1.5rem;
+        font-family: 'Courier New', monospace;
+        font-size: 0.9rem;
+        line-height: 1.6;
+        color: #fcd34d;
+        white-space: pre-wrap;
+        margin-top: 1rem;
+        position: relative;
+    }
+
+    .action-bar {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+
+    .btn {
+        background: var(--bg);
+        color: var(--text);
+        border: 1px solid var(--border);
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        font-size: 1rem;
+        flex: 1;
+    }
+
+    .btn:hover { background: var(--border); }
+    .btn-primary { background: var(--accent); color: #000; border: none; }
+    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-blue { background: var(--blue); color: white; border: none; }
+    .btn-blue:hover { background: #2563eb; }
+
+    .toast {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        background: var(--success);
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: 8px;
+        font-weight: bold;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        opacity: 0;
+        transition: 0.3s;
+        transform: translateY(20px);
+        z-index: 1000;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+</style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h1>⚙️ Workstation</h1>
+        </div>
+        <div class="agent-list">
+            <button class="agent-btn active" onclick="selectAgent('content')">
+                <span class="agent-icon">✍️</span> Content Creator
+            </button>
+            <button class="agent-btn" onclick="selectAgent('growth')">
+                <span class="agent-icon">🚀</span> Growth Hacker
+            </button>
+            <button class="agent-btn" onclick="selectAgent('reddit')">
+                <span class="agent-icon">🤝</span> Reddit Infiltrator
+            </button>
+            <button class="agent-btn" onclick="selectAgent('pr')">
+                <span class="agent-icon">📢</span> PR Commander
+            </button>
+            <button class="agent-btn" onclick="selectAgent('legal')">
+                <span class="agent-icon">⚖️</span> Legal Shield
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN -->
+    <div class="main">
+        <div class="container">
+            
+            <div class="header">
+                <h2 id="agent-title">Content Creator Workstation</h2>
+                <p id="agent-desc">Give me the raw idea, and I will forge the exact AI command to write your copy.</p>
+            </div>
+
+            <!-- STEP 1: INPUT -->
+            <div class="workflow-step">
+                <div class="step-number">1</div>
+                <h3>Describe the Mission</h3>
+                <div class="form-group">
+                    <label>What is the core topic or idea?</label>
+                    <input type="text" id="input-topic" placeholder="e.g., The Two Wings of the Same Rotten Bird">
+                </div>
+                <div class="form-group">
+                    <label>What is the goal of this piece?</label>
+                    <select id="input-goal">
+                        <option value="Educate the audience and build trust">Educate the audience and build trust</option>
+                        <option value="Go viral and provoke a strong emotional reaction">Go viral and provoke a strong emotional reaction</option>
+                        <option value="Drive traffic to download the free book">Drive traffic to download the free book</option>
+                        <option value="Recruit people to the affiliate program">Recruit people to the affiliate program</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- STEP 2: CONTEXT -->
+            <div class="workflow-step">
+                <div class="step-number">2</div>
+                <h3>Add the Fuel (Context)</h3>
+                <div class="form-group">
+                    <label>Paste any relevant text, bullet points, or background info</label>
+                    <textarea id="input-context" placeholder="e.g., The Right and Left are two wings of the same bird. They argue over pronouns while the banks drain us. I want to use the story of Hugo to wake people up..."></textarea>
+                </div>
+            </div>
+
+            <!-- STEP 3: EXECUTE -->
+            <div class="workflow-step" style="border-color: var(--accent);">
+                <div class="step-number">3</div>
+                <h3>Execute the Agent</h3>
+                <p style="color: var(--muted); margin-bottom: 1rem;">Click below to generate the final payload. Then, choose your AI engine to run it.</p>
+                <button class="btn btn-primary" onclick="generatePayload()" style="width: 100%;">⚡ Build AI Payload</button>
+                
+                <div id="payload-container" style="display: none; margin-top: 1.5rem;">
+                    <div class="payload-box" id="payload-text"></div>
+                    <div class="action-bar">
+                        <button class="btn" onclick="copyPayload()">📋 Copy to Clipboard</button>
+                        <a href="https://chatgpt.com" target="_blank" class="btn btn-blue" onclick="copyPayload()">Open ChatGPT</a>
+                        <a href="https://claude.ai" target="_blank" class="btn btn-blue" onclick="copyPayload()">Open Claude</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="toast" id="toast">Copied! Paste it into your AI.</div>
+
+<script>
+    // Agent Data
+    const agents = {
+        content: {
+            title: "Content Creator Workstation",
+            desc: "Give me the raw idea, and I will forge the exact AI command to write your copy.",
+            instruction: "You are an elite Content Creator Agent. Your job is to write highly engaging, platform-specific copy based on the provided context. Use strong hooks, emotional resonance, and a clear call to action."
+        },
+        growth: {
+            title: "Growth Hacker Workstation",
+            desc: "Give me the goal, and I will forge the exact AI command to design a viral loop.",
+            instruction: "You are an elite Growth Hacker Agent. Your job is to design viral acquisition loops, referral mechanics, and growth experiments. Focus on behavioral psychology, incentives, and measurable metrics."
+        },
+        reddit: {
+            title: "Reddit Infiltrator Workstation",
+            desc: "Give me the topic, and I will forge the exact AI command to write a Trojan Horse post.",
+            instruction: "You are an elite Reddit Community Builder Agent. Your job is to write authentic, value-first posts for specific subreddits. Provide 90% standalone value and leave the link/offer in the comments. Include a strategy for handling trolls."
+        },
+        pr: {
+            title: "PR Commander Workstation",
+            desc: "Give me the crisis, and I will forge the exact AI command to control the narrative.",
+            instruction: "You are an elite PR & Communications Manager. Your job is to write press releases, crisis response scripts, and narrative control strategies. Maintain an authoritative, calm, and unapologetic tone."
+        },
+        legal: {
+            title: "Legal Shield Workstation",
+            desc: "Give me the threat, and I will forge the exact AI command to build your legal defense.",
+            instruction: "You are an elite Legal Shield Agent. Your job is to generate Affidavits of Truth, Cease and Desist orders, and Notices of Liability based on the situation provided. Reference the Nuremberg Code and constitutional law."
+        }
+    };
+
+    let currentAgent = 'content';
+
+    // Switch Agent
+    function selectAgent(agentKey) {
+        currentAgent = agentKey;
+        
+        // Update UI
+        document.querySelectorAll('.agent-btn').forEach(btn => btn.classList.remove('active'));
+        event.currentTarget.classList.add('active');
+
+        const agent = agents[agentKey];
+        document.getElementById('agent-title').textContent = agent.title;
+        document.getElementById('agent-desc').textContent = agent.desc;
+        
+        // Hide payload if switching
+        document.getElementById('payload-container').style.display = 'none';
+    }
+
+    // Generate Payload
+    function generatePayload() {
+        const topic = document.getElementById('input-topic').value || "[No topic provided]";
+        const goal = document.getElementById('input-goal').value;
+        const context = document.getElementById('input-context').value || "[No context provided]";
+
+        const agent = agents[currentAgent];
+
+        const payload = `${agent.instruction}
+
+### MISSION:
+${topic}
+
+### GOAL:
+${goal}
+
+### CONTEXT / SOURCE MATERIAL:
+${context}
+
+### RULES:
+- Do not give generic advice. Give me exact, ready-to-copy-paste copy.
+- Use the tone of a Sovereign Operator: raw, unapologetic, and truth-driven.
+- Format the output so I can copy it directly to my platform.
+
+Please generate the content now.`;
+
+        document.getElementById('payload-text').textContent = payload;
+        document.getElementById('payload-container').style.display = 'block';
+        
+        // Scroll to payload
+        document.getElementById('payload-container').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Copy Payload
+    function copyPayload() {
+        const text = document.getElementById('payload-text').textContent;
+        navigator.clipboard.writeText(text).then(() => {
+            const toast = document.getElementById('toast');
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        });
+    }
+</script>
+</body>
+</html>
