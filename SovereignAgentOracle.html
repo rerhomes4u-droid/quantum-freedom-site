@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🔮 The Sovereign Agent Oracle</title>
+<style>
+    :root {
+        --bg: #050505;
+        --panel: #111111;
+        --text: #e5e5e5;
+        --muted: #888888;
+        --border: #222222;
+        --accent: #8b5cf6; /* Mystic Purple */
+        --accent-hover: #7c3aed;
+        --gold: #fbbf24;
+        --success: #10b981;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+        font-family: 'Inter', -apple-system, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 2rem;
+        background-image: 
+            radial-gradient(circle at 15% 50%, rgba(139, 92, 246, 0.08), transparent 25%),
+            radial-gradient(circle at 85% 30%, rgba(251, 191, 36, 0.05), transparent 25%);
+    }
+
+    .header {
+        text-align: center;
+        margin-bottom: 3rem;
+        margin-top: 2rem;
+    }
+
+    .header h1 {
+        font-size: 3rem;
+        font-weight: 900;
+        letter-spacing: -1px;
+        background: linear-gradient(135deg, #fff, #a78bfa);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 1rem;
+    }
+
+    .header p {
+        font-size: 1.2rem;
+        color: var(--muted);
+        max-width: 600px;
+        line-height: 1.6;
+    }
+
+    /* ================= APP CONTAINER ================= */
+    .app-container {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 3rem;
+        width: 100%;
+        max-width: 900px;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .app-container::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 4px;
+        background: linear-gradient(90deg, var(--accent), var(--gold));
+    }
+
+    /* ================= QUESTIONNAIRE ================= */
+    .question-step {
+        display: none;
+        animation: fadeIn 0.4s ease-out;
+    }
+
+    .question-step.active {
+        display: block;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .step-indicator {
+        font-size: 0.85rem;
+        color: var(--accent);
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+
+    .question-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin-bottom: 2rem;
+        line-height: 1.3;
+    }
+
+    .options-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    @media (max-width: 700px) {
+        .options-grid { grid-template-columns: 1fr; }
+        .header h1 { font-size: 2rem; }
+        .app-container { padding: 2rem; }
+    }
+
+    .option-btn {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        color: var(--text);
+        padding: 1.5rem;
+        border-radius: 12px;
+        text-align: left;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .option-btn:hover {
+        border-color: var(--accent);
+        background: rgba(139, 92, 246, 0.05);
+        transform: translateY(-2px);
+    }
+
+    .option-icon {
+        font-size: 2rem;
+        line-height: 1;
+    }
+
+    .option-text h3 {
+        font-size: 1.1rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .option-text p {
+        font-size: 0.85rem;
+        color: var(--muted);
+        line-height: 1.4;
+    }
+
+    .nav-buttons {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 2rem;
+    }
+
+    .btn {
+        background: transparent;
+        color: var(--text);
+        border: 1px solid var(--border);
+        padding: 0.8rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        font-size: 1rem;
+    }
+
+    .btn:hover { background: var(--border); }
+    .btn-primary { background: var(--accent); color: white; border: none; }
+    .btn-primary:hover { background: var(--accent-hover); }
+
+    /* ================= RESULTS ================= */
+    .results-section {
+        display: none;
+    }
+
+    .results-section.active {
+        display: block;
+        animation: fadeIn 0.5s ease-out;
+    }
+
+    .result-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .result-header h2 {
+        font-size: 2.5rem;
+        color: var(--gold);
+        margin-bottom: 0.5rem;
+    }
+
+    .result-header p {
+        color: var(--muted);
+        font-size: 1.1rem;
+    }
+
+    .agent-card {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        border-left: 4px solid var(--accent);
+    }
+
+    .agent-card h3 {
+        font-size: 1.3rem;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .agent-role {
+        font-size: 0.8rem;
+        color: var(--accent);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 1rem;
+        font-weight: 600;
+    }
+
+    .agent-card p {
+        color: var(--muted);
+        line-height: 1.6;
+        margin-bottom: 1rem;
+    }
+
+    .prompt-box {
+        background: #000;
+        border: 1px solid #333;
+        padding: 1rem;
+        border-radius: 6px;
+        font-family: 'Courier New', monospace;
+        font-size: 0.85rem;
+        color: #a5b4fc;
+        position: relative;
+    }
+
+    .copy-btn {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+        background: #333;
+        color: white;
+        border: none;
+        padding: 0.3rem 0.6rem;
+        border-radius: 4px;
+        font-size: 0.7rem;
+        cursor: pointer;
+    }
+
+    .copy-btn:hover { background: var(--accent); }
+
+    .toast {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        background: var(--success);
+        color: white;
+        padding: 1rem 2rem;
+        border-radius: 8px;
+        font-weight: bold;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        opacity: 0;
+        transition: 0.3s;
+        transform: translateY(20px);
+        z-index: 1000;
+    }
+
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+</style>
+</head>
+<body>
+
+    <div class="header">
+        <h1>The Sovereign Agent Oracle</h1>
+        <p>You have infinite AI power at your fingertips. Answer three questions, and we will summon your personal Sovereign Dream Team from the 230+ Agency Agents.</p>
+    </div>
+
+    <div class="app-container">
+        
+        <!-- STEP 1 -->
+        <div class="question-step active" id="step-1">
+            <div class="step-indicator">Question 1 of 3</div>
+            <div class="question-title">What is your primary mission right now?</div>
+            <div class="options-grid">
+                <div class="option-btn" onclick="selectOption('mission', 'marketing', this)">
+                    <div class="option-icon">📢</div>
+                    <div class="option-text">
+                        <h3>Spread the Message</h3>
+                        <p>I need to market, go viral, and build a community.</p>
+                    </div>
+                </div>
+                <div class="option-btn" onclick="selectOption('mission', 'building', this)">
+                    <div class="option-icon">🏗️</div>
+                    <div class="option-text">
+                        <h3>Build the Infrastructure</h3>
+                        <p>I need to code, design, and launch digital tools.</p>
+                    </div>
+                </div>
+                <div class="option-btn" onclick="selectOption('mission', 'protecting', this)">
+                    <div class="option-icon">🛡️</div>
+                    <div class="option-text">
+                        <h3>Protect the Family</h3>
+                        <p>I need legal, medical, and defense strategies.</p>
+                    </div>
+                </div>
+                <div class="option-btn" onclick="selectOption('mission', 'healing', this)">
+                    <div class="option-icon">🕊️</div>
+                    <div class="option-text">
+                        <h3>Heal the Community</h3>
+                        <p>I need to guide people through root-cause healing.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="nav-buttons">
+                <div></div>
+                <button class="btn btn-primary" onclick="nextStep(2)">Next →</button>
+            </div>
+        </div>
+
+        <!-- STEP 2 -->
+        <div class="question-step" id="step-2">
+            <div class="step-indicator">Question 2 of 3</div>
+            <div class="question-title">What is your biggest bottleneck?</div>
+            <div class="options-grid">
+                <div class="option-btn" onclick="selectOption('bottleneck', 'time', this)">
+                    <div class="option-icon">⏳</div>
+                    <div class="option-text">
+                        <h3>Time</h3>
+                        <p>I have too much to do and not enough hours.</p>
+                    </div>
+                </div>
+                <div class="option-btn" onclick="selectOption('bottleneck', 'money', this)">
+                    <div class="option-icon">💰</div>
+                    <div class="option-text">
+                        <h3>Money</h3>
+                        <p>I need to generate income and fund the mission.</p>
+                    </div>
+                </div>
+                <div class="option-btn" onclick="selectOption('bottleneck', 'skills', this)">
+                    <div class="option-icon">🧠</div>
+                    <div class="option-text">
+                        <h3>Skills</h3>
+                        <p>I don't know how to do the technical work.</p>
+                    </div>
+                </div>
+                <div class="option-btn" onclick="selectOption('bottleneck', 'reach', this)">
+                    <div class="option-icon">📡</div>
+                    <div class="option-text">
+                        <h3>Reach</h3>
+                        <p>Nobody knows about my project yet.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="nav-buttons">
+                <button class="btn" onclick="prevStep(1)">← Back</button>
+                <button class="btn btn-primary" onclick="nextStep(3)">Next →</button>
+            </div>
+        </div>
+
+        <!-- STEP 3 -->
+        <div class="question-step" id="step-3">
+            <div class="step-indicator">Question 3 of 3</div>
+            <div class="question-title">What is your experience level?</div>
+            <div class="options-grid">
+                <div class="option-btn" onclick="selectOption('experience', 'beginner', this)">
+                    <div class="option-icon">🌱</div>
+                    <div class="option-text">
+                        <h3>Beginner</h3>
+                        <p>I am just starting out and need guidance.</p>
+                    </div>
+                </div>
+                <div class="option-btn" onclick="selectOption('experience', 'intermediate', this)">
+                    <div class="option-icon">🌳</div>
+                    <div class="option-text">
+                        <h3>Intermediate</h3>
+                        <p>I know the basics but need to scale.</p>
+                    </div>
+                </div>
+                <div class="option-btn" onclick="selectOption('experience', 'advanced', this)">
+                    <div class="option-icon">🏔️</div>
+                    <div class="option-text">
+                        <h3>Advanced</h3>
+                        <p>I am a veteran operator looking for an edge.</p>
+                    </div>
+                </div>
+                <div class="option-btn" onclick="selectOption('experience', 'master', this)">
+                    <div class="option-icon">👑</div>
+                    <div class="option-text">
+                        <h3>Master</h3>
+                        <p>I am a leader and need high-level orchestration.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="nav-buttons">
+                <button class="btn" onclick="prevStep(2)">← Back</button>
+                <button class="btn btn-primary" onclick="generateOracle()">🔮 Summon My Dream Team</button>
+            </div>
+        </div>
+
+        <!-- RESULTS -->
+        <div class="results-section" id="results">
+            <div class="result-header">
+                <h2>Your Sovereign Dream Team</h2>
+                <p id="result-desc">Based on your answers, here is your custom AI agency.</p>
+            </div>
+            <div id="agents-container">
+                <!-- Agents injected here -->
+            </div>
+            <button class="btn" style="width: 100%; margin-top: 2rem;" onclick="resetOracle()">↺ Start Over</button>
+        </div>
+
+    </div>
+
+    <div class="toast" id="toast">Copied to clipboard!</div>
+
+<script>
+    // State
+    let answers = {
+        mission: '',
+        bottleneck: '',
+        experience: ''
+    };
+
+    // Agent Database (A curated list of the most powerful agents from the repo)
+    const agentDB = {
+        // Marketing
+        'growth-hacker': {
+            name: 'Growth Hacker',
+            icon: '🚀',
+            role: 'Viral Loops & User Acquisition',
+            desc: 'Designs viral referral engines, experiments, and explosive growth strategies.',
+            prompt: 'Act as a Growth Hacker (Agency-Agents). Design a 3-tier viral referral loop for my project. Focus on psychological triggers, status-driven sharing, and measurable conversion metrics.'
+        },
+        'content-creator': {
+            name: 'Content Creator',
+            icon: '✍️',
+            role: 'Multi-Platform Storytelling',
+            desc: 'Writes high-converting posts, threads, and scripts that stop the scroll.',
+            prompt: 'Act as a Content Creator (Agency-Agents). Write a 5-part social media sequence (Facebook/X) that introduces my core message. Use strong hooks, pattern interrupts, and a raw, truth-driven tone.'
+        },
+        'reddit-builder': {
+            name: 'Reddit Community Builder',
+            icon: '🤝',
+            role: 'Stealth Marketing & Trust',
+            desc: 'Crafts authentic, value-first posts that go viral without getting banned.',
+            prompt: 'Act as a Reddit Community Builder (Agency-Agents). Identify 3 subreddits for my topic. Write a "Trojan Horse" post that provides 90% standalone value and leaves the link in the comments. Include a strategy for handling hostile commenters.'
+        },
+        'pr-manager': {
+            name: 'PR Commander',
+            icon: '📢',
+            role: 'Crisis Comms & Reputation',
+            desc: 'Manages the narrative, writes press releases, and handles pushback.',
+            prompt: 'Act as a PR & Communications Manager (Agency-Agents). Draft a press release for my project. Then, write a "Rapid Response" script for when journalists call me a "conspiracy theorist." Pivot the conversation to documented facts and maintain an authoritative tone.'
+        },
+        
+        // Building
+        'frontend-dev': {
+            name: 'Frontend Developer',
+            icon: '🎨',
+            role: 'UI & Performance',
+            desc: 'Builds pixel-perfect, high-performance web interfaces.',
+            prompt: 'Act as a Frontend Developer (Agency-Agents). Write the HTML/CSS/JS for a landing page that converts. Ensure it is fully responsive, accessible, and uses a modern dark-mode aesthetic. Provide the code in a single block.'
+        },
+        'backend-arch': {
+            name: 'Backend Architect',
+            icon: '🏗️',
+            role: 'APIs & Database Design',
+            desc: 'Designs scalable server-side systems and data pipelines.',
+            prompt: 'Act as a Backend Architect (Agency-Agents). Design the database schema and API endpoints for a platform that tracks affiliate sales. Provide the SQL schema and the REST API structure.'
+        },
+        'rapid-prototyper': {
+            name: 'Rapid Prototyper',
+            icon: '⚡',
+            role: 'Fast MVP Development',
+            desc: 'Builds quick proof-of-concepts to validate ideas fast.',
+            prompt: 'Act as a Rapid Prototyper (Agency-Agents). I have an idea for a tool. Give me the quickest, hackiest way to build a working proof-of-concept using free tools (no-code or minimal code) in under 24 hours.'
+        },
+
+        // Protecting
+        'legal-compliance': {
+            name: 'Legal Compliance Checker',
+            icon: '⚖️',
+            role: 'Legal & Regulatory Review',
+            desc: 'Audits documents, flags risks, and ensures legal compliance.',
+            prompt: 'Act as a Legal Compliance Checker (Agency-Agents). I am writing a book that makes claims about medical tyranny. Review the attached text and flag any legal risks, then rewrite it to be legally bulletproof while maintaining the truth.'
+        },
+        'security-arch': {
+            name: 'Security Architect',
+            icon: '🛡️',
+            role: 'Threat Modeling & Defense',
+            desc: 'Builds secure systems and protects data from adversaries.',
+            prompt: 'Act as a Security Architect (Agency-Agents). I am building a platform for activists. What are the top 5 threat vectors (doxxing, data breach, etc.) and how do I architect the system to be zero-trust and encrypted end-to-end?'
+        },
+        
+        // Healing
+        'personal-growth': {
+            name: 'Personal Growth Mentor',
+            icon: '🧠',
+            role: 'Habit Systems & Accountability',
+            desc: 'Builds routines, removes mental blocks, and drives action.',
+            prompt: 'Act as a Personal Growth Mentor (Agency-Agents). I am trying to launch a massive project but I am overwhelmed and procrastinating. Break down my goal into a 7-day action plan and give me 3 psychological "pattern interrupts" to overcome my fear.'
+        },
+        'healthcare-marketing': {
+            name: 'Healthcare Marketing Compliance',
+            icon: '⚕️',
+            role: 'Compliant Health Messaging',
+            desc: 'Ensures health claims are compliant and ethical.',
+            prompt: 'Act as a Healthcare Marketing Compliance expert (Agency-Agents). Review my copy for a holistic healing protocol. Ensure it uses compliant language that avoids making illegal medical claims (e.g., "cures," "treats") while still communicating the value.'
+        }
+    };
+
+    // Navigation
+    function nextStep(step) {
+        document.querySelectorAll('.question-step').forEach(el => el.classList.remove('active'));
+        document.getElementById('step-' + step).classList.add('active');
+    }
+
+    function prevStep(step) {
+        document.querySelectorAll('.question-step').forEach(el => el.classList.remove('active'));
+        document.getElementById('step-' + step).classList.add('active');
+    }
+
+    // Selection
+    function selectOption(category, value, element) {
+        // Remove active class from siblings
+        const parent = element.parentElement;
+        Array.from(parent.children).forEach(child => {
+            child.style.borderColor = 'var(--border)';
+            child.style.background = 'var(--bg)';
+        });
+        
+        // Add active class
+        element.style.borderColor = 'var(--accent)';
+        element.style.background = 'rgba(139, 92, 246, 0.1)';
+
+        // Save answer
+        answers[category] = value;
+    }
+
+    // Generate Oracle
+    function generateOracle() {
+        // Validate
+        if(!answers.mission || !answers.bottleneck || !answers.experience) {
+            alert("Please answer all questions before summoning your Dream Team.");
+            return;
+        }
+
+        // Logic to determine the team
+        let team = [];
+
+        // 1. Based on Mission
+        if (answers.mission === 'marketing') {
+            team.push(agentDB['growth-hacker'], agentDB['content-creator'], agentDB['reddit-builder']);
+        } else if (answers.mission === 'building') {
+            team.push(agentDB['frontend-dev'], agentDB['backend-arch'], agentDB['rapid-prototyper']);
+        } else if (answers.mission === 'protecting') {
+            team.push(agentDB['legal-compliance'], agentDB['security-arch'], agentDB['pr-manager']);
+        } else if (answers.mission === 'healing') {
+            team.push(agentDB['personal-growth'], agentDB['healthcare-marketing'], agentDB['content-creator']);
+        }
+
+        // 2. Based on Bottleneck (Add a specialist)
+        if (answers.bottleneck === 'time') {
+            team.push(agentDB['rapid-prototyper']);
+        } else if (answers.bottleneck === 'money') {
+            team.push(agentDB['growth-hacker']);
+        } else if (answers.bottleneck === 'skills') {
+            team.push(agentDB['personal-growth']);
+        } else if (answers.bottleneck === 'reach') {
+            team.push(agentDB['pr-manager']);
+        }
+
+        // Remove duplicates
+        team = [...new Set(team)];
+
+        // Render Results
+        const container = document.getElementById('agents-container');
+        container.innerHTML = '';
+
+        team.forEach(agent => {
+            const card = document.createElement('div');
+            card.className = 'agent-card';
+            card.innerHTML = `
+                <h3>${agent.icon} ${agent.name}</h3>
+                <div class="agent-role">${agent.role}</div>
+                <p>${agent.desc}</p>
+                <div class="prompt-box">
+                    <button class="copy-btn" onclick="copyPrompt(this)">Copy</button>
+                    ${agent.prompt}
+                </div>
+            `;
+            container.appendChild(card);
+        });
+
+        // Update Header
+        document.getElementById('result-desc').textContent = `Because you are focused on ${answers.mission}, bottlenecked by ${answers.bottleneck}, and at an ${answers.experience} level.`;
+
+        // Switch View
+        document.querySelectorAll('.question-step').forEach(el => el.classList.remove('active'));
+        document.getElementById('results').classList.add('active');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function resetOracle() {
+        answers = { mission: '', bottleneck: '', experience: '' };
+        document.querySelectorAll('.option-btn').forEach(btn => {
+            btn.style.borderColor = 'var(--border)';
+            btn.style.background = 'var(--bg)';
+        });
+        document.getElementById('results').classList.remove('active');
+        nextStep(1);
+    }
+
+    // Copy Prompt
+    function copyPrompt(btn) {
+        const text = btn.parentElement.innerText.replace('Copy', '').trim();
+        navigator.clipboard.writeText(text).then(() => {
+            const toast = document.getElementById('toast');
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        });
+    }
+</script>
+</body>
+</html>
