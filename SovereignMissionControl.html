@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>👑 Sovereign Mission Control</title>
+<style>
+    :root {
+        --bg-main: #060606;
+        --bg-panel: #111111;
+        --bg-card: #1a1a1a;
+        --text-main: #f5f5f5;
+        --text-muted: #a3a3a3;
+        --border: #2a2a2a;
+        --accent: #ef4444; /* Sovereign Red */
+        --accent-hover: #dc2626;
+        --success: #10b981;
+        --gold: #fbbf24;
+        --blue: #3b82f6;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background: var(--bg-main);
+        color: var(--text-main);
+        display: flex;
+        height: 100vh;
+        overflow: hidden;
+    }
+
+    /* ================= SIDEBAR ================= */
+    .sidebar {
+        width: 280px;
+        background: var(--bg-panel);
+        border-right: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .sidebar-header {
+        padding: 2rem 1.5rem;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .sidebar-header h1 {
+        font-size: 1.3rem;
+        font-weight: 900;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: var(--gold);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .nav-list {
+        flex: 1;
+        overflow-y: auto;
+        padding: 1rem 0;
+    }
+
+    .nav-item {
+        padding: 1rem 1.5rem;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 0.95rem;
+        border-left: 3px solid transparent;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        color: var(--text-muted);
+    }
+
+    .nav-item:hover { background: rgba(255,255,255,0.03); color: var(--text-main); }
+    .nav-item.active { border-left-color: var(--accent); background: rgba(239, 68, 68, 0.1); color: var(--accent); }
+
+    .nav-section {
+        padding: 1.5rem 1.5rem 0.5rem;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    /* ================= MAIN ================= */
+    .main-content {
+        flex: 1;
+        overflow-y: auto;
+        padding: 3rem;
+        background: var(--bg-main);
+    }
+
+    .view { display: none; max-width: 1000px; margin: 0 auto; animation: fadeIn 0.3s; }
+    .view.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* ================= DASHBOARD ================= */
+    .dash-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-top: 2rem;
+    }
+
+    .dash-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .dash-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 4px;
+        background: var(--accent);
+    }
+
+    .dash-card h3 { font-size: 1.2rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+    .dash-card p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem; flex: 1; line-height: 1.5; }
+
+    .btn {
+        background: var(--bg-panel);
+        color: var(--text-main);
+        border: 1px solid var(--border);
+        padding: 0.8rem 1.2rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-align: center;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .btn:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-primary { background: var(--accent); color: white; border: none; }
+    .btn-primary:hover { background: var(--accent-hover); color: white; }
+
+    /* ================= BLITZ SCHEDULE ================= */
+    .blitz-list { margin-top: 2rem; }
+    
+    .blitz-item {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        display: flex;
+        gap: 1.5rem;
+        align-items: flex-start;
+    }
+
+    .blitz-day {
+        background: var(--accent);
+        color: white;
+        width: 60px; height: 60px;
+        border-radius: 50%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-weight: 900;
+        flex-shrink: 0;
+    }
+    .blitz-day span:first-child { font-size: 0.6rem; text-transform: uppercase; opacity: 0.8; }
+    .blitz-day span:last-child { font-size: 1.4rem; line-height: 1; }
+
+    .blitz-content h4 { font-size: 1.2rem; margin-bottom: 0.5rem; }
+    .blitz-content p { color: var(--text-muted); line-height: 1.6; margin-bottom: 1rem; }
+
+    /* ================= PROMPT GENERATOR ================= */
+    .form-group { margin-bottom: 1.5rem; }
+    .form-group label { display: block; font-size: 0.9rem; font-weight: 600; margin-bottom: 0.5rem; }
+    .form-group input, .form-group textarea, .form-group select {
+        width: 100%; background: var(--bg-card); border: 1px solid var(--border);
+        color: var(--text-main); padding: 1rem; border-radius: 8px; font-size: 1rem; font-family: inherit;
+    }
+    .form-group input:focus, .form-group textarea:focus, .form-group select:focus { outline: none; border-color: var(--accent); }
+    .form-group textarea { min-height: 100px; resize: vertical; }
+
+    .prompt-output-box {
+        background: #000; border: 1px solid var(--border); border-radius: 8px;
+        padding: 1.5rem; font-family: 'Courier New', Courier, monospace;
+        font-size: 0.95rem; line-height: 1.6; color: #a5b4fc; white-space: pre-wrap;
+    }
+
+    .output-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+
+    /* ================= AFFILIATE LEDGER ================= */
+    .ledger-table { width: 100%; border-collapse: collapse; margin-top: 2rem; }
+    .ledger-table th, .ledger-table td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--border); }
+    .ledger-table th { background: var(--bg-card); color: var(--text-muted); font-size: 0.85rem; text-transform: uppercase; }
+    .ledger-table td input { background: transparent; border: none; color: white; width: 100%; font-family: inherit; }
+    .ledger-table td input:focus { outline: 1px solid var(--accent); }
+
+    .toast {
+        position: fixed; bottom: 2rem; right: 2rem;
+        background: var(--success); color: white; padding: 1rem 2rem;
+        border-radius: 8px; font-weight: bold; box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+        transform: translateY(100px); opacity: 0; transition: all 0.3s; z-index: 1000;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+
+</style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h1>👑 Mission Control</h1>
+        </div>
+        <div class="nav-list">
+            <div class="nav-section">Operations</div>
+            <div class="nav-item active" data-view="dashboard"><span>📊</span> Dashboard</div>
+            <div class="nav-item" data-view="blitz"><span>🗓️</span> 7-Day Blitz</div>
+            
+            <div class="nav-section">AI Agents</div>
+            <div class="nav-item" data-view="prompts"><span>🤖</span> Prompt Generator</div>
+            
+            <div class="nav-section">The Engine</div>
+            <div class="nav-item" data-view="affiliate"><span>💰</span> Affiliate Ledger</div>
+            <div class="nav-item" data-view="assets"><span>📁</span> The Vault</div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+
+        <!-- VIEW: DASHBOARD -->
+        <div class="view active" id="view-dashboard">
+            <h2 style="font-size: 2rem; margin-bottom: 0.5rem;">Welcome, Sovereign Operator.</h2>
+            <p style="color: var(--text-muted); font-size: 1.1rem;">Your central nervous system for the book launch. Execute the blitz, generate your prompts, and track your affiliate army.</p>
+
+            <div class="dash-grid">
+                <div class="dash-card">
+                    <h3>📚 The Offer</h3>
+                    <p>Free PDF Download. The hook that builds the nation.</p>
+                    <a href="https://quantum-freedom-site.vercel.app/Forbidden_Knowledge_2026.html" target="_blank" class="btn">View Live Reader</a>
+                </div>
+                <div class="dash-card">
+                    <h3>📝 Today's Mission</h3>
+                    <p>Execute Day 1 of the 7-Day Blitz. Post the "Two Wings" concept.</p>
+                    <button class="btn btn-primary" onclick="switchView('blitz')">Go to Blitz</button>
+                </div>
+                <div class="dash-card">
+                    <h3>🤖 Need Copy?</h3>
+                    <p>Generate a master prompt for the Content Weaver to write your posts.</p>
+                    <button class="btn" onclick="switchView('prompts')">Open Generator</button>
+                </div>
+                <div class="dash-card">
+                    <h3>💰 Affiliate Check</h3>
+                    <p>Track your street dwellers and sovereign affiliates. Who is earning?</p>
+                    <button class="btn" onclick="switchView('affiliate')">Open Ledger</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: BLITZ -->
+        <div class="view" id="view-blitz">
+            <h2 style="font-size: 2rem;">The 7-Day Blitz</h2>
+            <p style="color: var(--text-muted); margin-bottom: 2rem;">Do not just post once. The algorithm requires a sequence. Here is how you feed the machine.</p>
+
+            <div class="blitz-list">
+                <!-- Day 1 -->
+                <div class="blitz-item">
+                    <div class="blitz-day"><span>Day</span><span>1</span></div>
+                    <div class="blitz-content">
+                        <h4>The Hook: "Two Wings of the Same Rotten Bird"</h4>
+                        <p>Post the concept on Facebook/X. No link yet. Just build curiosity. Let them get angry enough to ask for the book.</p>
+                        <button class="btn" onclick="openAgent('content', 'Write a viral Facebook/X post introducing the concept of the Right and Left being two wings of the same rotten bird. Build curiosity without linking to the book.')">🤖 Generate Copy</button>
+                    </div>
+                </div>
+                <!-- Day 2 -->
+                <div class="blitz-item">
+                    <div class="blitz-day"><span>Day</span><span>2</span></div>
+                    <div class="blitz-content">
+                        <h4>The Proof: The Murder of Hugo</h4>
+                        <p>Post the Prologue. This is raw, emotional storytelling. End with: "The full book is free tomorrow."</p>
+                        <button class="btn" onclick="openAgent('content', 'Write a Facebook post sharing the story of Hugo. Focus on the emotional weight of the medical protocol. End with a teaser that the free book drops tomorrow.')">🤖 Generate Copy</button>
+                    </div>
+                </div>
+                <!-- Day 3 -->
+                <div class="blitz-item">
+                    <div class="blitz-day"><span>Day</span><span>3</span></div>
+                    <div class="blitz-content">
+                        <h4>The Drop: Free PDF Launch</h4>
+                        <p>Launch the free PDF link. Post it on Facebook, X, and send it to your email list.</p>
+                        <button class="btn" onclick="openAgent('growth', 'Design a launch post for Facebook and X announcing the free PDF is live. Include a psychological reason why they should download it right now.')">🤖 Generate Copy</button>
+                    </div>
+                </div>
+                <!-- Day 4 -->
+                <div class="blitz-item">
+                    <div class="blitz-day"><span>Day</span><span>4</span></div>
+                    <div class="blitz-content">
+                        <h4>Reddit Infiltration: The Trojan Horse</h4>
+                        <p>Drop the "Trojan Horse" posts in 3 subreddits. Provide massive value, link in the comments.</p>
+                        <button class="btn" onclick="openAgent('reddit', 'Write a Trojan Horse post for r/conspiracy or r/AlternativeHealth. Provide massive standalone value about the medical tyranny, and mention the free PDF in the first comment.')">🤖 Generate Copy</button>
+                    </div>
+                </div>
+                <!-- Day 5 -->
+                <div class="blitz-item">
+                    <div class="blitz-day"><span>Day</span><span>5</span></div>
+                    <div class="blitz-content">
+                        <h4>The Affiliate Launch: "Earn 50%"</h4>
+                        <p>Announce the "Sovereign Affiliate" program. "Earn 50% by sharing the physical book."</p>
+                        <button class="btn" onclick="openAgent('sales', 'Write an announcement post for the Sovereign Affiliate program. Explain how readers can earn 50% commission by selling the physical book. Make it sound like a covenant, not a scam.')">🤖 Generate Copy</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: PROMPTS -->
+        <div class="view" id="view-prompts">
+            <h2 style="font-size: 2rem;">Omni-Agent Generator</h2>
+            <p style="color: var(--text-muted); margin-bottom: 2rem;">Fill in the blanks. It will generate a flawless prompt you can paste into ChatGPT, Claude, or any AI.</p>
+
+            <div class="form-group">
+                <label>Select Agent Persona</label>
+                <select id="agent-select">
+                    <option value="growth">🚀 Growth Hacker</option>
+                    <option value="content">✍️ Content Creator</option>
+                    <option value="reddit">🤝 Reddit Infiltrator</option>
+                    <option value="pr">📢 PR Commander</option>
+                    <option value="sales">💰 Sales Strategist</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>What is the primary goal?</label>
+                <input type="text" id="goal-input" placeholder="e.g., Get 1,000 downloads of my free book in 7 days">
+            </div>
+            <div class="form-group">
+                <label>What is the core offer or message?</label>
+                <textarea id="context-input" placeholder="e.g., A free PDF called 'Forbidden Knowledge: The Sovereign Operator' that exposes medical tyranny and teaches financial sovereignty."></textarea>
+            </div>
+            <button class="btn btn-primary" style="width: 100%;" onclick="generatePrompt()">⚡ Generate Master Prompt</button>
+
+            <div id="prompt-result" style="display: none; margin-top: 2rem;">
+                <div class="output-header">
+                    <h3 style="color: var(--success);">✅ Prompt Ready</h3>
+                    <button class="btn" onclick="copyPrompt()">Copy to Clipboard</button>
+                </div>
+                <div class="prompt-output-box" id="prompt-output"></div>
+            </div>
+        </div>
+
+        <!-- VIEW: AFFILIATE LEDGER -->
+        <div class="view" id="view-affiliate">
+            <h2 style="font-size: 2rem;">The Sovereign Ledger</h2>
+            <p style="color: var(--text-muted); margin-bottom: 2rem;">Track your affiliate army. Remember the covenant: 50% or more goes to the people who sell it.</p>
+
+            <table class="ledger-table">
+                <thead>
+                    <tr>
+                        <th>Affiliate Name</th>
+                        <th>Status</th>
+                        <th>Commission Split</th>
+                        <th>Total Sales</th>
+                    </tr>
+                </thead>
+                <tbody id="ledger-body">
+                    <!-- Default entry -->
+                    <tr>
+                        <td><input type="text" value="Street Dweller (John Doe)" placeholder="Name"></td>
+                        <td><input type="text" value="Active" placeholder="Status"></td>
+                        <td><input type="text" value="100% (Covenant Tier)" placeholder="Split"></td>
+                        <td><input type="text" value="$0.00" placeholder="$"></td>
+                    </tr>
+                </tbody>
+            </table>
+            <button class="btn" style="margin-top: 1rem;" onclick="addLedgerRow()">+ Add Affiliate</button>
+        </div>
+
+        <!-- VIEW: THE VAULT -->
+        <div class="view" id="view-assets">
+            <h2 style="font-size: 2rem;">The Vault</h2>
+            <p style="color: var(--text-muted); margin-bottom: 2rem;">Paste your AI-generated copy here so you never lose it.</p>
+
+            <div class="form-group">
+                <label>Asset Title</label>
+                <input type="text" id="asset-title" placeholder="e.g., Day 1 - Facebook Post">
+            </div>
+            <div class="form-group">
+                <label>Copy / Content</label>
+                <textarea id="asset-content" style="min-height: 200px;" placeholder="Paste your text here..."></textarea>
+            </div>
+            <button class="btn btn-primary" onclick="saveAsset()">💾 Save to Vault</button>
+
+            <div id="saved-assets" style="margin-top: 2rem;"></div>
+        </div>
+
+    </div>
+
+    <!-- TOAST -->
+    <div class="toast" id="toast">Action Successful!</div>
+
+<script>
+    // ================= NAVIGATION =================
+    const navItems = document.querySelectorAll('.nav-item');
+    const views = document.querySelectorAll('.view');
+
+    navItems.forEach(item => {
+        item.addEventListener('click', () => {
+            navItems.forEach(nav => nav.classList.remove('active'));
+            item.classList.add('active');
+            
+            const targetView = item.getAttribute('data-view');
+            switchView(targetView);
+        });
+    });
+
+    function switchView(viewId) {
+        // Update Sidebar
+        navItems.forEach(nav => {
+            if(nav.getAttribute('data-view') === viewId) nav.classList.add('active');
+            else nav.classList.remove('active');
+        });
+
+        // Update Views
+        views.forEach(v => v.classList.remove('active'));
+        document.getElementById('view-' + viewId).classList.add('active');
+    }
+
+    // ================= AGENT PROMPT GENERATOR =================
+    const agents = {
+        growth: "Act as a world-class Growth Hacker. Your specialty is rapid user acquisition, viral loops, and conversion optimization.",
+        content: "Act as an elite Content Creator. Your specialty is multi-platform content strategy, copywriting, and brand storytelling.",
+        reddit: "Act as a Reddit Community Builder. Your specialty is authentic engagement, value-driven content, and stealth marketing.",
+        pr: "Act as a PR & Communications Manager. Your specialty is media relations, crisis comms, and reputation management.",
+        sales: "Act as a Sales Outreach & Offer Strategist. Your specialty is top-of-funnel outreach and objection handling."
+    };
+
+    function generatePrompt() {
+        const agentType = document.getElementById('agent-select').value;
+        const goal = document.getElementById('goal-input').value || "[No specific goal]";
+        const context = document.getElementById('context-input').value || "[No specific context]";
+
+        const prompt = `${agents[agentType]}
+
+### YOUR TASK:
+Generate highly specific, actionable content based on the context below.
+
+### PROJECT CONTEXT:
+- **Core Message/Offer:** ${context}
+- **Primary Goal:** ${goal}
+
+### RULES:
+1. Do not give generic advice. Give me exact, ready-to-copy-paste copy or step-by-step instructions.
+2. Adopt the persona fully. You are the expert. Tell me exactly what to do.`;
+
+        document.getElementById('prompt-output').textContent = prompt;
+        document.getElementById('prompt-result').style.display = 'block';
+    }
+
+    function openAgent(agentType, goal) {
+        switchView('prompts');
+        document.getElementById('agent-select').value = agentType;
+        document.getElementById('goal-input').value = goal;
+        document.getElementById('context-input').value = "A free PDF called 'Forbidden Knowledge: The Sovereign Operator' that exposes medical tyranny and teaches financial sovereignty.";
+        generatePrompt();
+    }
+
+    function copyPrompt() {
+        const text = document.getElementById('prompt-output').textContent;
+        navigator.clipboard.writeText(text).then(() => {
+            showToast("Prompt copied! Paste it into ChatGPT/Claude.");
+        });
+    }
+
+    // ================= LEDGER =================
+    function addLedgerRow() {
+        const tbody = document.getElementById('ledger-body');
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><input type="text" placeholder="Name"></td>
+            <td><input type="text" placeholder="Status"></td>
+            <td><input type="text" placeholder="Split"></td>
+            <td><input type="text" placeholder="$0.00"></td>
+        `;
+        tbody.appendChild(tr);
+    }
+
+    // ================= THE VAULT =================
+    function saveAsset() {
+        const title = document.getElementById('asset-title').value;
+        const content = document.getElementById('asset-content').value;
+        
+        if(!title || !content) {
+            showToast("Please provide a title and content.", true);
+            return;
+        }
+
+        const asset = { title, content, date: new Date().toLocaleDateString() };
+        let vault = JSON.parse(localStorage.getItem('sovereignVault')) || [];
+        vault.push(asset);
+        localStorage.setItem('sovereignVault', JSON.stringify(vault));
+
+        document.getElementById('asset-title').value = '';
+        document.getElementById('asset-content').value = '';
+        
+        renderVault();
+        showToast("Asset saved to Vault!");
+    }
+
+    function renderVault() {
+        const vault = JSON.parse(localStorage.getItem('sovereignVault')) || [];
+        const container = document.getElementById('saved-assets');
+        
+        if(vault.length === 0) {
+            container.innerHTML = '<p style="color:var(--text-muted);">No assets saved yet.</p>';
+            return;
+        }
+
+        container.innerHTML = vault.map((item, index) => `
+            <div class="dash-card" style="margin-bottom: 1rem;">
+                <h3>${item.title}</h3>
+                <p style="font-size:0.8rem; color:var(--text-muted);">Saved on ${item.date}</p>
+                <div style="background:#000; padding:1rem; border-radius:8px; font-family:monospace; font-size:0.9rem; white-space:pre-wrap; margin-top:1rem; border:1px solid #333;">${item.content}</div>
+                <button class="btn" style="margin-top:1rem; align-self:flex-start; color:var(--accent); border-color:var(--accent);" onclick="deleteAsset(${index})">Delete</button>
+            </div>
+        `).join('');
+    }
+
+    function deleteAsset(index) {
+        let vault = JSON.parse(localStorage.getItem('sovereignVault')) || [];
+        vault.splice(index, 1);
+        localStorage.setItem('sovereignVault', JSON.stringify(vault));
+        renderVault();
+        showToast("Asset deleted.");
+    }
+
+    // ================= TOAST =================
+    function showToast(msg, isError = false) {
+        const toast = document.getElementById('toast');
+        toast.textContent = msg;
+        toast.style.background = isError ? 'var(--accent)' : 'var(--success)';
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+
+    // Initialize Vault on Load
+    renderVault();
+
+</script>
+</body>
+</html>
