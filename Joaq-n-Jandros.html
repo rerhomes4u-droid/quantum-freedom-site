@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🏔️ Nation Builder: Joaq'n'Jadro's Command</title>
+<style>
+    :root {
+        --bg: #0b0f12;
+        --panel: #12181f;
+        --card: #1a222b;
+        --text: #e8eef2;
+        --muted: #7a8b9a;
+        --border: #2a3540;
+        --accent: #2dd4bf; /* Teal for adventure */
+        --gold: #fbbf24;
+        --success: #10b981;
+        --danger: #ef4444;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+        font-family: 'Inter', -apple-system, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        display: flex;
+        height: 100vh;
+        overflow: hidden;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+        width: 260px;
+        background: var(--panel);
+        border-right: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+    }
+    .logo {
+        padding: 1.5rem;
+        font-size: 1.1rem;
+        font-weight: 900;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: var(--accent);
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .nav { flex: 1; padding: 1rem 0; }
+    .nav-item {
+        padding: 0.9rem 1.5rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-weight: 600;
+        color: var(--muted);
+        border-left: 3px solid transparent;
+        transition: all 0.2s;
+        font-size: 0.9rem;
+    }
+    .nav-item:hover { color: var(--text); background: rgba(255,255,255,0.02); }
+    .nav-item.active { color: var(--accent); border-left-color: var(--accent); background: rgba(45, 212, 191, 0.1); }
+
+    /* MAIN */
+    .main { flex: 1; overflow-y: auto; padding: 3rem; }
+    .view { display: none; max-width: 1000px; margin: 0 auto; animation: fadeIn 0.3s; }
+    .view.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    h1 { font-size: 2.2rem; margin-bottom: 0.5rem; }
+    .subtitle { color: var(--muted); font-size: 1rem; margin-bottom: 2rem; line-height: 1.6; }
+
+    /* CARDS */
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-top: 1.5rem; }
+    .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1.5rem;
+        position: relative;
+        overflow: hidden;
+    }
+    .card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; width: 4px; height: 100%;
+        background: var(--accent);
+    }
+    .card h3 { font-size: 1.1rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+    .card p { color: var(--muted); font-size: 0.85rem; line-height: 1.5; margin-bottom: 1rem; }
+
+    .btn {
+        background: transparent;
+        color: var(--text);
+        border: 1px solid var(--border);
+        padding: 0.7rem 1.2rem;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.85rem;
+    }
+    .btn:hover { background: var(--border); }
+    .btn-primary { background: var(--accent); color: #000; border: none; }
+    .btn-primary:hover { background: #14b8a6; }
+    .btn-gold { background: var(--gold); color: #000; border: none; }
+    .btn-gold:hover { background: #d97706; }
+
+    /* FORM */
+    .form-group { margin-bottom: 1.2rem; }
+    .form-group label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 0.4rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .form-group input, .form-group select {
+        width: 100%;
+        background: #000;
+        border: 1px solid var(--border);
+        color: var(--text);
+        padding: 0.8rem;
+        border-radius: 6px;
+        font-family: inherit;
+        font-size: 0.95rem;
+    }
+    .form-group input:focus, .form-group select:focus { outline: none; border-color: var(--accent); }
+
+    .output-box {
+        background: #000;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 1.2rem;
+        font-family: 'Courier New', monospace;
+        font-size: 0.85rem;
+        line-height: 1.5;
+        color: #a5b4fc;
+        white-space: pre-wrap;
+        margin-top: 1rem;
+    }
+
+    /* LEDGER TABLE */
+    .ledger-table { width: 100%; border-collapse: collapse; margin-top: 1.5rem; }
+    .ledger-table th, .ledger-table td { padding: 0.8rem; text-align: left; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+    .ledger-table th { color: var(--muted); font-size: 0.75rem; text-transform: uppercase; }
+    .ledger-table td input { background: transparent; border: none; color: white; width: 100%; font-family: inherit; }
+    .ledger-table td input:focus { outline: 1px solid var(--accent); }
+
+    .toast {
+        position: fixed; bottom: 2rem; right: 2rem;
+        background: var(--success); color: white; padding: 1rem 2rem;
+        border-radius: 6px; font-weight: 800; font-size: 0.9rem;
+        opacity: 0; transition: 0.3s; transform: translateY(20px);
+        pointer-events: none; z-index: 1000;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+</style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="logo">🏔️ Nation Builder</div>
+        <div class="nav">
+            <div class="nav-item active" onclick="switchView('dashboard')">📊 Dashboard</div>
+            <div class="nav-item" onclick="switchView('hunter')">🎯 Hunter (Outreach)</div>
+            <div class="nav-item" onclick="switchView('ledger')">💰 Deposit Ledger</div>
+            <div class="nav-item" onclick="switchView('arsenal')">⚙️ The Arsenal</div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main">
+
+        <!-- VIEW: DASHBOARD -->
+        <div class="view active" id="view-dashboard">
+            <h1>Joaq'n'Jadro's Command Center</h1>
+            <p class="subtitle">This is the operational hub for the 10% tourism ecosystem. Every adventure booked is a node activated. Every deposit is a covenant.</p>
+            
+            <div class="grid">
+                <div class="card">
+                    <h3>🎯 The Hunter</h3>
+                    <p>Generate the exact outreach messages for Instagram DMs, WhatsApp, and Email to get people excited about TripsToColombia.com.</p>
+                    <button class="btn btn-primary" onclick="switchView('hunter')">Open Hunter</button>
+                </div>
+                <div class="card">
+                    <h3>💰 The Ledger</h3>
+                    <p>Track every 10% deposit. Automatically calculate the 50% referrer payout and the 50% foundation donation.</p>
+                    <button class="btn btn-gold" onclick="switchView('ledger')">Open Ledger</button>
+                </div>
+                <div class="card">
+                    <h3>⚙️ The Arsenal</h3>
+                    <p>Deploy the real autonomous workers (OpenClaw, AdClaw, MetaHarness) to automate the sales pipeline and marketing.</p>
+                    <button class="btn" onclick="switchView('arsenal')">View Arsenal</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: HUNTER -->
+        <div class="view" id="view-hunter">
+            <h1>The Hunter: Outreach Generator</h1>
+            <p class="subtitle">Give me the target, and I will forge the exact message to get them on an ATV in Colombia.</p>
+
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <div class="form-group">
+                    <label>Target Audience / Platform</label>
+                    <select id="hunter-platform">
+                        <option value="Instagram DM to an adventure seeker">Instagram DM to an adventure seeker</option>
+                        <option value="WhatsApp message to a past client">WhatsApp message to a past client</option>
+                        <option value="Email to a travel agency">Email to a travel agency</option>
+                        <option value="Facebook post for a group">Facebook post for a group</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>What is the specific adventure?</label>
+                    <select id="hunter-adventure">
+                        <option value="ATV through the mountains">ATV through the mountains</option>
+                        <option value="Horseback riding at sunset">Horseback riding at sunset</option>
+                        <option value="Paragliding over the valley">Paragliding over the valley</option>
+                        <option value="The Full Wild Adventure Package">The Full Wild Adventure Package</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary" onclick="generateHunter()" style="width: 100%;">⚡ Generate Outreach</button>
+            </div>
+
+            <div id="hunter-output" style="display: none;">
+                <div class="output-box" id="hunter-text"></div>
+                <button class="btn" style="margin-top: 1rem;" onclick="copyHunter()">📋 Copy to Clipboard</button>
+            </div>
+        </div>
+
+        <!-- VIEW: LEDGER -->
+        <div class="view" id="view-ledger">
+            <h1>The Covenant Ledger</h1>
+            <p class="subtitle">Every deposit is split 50/50. The referrer gets their cut, and the Foundation gets theirs. This is the engine.</p>
+
+            <table class="ledger-table" id="ledger-table">
+                <thead>
+                    <tr>
+                        <th>Client Name</th>
+                        <th>Adventure</th>
+                        <th>Total Price</th>
+                        <th>10% Deposit</th>
+                        <th>Referrer (50%)</th>
+                        <th>Foundation (50%)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input type="text" placeholder="e.g., John Doe"></td>
+                        <td><input type="text" placeholder="e.g., ATV"></td>
+                        <td><input type="number" class="total-price" placeholder="1000" oninput="calculateSplit(this)"></td>
+                        <td class="deposit">$0</td>
+                        <td class="referrer">$0</td>
+                        <td class="foundation">$0</td>
+                    </tr>
+                </tbody>
+            </table>
+            <button class="btn" style="margin-top: 1rem;" onclick="addLedgerRow()">+ Add New Client</button>
+        </div>
+
+        <!-- VIEW: ARSENAL -->
+        <div class="view" id="view-arsenal">
+            <h1>The Arsenal: Real Execution Engines</h1>
+            <p class="subtitle">These are the tools the hackers are using. You don't just prompt them. You install them and they work for you 24/7.</p>
+
+            <div class="grid">
+                <div class="card">
+                    <h3>🦞 OpenClaw</h3>
+                    <p>The autonomous personal assistant. Runs on your machine, connects to your calendar and CRM, and executes tasks. The Felix case study: $177k in 2 months [citation:4].</p>
+                    <a href="https://github.com/openclaw/openclaw" target="_blank" class="btn">View Repo (394k ⭐)</a>
+                </div>
+                <div class="card">
+                    <h3>🤖 AdClaw</h3>
+                    <p>A multi-agent marketing team. Researcher, Content Writer, SEO, Ads Manager. Deploys with Docker. Connect it to Telegram and give it commands [citation:3].</p>
+                    <a href="https://github.com/Citedy/adclaw" target="_blank" class="btn">View Repo</a>
+                </div>
+                <div class="card">
+                    <h3>💼 MetaHarness Sales</h3>
+                    <p>A 3-agent sales pod: Qualifier, Opener, Closer. Built on Claude Code. Perfect for turning cold leads into booked tours [citation:6].</p>
+                    <a href="https://www.npmjs.com/package/@metaharness/sales" target="_blank" class="btn">View NPM Package</a>
+                </div>
+                <div class="card">
+                    <h3>📡 B2B SDR Template</h3>
+                    <p>AI sales rep that connects to WhatsApp, Telegram, and Email. 10-stage pipeline. Built on OpenClaw [citation:12].</p>
+                    <a href="https://github.com/Arnon-hs/open-source/blob/main/automation/ipythoning-b2b-sdr-agent-template.md" target="_blank" class="btn">View Template</a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="toast" id="toast">Copied!</div>
+
+<script>
+    // Navigation
+    function switchView(id) {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        document.getElementById('view-' + id).classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
+
+    // Hunter Generator
+    function generateHunter() {
+        const platform = document.getElementById('hunter-platform').value;
+        const adventure = document.getElementById('hunter-adventure').value;
+
+        const prompt = `You are the "Hunter" for Joaq'n'Jadro's Horses, ATV's & Wild Adventures in Paradise. 
+Your mission is to get people excited about TripsToColombia.com.
+
+### TARGET:
+${platform}
+
+### THE ADVENTURE:
+${adventure}
+
+### THE HOOK:
+We offer a 10% non-refundable deposit to lock in the adventure. The deposit goes to our foundation, which gives back to the community. Half of that deposit goes to the person who referred them.
+
+### YOUR TASK:
+Write the exact outreach message. It must be:
+1. Short and punchy (under 150 words).
+2. Focus on the thrill and the beauty of Colombia.
+3. Mention the 10% deposit as a "commitment to the adventure" not a fee.
+4. End with a clear call to action (e.g., "Reply 'WILD' to lock in your spot").
+
+Tone: Adventurous, welcoming, and authentic. No corporate jargon.`;
+
+        document.getElementById('hunter-text').textContent = prompt;
+        document.getElementById('hunter-output').style.display = 'block';
+    }
+
+    function copyHunter() {
+        const text = document.getElementById('hunter-text').textContent;
+        navigator.clipboard.writeText(text).then(() => {
+            showToast("Outreach Prompt Copied!");
+        });
+    }
+
+    // Ledger Calculation
+    function calculateSplit(input) {
+        const row = input.closest('tr');
+        const total = parseFloat(input.value) || 0;
+        const deposit = total * 0.10;
+        const referrer = deposit * 0.50;
+        const foundation = deposit * 0.50;
+
+        row.querySelector('.deposit').textContent = '$' + deposit.toFixed(2);
+        row.querySelector('.referrer').textContent = '$' + referrer.toFixed(2);
+        row.querySelector('.foundation').textContent = '$' + foundation.toFixed(2);
+    }
+
+    function addLedgerRow() {
+        const tbody = document.querySelector('#ledger-table tbody');
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td><input type="text" placeholder="Client Name"></td>
+            <td><input type="text" placeholder="Adventure"></td>
+            <td><input type="number" class="total-price" placeholder="1000" oninput="calculateSplit(this)"></td>
+            <td class="deposit">$0</td>
+            <td class="referrer">$0</td>
+            <td class="foundation">$0</td>
+        `;
+        tbody.appendChild(tr);
+    }
+
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 2500);
+    }
+</script>
+</body>
+</html>
