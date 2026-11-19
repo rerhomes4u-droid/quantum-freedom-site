@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🌐 The Sovereign OS</title>
+<style>
+    :root {
+        --bg: #050505;
+        --panel: #111;
+        --text: #e5e5e5;
+        --muted: #888;
+        --border: #222;
+        --accent: #22c55e; /* Green for Genesis */
+        --blue: #3b82f6;
+        --red: #ef4444;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+        font-family: 'Inter', -apple-system, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        height: 100vh;
+        display: flex;
+        overflow: hidden;
+    }
+
+    /* SIDEBAR */
+    .sidebar {
+        width: 260px;
+        background: var(--panel);
+        border-right: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .logo {
+        padding: 2rem 1.5rem;
+        font-size: 1.2rem;
+        font-weight: 900;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        color: var(--accent);
+        border-bottom: 1px solid var(--border);
+    }
+
+    .nav {
+        flex: 1;
+        padding: 1rem 0;
+    }
+
+    .nav-item {
+        padding: 1rem 1.5rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-weight: 600;
+        color: var(--muted);
+        border-left: 3px solid transparent;
+        transition: all 0.2s;
+    }
+
+    .nav-item:hover { color: var(--text); background: rgba(255,255,255,0.02); }
+    .nav-item.active { color: var(--accent); border-left-color: var(--accent); background: rgba(34, 197, 94, 0.1); }
+
+    /* MAIN */
+    .main {
+        flex: 1;
+        overflow-y: auto;
+        padding: 3rem;
+        position: relative;
+    }
+
+    .view { display: none; max-width: 900px; margin: 0 auto; animation: fadeIn 0.3s; }
+    .view.active { display: block; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    h1 { font-size: 2.5rem; margin-bottom: 0.5rem; letter-spacing: -1px; }
+    .subtitle { color: var(--muted); font-size: 1.1rem; margin-bottom: 2rem; line-height: 1.5; }
+
+    /* CARDS */
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
+
+    .card {
+        background: var(--panel);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1.5rem;
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.2s;
+    }
+
+    .card:hover { transform: translateY(-4px); border-color: #333; }
+
+    .card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; width: 4px; height: 100%;
+        background: var(--accent);
+    }
+
+    .card h3 { font-size: 1.2rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+    .card p { color: var(--muted); font-size: 0.9rem; line-height: 1.5; margin-bottom: 1.5rem; }
+
+    .btn {
+        background: transparent;
+        color: var(--text);
+        border: 1px solid var(--border);
+        padding: 0.8rem 1.2rem;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .btn:hover { background: var(--border); }
+    .btn-primary { background: var(--accent); color: #000; border: none; }
+    .btn-primary:hover { background: #16a34a; }
+    .btn-blue { background: var(--blue); color: white; border: none; }
+    .btn-blue:hover { background: #2563eb; }
+    .btn-red { background: var(--red); color: white; border: none; }
+    .btn-red:hover { background: #dc2626; }
+
+    /* FORMS */
+    .form-group { margin-bottom: 1.5rem; }
+    .form-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+    .form-group input, .form-group textarea, .form-group select {
+        width: 100%;
+        background: #000;
+        border: 1px solid var(--border);
+        color: var(--text);
+        padding: 1rem;
+        border-radius: 6px;
+        font-family: inherit;
+        font-size: 1rem;
+    }
+    .form-group input:focus, .form-group textarea:focus { outline: none; border-color: var(--accent); }
+    .form-group textarea { min-height: 120px; resize: vertical; }
+
+    .output-box {
+        background: #000;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 1.5rem;
+        font-family: 'Courier New', monospace;
+        font-size: 0.95rem;
+        line-height: 1.6;
+        color: #a5b4fc;
+        white-space: pre-wrap;
+        margin-top: 1rem;
+    }
+
+    .toast {
+        position: fixed; bottom: 2rem; right: 2rem;
+        background: var(--accent); color: black; padding: 1rem 2rem;
+        border-radius: 6px; font-weight: 800; font-size: 0.9rem;
+        opacity: 0; transition: 0.3s; transform: translateY(20px);
+        pointer-events: none; z-index: 1000;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="logo">Sovereign OS</div>
+        <div class="nav">
+            <div class="nav-item active" onclick="switchView('genesis')">🌱 Genesis</div>
+            <div class="nav-item" onclick="switchView('economy')">💰 Economy</div>
+            <div class="nav-item" onclick="switchView('defense')">🛡️ Defense</div>
+            <div class="nav-item" onclick="switchView('nodes')">🌐 Node Network</div>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main">
+
+        <!-- VIEW: GENESIS (The Launchpad) -->
+        <div class="view active" id="view-genesis">
+            <h1>Project Genesis</h1>
+            <p class="subtitle">This is not a book app. This is the operating system for the Sovereign Operator. Deploy the tools, arm the nodes, and build the parallel society.</p>
+            
+            <div class="grid">
+                <div class="card">
+                    <h3>📚 The Book</h3>
+                    <p>Access the complete manuscript. The root cause diagnosis of the system.</p>
+                    <a href="https://quantum-freedom-site.vercel.app/Forbidden_Knowledge_2026.html" target="_blank" class="btn btn-primary">Read Free PDF</a>
+                </div>
+                <div class="card">
+                    <h3>🤖 AI Agent Director</h3>
+                    <p>Generate marketing, legal, and healing prompts using the Sovereign Agent framework.</p>
+                    <button class="btn btn-blue" onclick="switchView('agents')">Open Agents</button>
+                </div>
+                <div class="card">
+                    <h3>📊 Affiliate Engine</h3>
+                    <p>Set up the Gumroad link. Track your street dwellers. The covenant must flow.</p>
+                    <button class="btn" onclick="switchView('economy')">Open Ledger</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: ECONOMY (The Engine) -->
+        <div class="view" id="view-economy">
+            <h1>The Sovereign Ledger</h1>
+            <p class="subtitle">The 2/3 to the seller, 1/3 to the Nation. This is the covenant. Track your affiliates and ensure the money flows to the people who need it.</p>
+
+            <div class="card" style="margin-bottom: 2rem; border-left-color: var(--blue);">
+                <h3>💸 The Gumroad Setup</h3>
+                <p style="margin-bottom: 1rem;"><strong>Step 1:</strong> Create a Gumroad account and upload your physical book cover.<br>
+                <strong>Step 2:</strong> Go to "Affiliates" and turn on the program.<br>
+                <strong>Step 3:</strong> Set the commission to 50%.<br>
+                <strong>Step 4:</strong> Send this link to your street dwellers: <em>gumroad.com/affiliates</em></p>
+                <p style="color: var(--muted); font-size: 0.9rem;">The AI Director will write the exact email to send them.</p>
+            </div>
+
+            <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                <tr style="border-bottom: 1px solid var(--border); color: var(--muted); font-size: 0.8rem; text-transform: uppercase;">
+                    <th style="padding: 1rem;">Affiliate Name</th>
+                    <th style="padding: 1rem;">Role</th>
+                    <th style="padding: 1rem;">Split</th>
+                    <th style="padding: 1rem;">Status</th>
+                </tr>
+                <tr style="border-bottom: 1px solid var(--border);">
+                    <td style="padding: 1rem;"><input type="text" placeholder="e.g., John Doe" style="background:transparent; border:none; color:white; width:100%;"></td>
+                    <td style="padding: 1rem;"><input type="text" placeholder="Street Dweller" style="background:transparent; border:none; color:white; width:100%;"></td>
+                    <td style="padding: 1rem;"><input type="text" placeholder="100%" style="background:transparent; border:none; color:white; width:100%;"></td>
+                    <td style="padding: 1rem;"><span style="color:var(--accent); font-weight:bold;">Active</span></td>
+                </tr>
+            </table>
+            <button class="btn" style="margin-top: 1rem;">+ Add Node</button>
+        </div>
+
+        <!-- VIEW: DEFENSE (The Shield) -->
+        <div class="view" id="view-defense">
+            <h1>The Hugo Protocol</h1>
+            <p class="subtitle">When the hospital calls, you must be ready. Generate the exact cease-and-desist and medical refusal letters instantly.</p>
+
+            <div class="form-group">
+                <label>Patient Name</label>
+                <input type="text" id="patient-name" placeholder="Full Name">
+            </div>
+            <div class="form-group">
+                <label>Hospital Name</label>
+                <input type="text" id="hospital-name" placeholder="e.g., Memorial Hospital">
+            </div>
+            <button class="btn btn-red" onclick="generateDefense()">🛡️ Generate Defense Letter</button>
+
+            <div id="defense-output" style="display:none;" class="output-box"></div>
+        </div>
+
+        <!-- VIEW: AGENTS (The Director) -->
+        <div class="view" id="view-agents">
+            <h1>Omni-Agent Director</h1>
+            <p class="subtitle">Select a Sovereign Agent and generate the exact prompt to command the AI.</p>
+
+            <div class="form-group">
+                <label>Agent Persona</label>
+                <select id="agent-type">
+                    <option value="Growth Hacker">🚀 Growth Hacker (Viral loops, referral engines)</option>
+                    <option value="Content Creator">✍️ Content Creator (Multi-platform copy, hooks)</option>
+                    <option value="Reddit Infiltrator">🤝 Reddit Infiltrator (Trojan Horse posts)</option>
+                    <option value="PR Commander">📢 PR Commander (Crisis comms, press releases)</option>
+                    <option value="Legal Shield">⚖️ Legal Shield (Cease and desist, sovereignty docs)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>What is your goal?</label>
+                <input type="text" id="agent-goal" placeholder="e.g., Write a Facebook post exposing the medical tyranny">
+            </div>
+            <button class="btn btn-blue" onclick="generateAgentPrompt()">🤖 Generate Master Prompt</button>
+
+            <div id="agent-output" style="display:none; margin-top: 2rem;">
+                <button class="btn" onclick="copyAgentPrompt()" style="margin-bottom: 1rem;">📋 Copy to Clipboard</button>
+                <div class="output-box" id="agent-text"></div>
+            </div>
+        </div>
+
+        <!-- VIEW: NODES (The Network) -->
+        <div class="view" id="view-nodes">
+            <h1>The Node Network</h1>
+            <p class="subtitle">A Sovereign Operator is never alone. Find a node, start a healing circle, or build a local community.</p>
+
+            <div class="card" style="border-left-color: var(--blue);">
+                <h3>🌐 The Map</h3>
+                <p>We are building a global network of Safe Houses and Healing Circles. If you are in a city and want to start a node, click below.</p>
+                <button class="btn btn-primary" onclick="showToast('Feature Coming Soon: Connect with local Sovereign Operators.')">Find a Node Near Me</button>
+            </div>
+
+            <div class="card" style="margin-top: 1rem;">
+                <h3>🤝 Start a Healing Circle</h3>
+                <p>Use Dr. Group's root-cause protocols and the Sovereign Operator philosophy to host a weekly meetup. The AI will generate your curriculum.</p>
+                <button class="btn" onclick="switchView('agents')">Generate Circle Curriculum</button>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="toast" id="toast">Success</div>
+
+<script>
+    // Navigation
+    function switchView(id) {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        
+        document.getElementById('view-' + id).classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
+
+    // Defense Protocol
+    function generateDefense() {
+        const patient = document.getElementById('patient-name').value || "[PATIENT NAME]";
+        const hospital = document.getElementById('hospital-name').value || "[HOSPITAL NAME]";
+        
+        const letter = `TO: Administration, ${hospital}
+        
+        RE: NOTICE OF LIABILITY AND REFUSAL OF CONSENT FOR ${patient}
+        
+        This letter serves as formal notice that the undersigned does NOT consent to any medical protocol that violates the Nuremberg Code (1947) or the fundamental right to informed consent. 
+        
+        Any attempt to administer experimental treatments, mRNA therapies, or protocols that have not been fully disclosed and consented to will be met with immediate legal action under 18 U.S.C. § 242 (Deprivation of Rights Under Color of Law).
+        
+        Furthermore, any restriction of family access or administration of non-consensual protocols (such as the COVID protocol that resulted in the death of Hugo) will be prosecuted to the fullest extent of the law.
+        
+        This is a formal demand to cease and desist. 
+        
+        Signed,
+        [YOUR NAME]
+        Sovereign Operator, Amnesty Coalition for Unity`;
+
+        document.getElementById('defense-output').textContent = letter;
+        document.getElementById('defense-output').style.display = 'block';
+        showToast("Defense Letter Generated");
+    }
+
+    // Agent Generator
+    function generateAgentPrompt() {
+        const type = document.getElementById('agent-type').value;
+        const goal = document.getElementById('agent-goal').value || "[No goal provided]";
+        
+        const prompt = `Act as an elite ${type} (inspired by the Agency-Agents framework). 
+Your mission is to support the Sovereign Operator, Ramiro Ramirez, in his mission to distribute "Forbidden Knowledge: The Sovereign Operator" and build the Amnesty Coalition for Unity.
+
+### YOUR TASK:
+${goal}
+
+### RULES:
+- Provide exact, ready-to-paste copy. No generic advice.
+- Use the tone of a warrior: unapologetic, truth-driven, and loving.
+- Remember the core philosophy: "Love you to abandon."
+
+Please generate the content now.`;
+
+        document.getElementById('agent-text').textContent = prompt;
+        document.getElementById('agent-output').style.display = 'block';
+        showToast("Master Prompt Generated");
+    }
+
+    function copyAgentPrompt() {
+        const text = document.getElementById('agent-text').textContent;
+        navigator.clipboard.writeText(text).then(() => {
+            showToast("Prompt Copied!");
+        });
+    }
+
+    // Toast
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 3000);
+    }
+</script>
+</body>
+</html>
