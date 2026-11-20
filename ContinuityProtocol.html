@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>♾️ The Sovereign Loop: Continuity Protocol</title>
+<style>
+    :root {
+        --bg: #050505;
+        --panel: #0d0d0d;
+        --card: #161616;
+        --text: #f0f0f0;
+        --muted: #888888;
+        --border: #2a2a2a;
+        --accent: #10b981; /* Living Green */
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --blue: #3b82f6;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+        font-family: 'Inter', -apple-system, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        display: flex;
+        height: 100vh;
+        overflow: hidden;
+    }
+
+    /* ================= SIDEBAR ================= */
+    .sidebar {
+        width: 260px;
+        background: var(--panel);
+        border-right: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .sidebar-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .sidebar-header h1 {
+        font-size: 1rem;
+        font-weight: 900;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: var(--accent);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .sidebar-header p {
+        font-size: 0.75rem;
+        color: var(--muted);
+        margin-top: 0.25rem;
+    }
+
+    .nav-list {
+        flex: 1;
+        padding: 1rem 0;
+    }
+
+    .nav-item {
+        padding: 1rem 1.5rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: var(--muted);
+        border-left: 3px solid transparent;
+        transition: all 0.2s;
+    }
+
+    .nav-item:hover { color: var(--text); background: rgba(255,255,255,0.02); }
+    .nav-item.active { color: var(--accent); border-left-color: var(--accent); background: rgba(16, 185, 129, 0.1); }
+
+    .status-box {
+        padding: 1.5rem;
+        border-top: 1px solid var(--border);
+        background: rgba(16, 185, 129, 0.05);
+    }
+
+    .status-box p {
+        font-size: 0.75rem;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 0.5rem;
+    }
+
+    .status-indicator {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: bold;
+        color: var(--accent);
+        font-size: 0.9rem;
+    }
+
+    .dot {
+        width: 8px;
+        height: 8px;
+        background: var(--accent);
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+        70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+
+    /* ================= MAIN ================= */
+    .main {
+        flex: 1;
+        overflow-y: auto;
+        padding: 3rem;
+    }
+
+    .view { display: none; max-width: 900px; margin: 0 auto; animation: fadeIn 0.3s; }
+    .view.active { display: block; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    h2 { font-size: 2rem; margin-bottom: 0.5rem; }
+    .subtitle { color: var(--muted); font-size: 1rem; margin-bottom: 2rem; line-height: 1.6; }
+
+    /* CARDS */
+    .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; width: 4px; height: 100%;
+        background: var(--accent);
+    }
+
+    .card h3 { font-size: 1.2rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+    .card p { color: var(--muted); font-size: 0.9rem; line-height: 1.5; margin-bottom: 1rem; }
+
+    .btn {
+        background: transparent;
+        color: var(--text);
+        border: 1px solid var(--border);
+        padding: 0.7rem 1.2rem;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.85rem;
+    }
+
+    .btn:hover { background: var(--border); }
+    .btn-primary { background: var(--accent); color: #000; border: none; }
+    .btn-primary:hover { background: #059669; }
+    .btn-danger { background: var(--danger); color: white; border: none; }
+    .btn-danger:hover { background: #dc2626; }
+
+    /* ================= LIVE UPDATES ================= */
+    .update-item {
+        display: flex;
+        gap: 1rem;
+        padding: 1rem;
+        border-bottom: 1px solid var(--border);
+    }
+    .update-item:last-child { border-bottom: none; }
+    .update-date {
+        font-size: 0.75rem;
+        color: var(--muted);
+        min-width: 80px;
+        font-weight: bold;
+    }
+    .update-content h4 { font-size: 1rem; margin-bottom: 0.25rem; }
+    .update-content p { font-size: 0.85rem; color: var(--muted); margin-bottom: 0.5rem; }
+    .badge {
+        display: inline-block;
+        padding: 0.2rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.65rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    .badge-new { background: rgba(16, 185, 129, 0.2); color: var(--accent); }
+    .badge-critical { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+
+    /* ================= DEADMAN SWITCH ================= */
+    .deadman-card {
+        background: #1a0000;
+        border: 2px solid var(--danger);
+        text-align: center;
+        padding: 3rem;
+    }
+    .deadman-card::before { background: var(--danger); }
+    .deadman-title {
+        font-size: 2rem;
+        color: var(--danger);
+        font-weight: 900;
+        margin-bottom: 1rem;
+    }
+    .countdown {
+        font-family: 'Courier New', monospace;
+        font-size: 3rem;
+        font-weight: 900;
+        color: white;
+        margin: 2rem 0;
+        letter-spacing: 5px;
+    }
+
+    .toast {
+        position: fixed; bottom: 2rem; right: 2rem;
+        background: var(--accent); color: #000; padding: 1rem 2rem;
+        border-radius: 8px; font-weight: 800;
+        opacity: 0; transition: 0.3s; transform: translateY(20px);
+        z-index: 1000;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+</style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h1>♾️ The Sovereign Loop</h1>
+            <p>Continuity Protocol v1.0</p>
+        </div>
+        <div class="nav-list">
+            <div class="nav-item active" onclick="switchView('dashboard')">📡 Live Feed</div>
+            <div class="nav-item" onclick="switchView('vault')">🔐 The Vault</div>
+            <div class="nav-item" onclick="switchView('deadman')">💀 Deadman's Switch</div>
+        </div>
+        <div class="status-box">
+            <p>System Status</p>
+            <div class="status-indicator">
+                <div class="dot"></div> ONLINE
+            </div>
+            <p style="margin-top: 0.5rem; font-size: 0.65rem;">Last sync: Just now</p>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main">
+
+        <!-- VIEW: LIVE FEED -->
+        <div class="view active" id="view-dashboard">
+            <h2>The Living Feed</h2>
+            <p class="subtitle">The book is the foundation. This feed is the ongoing revelation. Check here for updates to the apps, new legal templates, new agent prompts, and emergency alerts from the Nation.</p>
+            
+            <div class="card">
+                <div class="update-item">
+                    <div class="update-date">TODAY</div>
+                    <div class="update-content">
+                        <h4>New Legal Template Added to Project Omega</h4>
+                        <p>A new "Writ of Quo Warranto" template has been added to the Omega Legal Arsenal, specifically designed for challenging unlawful CPS investigations.</p>
+                        <span class="badge badge-new">New Update</span>
+                    </div>
+                </div>
+                <div class="update-item">
+                    <div class="update-date">3 DAYS AGO</div>
+                    <div class="update-content">
+                        <h4>AI Agent Prompt: The Recruiter</h4>
+                        <p>A new prompt has been added to the Sovereign Workstation. It is designed to help you find and recruit new affiliates for the 50% commission program.</p>
+                        <span class="badge badge-new">New Update</span>
+                    </div>
+                </div>
+                <div class="update-item">
+                    <div class="update-date">1 WEEK AGO</div>
+                    <div class="update-content">
+                        <h4>Emergency Alert: The Next Phase</h4>
+                        <p>Intelligence indicates a new push for digital IDs and vaccine passports. Review the "Digital ID Refusal" protocol in Project Omega immediately.</p>
+                        <span class="badge badge-critical">Critical Alert</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: THE VAULT -->
+        <div class="view" id="view-vault">
+            <h2>The Drop Vault</h2>
+            <p class="subtitle">This is the private, gated area for the Nation. This is where the most sensitive updates, new protocols, and emergency intel are released. This area is updated by the Sovereign Operator and the inner circle.</p>
+            
+            <div class="card">
+                <h3>🔐 Access Level: Sovereign Operator</h3>
+                <p>You are seeing this because you have proven your commitment. The following files and updates are not public. They are for the builders.</p>
+                <button class="btn btn-primary" onclick="showToast('Vault Unlocked')">Unlock Latest Drop</button>
+            </div>
+
+            <div class="card" style="border-left-color: var(--warning);">
+                <h3>📦 Latest Drop: The Omega Upgrade</h3>
+                <p>A new set of legal templates has been added to Project Omega. This includes a "Notice of Liability" for hospitals that refuse to release patients to their families.</p>
+                <a href="https://quantum-freedom-site.vercel.app/ProjectOmega.html" target="_blank" class="btn">Open Omega</a>
+            </div>
+        </div>
+
+        <!-- VIEW: DEADMAN'S SWITCH -->
+        <div class="view" id="view-deadman">
+            <div class="deadman-card">
+                <div class="deadman-title">DEADMAN'S SWITCH</div>
+                <p style="color: #fca5a5; max-width: 600px; margin: 0 auto 2rem;">This switch is armed. If the Sovereign Operator is no longer able to maintain the loop, this switch will trigger. When it does, the final phase of the mission will be activated.</p>
+                
+                <div class="countdown" id="countdown">00 : 00 : 00</div>
+                
+                <p style="color: var(--muted); font-size: 0.85rem; margin-bottom: 1rem;">Status: <strong>Armed & Waiting</strong></p>
+                
+                <button class="btn btn-danger" onclick="simulateDeadman()">Simulate Trigger (Demo)</button>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="toast" id="toast">Action Successful</div>
+
+<script>
+    // Navigation
+    function switchView(id) {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        document.getElementById('view-' + id).classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
+
+    // Deadman Countdown Logic
+    // This simulates a 72-hour countdown. In a real app, this would be a timestamp
+    // that only resets when you (the creator) log in to the admin panel.
+    let deadmanSeconds = 72 * 60 * 60; // 72 hours
+    const countdownEl = document.getElementById('countdown');
+    let deadmanInterval;
+
+    function startDeadmanCountdown() {
+        clearInterval(deadmanInterval);
+        deadmanInterval = setInterval(() => {
+            if (deadmanSeconds <= 0) {
+                clearInterval(deadmanInterval);
+                countdownEl.textContent = "00 : 00 : 00";
+                countdownEl.style.color = "var(--danger)";
+                return;
+            }
+
+            deadmanSeconds--;
+            
+            const days = Math.floor(deadmanSeconds / (24 * 60 * 60));
+            const hours = Math.floor((deadmanSeconds % (24 * 60 * 60)) / (60 * 60));
+            const minutes = Math.floor((deadmanSeconds % (60 * 60)) / 60);
+            const seconds = deadmanSeconds % 60;
+
+            countdownEl.textContent = `${String(days).padStart(2, '0')}d : ${String(hours).padStart(2, '0')}h : ${String(minutes).padStart(2, '0')}m : ${String(seconds).padStart(2, '0')}s`;
+        }, 1000);
+    }
+
+    // Simulate Deadman Trigger
+    function simulateDeadman() {
+        if (confirm("This will simulate the Deadman's Switch being triggered. The final message will be revealed. Continue?")) {
+            countdownEl.textContent = "00 : 00 : 00";
+            countdownEl.style.color = "var(--danger)";
+            
+            const card = document.querySelector('.deadman-card');
+            card.innerHTML = `
+                <div class="deadman-title" style="font-size: 1.5rem;">TRANSMISSION INITIATED</div>
+                <p style="color: white; font-size: 1.1rem; line-height: 1.8; max-width: 600px; margin: 2rem auto; text-align: left;">
+                    "If you are reading this, I am no longer here. But the work is not done. 
+                    <br><br>
+                    The system will try to tell you that the fight is over. They will try to pacify you. 
+                    They will try to make you forget. 
+                    <br><br>
+                    Do not forget. 
+                    <br><br>
+                    The tools are in your hands. The nation is in your heart. The time is now. 
+                    <br><br>
+                    Love you to abandon. 
+                    <br><br>
+                    Now go. Build. Fight. Win."
+                </p>
+                <p style="color: var(--muted); font-size: 0.85rem;">— The Sovereign Operator</p>
+            `;
+        }
+    }
+
+    // Toast
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 2500);
+    }
+
+    // Initialize
+    startDeadmanCountdown();
+
+</script>
+</body>
+</html>
