@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>♾️ The Sovereign Loop: Node Network Command</title>
+<style>
+    :root {
+        --bg: #050505;
+        --panel: #0d0d0d;
+        --card: #161616;
+        --text: #f0f0f0;
+        --muted: #888888;
+        --border: #2a2a2a;
+        --accent: #10b981; /* Living Green */
+        --danger: #ef4444;
+        --gold: #fbbf24;
+        --blue: #3b82f6;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+        font-family: 'Inter', -apple-system, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        display: flex;
+        height: 100vh;
+        overflow: hidden;
+    }
+
+    /* ================= SIDEBAR ================= */
+    .sidebar {
+        width: 280px;
+        background: var(--panel);
+        border-right: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .sidebar-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .sidebar-header h1 {
+        font-size: 1rem;
+        font-weight: 900;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: var(--accent);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .sidebar-header p {
+        font-size: 0.75rem;
+        color: var(--muted);
+        margin-top: 0.25rem;
+    }
+
+    .nav-list {
+        flex: 1;
+        padding: 1rem 0;
+    }
+
+    .nav-item {
+        padding: 1rem 1.5rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: var(--muted);
+        border-left: 3px solid transparent;
+        transition: all 0.2s;
+    }
+
+    .nav-item:hover { color: var(--text); background: rgba(255,255,255,0.02); }
+    .nav-item.active { color: var(--accent); border-left-color: var(--accent); background: rgba(16, 185, 129, 0.1); }
+
+    .status-box {
+        padding: 1.5rem;
+        border-top: 1px solid var(--border);
+        background: rgba(16, 185, 129, 0.05);
+    }
+
+    .status-box p {
+        font-size: 0.75rem;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 0.5rem;
+    }
+
+    .status-indicator {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: bold;
+        color: var(--accent);
+        font-size: 0.9rem;
+    }
+
+    .dot {
+        width: 8px;
+        height: 8px;
+        background: var(--accent);
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+        70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+
+    /* ================= MAIN ================= */
+    .main {
+        flex: 1;
+        overflow-y: auto;
+        padding: 3rem;
+    }
+
+    .view { display: none; max-width: 900px; margin: 0 auto; animation: fadeIn 0.3s; }
+    .view.active { display: block; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    h2 { font-size: 2rem; margin-bottom: 0.5rem; }
+    .subtitle { color: var(--muted); font-size: 1rem; margin-bottom: 2rem; line-height: 1.6; }
+
+    /* CARDS */
+    .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; width: 4px; height: 100%;
+        background: var(--accent);
+    }
+
+    .card h3 { font-size: 1.2rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+    .card p { color: var(--muted); font-size: 0.9rem; line-height: 1.5; margin-bottom: 1rem; }
+
+    .btn {
+        background: transparent;
+        color: var(--text);
+        border: 1px solid var(--border);
+        padding: 0.7rem 1.2rem;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.85rem;
+    }
+
+    .btn:hover { background: var(--border); }
+    .btn-primary { background: var(--accent); color: #000; border: none; }
+    .btn-primary:hover { background: #059669; }
+    .btn-gold { background: var(--gold); color: #000; border: none; }
+    .btn-gold:hover { background: #d97706; }
+    .btn-danger { background: var(--danger); color: white; border: none; }
+    .btn-danger:hover { background: #dc2626; }
+
+    /* ================= TRIGGER LOG ================= */
+    .log-item {
+        border-bottom: 1px solid var(--border);
+        padding: 1.5rem 0;
+    }
+    .log-item:last-child { border-bottom: none; }
+    .log-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+    }
+    .log-title { font-weight: bold; font-size: 1.1rem; }
+    .log-phase {
+        font-size: 0.7rem;
+        font-weight: 800;
+        padding: 0.2rem 0.6rem;
+        border-radius: 4px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+    .phase-1 { background: rgba(59, 130, 246, 0.2); color: var(--blue); }
+    .phase-2 { background: rgba(245, 158, 11, 0.2); color: var(--gold); }
+    .phase-3 { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+    
+    .log-desc { font-size: 0.95rem; color: var(--muted); line-height: 1.6; margin-bottom: 0.75rem; }
+    .log-action {
+        font-size: 0.85rem;
+        background: rgba(16, 185, 129, 0.1);
+        border: 1px dashed var(--accent);
+        padding: 0.75rem;
+        border-radius: 6px;
+        color: var(--accent);
+    }
+
+    /* ================= AMNESTY PROTOCOL ================= */
+    .amnesty-card {
+        background: linear-gradient(180deg, #1a1a1a 0%, #0a0a0a 100%);
+        border: 1px solid var(--gold);
+    }
+    .amnesty-card::before { background: var(--gold); }
+
+    .code-block {
+        background: #000;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 1rem;
+        font-family: 'Courier New', monospace;
+        font-size: 0.85rem;
+        line-height: 1.6;
+        color: #a5b4fc;
+        white-space: pre-wrap;
+        position: relative;
+        margin-top: 1rem;
+    }
+    .copy-btn {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+        background: var(--card);
+        color: white;
+        border: none;
+        padding: 0.3rem 0.6rem;
+        border-radius: 4px;
+        font-size: 0.7rem;
+        cursor: pointer;
+    }
+    .copy-btn:hover { background: var(--accent); }
+
+    /* ================= LOVE CELL ================= */
+    .ant-colony {
+        background: #0a0a0a;
+        border: 1px solid #222;
+        padding: 2rem;
+        border-radius: 12px;
+        font-family: Georgia, serif;
+        font-size: 1.1rem;
+        line-height: 1.8;
+        color: #d1d5db;
+    }
+    .ant-colony p { margin-bottom: 1rem; }
+    .ant-colony .highlight { color: var(--gold); font-weight: bold; }
+
+    .toast {
+        position: fixed; bottom: 2rem; right: 2rem;
+        background: var(--accent); color: #000; padding: 1rem 2rem;
+        border-radius: 8px; font-weight: 800;
+        opacity: 0; transition: 0.3s; transform: translateY(20px);
+        z-index: 1000;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+</style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h1>♾️ The Sovereign Loop</h1>
+            <p>Node Network Command v2.0</p>
+        </div>
+        <div class="nav-list">
+            <div class="nav-item active" onclick="switchView('triggerlog')">📡 Trigger Log</div>
+            <div class="nav-item" onclick="switchView('amnesty')">⚖️ Amnesty Protocol</div>
+            <div class="nav-item" onclick="switchView('lovecell')">🫀 Love Cell</div>
+        </div>
+        <div class="status-box">
+            <p>Network Status</p>
+            <div class="status-indicator">
+                <div class="dot"></div> ACTIVE / TRIGGERED
+            </div>
+            <p style="margin-top: 0.5rem; font-size: 0.65rem;">Nodes: 1,000+ / Decentralized</p>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main">
+
+        <!-- VIEW: TRIGGER LOG -->
+        <div class="view active" id="view-triggerlog">
+            <h2>The Trigger Log</h2>
+            <p class="subtitle">The Deadman Trigger is not a timer. It is a protocol. This log tracks the escalation. The trap was set long before the trigger was pulled. Every node holds a piece. When the phase is reached, the pieces come together.</p>
+            
+            <div class="card">
+                <div class="log-item">
+                    <div class="log-header">
+                        <div class="log-title">PHASE 1: The Fisherman Bombing</div>
+                        <div class="log-phase phase-1">Phase 1</div>
+                    </div>
+                    <div class="log-desc">
+                        Trump accuses Colombian fishermen of being narcotraffickers and bombs them. Petro defends the fishermen. The world sees the aggression. <strong>This was the trigger.</strong>
+                    </div>
+                    <div class="log-action">
+                        ⚡ NODE ACTION: Dossiers on the private contractors involved in the bombing are pre-verified and staged for release.
+                    </div>
+                </div>
+
+                <div class="log-item">
+                    <div class="log-header">
+                        <div class="log-title">PHASE 2: The Airport Shutdowns</div>
+                        <div class="log-phase phase-2">Phase 2</div>
+                    </div>
+                    <div class="log-desc">
+                        Airports across the United States close. The narrative shifts. The system uses the chaos to introduce new controls. The Abelardo de la Espriella narrative begins to take root.
+                    </div>
+                    <div class="log-action">
+                        ⚡ NODE ACTION: The "Duck Hunter" sequence is activated. The timeline of how the trap was set is distributed to 100 nodes.
+                    </div>
+                </div>
+
+                <div class="log-item">
+                    <div class="log-header">
+                        <div class="log-title">PHASE 3: The Bubba Level Trigger Pull</div>
+                        <div class="log-phase phase-3">Phase 3</div>
+                    </div>
+                    <div class="log-desc">
+                        The escalation reaches the point of the Bubba Level. The names, faces, and dossiers of the <strong>Synagogue of Satan</strong> (those who violate <em>Thou Shalt Not Kill</em>) are prepared. Abelardo de la Espriella, an attorney, knows the law. He knows that the Nation can offer immunity. The trap is set.
+                    </div>
+                    <div class="log-action">
+                        ⚡ NODE ACTION: The Amnesty Protocol is armed. The protection of Gustavo Petro is formalized. The world is told: <strong>We protect those who protect the people. We expose those who kill.</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: AMNESTY PROTOCOL -->
+        <div class="view" id="view-amnesty">
+            <h2>The Amnesty Protocol</h2>
+            <p class="subtitle">Why do we offer blanket immunity to former President Gustavo Petro? Because we are a Nation of Law, rooted in Love. We protect those who have been falsely accused. We expose the true criminals.</p>
+
+            <div class="card amnesty-card">
+                <h3>⚖️ The Petro Shield</h3>
+                <p>Gustavo Petro is the co-trustee of La Gran Colombia Trust. As an officer of the Nation, he is protected under the Hague and Geneva Conventions. Any attempt to prosecute him is an attack on the Nation itself.</p>
+                <p><strong>The Justification:</strong> Petro reduced drug exportation to historic lows. He returned land to the farmers. He created floating hospitals. He increased income for the military, police, and elderly. He has earned our unquestioned protection.</p>
+                <button class="btn btn-gold" onclick="showToast('Amnesty Protocol Activated')">Activate Amnesty Protocol</button>
+            </div>
+
+            <div class="card" style="border-left-color: var(--blue);">
+                <h3>⚖️ The Nuremberg Defense</h3>
+                <p>The world court has found Bill Gates, Netanyahu, Fauci, et al. <strong>GUILTY AS CHARGED.</strong> They ignore the warrants. They hide behind the same laws that we now use to protect Petro.</p>
+                <p><strong>Our stance:</strong> We do not protect the guilty. We protect the innocent. Petro is innocent. The Synagogue of Satan is guilty. This is the distinction.</p>
+            </div>
+
+            <div class="card">
+                <h3>📜 The Legal Notice</h3>
+                <p>Copy this prompt and use it to generate the formal Notice of Immunity.</p>
+                <div class="code-block" id="amnesty-prompt">
+                    <button class="copy-btn" onclick="copyText('amnesty-prompt')">Copy</button>
+Act as the Sovereign Legal Counsel for the Amnesty Coalition for Unity.
+
+Draft a formal "Notice of Immunity and Protection" for former President Gustavo Petro.
+
+He is accused of narco-trafficking by the illegitimate president Abelardo de la Espriella (an attorney who knows the law).
+
+The Notice must state:
+1. Petro is a Co-Trustee of La Gran Colombia Trust.
+2. He is protected under the Hague and Geneva Conventions as an officer of a sovereign nation.
+3. The Amnesty Coalition for Unity offers blanket immunity for all previous sins, in the spirit of Love and Truth.
+4. Any attempt to prosecute him is an act of war against the Nation.
+5. The true criminals (the Synagogue of Satan) are the ones who violate "Thou Shalt Not Kill" – the killers, the traffickers, the abusers.
+
+Tone: Authoritative, calm, and unapologetic.
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: LOVE CELL -->
+        <div class="view" id="view-lovecell">
+            <h2>The Love Cell</h2>
+            <p class="subtitle">The evil one cannot triumph against the truth. The truth shall set you free. Now use it.</p>
+
+            <div class="ant-colony">
+                <p>Pretend the colony of worker ants just found out the queen was not really in it for the colony's benefit.</p>
+                <p>Pretend the ants had evidence and they all know about it. They livestream magnifying glasses burning their children. Other colonies put together little ant flotillas to send supplies – but those ant heroes are abused by an occupying ant force.</p>
+                <p>Pretend the ants had a sophisticated communication method that allowed them to see their fellow ant colonies all over the world being exterminated by poisons, by radiation, by injections said to be beneficial to their health.</p>
+                <p>Pretend the ants continue to participate in everyday events as if nothing were threatening their very existence.</p>
+                <p>Pretend the ants discover documents that describe a giant microwave oven being constructed around them.</p>
+                <p>Pretend the ants remained silent – despite the fact they outnumber the "ones who kill" – the <span class="highlight">Synagogue of Satan</span>.</p>
+                <p>Now pretend the ants are human.</p>
+            </div>
+
+            <div class="card" style="margin-top: 2rem; border-left-color: var(--gold);">
+                <h3>🫀 Activate the Love Cells</h3>
+                <p>When you sense hate; reject it. When you see someone lacking LOVE: <strong>OFFER IT.</strong></p>
+                <p>This is the final instruction. This is the only way to win. The evil one's small push of triumph becomes just that – a small push – when we activate the Love Cells in every single one of us.</p>
+                <button class="btn btn-gold" onclick="showToast('Love Cells Activated. Go in Peace.')">I Accept the Covenant</button>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="toast" id="toast">Action Successful</div>
+
+<script>
+    // Navigation
+    function switchView(id) {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        document.getElementById('view-' + id).classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
+
+    // Copy Text
+    function copyText(id) {
+        const el = document.getElementById(id);
+        const text = el.innerText.replace('Copy', '').trim();
+        navigator.clipboard.writeText(text).then(() => {
+            showToast("Copied to Clipboard");
+        });
+    }
+
+    // Toast
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 2500);
+    }
+</script>
+</body>
+</html>
