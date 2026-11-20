@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🫀 The Witness App</title>
+<style>
+    :root {
+        --bg: #050505;
+        --panel: #0f0f0f;
+        --card: #1a1a1a;
+        --text: #f0f0f0;
+        --muted: #888888;
+        --border: #2a2a2a;
+        --accent: #10b981; /* Green for action */
+        --gold: #fbbf24;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+        font-family: 'Inter', -apple-system, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+    }
+
+    /* HEADER */
+    header {
+        background: var(--panel);
+        padding: 1rem 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--border);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+    }
+
+    .logo {
+        font-size: 1.1rem;
+        font-weight: 900;
+        color: var(--gold);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .status-badge {
+        background: rgba(16, 185, 129, 0.15);
+        color: var(--accent);
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border: 1px solid var(--accent);
+    }
+
+    /* MAIN */
+    .main {
+        flex: 1;
+        max-width: 600px;
+        margin: 0 auto;
+        width: 100%;
+        padding: 2rem 1rem;
+    }
+
+    h1 {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+        line-height: 1.2;
+    }
+
+    .subtitle {
+        color: var(--muted);
+        font-size: 1rem;
+        margin-bottom: 2rem;
+        line-height: 1.5;
+    }
+
+    /* MISSION CARDS */
+    .mission-card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        position: relative;
+    }
+
+    .mission-card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; width: 4px; height: 100%;
+        background: var(--gold);
+        border-radius: 12px 0 0 12px;
+    }
+
+    .mission-step {
+        font-size: 0.75rem;
+        font-weight: 800;
+        color: var(--gold);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 0.5rem;
+    }
+
+    .mission-card h2 {
+        font-size: 1.3rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .mission-card p {
+        color: var(--muted);
+        font-size: 0.9rem;
+        line-height: 1.5;
+        margin-bottom: 1rem;
+    }
+
+    /* ACTION BUTTONS */
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        width: 100%;
+        padding: 1rem;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+        border: none;
+        margin-bottom: 0.5rem;
+    }
+
+    .btn-primary { background: var(--gold); color: #000; }
+    .btn-primary:active { transform: scale(0.98); }
+
+    .btn-secondary { background: var(--border); color: var(--text); }
+    .btn-secondary:active { transform: scale(0.98); }
+
+    .btn-share { background: #25D366; color: white; } /* WhatsApp Green */
+    .btn-share:active { transform: scale(0.98); }
+
+    .btn-copy { background: var(--accent); color: #000; }
+    .btn-copy:active { transform: scale(0.98); }
+
+    /* SPECIFIC MISSION STYLES */
+    .mission-share { border-left-color: var(--accent); }
+    .mission-share::before { background: var(--accent); }
+    
+    .mission-money { border-left-color: var(--gold); }
+    .mission-money::before { background: var(--gold); }
+
+    .money-highlight {
+        background: rgba(251, 191, 36, 0.1);
+        border: 1px dashed var(--gold);
+        padding: 1rem;
+        border-radius: 8px;
+        text-align: center;
+        margin: 1rem 0;
+        font-weight: bold;
+        color: var(--gold);
+        font-size: 1.1rem;
+    }
+
+    /* FOOTER */
+    .footer {
+        text-align: center;
+        padding: 2rem 1rem;
+        color: var(--muted);
+        font-size: 0.8rem;
+        border-top: 1px solid var(--border);
+        margin-top: 2rem;
+    }
+
+    /* TOAST */
+    .toast {
+        position: fixed;
+        bottom: 2rem;
+        left: 50%;
+        transform: translateX(-50%) translateY(100px);
+        background: var(--accent);
+        color: #000;
+        padding: 1rem 2rem;
+        border-radius: 30px;
+        font-weight: 800;
+        opacity: 0;
+        transition: all 0.3s;
+        z-index: 1000;
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+
+    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+</style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">🫀 The Witness</div>
+        <div class="status-badge">Node Active</div>
+    </header>
+
+    <div class="main">
+        <h1>You are the Node.</h1>
+        <p class="subtitle">The book gave you the truth. This app gives you the mission. Complete these 3 steps today to protect the innocent and build your nation.</p>
+
+        <!-- MISSION 1 -->
+        <div class="mission-card mission-share">
+            <div class="mission-step">Mission 1: The Signal</div>
+            <h2>Share the Truth</h2>
+            <p>They want you to stay silent. They want you to think you are alone. Share this truth bomb on your social media right now. It takes 10 seconds.</p>
+            <button class="btn btn-share" onclick="shareTruth()">
+                <span>📲</span> Share on WhatsApp / Facebook
+            </button>
+        </div>
+
+        <!-- MISSION 2 -->
+        <div class="mission-card mission-share">
+            <div class="mission-step">Mission 2: The Ant Colony</div>
+            <h2>Wake Up Your Friends</h2>
+            <p>Copy this message and send it to 5 friends. It is the "Ant Colony" parable. It explains the entire situation without using a single political word.</p>
+            <button class="btn btn-copy" onclick="copyAntColony()">
+                <span>📋</span> Copy the Parable
+            </button>
+        </div>
+
+        <!-- MISSION 3 -->
+        <div class="mission-card mission-money">
+            <div class="mission-step">Mission 3: The Covenant</div>
+            <h2>Build Your Income</h2>
+            <p>You are authorized to sell this book. Keep 2/3 of the money. Give 1/3 to the foundation. Here is how you get started.</p>
+            
+            <div class="money-highlight">
+                Sell the Book for $33<br>
+                You Keep $22. Give $11 to the Nation.
+            </div>
+
+            <button class="btn btn-primary" onclick="startAffiliate()">
+                <span>💰</span> Get Your Affiliate Link
+            </button>
+        </div>
+
+        <!-- MISSION 4 -->
+        <div class="mission-card mission-share" style="border-left-color: var(--gold);">
+            <div class="mission-step">Mission 4: The Record</div>
+            <h2>Protect President Petro</h2>
+            <p>They are trying to destroy a warrior for mankind with lies. Read the public record of what he actually did, and share it with someone who only watches the news.</p>
+            <button class="btn btn-secondary" onclick="showPetroRecord()">
+                <span>📖</span> Read the Petro Record
+            </button>
+        </div>
+
+        <div class="footer">
+            The Amnesty Coalition for Unity<br>
+            "Love you to abandon."
+        </div>
+    </div>
+
+    <div class="toast" id="toast">Action Successful</div>
+
+<script>
+    // Mission 1: Share the Truth
+    function shareTruth() {
+        const text = "I just read Forbidden Knowledge: The Sovereign Operator. It exposes the medical tyranny, the financial traps, and the Synagogue of Satan. But more importantly, it gives you the tools to escape. Read it before they ban it.";
+        const url = "https://quantum-freedom-site.vercel.app/Forbidden_Knowledge_2026.html"; 
+        
+        if (navigator.share) {
+            navigator.share({
+                title: 'Forbidden Knowledge',
+                text: text,
+                url: url
+            }).then(() => showToast("Truth Shared!"))
+            .catch((error) => console.log('Error sharing', error));
+        } else {
+            // Fallback for browsers that don't support navigator.share
+            window.open(`https://wa.me/?text=${encodeURIComponent(text + " " + url)}`, '_blank');
+            showToast("Opening WhatsApp...");
+        }
+    }
+
+    // Mission 2: Copy the Ant Colony
+    function copyAntColony() {
+        const parable = `Pretend the colony of worker ants just found out the queen was not really in it for the colony's benefit.
+Pretend the ants had evidence and they all know about it. They livestream magnifying glasses burning their children. Other colonies put together little ant flotillas to send supplies – but those ant heroes are abused by an occupying ant force.
+
+Pretend the ants had a sophisticated communication method that allowed them to see their fellow ant colonies all over the world being exterminated by poisons, by radiation, by injections said to be beneficial to their health.
+
+Pretend the ants continue to participate in everyday events as if nothing were threatening their very existence.
+
+Pretend the ants discover documents that describe a giant microwave oven being constructed around them.
+
+Pretend the ants remained silent – despite the fact they outnumber the "ones who kill" – the Synagogue of Satan.
+
+Now pretend the ants are human.`;
+
+        navigator.clipboard.writeText(parable).then(() => {
+            showToast("Parable Copied! Send it to 5 friends.");
+        });
+    }
+
+    // Mission 3: Affiliate Link
+    function startAffiliate() {
+        // In a real app, this would link to Gumroad.
+        // For now, it shows the instructions.
+        const msg = "To get your affiliate link, go to gumroad.com, create an account, and upload your book cover. Then send the link to your friends. You keep 2/3 of the profit.";
+        alert(msg);
+        showToast("Affiliate Instructions Ready!");
+    }
+
+    // Mission 4: Petro Record
+    function showPetroRecord() {
+        const record = `THE PETRO RECORD:
+1. Reduced drug exportation to historic lows.
+2. Returned land to farmers.
+3. Created floating hospitals.
+4. Increased income for military, police, and elderly.
+5. Protected growers and offered alternatives.
+
+They want you to believe he is a criminal. We have the record. He is a warrior. Share this truth.`;
+        
+        navigator.clipboard.writeText(record).then(() => {
+            showToast("Record Copied! Share it everywhere.");
+        });
+    }
+
+    // Toast Notification
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 3000);
+    }
+</script>
+</body>
+</html>
