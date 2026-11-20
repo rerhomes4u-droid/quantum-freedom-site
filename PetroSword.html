@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⚖️ The Sovereign Witness: Amnesty Coalition</title>
+<style>
+    :root {
+        --bg: #050505;
+        --panel: #0d0d0d;
+        --card: #161616;
+        --text: #f0f0f0;
+        --muted: #888888;
+        --border: #2a2a2a;
+        --accent: #10b981;
+        --gold: #fbbf24;
+        --blue: #3b82f6;
+        --danger: #ef4444;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+        font-family: 'Inter', -apple-system, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        display: flex;
+        height: 100vh;
+        overflow: hidden;
+    }
+
+    .sidebar {
+        width: 280px;
+        background: var(--panel);
+        border-right: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .sidebar-header {
+        padding: 1.5rem;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .sidebar-header h1 {
+        font-size: 1rem;
+        font-weight: 900;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: var(--gold);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .sidebar-header p {
+        font-size: 0.75rem;
+        color: var(--muted);
+        margin-top: 0.25rem;
+    }
+
+    .nav-list {
+        flex: 1;
+        padding: 1rem 0;
+    }
+
+    .nav-item {
+        padding: 1rem 1.5rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        font-weight: 600;
+        font-size: 0.9rem;
+        color: var(--muted);
+        border-left: 3px solid transparent;
+        transition: all 0.2s;
+    }
+
+    .nav-item:hover { color: var(--text); background: rgba(255,255,255,0.02); }
+    .nav-item.active { color: var(--gold); border-left-color: var(--gold); background: rgba(251, 191, 36, 0.1); }
+
+    .status-box {
+        padding: 1.5rem;
+        border-top: 1px solid var(--border);
+        background: rgba(251, 191, 36, 0.05);
+    }
+
+    .status-box p {
+        font-size: 0.75rem;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 0.5rem;
+    }
+
+    .status-indicator {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: bold;
+        color: var(--gold);
+        font-size: 0.9rem;
+    }
+
+    .dot {
+        width: 8px;
+        height: 8px;
+        background: var(--gold);
+        border-radius: 50%;
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0.7); }
+        70% { box-shadow: 0 0 0 6px rgba(251, 191, 36, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(251, 191, 36, 0); }
+    }
+
+    .main {
+        flex: 1;
+        overflow-y: auto;
+        padding: 3rem;
+    }
+
+    .view { display: none; max-width: 900px; margin: 0 auto; animation: fadeIn 0.3s; }
+    .view.active { display: block; }
+
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    h2 { font-size: 2rem; margin-bottom: 0.5rem; }
+    .subtitle { color: var(--muted); font-size: 1rem; margin-bottom: 2rem; line-height: 1.6; }
+
+    .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .card::before {
+        content: '';
+        position: absolute;
+        top: 0; left: 0; width: 4px; height: 100%;
+        background: var(--gold);
+    }
+
+    .card h3 { font-size: 1.2rem; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.5rem; }
+    .card p { color: var(--muted); font-size: 0.9rem; line-height: 1.5; margin-bottom: 1rem; }
+
+    .btn {
+        background: transparent;
+        color: var(--text);
+        border: 1px solid var(--border);
+        padding: 0.7rem 1.2rem;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.85rem;
+    }
+
+    .btn:hover { background: var(--border); }
+    .btn-primary { background: var(--gold); color: #000; border: none; }
+    .btn-primary:hover { background: #d97706; }
+    .btn-blue { background: var(--blue); color: white; border: none; }
+    .btn-blue:hover { background: #2563eb; }
+
+    .code-block {
+        background: #000;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 1rem;
+        font-family: 'Courier New', monospace;
+        font-size: 0.85rem;
+        line-height: 1.6;
+        color: #a5b4fc;
+        white-space: pre-wrap;
+        position: relative;
+        margin-top: 1rem;
+    }
+    .copy-btn {
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+        background: var(--card);
+        color: white;
+        border: none;
+        padding: 0.3rem 0.6rem;
+        border-radius: 4px;
+        font-size: 0.7rem;
+        cursor: pointer;
+    }
+    .copy-btn:hover { background: var(--gold); }
+
+    .toast {
+        position: fixed; bottom: 2rem; right: 2rem;
+        background: var(--gold); color: #000; padding: 1rem 2rem;
+        border-radius: 8px; font-weight: 800;
+        opacity: 0; transition: 0.3s; transform: translateY(20px);
+        z-index: 1000;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+</style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <h1>⚖️ The Sovereign Witness</h1>
+            <p>Amnesty Coalition for Unity</p>
+        </div>
+        <div class="nav-list">
+            <div class="nav-item active" onclick="switchView('amnesty')">🤝 Amnesty Protocol</div>
+            <div class="nav-item" onclick="switchView('seventh')">⚖️ 7th Amendment Demand</div>
+            <div class="nav-item" onclick="switchView('refuge')">🏠 Refuge Network</div>
+            <div class="nav-item" onclick="switchView('manifesto')">🫀 Witness Manifesto</div>
+        </div>
+        <div class="status-box">
+            <p>Status</p>
+            <div class="status-indicator">
+                <div class="dot"></div> ACTIVE
+            </div>
+            <p style="margin-top: 0.5rem; font-size: 0.65rem;">Nodes: 1,000+</p>
+        </div>
+    </div>
+
+    <div class="main">
+
+        <!-- VIEW: AMNESTY -->
+        <div class="view active" id="view-amnesty">
+            <h2>The Amnesty Protocol</h2>
+            <p class="subtitle">We do not grant legal immunity. We grant moral absolution. We offer the truth. We offer our witness.</p>
+            
+            <div class="card">
+                <h3>🤝 Moral Absolution</h3>
+                <p>The Amnesty Coalition for Unity offers Gustavo Francisco Petro Urrego full and unconditional moral amnesty for every past wrong, known or unknown, confessed or alleged. This is not a legal shield. It is a declaration of forgiveness. It is offered with no price attached and no confession demanded.</p>
+                <p><strong>The Grounds:</strong> He reduced drug exportation to historic lows. He returned land to farmers. He created floating hospitals. He raised income for the military, police, and elderly. He has earned our unquestioned moral protection.</p>
+            </div>
+
+            <div class="card" style="border-left-color: var(--blue);">
+                <h3>📜 The Petro Record</h3>
+                <p>We do not hide the accusations. We meet them with the record.</p>
+                <ul style="color: var(--muted); line-height: 1.8; margin-left: 1.5rem;">
+                    <li>Drug exportation reduced to historic lows.</li>
+                    <li>Land returned to farmers, taken from nefarious entities.</li>
+                    <li>Three floating hospitals built to reach the unreachable.</li>
+                    <li>Income increased for military, police, and elderly.</li>
+                    <li>Protection and incentives for growers to transition to alternative crops.</li>
+                </ul>
+                <p style="margin-top: 1rem;"><strong>This is the truth. We will not be silent.</strong></p>
+            </div>
+
+            <div class="card">
+                <h3>📝 Generate the Notice of Amnesty</h3>
+                <p>Copy this prompt and paste it into ChatGPT or Claude to generate the formal Notice.</p>
+                <div class="code-block" id="amnesty-prompt">
+                    <button class="copy-btn" onclick="copyText('amnesty-prompt')">Copy</button>
+Act as the Sovereign Legal Counsel for the Amnesty Coalition for Unity.
+
+Draft a formal "Notice of Moral Amnesty and Public Record" for former President Gustavo Petro.
+
+The document must include:
+1. The Coalition's declaration of moral amnesty for all past wrongs, with no confession demanded.
+2. The Petro Record: reduced drug exportation, land reform, floating hospitals, income increases, grower transition programs.
+3. A statement that the Coalition is not a court, but a witness. Its power is in the record, not in legal immunity.
+4. A demand for a fair hearing and a jury trial if any charges are ever brought.
+5. A clear statement that the Coalition does not condone or legalize narco-trafficking. It defends a man who has demonstrably fought against it.
+
+Tone: Authoritative, moral, and unapologetic.
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: SEVENTH AMENDMENT -->
+        <div class="view" id="view-seventh">
+            <h2>The Seventh Amendment Demand</h2>
+            <p class="subtitle">You cannot be condemned by decree. You must be tried by a jury. This is the law of the United States. This is the law of the Nation.</p>
+
+            <div class="card">
+                <h3>⚖️ The Legal Foundation</h3>
+                <p>The Seventh Amendment guarantees the right to a jury trial in civil cases. The Supreme Court has called the jury trial "the heart of the fact-finding process." It has held that this right is fundamental.</p>
+                <p>For Gustavo Petro, this means: if a foreign power or a domestic court attempts to condemn him, he has the right to demand a jury. He has the right to see the evidence. He has the right to a fair hearing.</p>
+            </div>
+
+            <div class="card" style="border-left-color: var(--danger);">
+                <h3>⚔️ The Demand</h3>
+                <p>If the United States or any foreign power attempts to seize, abduct, or prosecute Gustavo Petro outside the lawful procedures of the Colombian Constitution, the Amnesty Coalition will file suit under the <strong>Alien Tort Statute</strong> and demand a <strong>Seventh Amendment jury trial</strong>.</p>
+                <p>We will demand that the evidence be presented. We will demand that the world see the truth. And we will demand that the jury decide.</p>
+                <button class="btn btn-blue" onclick="showToast('Demand Filed. The world is watching.')">File the Demand</button>
+            </div>
+
+            <div class="card">
+                <h3>📝 Generate the Demand Letter</h3>
+                <div class="code-block" id="seventh-prompt">
+                    <button class="copy-btn" onclick="copyText('seventh-prompt')">Copy</button>
+Act as a Constitutional Lawyer for the Amnesty Coalition for Unity.
+
+Draft a "Demand for a Seventh Amendment Jury Trial" on behalf of Gustavo Petro.
+
+The document must:
+1. Cite the Seventh Amendment and the Supreme Court's interpretation that it guarantees the right to a jury trial.
+2. Argue that any attempt to condemn or extradite Petro without a jury trial violates his constitutional rights.
+3. Cite the Alien Tort Statute as a basis for filing suit in US courts.
+4. Demand that all evidence against Petro be presented to a jury of his peers.
+5. State that the Coalition will pursue this demand in every court that will hear it.
+
+Tone: Legal, forceful, and confident.
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: REFUGE -->
+        <div class="view" id="view-refuge">
+            <h2>The Refuge Network</h2>
+            <p class="subtitle">We are not a nation with borders. We are a nation with a memory. But we do have lands. And we do have people who will hide and protect.</p>
+
+            <div class="card">
+                <h3>🏠 The Real Shelter</h3>
+                <p>The Amnesty Coalition has members in the United States, Canada, Colombia, and Spain. They own lands, homes, and safe houses. If Gustavo Petro needs refuge, he will have it.</p>
+                <p>This is not a legal shield. It is a physical one. It is the promise that if the storm comes, there is a door that will open.</p>
+                <button class="btn btn-primary" onclick="showToast('Refuge Network Activated. The doors are open.')">Activate Refuge Network</button>
+            </div>
+
+            <div class="card" style="border-left-color: var(--blue);">
+                <h3>🗺️ The Nodes</h3>
+                <p>Each refuge is a node. Each node is a person who has sworn to protect. They are not soldiers. They are not lawyers. They are the people who will feed, hide, and protect a man who has fought for them.</p>
+            </div>
+        </div>
+
+        <!-- VIEW: MANIFESTO -->
+        <div class="view" id="view-manifesto">
+            <h2>The Witness Manifesto</h2>
+            <p class="subtitle">We are the ants. We have seen the queen. We will not be silent.</p>
+
+            <div class="card" style="background: #0a0a0a; border: 1px solid #222; padding: 2rem; border-radius: 12px; font-family: Georgia, serif; font-size: 1.1rem; line-height: 1.8;">
+                <p>Pretend the colony of worker ants just found out the queen was not really in it for the colony's benefit.</p>
+                <p>Pretend the ants had evidence and they all know about it. They livestream magnifying glasses burning their children. Other colonies put together little ant flotillas to send supplies – but those ant heroes are abused by an occupying ant force.</p>
+                <p>Pretend the ants had a sophisticated communication method that allowed them to see their fellow ant colonies all over the world being exterminated by poisons, by radiation, by injections said to be beneficial to their health.</p>
+                <p>Pretend the ants continue to participate in everyday events as if nothing were threatening their very existence.</p>
+                <p>Pretend the ants discover documents that describe a giant microwave oven being constructed around them.</p>
+                <p>Pretend the ants remained silent – despite the fact they outnumber the "ones who kill" – the <strong>Synagogue of Satan</strong>.</p>
+                <p><strong>Now pretend the ants are human.</strong></p>
+            </div>
+
+            <div class="card" style="margin-top: 2rem; border-left-color: var(--gold);">
+                <h3>🫀 Activate the Love Cells</h3>
+                <p>When you sense hate; reject it. When you see someone lacking LOVE: <strong>OFFER IT.</strong></p>
+                <p>This is the final instruction. This is the only way to win.</p>
+                <button class="btn btn-primary" onclick="showToast('Love Cells Activated. Go in Peace.')">I Accept the Covenant</button>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="toast" id="toast">Action Successful</div>
+
+<script>
+    function switchView(id) {
+        document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+        document.getElementById('view-' + id).classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
+
+    function copyText(id) {
+        const el = document.getElementById(id);
+        const text = el.innerText.replace('Copy', '').trim();
+        navigator.clipboard.writeText(text).then(() => {
+            showToast("Copied to Clipboard");
+        });
+    }
+
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.textContent = msg;
+        t.classList.add('show');
+        setTimeout(() => t.classList.remove('show'), 2500);
+    }
+</script>
+</body>
+</html>
