@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>Equity Call Assistant · Simple Mode</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #eef2f5;
+            font-family: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 12px;
+            margin: 0;
+        }
+
+        .app-card {
+            max-width: 500px;
+            width: 100%;
+            background: white;
+            border-radius: 42px;
+            box-shadow: 0 20px 40px rgba(0, 20, 30, 0.2);
+            padding: 24px 20px 28px;
+            border: 1px solid rgba(0, 70, 90, 0.1);
+            transition: all 0.2s;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #d0e0e8;
+        }
+
+        .header h1 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #0a3e4f;
+            letter-spacing: -0.02em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .badge {
+            background: #d4edda;
+            color: #0a5a3a;
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 6px 10px;
+            border-radius: 40px;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+            border: 1px solid #b8dfc5;
+            white-space: nowrap;
+        }
+
+        .notice {
+            background: #fef7e6;
+            border-left: 6px solid #e6b12e;
+            padding: 12px 16px;
+            border-radius: 16px;
+            font-size: 0.9rem;
+            color: #4a3b0e;
+            margin-bottom: 20px;
+            font-weight: 500;
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+        }
+
+        .notice span {
+            font-size: 1.2rem;
+            line-height: 1;
+        }
+
+        .call-step {
+            background: #f9fcff;
+            border-radius: 28px;
+            padding: 18px 16px;
+            margin-bottom: 18px;
+            border: 1px solid #cfe2ed;
+            box-shadow: inset 0 1px 4px rgba(255,255,255,0.8), 0 4px 10px rgba(0, 0, 0, 0.02);
+        }
+
+        .step-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .step-number {
+            background: #1f6e8c;
+            color: white;
+            font-weight: 700;
+            width: 32px;
+            height: 32px;
+            border-radius: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 8px rgba(0,60,80,0.2);
+        }
+
+        .step-label h2 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #135a72;
+        }
+
+        .script-box {
+            background: white;
+            padding: 20px 18px;
+            border-radius: 22px;
+            border: 1px solid #d6e4ee;
+            font-size: 1.2rem;
+            line-height: 1.55;
+            font-weight: 480;
+            color: #0d2e3b;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.02);
+            margin-bottom: 16px;
+        }
+
+        .script-box strong {
+            color: #00778b;
+            font-weight: 700;
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin: 24px 0 16px;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 60px;
+            padding: 20px 16px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            background: white;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.04);
+            border: 1px solid rgba(0, 70, 90, 0.12);
+            color: #1b4b5e;
+            letter-spacing: 0.2px;
+            min-height: 68px;
+            line-height: 1.2;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: #0f6b7c;
+            border: 1px solid #0b5c6b;
+            color: white;
+            box-shadow: 0 10px 18px -6px rgba(15, 107, 124, 0.4);
+            font-weight: 700;
+        }
+
+        .btn-primary:active {
+            background: #0a5462;
+            transform: scale(0.98);
+            box-shadow: 0 4px 8px rgba(0, 50, 60, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f0f6fa;
+            border: 1px solid #c2d9e6;
+            color: #135a72;
+            font-size: 1.1rem;
+            min-height: 60px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        }
+
+        .btn-secondary:active {
+            background: #dfebf2;
+            transform: scale(0.98);
+        }
+
+        .btn-large {
+            font-size: 1.3rem;
+            padding: 22px 16px;
+            background: #1e7e34;
+            border-color: #166a2b;
+            color: white;
+            font-weight: 700;
+            box-shadow: 0 12px 20px -8px rgba(30, 126, 52, 0.4);
+        }
+
+        .btn-large:active {
+            background: #14622a;
+            transform: scale(0.98);
+        }
+
+        .footer-note {
+            margin-top: 14px;
+            font-size: 0.8rem;
+            color: #426d7e;
+            text-align: center;
+            line-height: 1.5;
+            border-top: 1px solid #cbdae3;
+            padding-top: 16px;
+        }
+
+        .highlight {
+            background: #e2f0f5;
+            border-radius: 40px;
+            padding: 6px 14px;
+            display: inline-block;
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: #1b5f73;
+            margin-bottom: 6px;
+        }
+
+        .info-line {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            background: #eaf3f8;
+            padding: 12px 16px;
+            border-radius: 30px;
+            margin-bottom: 18px;
+        }
+
+        .dot {
+            width: 12px;
+            height: 12px;
+            background: #1f9b5c;
+            border-radius: 20px;
+            display: inline-block;
+            box-shadow: 0 0 0 2px white, 0 0 0 4px #c8e6d9;
+        }
+
+        .small-note {
+            font-size: 0.8rem;
+            color: #4c6f7e;
+            padding-left: 6px;
+        }
+
+        .spacer {
+            height: 6px;
+        }
+
+        .confirmation-msg {
+            background: #dcfce7;
+            border-radius: 40px;
+            padding: 14px;
+            text-align: center;
+            font-weight: 600;
+            color: #0a5a2a;
+            margin-top: 12px;
+            border: 1px solid #b0e0c0;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .inline-icon {
+            font-size: 1.3rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-card" id="app">
+        <div class="header">
+            <h1>📞 Equity Call</h1>
+            <div class="badge">Simplified</div>
+        </div>
+
+        <div class="notice">
+            <span>⚖️</span>
+            <div><strong>Without prejudice · UCC 1-308</strong><br>All communications preserve your rights.</div>
+        </div>
+
+        <div class="info-line">
+            <span class="dot"></span>
+            <span style="font-weight: 600; color: #0e4f63;">Done already? Tell them:</span>
+            <span style="margin-left: auto; background: #0f6b7c; color: white; padding: 6px 14px; border-radius: 30px; font-size: 0.85rem; font-weight: 600;">“I have performed”</span>
+        </div>
+
+        <!-- STEP 1 — Opening and info (but simplified: key script always visible) -->
+        <div class="call-step">
+            <div class="step-label">
+                <div class="step-number">1</div>
+                <h2>Start with kindness</h2>
+            </div>
+            <div class="script-box">
+                “Well, thank you so much for calling. <strong>Who am I speaking with?</strong>”
+            </div>
+            <div class="script-box" style="background: #f4faff;">
+                “Do you have an <strong>employee ID number</strong>? What’s the <strong>company</strong> you work for? What’s your <strong>mailing address</strong>? May I have your <strong>supervisor’s name</strong>?”
+            </div>
+        </div>
+
+        <!-- STEP 2 — Equity performed (the big one) -->
+        <div class="call-step" style="background: #ecf9f0; border-color: #b8dfc5;">
+            <div class="step-label">
+                <div class="step-number" style="background: #1e7e34;">2</div>
+                <h2>Let them know you performed</h2>
+            </div>
+            <div class="script-box" style="background: white; border-color: #b8dfc5;">
+                “I have already <strong>performed the equity</strong> on this matter. Please <strong>send me the written presentment</strong> and I will honor it immediately.”
+            </div>
+            <div class="script-box" style="font-size: 1rem; background: #f7fff9; border-color: #cfe2d6;">
+                “Does your record reflect that I have <strong>accepted and returned all presentments</strong> for settlement and closure?”
+            </div>
+            <div style="font-size: 0.9rem; margin-top: 6px; color: #20603b; background: #dff3e5; padding: 10px 14px; border-radius: 40px; font-weight: 500;">
+                ✅ This stops repeated calls — you already performed equity.
+            </div>
+        </div>
+
+        <!-- STEP 3 — Ask for writing / mailing -->
+        <div class="call-step">
+            <div class="step-label">
+                <div class="step-number">3</div>
+                <h2>Request written presentment</h2>
+            </div>
+            <div class="script-box">
+                “Thank you. If you could <strong>put that in writing and mail it to me</strong>, I will honor it immediately once I receive it. Could you do that for me?”
+            </div>
+        </div>
+
+        <!-- STEP 4 — Close the call -->
+        <div class="call-step">
+            <div class="step-label">
+                <div class="step-number">4</div>
+                <h2>End gracefully</h2>
+            </div>
+            <div class="script-box">
+                “Thank you so much, you have a wonderful day.”
+            </div>
+        </div>
+
+        <!-- BUTTONS: self-executing log + copy script -->
+        <div class="action-buttons">
+            <button class="btn btn-large" id="performEquityBtn">
+                ✅  I HAVE PERFORMED EQUITY  ✅
+            </button>
+            <button class="btn btn-secondary" id="copyScriptBtn">
+                📋  Copy full script to clipboard
+            </button>
+            <button class="btn btn-secondary" id="markCallBtn">
+                📝  Log this call (timestamp)
+            </button>
+        </div>
+
+        <!-- Live confirmation / status area -->
+        <div id="statusPanel" style="margin-top: 6px;">
+            <!-- filled by JS -->
+        </div>
+
+        <div class="footer-note">
+            ⚖️ Equity · Without prejudice · UCC 1-308<br>
+            <span style="font-size:0.75rem;">This is a simplified tool. Speak calmly and kindly.</span>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // Data / last action
+            const statusPanel = document.getElementById('statusPanel');
+            const performBtn = document.getElementById('performEquityBtn');
+            const copyBtn = document.getElementById('copyScriptBtn');
+            const markBtn = document.getElementById('markCallBtn');
+
+            // The complete script (for copy)
+            const FULL_SCRIPT = `EQUITY CALL SCRIPT — SIMPLIFIED
+
+[OPENING]
+YOU (kindly): “Well, thank you so much for calling. Who am I speaking with?”
+YOU: “Do you have an employee ID number? What’s the company you work for? What’s your mailing address? May I have your supervisor’s name?”
+
+[KEY – ALREADY PERFORMED]
+YOU: “I have already performed the equity on this matter. Please send me the written presentment and I will honor it immediately.”
+YOU: “Does your record reflect that I have accepted and returned all presentments for settlement and closure?”
+
+[REQUEST WRITING]
+YOU: “Thank you. If you could put that in writing and mail it to me, I will honor it immediately once I receive it. Could you do that for me?”
+
+[CLOSING]
+YOU: “Thank you so much, you have a wonderful day.”
+
+— Without prejudice, UCC 1-308. All rights reserved.`;
+
+            // Helper: show status message
+            function showStatus(message, isSuccess = true) {
+                const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                statusPanel.innerHTML = `
+                    <div class="confirmation-msg">
+                        <span class="inline-icon">${isSuccess ? '✅' : '📌'}</span>
+                        <span><strong>${time}</strong> — ${message}</span>
+                    </div>
+                `;
+                // auto-hide after 6 seconds? let's keep it visible, but we can fade older.
+                // It's a single message; we'll keep it.
+            }
+
+            // Preload status with a gentle instruction
+            function setInitialStatus() {
+                statusPanel.innerHTML = `
+                    <div style="background: #e8f2f7; border-radius: 40px; padding: 14px; text-align: center; color: #1b5f73; font-weight: 500; font-size: 0.95rem;">
+                        ⚡ Tap “I HAVE PERFORMED EQUITY” before or during the call.
+                    </div>
+                `;
+            }
+
+            // I have performed equity — this is the main action.
+            performBtn.addEventListener('click', function() {
+                const now = new Date();
+                const timestamp = now.toLocaleString();
+                const logEntry = {
+                    action: 'PERFORMED_EQUITY',
+                    timestamp: timestamp,
+                    note: 'User confirmed equity has been performed. Written presentment requested.'
+                };
+
+                // Show immediate confirmation
+                showStatus('Equity performed — you are telling them: “I have already performed the equity. Send written presentment.”', true);
+
+                // Also update button text for visual feedback
+                performBtn.innerHTML = '✅  EQUITY PERFORMED  ✅';
+                performBtn.style.background = '#166a2b';
+                performBtn.style.boxShadow = '0 8px 16px -4px rgba(20, 90, 40, 0.4)';
+
+                // Save to localStorage (for record) — app is self-executing, no server.
+                try {
+                    let log = JSON.parse(localStorage.getItem('equityCallLog') || '[]');
+                    log.push(logEntry);
+                    localStorage.setItem('equityCallLog', JSON.stringify(log));
+                } catch (e) {
+                    // localStorage might be full or disabled; ignore gracefully
+                }
+
+                // Optional: vibrate if available
+                if (navigator.vibrate) navigator.vibrate(100);
+            });
+
+            // Copy script to clipboard
+            copyBtn.addEventListener('click', function() {
+                navigator.clipboard.writeText(FULL_SCRIPT).then(() => {
+                    showStatus('Script copied to clipboard — paste in notes or read from there.', true);
+                }).catch(() => {
+                    // fallback
+                    const textArea = document.createElement('textarea');
+                    textArea.value = FULL_SCRIPT;
+                    document.body.appendChild(textArea);
+                    textArea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    showStatus('Script copied (fallback).', true);
+                });
+            });
+
+            // Log this call (simple timestamp)
+            markBtn.addEventListener('click', function() {
+                const now = new Date();
+                const timeStr = now.toLocaleTimeString() + ' — ' + now.toLocaleDateString();
+                showStatus(`Call logged at ${timeStr}. Remember: you already performed equity.`, true);
+
+                try {
+                    let log = JSON.parse(localStorage.getItem('equityCallLog') || '[]');
+                    log.push({ action: 'CALL_LOGGED', timestamp: timeStr, note: 'Simple log from equity assistant' });
+                    localStorage.setItem('equityCallLog', JSON.stringify(log));
+                } catch (e) {}
+            });
+
+            // Set initial status on load
+            setInitialStatus();
+
+            // Optional: preload a log entry for page open? not necessary.
+
+            // Detect if on mobile and adjust a little.
+            if (/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+                document.querySelector('.app-card').style.padding = '20px 16px 24px';
+                performBtn.style.fontSize = '1.25rem';
+            }
+
+            // Ensure buttons are touch-friendly
+            // Additional: "Without prejudice" reminder if long press? no.
+
+            // Provide a very simple "reset" if needed? not required.
+
+            // Add a subtle visual pulse to the main button on load.
+            setTimeout(() => {
+                performBtn.style.transition = 'box-shadow 0.3s';
+                performBtn.style.boxShadow = '0 0 0 3px rgba(30,126,52,0.3), 0 12px 20px -8px rgba(30,126,52,0.4)';
+                setTimeout(() => {
+                    performBtn.style.boxShadow = '0 12px 20px -8px rgba(30,126,52,0.4)';
+                }, 600);
+            }, 400);
+
+            // Also if user has already performed in a previous session? We could show log? Not needed.
+        })();
+    </script>
+</body>
+</html>
