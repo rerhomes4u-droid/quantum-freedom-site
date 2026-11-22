@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0a0a0f">
+<title>Liberty Guard — Know Your Rights. Document Everything. Clean Your Record.</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  :root {
+    --bg:#0a0a0f; --surface:#12121a; --surface2:#1a1a26; --border:#2a2a3a;
+    --text:#e8e8f0; --muted:#8888a0; --accent:#3b82f6; --accent2:#2563eb;
+    --danger:#ef4444; --success:#22c55e; --warning:#f59e0b;
+  }
+  html,body { height:100%; }
+  body {
+    font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+    background:var(--bg); color:var(--text); line-height:1.5; overflow-x:hidden;
+    padding-bottom:80px;
+  }
+  header {
+    position:sticky; top:0; z-index:100;
+    background:linear-gradient(135deg,#0f0f18 0%,#1a1a2e 100%);
+    border-bottom:1px solid var(--border);
+    padding:12px 16px; display:flex; align-items:center; gap:12px; flex-wrap:wrap;
+  }
+  .logo { width:38px; height:38px; border-radius:10px;
+    background:linear-gradient(135deg,var(--accent),#8b5cf6);
+    display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; }
+  header h1 { font-size:16px; font-weight:700; }
+  header .sub { font-size:11px; color:var(--muted); }
+  .state-select {
+    margin-left:auto; background:var(--surface2); border:1px solid var(--border);
+    color:var(--text); padding:6px 10px; border-radius:8px; font-size:12px; font-family:inherit;
+    max-width:140px;
+  }
+  .panel { display:none; padding:16px; max-width:640px; margin:0 auto; animation:fadeIn .25s ease; }
+  .panel.active { display:block; }
+  @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+  .card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:16px; margin-bottom:12px; }
+  .card-title { font-size:14px; font-weight:700; margin-bottom:8px; display:flex; align-items:center; gap:8px; }
+  .card-body { font-size:13px; color:var(--muted); line-height:1.6; }
+  .card-body strong { color:var(--text); }
+  .btn { width:100%; padding:16px; border:none; border-radius:14px; font-size:15px; font-weight:700; cursor:pointer;
+    display:flex; align-items:center; justify-content:center; gap:10px; transition:transform .1s;
+    font-family:inherit; }
+  .btn:active { transform:scale(.97); }
+  .btn-primary { background:linear-gradient(135deg,var(--accent),var(--accent2)); color:#fff; }
+  .btn-danger { background:linear-gradient(135deg,#dc2626,#ef4444); color:#fff; }
+  .btn-success { background:linear-gradient(135deg,#16a34a,#22c55e); color:#fff; }
+  .btn-warning { background:linear-gradient(135deg,#d97706,#f59e0b); color:#fff; }
+  .btn-ghost { background:var(--surface2); color:var(--text); border:1px solid var(--border); }
+  .btn-sm { padding:11px 14px; font-size:13px; }
+  .record-zone { text-align:center; padding:20px 0; }
+  .record-btn { width:130px; height:130px; border-radius:50%; border:4px solid #ef4444;
+    background:radial-gradient(circle,#ef4444 0%,#991b1b 100%); color:#fff;
+    font-size:14px; font-weight:800; cursor:pointer; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; margin:0 auto; gap:4px;
+    box-shadow:0 0 0 0 rgba(239,68,68,.5), 0 8px 32px rgba(239,68,68,.3); transition:all .2s; }
+  .record-btn:active { transform:scale(.95); }
+  .record-btn.recording { animation:recPulse 1.5s infinite; border-color:#fff; }
+  @keyframes recPulse { 0%{box-shadow:0 0 0 0 rgba(239,68,68,.7)} 70%{box-shadow:0 0 0 24px rgba(239,68,68,0)} 100%{box-shadow:0 0 0 0 rgba(239,68,68,0)} }
+  .record-timer { font-size:30px; font-weight:800; font-variant-numeric:tabular-nums; margin:14px 0 6px; color:var(--danger); letter-spacing:2px; }
+  .notice-banner { background:#f59e0b15; border:1px solid #f59e0b44; color:#f59e0b; border-radius:10px; padding:10px 12px; font-size:12px; margin-top:12px; }
+  .log-item { background:var(--surface2); border-left:3px solid var(--accent); border-radius:8px; padding:10px 12px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; gap:10px; }
+  .log-item .time { font-size:11px; color:var(--muted); font-variant-numeric:tabular-nums; }
+  .log-item .label { font-size:13px; font-weight:600; }
+  .log-item .del { background:none; border:none; color:var(--danger); font-size:18px; cursor:pointer; padding:4px 8px; }
+  input, textarea, select { width:100%; background:var(--surface2); border:1px solid var(--border); border-radius:10px; padding:12px; color:var(--text); font-size:14px; font-family:inherit; margin-bottom:10px; }
+  input:focus, textarea:focus, select:focus { outline:none; border-color:var(--accent); }
+  textarea { resize:vertical; min-height:80px; }
+  label { font-size:12px; color:var(--muted); display:block; margin-bottom:4px; font-weight:600; }
+  .script-box { background:linear-gradient(135deg,#1e1e2e,#16161f); border:1px solid var(--accent); border-radius:12px; padding:14px; margin-bottom:10px; }
+  .script-text { font-size:14px; font-weight:600; line-height:1.6; margin-bottom:10px; }
+  .copy-btn { background:var(--accent); color:#fff; border:none; border-radius:8px; padding:8px 14px; font-size:12px; font-weight:700; cursor:pointer; font-family:inherit; }
+  .tabs { display:flex; gap:6px; margin-bottom:16px; overflow-x:auto; padding-bottom:4px; }
+  .tab { flex:1; min-width:80px; padding:10px; border-radius:10px; background:var(--surface2); border:1px solid var(--border); color:var(--muted); font-size:11px; font-weight:700; cursor:pointer; text-align:center; white-space:nowrap; font-family:inherit; }
+  .tab.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+  .check-item { display:flex; align-items:flex-start; gap:12px; padding:12px; background:var(--surface2); border-radius:10px; margin-bottom:8px; cursor:pointer; border:1px solid transparent; transition:all .15s; }
+  .check-item.done { border-color:var(--success); background:#22c55e10; }
+  .check-box { width:22px; height:22px; border-radius:6px; border:2px solid var(--border); flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:14px; color:var(--success); margin-top:1px; }
+  .check-item.done .check-box { border-color:var(--success); background:var(--success); color:#fff; }
+  .check-text { font-size:13px; line-height:1.5; }
+  .check-text strong { display:block; margin-bottom:2px; }
+  .check-text .desc { color:var(--muted); font-size:12px; }
+  .progress-bar { height:8px; background:var(--surface2); border-radius:4px; overflow:hidden; margin:8px 0 16px; }
+  .progress-fill { height:100%; background:linear-gradient(90deg,var(--accent),var(--success)); border-radius:4px; transition:width .4s ease; }
+  nav { position:fixed; bottom:0; left:0; right:0; z-index:100; background:var(--surface); border-top:1px solid var(--border); display:flex; padding:6px 4px calc(6px + env(safe-area-inset-bottom)); max-width:640px; margin:0 auto; }
+  .nav-btn { flex:1; background:none; border:none; color:var(--muted); font-size:10px; font-weight:700; cursor:pointer; padding:6px 2px; display:flex; flex-direction:column; align-items:center; gap:3px; font-family:inherit; }
+  .nav-btn .ico { font-size:20px; line-height:1; }
+  .nav-btn.active { color:var(--accent); }
+  .disclaimer { font-size:11px; color:var(--muted); line-height:1.6; background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:14px; margin-top:16px; }
+  .disclaimer strong { color:var(--warning); }
+  h2.section-title { font-size:18px; font-weight:800; margin-bottom:4px; }
+  p.section-sub { font-size:13px; color:var(--muted); margin-bottom:16px; }
+  .divider { height:1px; background:var(--border); margin:16px 0; }
+  .toast { position:fixed; bottom:90px; left:50%; transform:translateX(-50%); background:var(--success); color:#fff; padding:12px 20px; border-radius:12px; font-size:13px; font-weight:700; z-index:300; opacity:0; transition:opacity .3s; pointer-events:none; white-space:nowrap; }
+  .toast.show { opacity:1; }
+  .badge { display:inline-block; padding:3px 10px; border-radius:20px; font-size:10px; font-weight:800; text-transform:uppercase; }
+  .badge-blue { background:#3b82f622; color:var(--accent); }
+  .badge-green { background:#22c55e22; color:var(--success); }
+  .badge-warn { background:#f59e0b22; color:var(--warning); }
+  .state-note { font-size:11px; color:var(--warning); padding:8px 12px; background:#f59e0b10; border-radius:8px; margin-bottom:12px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🛡️</div>
+  <div>
+    <h1>Liberty Guard</h1>
+    <div class="sub">Document. Know. Clean.</div>
+  </div>
+  <select class="state-select" id="stateSelect" onchange="changeState(this.value)">
+    <option value="IL">Illinois</option>
+    <option value="CA">California</option>
+    <option value="TX">Texas</option>
+    <option value="FL">Florida</option>
+    <option value="NY">New York</option>
+    <option value="OTHER">Other State</option>
+  </select>
+</header>
+
+<!-- ==================== PANEL 1: ENCOUNTER ==================== -->
+<section class="panel active" id="panel-encounter">
+  <h2 class="section-title">Live Encounter</h2>
+  <p class="section-sub">Document everything. Comply with booking. Preserve your record.</p>
+
+  <div class="state-note" id="stateNote">📍 Illinois selected. Recording laws and expungement rules shown for IL.</div>
+
+  <div class="record-zone">
+    <button class="record-btn" id="recordBtn" onclick="toggleRecording()">
+      <span style="font-size:34px;">🎙️</span>
+      <span id="recordLabel">START</span>
+    </button>
+    <div class="record-timer" id="recordTimer">00:00:00</div>
+    <div style="font-size:12px;color:var(--muted)" id="recordStatus">Tap to begin open recording</div>
+  </div>
+
+  <div class="notice-banner">
+    ⚠️ <strong>Open recording only.</strong> You are recording openly with notice. Illinois law protects open recording of police performing public duties. Do not secretly record.
+  </div>
+
+  <div class="divider"></div>
+
+  <h3 style="font-size:14px;margin-bottom:10px;">⏱️ Timeline Log</h3>
+  <p style="font-size:12px;color:var(--muted);margin-bottom:10px;">Every timestamp matters. Log the seizure of your person.</p>
+
+  <div id="timelineList"></div>
+
+  <div style="display:flex;gap:8px;margin-top:10px;">
+    <select id="eventType" style="flex:1;margin:0;">
+      <option value="Traffic Stop">Traffic Stop</option>
+      <option value="Street Stop">Street Stop</option>
+      <option value="Arrest">Arrest</option>
+      <option value="Arrival at Station">Arrival at Station</option>
+      <option value="Booking / Fingerprints">Booking / Fingerprints</option>
+      <option value="Interrogation">Interrogation</option>
+      <option value="Magistrate / Judge">Magistrate / Judge</option>
+      <option value="Release">Release</option>
+      <option value="Other">Other</option>
+    </select>
+    <button class="btn btn-primary btn-sm" style="width:auto;padding:12px 18px;" onclick="addLog()">+ Log</button>
+  </div>
+
+  <div class="divider"></div>
+
+  <h3 style="font-size:14px;margin-bottom:10px;">📋 Officer Details</h3>
+  <input type="text" id="officerName" placeholder="Officer name(s)" oninput="save()">
+  <input type="text" id="badgeNum" placeholder="Badge / plate number(s)" oninput="save()">
+  <input type="text" id="agency" placeholder="Agency / department" oninput="save()">
+  <textarea id="encounterNotes" placeholder="What happened? Witnesses? Exact words used?" oninput="save()"></textarea>
+
+  <button class="btn btn-ghost" onclick="copyEncounterReport()">📄 Copy Full Encounter Report</button>
+
+  <div class="disclaimer">
+    <strong>Legal reality:</strong> Complying with fingerprinting and mugshots after a lawful arrest is not an admission of guilt, and refusing can lead to obstruction charges. Your protection is the <strong>timeline</strong> — especially time held before seeing a magistrate. The Supreme Court's 48-hour guideline (County of Riverside v. McLaughlin) is your benchmark.
+  </div>
+</section>
+
+<!-- ==================== PANEL 2: RIGHTS ==================== -->
+<section class="panel" id="panel-rights">
+  <h2 class="section-title">Know Your Rights</h2>
+  <p class="section-sub">Real rights. Real scripts. What the court will actually hear.</p>
+
+  <div class="tabs">
+    <button class="tab active" onclick="showRightsTab('scripts',this)">Scripts</button>
+    <button class="tab" onclick="showRightsTab('what',this)">Protected</button>
+    <button class="tab" onclick="showRightsTab('myths',this)">Myths</button>
+  </div>
+
+  <div id="rights-scripts">
+    <div class="script-box">
+      <div class="script-text">"I am invoking my right to remain silent. I want to speak to a lawyer."</div>
+      <button class="copy-btn" onclick="copyScript(this)">Copy</button>
+    </div>
+    <div class="script-box">
+      <div class="script-text">"I do not consent to a search of my person, vehicle, or property."</div>
+      <button class="copy-btn" onclick="copyScript(this)">Copy</button>
+    </div>
+    <div class="script-box">
+      <div class="script-text">"Am I being detained, or am I free to go?"</div>
+      <button class="copy-btn" onclick="copyScript(this)">Copy</button>
+    </div>
+    <div class="script-box">
+      <div class="script-text">"I am recording this encounter openly. This is my First Amendment right."</div>
+      <button class="copy-btn" onclick="copyScript(this)">Copy</button>
+    </div>
+    <div class="script-box">
+      <div class="script-text">"I will comply with booking procedures. I am not resisting. I am requesting a magistrate appearance without unnecessary delay."</div>
+      <button class="copy-btn" onclick="copyScript(this)">Copy</button>
+    </div>
+  </div>
+
+  <div id="rights-what" style="display:none;">
+    <div class="card">
+      <div class="card-title">🔒 Fourth Amendment</div>
+      <div class="card-body">Protects <strong>the people</strong> — your person, house, papers, and effects — against <strong>unreasonable seizures</strong>. Your body is a person. An arrest is a seizure. This is your shield.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">🗣️ First Amendment</div>
+      <div class="card-body">The right to <strong>record police in public</strong> is protected. Illinois law explicitly prohibits officers from hindering a person recording an officer performing public duties. Keep recording — do not physically interfere.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">⏳ Prompt Magistrate (Rule 5 / McLaughlin)</div>
+      <div class="card-body">You must be brought before a judge for a probable cause determination <strong>without unnecessary delay</strong>. The Supreme Court's benchmark: <strong>48 hours</strong>. Detention beyond that without a hearing can support a Fourth Amendment claim.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">⚖️ Fifth Amendment</div>
+      <div class="card-body"><strong>Right to remain silent.</strong> You must state it out loud: "I invoke my right to remain silent." Then stop talking. Ask for a lawyer.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">📜 Illinois Expungement</div>
+      <div class="card-body">If charges were <strong>dropped or dismissed</strong>, you are generally eligible for <strong>expungement with no waiting period</strong> under Illinois law (20 ILCS 2630/5.2). The arresting agency and State Police must destroy or return the records.</div>
+    </div>
+  </div>
+
+  <div id="rights-myths" style="display:none;">
+    <div class="card">
+      <div class="card-title" style="color:var(--danger);">❌ Myth: "I can refuse fingerprinting and mugshots."</div>
+      <div class="card-body">After a lawful arrest, booking procedures are standard. Courts treat fingerprinting as a minimal intrusion. Refusing can add <strong>obstruction charges</strong>. Compliance is not consent — you still challenge the arrest later.</div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:var(--danger);">❌ Myth: "48 hours means they must release me."</div>
+      <div class="card-body">48 hours is a <strong>benchmark</strong>, not an automatic release trigger. Detention beyond it without a probable cause hearing can support a claim — but it is not automatic false imprisonment.</div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:var(--danger);">❌ Myth: "State citizen / sovereign citizen status wins in court."</div>
+      <div class="card-body">Federal courts, including the Seventh Circuit (Illinois), have <strong>summarily rejected</strong> these arguments [citation:16][citation:30]. They will not protect you in a §1983 lawsuit. The Fourth Amendment's protection of <strong>"the people"</strong> and <strong>"persons"</strong> is your real ground.</div>
+    </div>
+    <div class="card">
+      <div class="card-title" style="color:var(--danger);">❌ Myth: "Expungement removes everything from the internet."</div>
+      <div class="card-body">Expungement cleans the <strong>legal record</strong>. It does <strong>not</strong> automatically remove news articles or mugshots from Google or private sites. You must pursue publisher removal separately.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== PANEL 3: CLEAN RECORD ==================== -->
+<section class="panel" id="panel-clean">
+  <h2 class="section-title">Clean Your Record</h2>
+  <p class="section-sub">Illinois expungement + online reputation repair.</p>
+
+  <div class="card">
+    <div class="card-title">📊 Your Progress</div>
+    <div class="progress-bar"><div class="progress-fill" id="cleanProgress" style="width:0%"></div></div>
+    <div style="font-size:12px;color:var(--muted)" id="cleanProgressText">0 of 8 steps complete</div>
+  </div>
+
+  <div id="expungeChecklist"></div>
+
+  <div class="divider"></div>
+
+  <h3 style="font-size:14px;margin-bottom:10px;">🌐 Online Reputation Repair</h3>
+
+  <div class="card">
+    <div class="card-title">📰 Publisher Removal Letter</div>
+    <div class="card-body">Send this to news outlets that published your arrest. Attach proof of expungement/dismissal.</div>
+    <button class="btn btn-primary btn-sm" style="margin-top:10px;" onclick="generatePublisherLetter()">Generate Letter</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🔍 Google Removal Request</div>
+    <div class="card-body">Google mirrors the source. If the source is updated or removed, request Google refresh its index. Use Google's "Remove Outdated Content" tool after the publisher updates.</div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📈 Outrank the Old Pages</div>
+    <div class="card-body">Create positive, accurate content: a LinkedIn profile, a personal site, professional profiles. Fresh, accurate content pushes old arrest pages down in search results over time.</div>
+  </div>
+</section>
+
+<!-- ==================== PANEL 4: §1983 ==================== -->
+<section class="panel" id="panel-1983">
+  <h2 class="section-title">§1983 Roadmap</h2>
+  <p class="section-sub">Your federal civil rights claim. Realistic. Organized.</p>
+
+  <div class="card">
+    <div class="card-title">⚖️ What §1983 Requires</div>
+    <div class="card-body">
+      To state a claim under <strong>42 U.S.C. §1983</strong>, you must allege:<br><br>
+      <strong>1.</strong> A person acted <strong>under color of state law</strong> (police officers qualify) [citation:1][citation:2].<br>
+      <strong>2.</strong> That conduct <strong>deprived you of a federal constitutional right</strong> (e.g., Fourth Amendment — unreasonable seizure / prolonged detention without probable cause hearing).
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title" style="color:var(--warning);">🛡️ Qualified Immunity — The Real Wall</div>
+    <div class="card-body">
+      Officers are shielded from liability unless they violated a <strong>clearly established</strong> constitutional right that a reasonable officer would have known [citation:11]. This is the biggest hurdle. Your timeline log — especially detention duration before magistrate — is your best evidence.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">⏰ Deadlines — Do Not Miss</div>
+    <div class="card-body">
+      <strong>Notice of Claim:</strong> Some jurisdictions require notice within 90–180 days.<br>
+      <strong>Statute of Limitations:</strong> For §1983, courts borrow the state's personal injury statute of limitations [citation:12]. In Illinois, that is <strong>2 years</strong>.<br><br>
+      Log the date of your arrest below. The app will track your window.
+    </div>
+    <label>Date of Arrest</label>
+    <input type="date" id="arrestDate" onchange="save(); updateDeadline();">
+    <div id="deadlineDisplay" style="font-size:12px;color:var(--warning);margin-top:8px;"></div>
+  </div>
+
+  <div class="divider"></div>
+
+  <h3 style="font-size:14px;margin-bottom:10px;">📁 Evidence Organizer</h3>
+  <p style="font-size:12px;color:var(--muted);margin-bottom:10px;">Collect this fast. Body camera footage can be overwritten in 90 days under Illinois law [citation:27].</p>
+
+  <div id="evidenceChecklist"></div>
+
+  <div class="disclaimer">
+    <strong>This is not legal advice.</strong> This app organizes facts and educates. It does not create an attorney-client relationship. For a §1983 claim, consult a licensed civil rights attorney in your jurisdiction. Bring your timeline log, officer details, and evidence checklist to the consultation.
+  </div>
+</section>
+
+<!-- ==================== NAV ==================== -->
+<nav>
+  <button class="nav-btn active" onclick="showPanel('encounter',this)"><span class="ico">🎙️</span>Encounter</button>
+  <button class="nav-btn" onclick="showPanel('rights',this)"><span class="ico">📖</span>Rights</button>
+  <button class="nav-btn" onclick="showPanel('clean',this)"><span class="ico">🧹</span>Clean Record</button>
+  <button class="nav-btn" onclick="showPanel('1983',this)"><span class="ico">⚖️</span>§1983</button>
+</nav>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ==================== STATE DATA (ARCHITECTURE) ====================
+// To add a state: add an entry here with the same keys.
+// Illinois is fully populated. Others are placeholders.
+const STATE_DATA = {
+  IL: {
+    name: 'Illinois',
+    recording: 'Illinois is a two-party consent state, but courts have held open recording of police performing public duties is protected. Do NOT record secretly.',
+    expungeEligible: 'Charges dropped or dismissed? You are generally eligible for expungement with no waiting period under 20 ILCS 2630/5.2.',
+    expungeSteps: [
+      { id:'e1', title:'Confirm eligibility', desc:'Charges dropped or dismissed? You generally qualify with no waiting period.' },
+      { id:'e2', title:'Obtain disposition / proof of dismissal', desc:'Certified copy from the circuit clerk showing the case was dropped or dismissed.' },
+      { id:'e3', title:'File expungement petition', desc:'File in the county where the arrest occurred. Illinois Courts provides approved statewide forms [citation:22].' },
+      { id:'e4', title:'Serve the State\'s Attorney and arresting agency', desc:'Proper service starts the clock. Keep proof of service.' },
+      { id:'e5', title:'Attend hearing (if required)', desc:'Many non-conviction expungements are granted without a hearing. Bring your disposition.' },
+      { id:'e6', title:'Obtain expungement order', desc:'Certified copies go to the arresting agency and Illinois State Police for destruction.' },
+      { id:'e7', title:'Verify destruction', desc:'Follow up with the arresting agency and ISP to confirm records were destroyed or returned.' },
+      { id:'e8', title:'Update online presence', desc:'Contact publishers, request Google refresh, build positive content.' }
+    ],
+    solYears: 2
+  },
+  CA: { name:'California', recording:'California is a two-party consent state. Open recording of police in public is generally protected, but consult local law.', expungeEligible:'Check California Penal Code § 851.8 for non-conviction arrest record relief.', expungeSteps:[], solYears:2 },
+  TX: { name:'Texas', recording:'Texas is a one-party consent state. You may record conversations you are a party to.', expungeEligible:'Texas expunction under Code of Criminal Procedure Art. 55.01 for arrests not resulting in conviction.', expungeSteps:[], solYears:2 },
+  FL: { name:'Florida', recording:'Florida is a two-party consent state. Open recording of police in public is generally protected.', expungeEligible:'Florida expunction/sealing under Fla. Stat. § 943.0585 and § 943.059.', expungeSteps:[], solYears:4 },
+  NY: { name:'New York', recording:'New York is a one-party consent state.', expungeEligible:'New York sealing under CPL § 160.50 for non-conviction dispositions.', expungeSteps:[], solYears:3 },
+  OTHER: { name:'Your State', recording:'Check your state\'s wiretap consent laws before recording. When in doubt, record openly with notice.', expungeEligible:'Search "[your state] expungement non-conviction" for your state\'s rules.', expungeSteps:[], solYears:2 }
+};
+
+let currentState = 'IL';
+let state = {
+  recording: false, recStart: 0, recTimer: null, logs: [],
+  expungeSteps: STATE_DATA.IL.expungeSteps,
+  evidenceSteps: [
+    { id:'v1', title:'Body camera footage request', desc:'Request in writing immediately. Illinois body cam footage may be destroyed after 90 days unless flagged [citation:27].' },
+    { id:'v2', title:'Dispatch / CAD logs', desc:'Request the 911 call and dispatch records. They show the initial report and timeline.' },
+    { id:'v3', title:'Arrest report / booking records', desc:'Request the full arrest report and booking sheet via FOIA.' },
+    { id:'v4', title:'Witness contacts', desc:'Names and phone numbers of anyone who saw the encounter.' },
+    { id:'v5', title:'Your timeline log', desc:'Export from the Encounter tab. This is your backbone.' },
+    { id:'v6', title:'Medical records (if injured)', desc:'Document any injuries from the encounter.' }
+  ]
+};
+
+// ==================== STORAGE ====================
+function save() {
+  try {
+    const data = {
+      currentState: currentState,
+      logs: state.logs,
+      officerName: document.getElementById('officerName')?.value || '',
+      badgeNum: document.getElementById('badgeNum')?.value || '',
+      agency: document.getElementById('agency')?.value || '',
+      encounterNotes: document.getElementById('encounterNotes')?.value || '',
+      arrestDate: document.getElementById('arrestDate')?.value || '',
+      expungeDone: state.expungeSteps.map(s => !!document.querySelector(`[data-exp="${s.id}"]`)?.classList.contains('done')),
+      evidenceDone: state.evidenceSteps.map(s => !!document.querySelector(`[data-evi="${s.id}"]`)?.classList.contains('done'))
+    };
+    localStorage.setItem('libertyGuard', JSON.stringify(data));
+  } catch(e) {}
+}
+
+function load() {
+  try {
+    const raw = localStorage.getItem('libertyGuard');
+    if (!raw) { renderAll(); return; }
+    const d = JSON.parse(raw);
+    currentState = d.currentState || 'IL';
+    document.getElementById('stateSelect').value = currentState;
+    state.logs = d.logs || [];
+    if (d.officerName) document.getElementById('officerName').value = d.officerName;
+    if (d.badgeNum) document.getElementById('badgeNum').value = d.badgeNum;
+    if (d.agency) document.getElementById('agency').value = d.agency;
+    if (d.encounterNotes) document.getElementById('encounterNotes').value = d.encounterNotes;
+    if (d.arrestDate) document.getElementById('arrestDate').value = d.arrestDate;
+    state.expungeSteps = STATE_DATA[currentState]?.expungeSteps || [];
+    renderAll(d.expungeDone, d.evidenceDone);
+    updateDeadline();
+    updateStateNote();
+  } catch(e) { renderAll(); }
+}
+
+function renderAll(expungeDone, evidenceDone) {
+  renderTimeline();
+  renderExpunge(expungeDone);
+  renderEvidence(evidenceDone);
+}
+
+function changeState(val) {
+  currentState = val;
+  state.expungeSteps = STATE_DATA[val]?.expungeSteps || [];
+  updateStateNote();
+  renderExpunge();
+  save();
+}
+
+function updateStateNote() {
+  const d = STATE_DATA[currentState] || STATE_DATA.OTHER;
+  document.getElementById('stateNote').textContent = '📍 ' + d.name + ' selected. ' + (d.expungeEligible || '');
+}
+
+function showPanel(name, btn) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function showRightsTab(tab, btn) {
+  document.querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  ['scripts','what','myths'].forEach(t => {
+    document.getElementById('rights-' + t).style.display = (t === tab) ? 'block' : 'none';
+  });
+}
+
+// ==================== RECORDING ====================
+function toggleRecording() {
+  const btn = document.getElementById('recordBtn');
+  const label = document.getElementById('recordLabel');
+  const status = document.getElementById('recordStatus');
+  const timer = document.getElementById('recordTimer');
+  if (!state.recording) {
+    state.recording = true; state.recStart = Date.now();
+    btn.classList.add('recording'); label.textContent = 'STOP';
+    status.innerHTML = '<span style="color:var(--danger);font-weight:700;">● RECORDING OPENLY</span> — This encounter is being recorded with notice.';
+    state.recTimer = setInterval(() => {
+      const el = Math.floor((Date.now() - state.recStart) / 1000);
+      const h = String(Math.floor(el/3600)).padStart(2,'0');
+      const m = String(Math.floor((el%3600)/60)).padStart(2,'0');
+      const s = String(el%60).padStart(2,'0');
+      timer.textContent = `${h}:${m}:${s}`;
+    }, 1000);
+    showToast('Recording started openly');
+  } else {
+    state.recording = false; clearInterval(state.recTimer);
+    btn.classList.remove('recording'); label.textContent = 'START';
+    status.textContent = 'Recording stopped. Timer reset.';
+    timer.textContent = '00:00:00';
+    showToast('Recording stopped');
+  }
+}
+
+// ==================== TIMELINE ====================
+function addLog() {
+  const type = document.getElementById('eventType').value;
+  state.logs.push({ type, time: new Date().toISOString() });
+  renderTimeline(); save();
+}
+
+function renderTimeline() {
+  const el = document.getElementById('timelineList');
+  if (!state.logs.length) { el.innerHTML = '<div style="font-size:12px;color:var(--muted);padding:8px;">No events logged yet.</div>'; return; }
+  el.innerHTML = state.logs.map((l,i) => {
+    const d = new Date(l.time);
+    const ts = d.toLocaleDateString() + ' ' + d.toLocaleTimeString();
+    return `<div class="log-item"><div><div class="label">${l.type}</div><div class="time">${ts}</div></div><button class="del" onclick="delLog(${i})">✕</button></div>`;
+  }).join('');
+}
+
+function delLog(i) { state.logs.splice(i,1); renderTimeline(); save(); }
+
+function copyEncounterReport() {
+  let r = 'ENCOUNTER REPORT — Liberty Guard\n=============================\n';
+  r += 'State: ' + STATE_DATA[currentState].name + '\n';
+  r += 'Officer: ' + (document.getElementById('officerName').value || 'N/A') + '\n';
+  r += 'Badge/Plate: ' + (document.getElementById('badgeNum').value || 'N/A') + '\n';
+  r += 'Agency: ' + (document.getElementById('agency').value || 'N/A') + '\n\n';
+  r += 'TIMELINE:\n';
+  state.logs.forEach(l => { r += '• ' + l.type + ' — ' + new Date(l.time).toLocaleString() + '\n'; });
+  r += '\nNOTES:\n' + (document.getElementById('encounterNotes').value || 'None') + '\n';
+  r += '\nGenerated: ' + new Date().toLocaleString();
+  copyText(r); showToast('Report copied to clipboard');
+}
+
+// ==================== EXPUNGEMENT ====================
+function renderExpunge(doneArr) {
+  const el = document.getElementById('expungeChecklist');
+  const steps = state.expungeSteps;
+  if (!steps.length) { el.innerHTML = '<div class="card"><div class="card-body">Expungement steps for ' + STATE_DATA[currentState].name + ' are not yet loaded. Search "[state] expungement non-conviction" for your state\'s process.</div></div>'; updateProgress(); return; }
+  el.innerHTML = steps.map((s,i) => `<div class="check-item ${doneArr?.[i]?'done':''}" data-exp="${s.id}" onclick="toggleCheck(this,'exp')"><div class="check-box">${doneArr?.[i]?'✓':''}</div><div class="check-text"><strong>${s.title}</strong><span class="desc">${s.desc}</span></div></div>`).join('');
+  updateProgress();
+}
+
+function toggleCheck(el, type) {
+  el.classList.toggle('done');
+  el.querySelector('.check-box').textContent = el.classList.contains('done') ? '✓' : '';
+  updateProgress(); save();
+}
+
+function updateProgress() {
+  const items = document.querySelectorAll('[data-exp]');
+  const done = document.querySelectorAll('[data-exp].done').length;
+  const pct = items.length ? Math.round((done/items.length)*100) : 0;
+  document.getElementById('cleanProgress').style.width = pct + '%';
+  document.getElementById('cleanProgressText').textContent = done + ' of ' + items.length + ' steps complete';
+}
+
+// ==================== EVIDENCE ====================
+function renderEvidence(doneArr) {
+  const el = document.getElementById('evidenceChecklist');
+  el.innerHTML = state.evidenceSteps.map((s,i) => `<div class="check-item ${doneArr?.[i]?'done':''}" data-evi="${s.id}" onclick="toggleCheck(this,'evi')"><div class="check-box">${doneArr?.[i]?'✓':''}</div><div class="check-text"><strong>${s.title}</strong><span class="desc">${s.desc}</span></div></div>`).join('');
+}
+
+// ==================== DEADLINES ====================
+function updateDeadline() {
+  const val = document.getElementById('arrestDate').value;
+  const el = document.getElementById('deadlineDisplay');
+  if (!val) { el.textContent = ''; return; }
+  const arrest = new Date(val);
+  const years = STATE_DATA[currentState]?.solYears || 2;
+  const sol = new Date(arrest); sol.setFullYear(sol.getFullYear() + years);
+  const days = Math.ceil((sol - Date.now()) / 86400000);
+  const status = days > 365 ? '✅' : days > 90 ? '⚠️' : '🔴';
+  el.innerHTML = `${status} Statute of limitations (${years} years, ${STATE_DATA[currentState].name}): <strong>${sol.toLocaleDateString()}</strong> — ${days > 0 ? days + ' days remaining' : 'EXPIRED'}`;
+}
+
+// ==================== PUBLISHER LETTER ====================
+function generatePublisherLetter() {
+  const letter = `[Your Name]
+[Your Address]
+[Date]
+
+[Publisher Name]
+[Publisher Address]
+
+RE: Request to Update/Remove Arrest Record — [Your Name]
+
+To the Editor:
+
+I am writing to request that you update or remove the article published on [date] regarding my arrest on [date of arrest].
+
+The charges against me were dropped/dismissed on [date]. I have obtained an expungement order from [county] County, Illinois, under 20 ILCS 2630/5.2. The legal record has been destroyed.
+
+The continued publication of my name, photograph, and arrest information is inaccurate and misleading. It does not reflect the disposition of the case.
+
+I request that you either:
+1. Remove the article and any associated mugshot from your website, OR
+2. Update the article to prominently state that all charges were dropped/dismissed and the record was expunged.
+
+Please confirm in writing within 14 days that you have taken action.
+
+Sincerely,
+[Your Name]
+[Phone] | [Email]
+
+Enclosure: Certified copy of expungement order`;
+  copyText(letter); showToast('Letter copied — fill in bracketed fields');
+}
+
+// ==================== UTILITIES ====================
+function copyScript(btn) { copyText(btn.parentElement.querySelector('.script-text').textContent.replace(/"/g,'')); showToast('Script copied'); }
+function copyText(t) {
+  navigator.clipboard?.writeText(t).catch(()=>{
+    const ta = document.createElement('textarea'); ta.value=t; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+  });
+}
+function showToast(msg) {
+  const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+// ==================== INIT ====================
+load();
+</script>
+</body>
+</html>
