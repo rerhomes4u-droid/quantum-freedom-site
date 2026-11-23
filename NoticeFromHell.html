@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Notice from Hell: A Deep Dive</title>
+<style>
+  :root{
+    --bg:#0d0d0f; --panel:#16161a; --panel2:#1d1d23; --ink:#e8e6e3; --muted:#9a978f;
+    --accent:#c9a227; --accent2:#e6c458; --danger:#e0563f; --ok:#4fae7a; --line:#2a2a31;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);
+    font-family:Georgia,'Times New Roman',serif;line-height:1.65}
+  header{position:sticky;top:0;z-index:20;background:rgba(13,13,15,.96);
+    border-bottom:1px solid var(--line);backdrop-filter:blur(6px)}
+  .wrap{max-width:980px;margin:0 auto;padding:0 20px}
+  .masthead{display:flex;align-items:baseline;justify-content:space-between;
+    padding:16px 0 10px;flex-wrap:wrap;gap:8px}
+  .masthead h1{font-size:1.35rem;margin:0;letter-spacing:.5px}
+  .masthead h1 span{color:var(--accent)}
+  .kicker{font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+  nav{display:flex;gap:4px;flex-wrap:wrap;padding-bottom:12px}
+  nav button{background:transparent;border:1px solid var(--line);color:var(--muted);
+    padding:8px 14px;font-family:inherit;font-size:.85rem;cursor:pointer;border-radius:3px;
+    letter-spacing:.03em;transition:.15s}
+  nav button:hover{color:var(--ink);border-color:#3a3a44}
+  nav button.active{background:var(--accent);color:#111;border-color:var(--accent);font-weight:bold}
+  main{padding:34px 0 80px}
+  section{display:none;animation:fade .25s ease}
+  section.active{display:block}
+  @keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+  h2{font-size:1.6rem;margin:0 0 6px;letter-spacing:.2px}
+  h3{font-size:1.15rem;margin:28px 0 8px;color:var(--accent2)}
+  p{margin:0 0 14px}
+  .lede{color:var(--muted);font-size:1.02rem;max-width:70ch}
+  .banner{border:1px solid var(--danger);background:rgba(224,86,63,.08);
+    padding:14px 16px;border-radius:4px;margin:18px 0;font-size:.9rem}
+  .banner strong{color:var(--danger)}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:5px;
+    padding:18px 20px;margin:16px 0}
+  .card h4{margin:0 0 6px;font-size:.78rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted)}
+  .claim{color:var(--ink);font-size:1.02rem}
+  .reality{color:#d8d4cc}
+  .reality strong{color:var(--ok)}
+  .cite{font-size:.82rem;color:var(--muted);font-style:italic;margin-top:6px}
+  .doc{white-space:pre-wrap;font-family:Georgia,serif;font-size:.95rem;
+    background:var(--panel);border:1px solid var(--line);border-radius:5px;
+    padding:22px 26px;max-height:70vh;overflow:auto;line-height:1.75}
+  .doc .label{font-family:'Courier New',monospace;font-size:.72rem;letter-spacing:.15em;
+    text-transform:uppercase;color:var(--muted);display:block;margin-bottom:12px}
+  .eq-note{font-size:.9rem;color:var(--muted);border-left:3px solid var(--accent);
+    padding:6px 14px;margin:14px 0;background:var(--panel2)}
+  textarea{width:100%;min-height:180px;background:var(--panel2);color:var(--ink);
+    border:1px solid var(--line);border-radius:4px;padding:12px;font-family:Georgia,serif;
+    font-size:.95rem;resize:vertical}
+  .btnrow{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+  .btn{background:var(--accent);color:#111;border:none;padding:10px 18px;font-family:inherit;
+    font-size:.9rem;font-weight:bold;border-radius:3px;cursor:pointer}
+  .btn.ghost{background:transparent;color:var(--muted);border:1px solid var(--line);font-weight:normal}
+  .btn:hover{opacity:.9}
+  .saved{color:var(--ok);font-size:.85rem;margin-top:10px}
+  .reader{position:sticky;bottom:0;z-index:15;background:var(--panel);
+    border-top:1px solid var(--line);padding:10px 0;margin-top:30px}
+  .reader .wrap{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .reader button{background:var(--panel2);border:1px solid var(--line);color:var(--ink);
+    padding:6px 12px;border-radius:3px;font-family:inherit;font-size:.82rem;cursor:pointer}
+  .reader button:hover{border-color:var(--accent)}
+  .reader label{font-size:.78rem;color:var(--muted);letter-spacing:.05em}
+  .reader input[type=range]{accent-color:var(--accent);width:120px}
+  .reader .status{font-size:.75rem;color:var(--muted);margin-left:auto}
+  footer{position:fixed;bottom:0;left:0;right:0;z-index:25;background:#000;
+    border-top:1px solid var(--danger);padding:6px 12px;text-align:center;
+    font-size:.72rem;color:#c8c4bc;letter-spacing:.02em}
+  footer strong{color:var(--danger)}
+  .toc{list-style:none;padding:0;margin:14px 0}
+  .toc li{margin:4px 0;font-size:.9rem;color:var(--muted)}
+  .toc li b{color:var(--accent2)}
+  @media(max-width:600px){
+    .doc{padding:16px;font-size:.9rem}
+    h2{font-size:1.3rem}
+    .reader .status{display:none}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="masthead">
+      <div>
+        <div class="kicker">A Deep Dive</div>
+        <h1>The Notice <span>from Hell</span></h1>
+      </div>
+      <div class="kicker">Forbidden knowledge people claim works. Here's our take.</div>
+    </div>
+    <nav id="nav">
+      <button data-tab="start" class="active">Start Here</button>
+      <button data-tab="doc">The Document</button>
+      <button data-tab="breakdown">Point by Point</button>
+      <button data-tab="equity">Equity</button>
+      <button data-tab="forum">Public Opinion</button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- START -->
+  <section id="start" class="active">
+    <h2>Start Here</h2>
+    <p class="lede">You've probably seen something like this circulating: a "notice" that promises to make criminal cases vanish, stop the IRS, and defeat CPS, all with a few paragraphs of pointed language. It is presented as forbidden knowledge, the cheat code the system doesn't want you to find.</p>
+    <div class="banner">
+      <strong>What this app is.</strong> A close reading of that document as it actually circulates, paired with what happens in real courtrooms when people file it. It is not a legal template. It is not legal advice. It is a study of a claim.
+    </div>
+    <p>We are not here to sneer at the people who share it. The anger behind the notice is real, and a lot of it is justified. The question this app asks is narrower and harder: <em>does the notice do what it says it does?</em></p>
+    <h3>How to use this</h3>
+    <ul class="toc">
+      <li><b>1. The Document</b> — read the text as it circulates, in full.</li>
+      <li><b>2. Point by Point</b> — every major claim, what the text says, and what courts have actually done with it.</li>
+      <li><b>3. Equity</b> — the conscience-pricking framework some teachers point to instead. Presented as rhetoric and spiritual practice, not legal remedy.</li>
+      <li><b>4. Public Opinion</b> — write your own story or analysis. Saved only in your browser. Not a legal filing.</li>
+    </ul>
+    <p style="color:var(--muted);font-size:.88rem">A reading tool is docked at the bottom of the screen. It reads the visible tab aloud.</p>
+  </section>
+
+  <!-- DOCUMENT -->
+  <section id="doc">
+    <h2>The Document</h2>
+    <p class="lede">This is the notice as it circulates online, reproduced faithfully from the text provided. Read it as an artifact: note its rhetoric, its certainty, its promise. The Point by Point tab takes it apart claim by claim.</p>
+    <div class="banner"><strong>Not a template.</strong> This is reproduced for study. Do not copy it into a court filing.</div>
+    <div class="doc" id="docText">
+<span class="label">Notice — as circulated</span>If you’re in jail, this will get you out of jail. If you’re on your way to jail, this will stop it. If the IRS is on your ass, this will slam their door on their face. If CPS is trying to steal your kids, this will stop them cold. If a judge thinks he can railroad you without a verified claim, this WILL flip the script.
+
+Grab your popcorn, folks — the emperor truly has no clothes. Are you ready for your freedom from government? You’re about to learn about a money-grabbing, society-controlling, governing-for-profit, unlawful scam that’s been plaguing America for far too long.
+
+You’ll never be the same after reading this. I guarantee it. The notice is found deep inside this article.
+
+You’re going to need to read the entire oracle in its entirety so you understand why and how to use this notice to hold a prosecutor accountable for his trespasses when filing false claims and criminal complaints into court against you.
+
+Your attorney was not taught this information in law school — and I mean statute-code school. If you share this with your attorney and he claims it’s patriot mythology, sovereign-citizen nonsense, something that’s never worked in court, free-man-on-the-land conspiracy, unsubstantiated legal theory — his flat answer is either spite, or complete and utter ignorance of the law.
+
+Warning to all prosecutors who insist on bringing false claims and criminal complaints against your fellow man on behalf of your imaginary friends — such as the City of Galveston versus John Q. Public for unlawful possession of whatever, or the State of Texas versus John Q. Public, or the United States versus John Q. Public for failure to file whatever, or any other agency such as the DEA, FBI, IRS, BLM — here’s how you keep them out of your business, permanently. Tell them: you’d better be able to cough up your imaginary friend the plaintiff to take the stand and verify his claims, or you’re going to be the witness on the stand as a defendant in a trespass claim for filing false claims against your fellow man.
+
+The State of Texas versus John Q. Public — the notice from hell. Update as of October 2, 2018: this very notice has made 83 cases vanish from PACER — gone without a trace, no paper trail, vanished into thin air. Actual screenshots from real people in the post this came out of verify the notice made their cases vanish. The comments on the Facebook page provide your proof.
+
+No one is forcing you to use this notice. If you feel it may benefit you, use it or don’t. If the notice didn’t work, I wouldn’t waste my time with this article. I would not share something like this if it was a failure and had not been proven to work.
+
+Continuing about your attorney — try not to hold it against him. He wasn’t trained in actual law, such as the common law this nation was founded upon and still operates under today. He was trained in codes and statutes, and there is a huge difference between actual law and statutory law as taught in law schools. Bar attorneys, prosecutors, and defenders are compensated to abide by codes, rules, regulations, and statutes found in the U.S. Code or state statutes. Those compensated people are government employees on a local, state, or federal level.
+
+When you read a statute that says “no person shall possess a fully suppressed automatic weapon without first obtaining a class three weapons permit,” or “no person shall openly carry a firearm without first obtaining a concealed carry permit,” pay very close attention to the words. That nasty little word “person” doesn’t mean what you think it means within their statutes. That word is code for federal employee. Federal employees are compensated to abide by those restrictive firearm statutes while they are on the clock receiving their government paycheck. You and I are not.
+
+It is actually against the attorney’s bar charter to represent anyone other than officers, employees, or elected officials of corporations such as the corporation known as the United States, or one of its sub-corporations such as the State of Texas, or one of its sub-corporations such as the City of Galveston. Ask him to show the footnote on Article Seven of the Bill of Rights, or the amendment to the Constitution that abolished Article 7 — the Seventh Amendment. Believe me, America is still a common-law nation, but your supposed government would rather you believe it is a code land like France.
+
+Don’t allow yourself to be fooled by this treasured attempt to govern you and your family under statutory law, which only applies to government employees being compensated to abide by those codes and statutes bound in the U.S. Code and state statutes.
+
+They have their laws in the U.S. Code and state statutes. We the people have our law: the common law, which is unwritten law. And here it is: do no harm. As in, you can do anything you damn well please, and you may own, buy, sell, or trade anything you damn well please on American soil, as long as you’re not harming your fellow man or his property. Only if you do harm to your fellow man or his property have you committed trespass upon your fellow man.
+
+You will never see the words “man” or “woman” within their codes. Government is instituted amongst men to protect and secure his rights and property, but government is not obligated to protect and secure the rights and property of “persons” or “individuals,” which are statutory words they created with their codes to define their own internal employees. They have hoodwinked the average man or woman into believing those codes actually apply to them.
+
+These people are master word-nerds, and you need to believe it.
+
+Also note: they have their Supreme Court — the Supreme Court of the United States. We the people have our Supreme Court: your local county courthouse, which is superior to their Supreme Court. No fact tried by a jury in that court shall be otherwise re-examined in any court of the United States, and that would include — wait, here he is in the back, he’s got it — the Supreme Court of the United States, which is the supreme court of government employees, not the average man or woman not holding a government job.
+
+Amendment Seven: “In suits at common law, where the value in controversy shall exceed twenty dollars, the right of trial by jury shall be preserved, and no fact tried by a jury shall be otherwise re-examined in any court of the United States, than according to the rules of the common law.”
+
+Attorneys would have you believe the law is difficult, that you need years of special training to understand it and to protect and secure your rights. The truth is it has been over-complicated. So let’s begin.
+
+Take a second and notice who the plaintiff is in the photo attached to this. The photo shows what a criminal complaint looks like — a claimant in the lower right-hand corner has brought a claim against a man on behalf of his imaginary friend who goes by the name the United States of America, claiming this man harmed his imaginary friend, who is not a living man. It is the prosecutor’s and the claimant’s imaginary friend.
+
+Do you really think a man named the United States of America, or the United States, or the State of Texas, or the City of Galveston, ran down and hired this claimant to file a complaint on his behalf, who then hired an attorney to file a criminal complaint against you? Of course not. They don’t like leaving paper trails. Once you’ve entered a notice like this into a prosecutor’s case, he knows he’s about to bear the full liability and be held accountable. That is what makes cases disappear from PACER in a little puff, like magic.
+
+Any time a prosecuting attorney brings charges against you for anything, pretending it’s a code or statute violation such as those found in U.S. Code and state statutes, he is operating under the presumption that you are one of the corporation’s own internal employees who has contractually obligated to abide by those internal statutes. They make billions of dollars every year from unsuspecting Americans because we don’t know the difference between a criminal complaint and an actual complaint.
+
+The Second Amendment isn’t under attack. You’ve simply never been taught the difference between statutes and actual law.
+
+If you’re not employed by that corporation — the IRS, the City of Galveston, the FBI, the BLM, the State of Texas, the United States — and being compensated to abide by that corporation’s internal rules, codes, statutes, and regulations, they simply do not apply to you. Slavery and involuntary servitude are against the law on American soil (Thirteenth Amendment), and no man may compel performance — force another man to abide by internal corporate statutes, duties, and obligations — without fairly and justly compensating that man for his performance. Employees assign to an employment contract to hold those government jobs and are compensated to abide by that corporation’s internal statutes. You and I are not, therefore they simply do not apply to us.
+
+Yes, it is a nationwide con, vanilla, going for years. It is how they control society under corporate statutes. It is how they interfere with your rights. It is how they make billions of dollars due to our ignorance of the law. It is how they incarcerate us for victimless crimes where there is no injured party.
+
+Any time a prosecutor brings forth a criminal complaint against you that reads “State of Texas versus John Q. Public, illegal possession of cannabis or marijuana and automatic weapons, etc.” — if he had an actual claim, it would read “Bob T. Jones the Second versus John Q. Public.” Bob is the prosecutor himself in his capacity as a man. He is filing a complaint on behalf of his imaginary friend that goes by the name State of Texas, but he has no verifiable claim, because nothing you may have done harmed him or his personal property. Let him produce his plaintiff, his imaginary friend, to point you out across the courtroom and say, “That guy sitting right over there — that’s the one that caused me harm by his failure to file an income tax return, or his failure to obtain a concealed carry permit, or his possession of cannabis oil.”
+
+You have a right to face your accuser under Amendment Six, to cross-examine him, and to avoid any case of mistaken identity. That is why you must require a prosecutor to cough up his imaginary friend to take the stand and verify his claims against you with his mouth in open court, pressing it upon the court with his voice. Only a living, breathing man can do that.
+
+The other reason to require the prosecutor to cough up his imaginary friend is so you’ll know exactly who to hold accountable should those claims turn out to be false or inaccurate. You want to know who bears liability for this matter should he be lying, and who you could file your own claim against should he be acting in dishonor by dragging you into court and wasting your time with a complaint that no living man can take the stand and verify — a complaint that could have landed you in prison that very day. Someone — a living man — has to bear liability if the claims turn out to be false or inaccurate. That someone’s name needs to be the actual plaintiff, not an imaginary one you’ll never be able to track down and hold accountable for his trespasses.
+
+The prosecutor conceals himself behind his worthless, toothless complaint because he’s the one who wrote it. A notary can certify she’s seen a piece of paper, but can she verify anything on that paper is actually true? Not unless she has personal, firsthand knowledge. You don’t care about his certified complaint. You want to see a verifiable claim so you know who’s going to be nailed to the cross when that claim turns out to be false — nothing more than an attempt to maliciously prosecute you to unjustly enrich himself and his imaginary friends.
+
+Remember, he’s only complaining because the government can’t bring forth actual claims against a man, because man created government. All they can do is complain. If you are not an employee of that agency who has been compensated to abide by the agency’s internal corporate codes and statutes, his complaints are causing you harm — harm to your good name in your community, deprivation of your property without due process of law, and a waste of your valuable time, money, and resources having to deal with a complaint that no one can take the stand and verify in open court.
+
+Therefore the prosecutor is filing false claims against his fellow man, and that is an unlawful act for which he certainly can be held accountable. If the prosecutor has a problem with you, then he needs to bring forth the claim on his own behalf — him as the actual plaintiff, not on behalf of his imaginary friend who is nowhere in sight. Someone has to bear all liability should the claims turn out to be false, and good luck tracking down his imaginary friend, who can’t even fog up a mirror.
+
+Use this notice in an existing case. Just replace “State of Texas” with “IRS,” “City of Galveston,” “Child Protective Services,” “United States,” etc., depending on whatever is going on with you. If there is no property involved and it’s just some prosecutor attempting to bring you up on a criminal complaint for anything, just take out the parts having to do with property.
+
+I may say it again: hand-write the notice on paper with pen, because you are a living, breathing man. Make copies. Enter a copy into the prosecutor’s case, not the original — doing so would be surrendering your property to the court. Keep that original so they cannot alter it in any way, shape, or form. The only body that may hold and verify the original would be a jury of your peers.
+
+You must be very vigilant in protecting your property, claims, and notices when dealing with these courts and prosecutors. If they can change or alter it in any way — change your claim into a complaint, something like that — they get themselves off the hook. Protect yourself: only enter a copy into the case, so they know you still possess the original. Should they trespass on your property by altering it in any way, shape, or form, court clerks are notorious for changing claims and complaints without your knowledge. Stay vigilant.
+
+Remember, America is still a common-law nation, as are Canada, England, Australia, and a few others. Common law is unwritten law. It is nowhere to be found in codes, statutes, rules, or regulations. Basically, you can do anything you damn well please as long as you’re not harming your fellow man or his property. And you have the right to face your accuser — see Article Six — and to settle with him on the private side before he goes public.
+
+If for some reason you do trespass on your fellow man or woman, beware of the bar shysters who say the Sixth Amendment only guarantees you the right to confront the witnesses against you, and says nothing about your accuser. Here is where common sense comes into play: would an accuser not also have witnessed the supposed crime?
+
+Therefore, if a prosecutor stating “the IRS” or “the State of Idaho” is the plaintiff, make that son of a bench put his plaintiff on the witness stand so you may cross-examine him and be compensated for any harm you may have caused him on his personal property — by your failure to file or pay tax forms, failure to obtain a concealed carry permit, failure to obtain a class three weapons tax stamp, possession of marijuana, or whatever. If he can’t produce the plaintiff, the plaintiff must appear. Then sue him for filing false claims against you and take his house or his retirement fund. Someone — a living man or woman — has to show up and bear the harm, injury, or loss.
+
+Are you ready? Here is the notice. Capitalization and punctuation mean everything. Pay attention to exactly what it says. Write it out exactly as it is. Don’t change anything because you’re smart and you think you’re crafty and you know you need to add something. It works. KISS — keep it simple, stupid.
+
+Here we go:
+
+NOTICE
+
+I, a man, require the State of Texas to show up in court, take the stand, and present me with photo ID — a driver’s license with his/her name “State of Texas” clearly printed on it, a current street address, and a clear photo of his/her face — to enter into the record, so I’ll know who to hold personally liable should the claims against me turn out to be false and/or inaccurate, and to verify his/her claim against me so I may cross-examine my accuser (Amendment Six). The accuser surely witnessed the supposed crime, and the plaintiff must appear and be compensated for any harm, injury, or loss I may have caused.
+
+If this man or woman that goes by the name “State of Texas” cannot show and verify his/her claim, I require this matter immediately discharged, as a court will have no jurisdiction to even hear the case, because there is apparently no controversy before this court. It is my belief there is no man or woman named “State of Texas” who can verify this claim by pointing me out across the room and uttering with his or her voice that I’ve done wrong or caused him or her personal harm, injury, or loss. Therefore, let it be precedented upon the record in open court that I’ve never even heard of this man or woman and don’t believe we ever crossed paths, to be quite honest.
+
+It is also my belief that someone is filing fruitless complaints and baseless claims on behalf of their imaginary friend known as the State of Texas in an attempt to unjustly enrich themselves, and to deprive me of my rights, liberty, and property without due process of law and without just compensation. If this matter is not immediately discharged prior to the first hearing, I will be requiring leave of court so I may bring forth an actual, proper, and verifiable claim before the court to address these trespasses against me in the proper venue, a court of record — trespasses being filing false claims, verity, extortion, malicious prosecution, unjust enrichment, fraud, theft, robbery, kidnapping, etc. — in which I will be requiring compensation for the trespasses, as well as compensation for wasting my valuable time, money, and resources having to deal with this complaint no living man can take the stand and verify.
+
+As I do not have time to answer complaints without compensation at this time, unless there is a verified claim before this court — and not a verified complaint — I will require compensation and a private bill to whoever is responsible for me having to take time off work to listen to the complaints. I charge $25,752.83 in U.S. dollars, Federal Reserve notes, or gold/silver coin, to show up and listen to complaints, and an additional $147.60 per minute I am standing there, balanced, due within 30 days of hearing. Failure to discharge this complaint is agreement to these terms and conditions.
+
+You have disrupted my life having to deal with this complaint you have filed on behalf of your imaginary friend, and I simply want to get on with my life. I am willing to forgive this trespass should you decide to act in honor and discharge this matter immediately.
+
+In the unforeseen event I have been unlawfully incarcerated due to this criminal complaint or a warrant issued due to this false claim, I will also be recording compensation of $1,000,500 per minute for every minute I have been or am incarcerated, from the very commencement of the crime until I be released.
+
+If there is an actual verifiable claim before the court, I will be more than happy to show up free of charge and address any proper and verifiable claim against me, and compensate any man I have harmed, injured, or caused loss.
+
+I also require and order the immediate restoration of my property, see Exhibit A, at one dollar per second from the commencement of the crime until my property be restored.
+
+_________________________
+Your name here
+
+For those of you new to common law, as well as you legal experts: read the comments below, especially the ones about the temptation to dazzle everyone with your legalistic bullshit by adding codes, statutes, and case law of any kind to the notice to give it more teeth, because you think it’s too simple and needs more added to it. If there is no robbery of property or kidnapping involved, just leave that out of the notice.
+
+Property is anything you enjoy exclusive rights to. If it’s a CPS case involving your children, use the word “property,” not “children.” The state has no control over your property, but it does have control over the words they created in their statutes — “child,” “infant,” “children,” “motor vehicle,” “marijuana,” “automatic weapon,” “firearms,” “land,” “homes,” “bicycles,” etc. You always use the word “property.” Exhibit A should be a photo of the property attached to the back of your notice; a photocopy is fine. Pricing for trespasses may be different than listed — if you feel it’s not enough or too much, change your amount to reflect your required compensation.
+
+One wife required the immediate restoration of her property, a child, and threatened to charge the state one dollar per second for every second the property was not restored, and the judge ordered the immediate restoration of the property. Once you claim your property, and no one can show up to court and verify a superior claim to that property, then the judge has to order the restoration of the property — where he himself now becomes an accessory to the crime against property after the fact, and now you can file a claim against him or her for that trespass.
+
+Bonus note: the government hates it when you use the pesky word “property” in your claims, because the government has no control over the property of man, but it does have control over the words they created within their own statutes — “child,” “firearms,” “automobiles,” whatever. Let them call it whatever they want to call it. You call it property. In the end, it’s property.
+
+Either someone can show up in person to claim it by pressing it upon the record in open court, or there is no case. The prosecutor cannot verify the claim because he has no firsthand knowledge, and nothing you may have done caused him harm, injury, or loss — not to himself or his personal property — and his imaginary friend cannot speak. It can’t even fog up a mirror. We all know by now that the plaintiff must appear and verify his/her claim, so that there is someone who can bear full liability should those claims turn out to be false or inaccurate.
+
+If the prosecutor has a problem with you, the prosecutor in his personal name is the plaintiff in a lawsuit — not his imaginary friend, who you will never be able to run down once you start filing your claims. Simply put, he is filing false claims against you to unjustly enrich himself, put you in a cage so they can rape your birth bond and fill their industrial prison complex with fresh souls for more state and federal bonding.
+
+This entity known as the State of Texas, the IRS, the United States, or whoever it is: you’re letting the man or woman prosecuting the case against you know that if they don’t discharge this nonsense before the next hearing, you’re going to stop the next hearing in its tracks by saying, “I require leave of court so I may bring forth a proper and verifiable claim against you for filing false claims against me, and I will be requiring compensation for the trespasses — and that compensation is not going to be cheap. And if a jury sees it, it may be you who is up in prison for trespasses instead of me.”
+
+Up to this point the prosecutor had no skin in the game. He wins or loses; he suffers no loss other than his time. But when you bring forth your own claim in your court against him, now he definitely has some skin in the game, and now he may very well lose a lot of money and/or get sentenced to prison himself for trespasses against his fellow man.
+
+Filing false claims is very serious business. Those clowns ruin a lot of people’s lives with their con of filing criminal complaints in courthouses that no living man can verify. But up until now we haven’t known how to hold them personally accountable for the trespasses, which makes the game a whole lot more interesting when you agree that now you have two players who may be held accountable instead of only one — just you. Now he has some kind of actual skin in the game, which is exactly how it should be.
+
+If anyone else went down to their local county courthouse and started filing bullshit complaints on behalf of their imaginary friend, they’d be locked up. Filing claims is serious business — filing false claims is real serious business.
+
+Remember, your claim supersedes his silly complaint. You can verify your claim, but he cannot verify the complaint. Court is no place for men to waste the court’s time and resources listening to men complain about other men. The prosecutor himself has no firsthand knowledge of anything unless he is the actual injured party in the suit, and nothing you may have done caused harm, injury, or loss to himself or his property, and he cannot produce his plaintiff, because there is no man named the State of Texas who can take the stand and verify the complaint either.
+
+The court is a place for a man to settle his claims, not his complaints.
+
+This is why so many police brutality cases get dismissed and people don’t get the remedy they rightfully deserve: they file complaints with the police department instead of following an actual claim against the cop for his trespasses — harassing you, assaulting you, kidnapping you, killing your pet, beating the shit out of you because you didn’t respect their authority — and dragging him into court in his private, personal capacity as a man for his trespasses. Just because you wear a badge does not give you the right to harm another man, and the “I was just doing my job” angle? Nobody was listening. They will, on the other hand, listen when you file an actual claim.
+
+There’s a huge difference between the two — for a reason. A complaint is nothing more than a prosecutor complaining about you or something.
+    </div>
+  </section>
+
+  <!-- BREAKDOWN -->
+  <section id="breakdown">
+    <h2>Point by Point</h2>
+    <p class="lede">Each card below states a claim the notice makes, then what actually happens when it meets a real court. The pattern is consistent: the argument has been tried, and it has failed.</p>
+
+    <div class="card">
+      <h4>Claim 01 — Statutes don't apply to non-employees</h4>
+      <p class="claim">“If you’re not employed by that corporation … they simply do not apply to you.”</p>
+      <p class="reality"><strong>What courts do:</strong> Reject it. Statutes apply to persons within the jurisdiction, not only to government employees. This is the core “sovereign citizen” premise, and it has been rejected in every federal circuit that has addressed it.</p>
+      <div class="cite">Courts have described the underlying theories as “incoherent,” “unintelligible,” and “patently frivolous.” A California federal court dismissed a suit built on these arguments with prejudice.</div>
+    </div>
+
+    <div class="card">
+      <h4>Claim 02 — “Person” means federal employee</h4>
+      <p class="claim">“That nasty little word ‘person’ … is actually code for federal employee.”</p>
+      <p class="reality"><strong>What courts do:</strong> Reject it. “Person” is defined by statute and interpreted by courts to include individuals, corporations, and other entities. No court has held that “person” in the U.S. Code means only federal employees.</p>
+      <div class="cite">This is a hallmark of pseudolaw: redefining ordinary legal terms to create a parallel legal universe.</div>
+    </div>
+
+    <div class="card">
+      <h4>Claim 03 — County court is superior to the Supreme Court</h4>
+      <p class="claim">“Your local county courthouse … is superior to their Supreme Court.”</p>
+      <p class="reality"><strong>What courts do:</strong> The Seventh Amendment protects jury findings from re-examination, but it does not make a county court superior to the Supreme Court. The Supreme Court is the final appellate authority in the federal system.</p>
+      <div class="cite">The notice reads the Seventh Amendment far beyond its text and settled precedent.</div>
+    </div>
+
+    <div class="card">
+      <h4>Claim 04 — 83 cases vanished from PACER</h4>
+      <p class="claim">“This very notice has made 83 cases vanish from PACER.”</p>
+      <p class="reality"><strong>What actually happens:</strong> No verifiable evidence exists. Cases are dismissed for ordinary reasons — lack of evidence, procedural defects, plea agreements — and the notice gets the credit. This is survivorship bias, not proof.</p>
+      <div class="cite">If a document could erase federal filings, it would be the most consequential legal discovery in American history. It isn’t.</div>
+    </div>
+
+    <div class="card">
+      <h4>Claim 05 — The plaintiff must appear and be cross-examined</h4>
+      <p class="claim">“Require the State of Texas to show up in court … present photo ID … verify his/her claim.”</p>
+      <p class="reality"><strong>What courts do:</strong> The Sixth Amendment guarantees confrontation of witnesses against you. It does not require the prosecuting entity to appear as a physical person. The State is represented by counsel, and that is legally sufficient.</p>
+      <div class="cite">Demanding that “the State” take the stand is treated as frivolous and can draw sanctions.</div>
+    </div>
+
+    <div class="card">
+      <h4>Claim 06 — Filing this notice creates liability for the prosecutor</h4>
+      <p class="claim">“He knows he’s about to bear the full liability … that is what makes cases disappear.”</p>
+      <p class="reality"><strong>What actually happens:</strong> Prosecutors have absolute immunity for acts within their prosecutorial function. Filing a notice does not strip that immunity. It does, however, put you on the record as making a frivolous filing.</p>
+      <div class="cite">Absolute prosecutorial immunity is longstanding Supreme Court doctrine.</div>
+    </div>
+
+    <div class="card">
+      <h4>Claim 07 — The fee schedule ($25,752.83 + $147.60/min)</h4>
+      <p class="claim">“I charge $25,752.83 … and an additional $147.60 per minute.”</p>
+      <p class="reality"><strong>What courts do:</strong> Ignore it. You cannot unilaterally bill a court or prosecutor into liability by writing a number on a document. No court has enforced these “fee schedules.”</p>
+      <div class="cite">Unilateral “contracts” imposed on government actors are not enforceable.</div>
+    </div>
+
+    <div class="card">
+      <h4>Claim 08 — Call it “property,” never “child”</h4>
+      <p class="claim">“The state has no control over your property … use the word ‘property,’ not ‘children.’”</p>
+      <p class="reality"><strong>What courts do:</strong> Children are not property. CPS cases are governed by child-welfare statutes, and courts apply the best-interests-of-the-child standard. Relabeling a child as “property” does not change the legal analysis and can harm your credibility in a custody proceeding.</p>
+      <div class="cite">This is one of the most dangerous claims in the document for parents facing CPS.</div>
+    </div>
+
+    <div class="card">
+      <h4>Claim 09 — Hand-write it, keep the original, file a copy</h4>
+      <p class="claim">“Hand-write the notice … enter a copy, not the original.”</p>
+      <p class="reality"><strong>What courts do:</strong> Courts have filing rules. A handwritten document with no legal basis is still a frivolous filing. Keeping the “original” confers no legal protection.</p>
+      <div class="cite">Procedure matters in court — but procedure cannot rescue a claim with no legal foundation.</div>
+    </div>
+
+    <div class="card">
+      <h4>Claim 10 — Common law means “do anything you please”</h4>
+      <p class="claim">“You can do anything you damn well please … as long as you’re not harming your fellow man.”</p>
+      <p class="reality"><strong>What courts do:</strong> Common law is judge-made law built from centuries of precedent — not a license for unlimited conduct. It coexists with statutes, which are also law. The notice’s version of “common law” is a fiction.</p>
+      <div class="cite">The “do no harm” formulation is a slogan, not a legal standard.</div>
+    </div>
+
+    <div class="banner" style="margin-top:26px">
+      <strong>The pattern.</strong> Each claim sounds like a key. Each one, tested in court, turns out to be a key that fits no lock. The notice’s power is rhetorical, not legal: it names a real grievance — unaccountable prosecutors, opaque procedure — and offers a fantasy of reversal.
+    </div>
+  </section>
+
+  <!-- EQUITY -->
+  <section id="equity">
+    <h2>Equity</h2>
+    <p class="lede">Some teachers point away from the notice and toward “equity” — a tradition of conscience, fairness, and moral suasion. It is worth understanding on its own terms. It is also not a legal cheat code, and this tab says so plainly.</p>
+
+    <div class="eq-note">This section presents equity as a rhetorical and spiritual framework. It is not legal advice, and no court has validated it as a method for defeating prosecution.</div>
+
+    <h3>What the equity tradition claims</h3>
+    <p>In the materials associated with Julian Swan and “Standing on the Rock,” equity is described as a practice of asking questions that prick the conscience — using “soft power that compels performance rather than the contention that causes people to resist.” The idea is that moral clarity, patience, and well-formed questions can move a person in authority to do what is right, where confrontation would only harden them.</p>
+
+    <h3>Why it resonates</h3>
+    <p>It resonates because it names something true: institutions often respond to moral pressure in ways they do not respond to legal technicality. A prosecutor who will not read your motion may still be moved by a victim’s family. A clerk who will not bend a rule may still be shamed by public attention. Equity, in this sense, is a real force in human affairs.</p>
+
+    <h3>Where the claim overreaches</h3>
+    <p>The overreach is the leap from “moral suasion can matter” to “this is an absolute way to win.” Courts decide cases on law and evidence. A conscience-pricking question is not a legal argument, and a judge who is not persuaded by it has not violated any rule. The equity tradition’s own teachers describe it as soft power, not as a remedy — and that distinction matters.</p>
+
+    <h3>What equity can honestly do</h3>
+    <p>It can help you speak clearly and humanely. It can help you preserve relationships that litigation destroys. It can help you tell your story in a way people remember. Those are real goods. They are not the same as a defense, and no one should walk into a courtroom believing they are.</p>
+
+    <div class="banner" style="margin-top:24px">
+      <strong>Honest bottom line.</strong> Equity is a moral and rhetorical practice with real value. It is not a substitute for legal counsel, and it has not been validated by any court as a way to defeat a prosecution.
+    </div>
+  </section>
+
+  <!-- FORUM -->
+  <section id="forum">
+    <h2>Court of Public Opinion</h2>
+    <p class="lede">Write your own story, analysis, or response. It is saved only in your browser — no server, no account, no transmission. This is a place to think in public, not a place to file.</p>
+    <div class="banner">
+      <strong>Not a legal filing.</strong> This text is stored locally in your browser only. It has no legal effect. Do not submit it to a court, a prosecutor, or an agency as a legal document.
+    </div>
+    <textarea id="forumText" placeholder="Write your analysis, your story, or your response to the notice…"></textarea>
+    <div class="btnrow">
+      <button class="btn" id="saveBtn">Save to this browser</button>
+      <button class="btn ghost" id="clearBtn">Clear</button>
+    </div>
+    <div class="saved" id="savedMsg"></div>
+  </section>
+
+</main>
+
+<div class="reader">
+  <div class="wrap">
+    <button id="playBtn">▶ Read aloud</button>
+    <button id="pauseBtn">⏸ Pause</button>
+    <button id="stopBtn">⏹ Stop</button>
+    <label for="rate">Speed</label>
+    <input type="range" id="rate" min="0.6" max="1.6" step="0.1" value="1">
+    <span class="status" id="readStatus">Ready</span>
+  </div>
+</div>
+
+<footer>
+  <strong>Not legal advice.</strong> This app is an educational close reading of a circulating document. It is not a template and has no legal effect. If you are in legal trouble, contact a licensed attorney or your public defender.
+</footer>
+
+<script>
+(function(){
+  // Tabs
+  var nav = document.getElementById('nav');
+  var sections = document.querySelectorAll('main section');
+  nav.addEventListener('click', function(e){
+    var btn = e.target.closest('button[data-tab]');
+    if(!btn) return;
+    var id = btn.getAttribute('data-tab');
+    nav.querySelectorAll('button').forEach(function(b){ b.classList.toggle('active', b===btn); });
+    sections.forEach(function(s){ s.classList.toggle('active', s.id===id); });
+    stopSpeech();
+    window.scrollTo({top:0, behavior:'smooth'});
+  });
+
+  // Forum storage
+  var ta = document.getElementById('forumText');
+  var savedMsg = document.getElementById('savedMsg');
+  var KEY = 'noticeFromHell.forum';
+  try { ta.value = localStorage.getItem(KEY) || ''; } catch(e){}
+  document.getElementById('saveBtn').addEventListener('click', function(){
+    try {
+      localStorage.setItem(KEY, ta.value);
+      savedMsg.textContent = 'Saved locally at ' + new Date().toLocaleTimeString() + '. This is not a legal filing.';
+    } catch(e){
+      savedMsg.textContent = 'Could not save (storage unavailable).';
+    }
+  });
+  document.getElementById('clearBtn').addEventListener('click', function(){
+    ta.value = '';
+    try { localStorage.removeItem(KEY); } catch(e){}
+    savedMsg.textContent = 'Cleared.';
+  });
+
+  // Speech synthesis
+  var synth = window.speechSynthesis;
+  var playBtn = document.getElementById('playBtn');
+  var pauseBtn = document.getElementById('pauseBtn');
+  var stopBtn = document.getElementById('stopBtn');
+  var rate = document.getElementById('rate');
+  var status = document.getElementById('readStatus');
+  var utter = null;
+
+  function visibleText(){
+    var active = document.querySelector('main section.active');
+    if(!active) return '';
+    return active.innerText || active.textContent || '';
+  }
+
+  function stopSpeech(){
+    if(synth){ synth.cancel(); }
+    utter = null;
+    status.textContent = 'Ready';
+    playBtn.textContent = '▶ Read aloud';
+  }
+
+  playBtn.addEventListener('click', function(){
+    if(!('speechSynthesis' in window)){
+      status.textContent = 'Speech not supported in this browser.';
+      return;
+    }
+    if(synth.speaking && !synth.paused){
+      synth.pause();
+      playBtn.textContent = '▶ Resume';
+      status.textContent = 'Paused';
+      return;
+    }
+    if(synth.paused){
+      synth.resume();
+      playBtn.textContent = '▶ Read aloud';
+      status.textContent = 'Reading…';
+      return;
+    }
+    var text = visibleText().trim();
+    if(!text){ status.textContent = 'Nothing to read.'; return; }
+    utter = new SpeechSynthesisUtterance(text);
+    utter.rate = parseFloat(rate.value) || 1;
+    utter.onend = function(){ status.textContent = 'Done'; playBtn.textContent = '▶ Read aloud'; };
+    utter.onerror = function(){ status.textContent = 'Stopped'; playBtn.textContent = '▶ Read aloud'; };
+    synth.speak(utter);
+    status.textContent = 'Reading…';
+  });
+
+  pauseBtn.addEventListener('click', function(){
+    if(synth && synth.speaking && !synth.paused){
+      synth.pause();
+      status.textContent = 'Paused';
+      playBtn.textContent = '▶ Resume';
+    }
+  });
+
+  stopBtn.addEventListener('click', function(){
+    stopSpeech();
+  });
+
+  rate.addEventListener('input', function(){
+    if(utter){ utter.rate = parseFloat(rate.value) || 1; }
+  });
+
+  window.addEventListener('beforeunload', function(){ if(synth) synth.cancel(); });
+})();
+</script>
+</body>
+</html>
